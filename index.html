@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlliedRNPrep - Navigate Nursing School</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS for animations and blob effect */
+        @keyframes fadeInFromBottom {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInFromBottom 0.8s ease-out forwards;
+          opacity: 0; /* Hidden by default */
+        }
+
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-1000 { animation-delay: 1s; }
+        .animation-delay-2000 { animation-delay: 2s; }
+
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+
+        .animate-blob {
+          animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-sans antialiased text-gray-800">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-lg py-4 relative z-10">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <!-- Logo/Site Name -->
+            <a href="#" class="text-3xl font-extrabold text-blue-700 rounded-lg p-2 hover:bg-blue-50 transition duration-300 transform hover:scale-105">
+                AlliedRNPrep
+            </a>
+            <!-- Navigation -->
+            <nav>
+                <ul class="flex space-x-8">
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Contact</a></li>
+                    <li><a href="#" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-bold transform hover:scale-105">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-24 md:py-36 overflow-hidden">
+        <!-- Background Blob/Shape for visual interest -->
+        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up">
+                Navigate Nursing School with AlliedRNPrep.
+            </h1>
+            <p class="text-xl md:text-2xl mb-10 max-w-4xl mx-auto opacity-95 animate-fade-in-up animation-delay-500">
+                Access supplementary study resources and materials to support your nursing education journey.
+            </p>
+            <button class="bg-white text-blue-700 px-10 py-5 rounded-full text-xl font-bold shadow-2xl hover:bg-gray-100 transform hover:scale-105 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
+                Start Your Journey Today
+            </button>
+        </div>
+    </section>
+
+    <!-- Semesters Section -->
+    <section class="py-20 md:py-32 bg-white relative z-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-800 animate-fade-in-up">
+                Your Structured Path to Support
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <!-- Semester One Card -->
+                <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
+                    <!-- Icon Placeholder -->
+                    <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester One</h3>
+                    <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supplementary resources for foundational concepts, basic patient care, and nursing principles.</p>
+                    <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">
+                        Start Studying
+                    </a>
+                </div>
+                <!-- Semester Two Card -->
+                <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
+                    <!-- Icon Placeholder -->
+                    <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Two</h3>
+                    <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Additional materials for intermediate clinical skills, pharmacology, and common health alterations.</p>
+                    <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">
+                        Start Studying
+                    </a>
+                </div>
+                <!-- Semester Three Card -->
+                <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
+                    <!-- Icon Placeholder -->
+                    <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Three</h3>
+                    <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
+                    <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">
+                        Start Studying
+                    </a>
+                </div>
+                <!-- Semester Four Card -->
+                <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
+                    <!-- Icon Placeholder -->
+                    <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Four</h3>
+                    <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Preparation aids for leadership, management, community health, and NCLEX study strategies.</p>
+                    <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">
+                        Start Studying
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About/Value Proposition Section -->
+    <section class="bg-gradient-to-r from-blue-50 to-gray-100 py-20 md:py-28">
+        <div class="container mx-auto px-4 text-center max-w-5xl">
+            <h2 class="text-4xl md:text-5xl font-bold text-blue-800 mb-8 animate-fade-in-up">
+                Why AlliedRNPrep Can Help You
+            </h2>
+            <p class="text-xl leading-relaxed text-gray-700 mb-12 animate-fade-in-up animation-delay-300">
+                AlliedRNPrep is a resource crafted by a nursing student to provide supplementary learning materials. Our platform offers comprehensive, up-to-date study aids, practice questions, and insights from a student perspective, aiming to support you in your nursing program and aid in your NCLEX preparation.
+            </p>
+            <button class="bg-blue-700 text-white px-8 py-4 rounded-full shadow-lg hover:bg-blue-800 transition duration-300 font-bold transform hover:scale-105">
+                Discover Our Story
+            </button>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="bg-blue-700 text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Enhance Your Nursing Studies?</h2>
+            <p class="text-lg md:text-xl mb-10 opacity-90">Join other nursing students who use AlliedRNPrep for their academic support.</p>
+            <button class="bg-white text-blue-700 px-8 py-4 rounded-full text-lg font-bold shadow-xl hover:bg-gray-100 transform hover:scale-105 transition duration-300 ease-in-out">
+                Explore Resources
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-900 text-gray-300 py-10">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <p class="text-sm mb-4 md:mb-0">&copy; <script>document.write(new Date().getFullYear())</script> AlliedRNPrep. All rights reserved.</p>
+            <div class="flex justify-center space-x-8">
+                <a href="#" class="hover:text-white text-sm transition duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-white text-sm transition duration-300">Terms of Service</a>
+                <a href="#" class="hover:text-white text-sm transition duration-300">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
