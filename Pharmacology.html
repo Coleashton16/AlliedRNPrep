@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQKB2E7CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-WQKB2E7CLH');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacology | Academic Portal</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Feather Icons for cleaner iconography -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* Base styles and custom utilities */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* A softer, cooler background */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom class for the active navigation link in the sidebar */
+        .nav-link-active {
+            background-color: #e0f2fe; /* light-sky-100 */
+            color: #0c4a6e; /* sky-900 */
+            font-weight: 600;
+        }
+        
+        /* Custom class for the main content sections to handle transitions */
+        .content-section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-200">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo and Site Title -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="flex items-center gap-3 text-xl font-bold text-slate-900">
+                        <div class="bg-sky-600 p-2 rounded-lg text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3c0-1.4-1.85-2.24-2.5-3Z"/><path d="m14.94 7.07c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3c-1.4 0-2.24 1.85-3 2.5Z"/></svg>
+                        </div>
+                        <span>PharmResources</span>
+                    </a>
+                </div>
+                <!-- Desktop Menu Links -->
+                <div class="hidden md:flex items-center space-x-2">
+                    <a href="index.html" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                    <a href="Calendar.html" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Calendar</a>
+                    <a href="AcademicSupportResourcesConsentAndTOS.html" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Support Docs</a>
+                    <a href="https://www.vsrep.org/anonymous-reporting-form" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5">
+                        <span>Complaints</span>
+                        <i data-feather="external-link" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <!-- Mobile Menu Button (for future use if a dropdown is needed) -->
+                <div class="md:hidden">
+                    <!-- A hamburger icon could go here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+
+            <!-- Left Sidebar Navigation -->
+            <aside class="md:col-span-3 lg:col-span-2">
+                <div class="sticky top-24">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Course Units</h3>
+                    <nav id="unit-navigation" class="flex flex-col space-y-1">
+                        <!-- Navigation links will be dynamically populated here -->
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Right Content Pane -->
+            <main class="md:col-span-9 lg:col-span-10">
+                
+                <!-- Page Header -->
+                <header class="relative bg-sky-600 p-8 md:p-10 rounded-2xl shadow-lg mb-8 overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-sky-500/50 rounded-full"></div>
+                    <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-sky-500/50 rounded-full"></div>
+                    <div class="relative z-10">
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Pharmacology Resources</h1>
+                        <p class="mt-3 max-w-3xl text-sky-100">Your comprehensive guide and practice platform for mastering pharmacology.</p>
+                    </div>
+                </header>
+
+                <!-- Content sections will be rendered here -->
+                <div id="content-container"></div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-8 py-6 border-t border-slate-200">
+        <p class="text-sm text-slate-500">&copy; 2024 Cole Ashton Valencia Student Representation. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- DATA STORE ---
+        const courseData = {
+            units: [
+                {
+                    id: 'unit-1',
+                    title: 'Unit 1: Fundamentals',
+                    subtitle: 'Core Concepts & Principles',
+                    resources: [
+                        { 
+                            title: 'Unit One Practice Exam',
+                            description: 'NCLEX-style questions covering fundamental pharmacology topics.',
+                            link: 'Pharmacology NCLEX Unit One Exam.html',
+                            type: 'exam',
+                            icon: 'file-text'
+                        }
+                    ]
+                },
+                {
+                    id: 'unit-2',
+                    title: 'Unit 2: Respiratory & Hormones',
+                    subtitle: 'Pharmacology for Respiratory and Endocrine Systems',
+                    resources: [
+                        { 
+                            title: 'Upper Respiratory Module',
+                            description: 'Learn about medications for upper respiratory conditions.',
+                            link: 'Pharmacology Upper Respiratory Learning Module.html',
+                            type: 'learn',
+                            icon: 'book-open'
+                        },
+                        { 
+                            title: 'Lower Respiratory Module',
+                            description: 'Explore drugs used to treat lower respiratory disorders.',
+                            link: 'Pharmacology Lower Respiratory Disorders Learning Module.html',
+                            type: 'learn',
+                            icon: 'wind'
+                        },
+                        { 
+                            title: 'Hormones Learning Module',
+                            description: 'An overview of hormone therapies and related medications.',
+                            link: 'Hormones Learning Module Pharmacology.html',
+                            type: 'learn',
+                            icon: 'zap'
+                        },
+                         { 
+                            title: 'Antidiabetics Module',
+                            description: 'In-depth module on medications used to manage diabetes.',
+                            link: 'Pharmacology Antidiabetics Learning Module.html',
+                            type: 'learn',
+                            icon: 'droplet'
+                        },
+                        { 
+                            title: 'Upper Respiratory SDE',
+                            description: 'Test your knowledge on upper respiratory medications.',
+                            link: 'Upper Respiratory Pharmacology SDE.html',
+                            type: 'exam',
+                            icon: 'clipboard'
+                        },
+                        { 
+                            title: 'Lower Respiratory SDE',
+                            description: 'Diagnostic exam for lower respiratory pharmacology.',
+                            link: 'Pharmacology Lower Respiratory Disorders SDE.html',
+                            type: 'exam',
+                            icon: 'activity'
+                        },
+                        { 
+                            title: 'Hormone/Glucose SDE',
+                            description: 'Assess your knowledge of endocrine and diabetic drugs.',
+                            link: 'Pharmacology Glucose and Hormones SDE.html',
+                            type: 'exam',
+                            icon: 'bar-chart-2'
+                        },
+                        { 
+                            title: 'Unit 2 Exam Simulation',
+                            description: 'A timed, comprehensive simulation of the Unit 2 exam.',
+                            link: 'Pharmacology Unit-2 Exam Simulation.html',
+                            type: 'final', // Using 'final' style for unit exams
+                            icon: 'clock'
+                        }
+                    ]
+                },
+                {
+                    id: 'unit-3',
+                    title: 'Unit 3: Systemic Medications',
+                    subtitle: 'Cardiac, Inflammatory, and Infectious Agents',
+                    resources: [
+                        { title: 'Cardiac Glycosides Module', description: 'Understanding digoxin and related medications.', link: 'Pharmacology Cardiac Glycosides Learning Module.html', type: 'learn', icon: 'heart' },
+                        { title: 'Diuretics Learning Module', description: 'Explore the different classes and uses of diuretics.', link: 'Pharmacology Dieuretics Learning Module.html', type: 'learn', icon: 'filter' },
+                        { title: 'Antihypertensives Module', description: 'Comprehensive guide to blood pressure medications.', link: 'Pharmacology Antihypertensives Learning Module.html', type: 'learn', icon: 'trending-down' },
+                        { title: 'Anticoagulants Module', description: 'Learn about drugs that affect blood clotting.', link: 'Chapter 43: Anticoagulants, Antiplatelets, and Thrombolytics.html', type: 'learn', icon: 'shield-off' },
+                        { title: 'Antihyperlipidemics Module', description: 'Medications used to manage high cholesterol.', link: 'Chapter 44: Antihyperlipidemics & Peripheral Blood Flow Drugs.html', type: 'learn', icon: 'bar-chart' },
+                        { title: 'Anti-inflammatory Module', description: 'Covering NSAIDs, corticosteroids, and more.', link: 'pharmacology anti-inflammatory learning module.html', type: 'learn', icon: 'shield' },
+                        { title: 'Analgesics Learning Module', description: 'Opioid and non-opioid pain management.', link: 'pharmacologyanalgesicslearningmodule.html', type: 'learn', icon: 'moon' },
+                        { title: 'Beta-Lactam Antibacterials', description: 'Penicillins, cephalosporins, and related antibiotics.', link: 'pharmbetalactimantibacterialslearningmodule.html', type: 'learn', icon: 'plus-square' },
+                        { title: 'Macrolides Module', description: 'A key class of antibiotics explained.', link: 'pharmmacrolideslearningmodule.html', type: 'learn', icon: 'disc' },
+                        { title: 'Sulfonamides & Nitroimidazoles', description: 'Learn about these specific antibacterial agents.', link: 'pharmsulfonamidesnitroimidazolesantibioticslearningmodule.html', type: 'learn', icon: 'package' },
+                        { title: 'Tetracyclines, Aminoglycosides & Fluoroquinolones', description: 'Modules on three major antibiotic classes.', link: 'pharmtetracyclinesaminosandfluorquinoloneslearningmodule.html', type: 'learn', icon: 'layers' },
+                        { title: 'Cardiac Glycosides SDE', description: 'Test your knowledge of these cardiac drugs.', link: 'pharmcardiacglycosidessde.html', type: 'exam', icon: 'activity' },
+                        { title: 'Diuretics SDE', description: 'Diagnostic exam on diuretic medications.', link: 'pharmdiureticssde.html', type: 'exam', icon: 'clipboard' },
+                        { title: 'Antihypertensives SDE', description: 'Assess your knowledge of BP medications.', link: 'pharmantihypertensivessde.html', type: 'exam', icon: 'activity' },
+                        { title: 'Anticoagulants SDE', description: 'Practice questions on blood thinners.', link: 'pharmanticoagssde.html', type: 'exam', icon: 'clipboard' },
+                        { title: 'Antihyperlipidemics SDE', description: 'Diagnostic exam for cholesterol drugs.', link: 'pharmantihyperlipidemicssde.html', type: 'exam', icon: 'activity' },
+                        { title: 'Anti-inflammatory & Analgesics SDE', description: 'Test on pain and inflammation drugs.', link: 'pharmacologyanti-inflammatoryanalgesicsSDE.html', type: 'exam', icon: 'clipboard' },
+                        { title: 'Unit 3 SDE', description: 'A comprehensive diagnostic for all Unit 3 meds.', link: 'pharmunit3medssde.html', type: 'exam', icon: 'file-text' },
+                        { title: 'Unit 3 Exam Simulation', description: 'A timed, comprehensive simulation of the Unit 3 exam.', link: 'pharmunit3examsimulation.html', type: 'final', icon: 'clock' }
+                    ]
+                },
+                {
+                    id: 'unit-final',
+                    title: 'Final Exam Prep',
+                    subtitle: 'Comprehensive Review',
+                    resources: [
+                        { 
+                            title: 'Final Exam Practice NCLEX',
+                            description: 'A full-length, comprehensive practice exam to prepare you for the final.',
+                            link: 'pharmacologyfinalexamsim.html',
+                            type: 'final',
+                            icon: 'award'
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- DYNAMIC RENDERING ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const navContainer = document.getElementById('unit-navigation');
+            const contentContainer = document.getElementById('content-container');
+
+            if (!navContainer || !contentContainer) {
+                console.error("Required containers not found.");
+                return;
+            }
+
+            const createResourceCard = (resource) => {
+                const typeStyles = {
+                    exam: { bg: 'bg-rose-50', border: 'border-rose-200', iconColor: 'text-rose-600', hover: 'hover:border-rose-400 hover:bg-rose-100' },
+                    learn: { bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-600', hover: 'hover:border-sky-400 hover:bg-sky-100' },
+                    final: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' }
+                };
+                const styles = typeStyles[resource.type] || typeStyles.learn;
+                return `
+                    <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="group block p-5 rounded-xl border-2 transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-lg ${styles.bg} ${styles.border} ${styles.hover}">
+                        <div class="flex items-start gap-4">
+                            <div class="p-2 rounded-lg ${styles.iconColor}"><i data-feather="${resource.icon}" class="w-6 h-6"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 group-hover:text-black">${resource.title}</h4>
+                                <p class="text-sm text-slate-600 mt-1">${resource.description}</p>
+                            </div>
+                        </div>
+                    </a>`;
+            };
+            
+            courseData.units.forEach((unit) => {
+                const navLink = document.createElement('a');
+                navLink.href = `#${unit.id}`;
+                navLink.dataset.target = unit.id;
+                navLink.className = 'nav-link text-slate-700 hover:bg-slate-200 px-3 py-2 rounded-md text-sm font-medium transition-colors';
+                navLink.innerHTML = `<span class="font-semibold">${unit.title.split(':')[0]}</span>: ${unit.title.split(':')[1] || 'Overview'}`;
+                navContainer.appendChild(navLink);
+
+                const section = document.createElement('section');
+                section.id = unit.id;
+                section.className = 'content-section';
+                
+                let contentHTML = `<div class="mb-6"><h2 class="text-2xl font-bold text-slate-900">${unit.title}</h2><p class="text-slate-500">${unit.subtitle}</p></div>`;
+
+                if (unit.resources.length > 0) {
+                    const learningModules = unit.resources.filter(r => r.type === 'learn');
+                    const exams = unit.resources.filter(r => r.type === 'exam');
+                    const finalExams = unit.resources.filter(r => r.type === 'final');
+                    let resourcesHTML = '';
+
+                    const createSection = (title, icon, items) => {
+                        if (items.length === 0) return '';
+                        const iconColor = { 'Learning Modules': 'text-sky-600', 'Diagnostic Exams': 'text-rose-600', 'Unit Exams & Finals': 'text-indigo-600' }[title] || 'text-slate-600';
+                        return `
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
+                                    <i data-feather="${icon}" class="w-5 h-5 ${iconColor}"></i><span>${title}</span>
+                                </h3>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">${items.map(createResourceCard).join('')}</div>
+                            </div>`;
+                    };
+                    
+                    resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
+                    resourcesHTML += createSection('Diagnostic Exams', 'clipboard', exams);
+                    resourcesHTML += createSection('Unit Exams & Finals', 'award', finalExams);
+                    
+                    contentHTML += resourcesHTML;
+                } else {
+                    contentHTML += `
+                        <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
+                            <i data-feather="folder" class="w-12 h-12 mx-auto text-slate-400"></i>
+                            <h3 class="mt-4 text-lg font-semibold text-slate-700">No Resources Available Yet</h3>
+                            <p class="mt-1 text-slate-500">Please check back later for materials related to this unit.</p>
+                        </div>`;
+                }
+                section.innerHTML = contentHTML;
+                contentContainer.appendChild(section);
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            const switchTab = (targetId) => {
+                navLinks.forEach(link => link.classList.toggle('nav-link-active', link.dataset.target === targetId));
+                contentSections.forEach(section => section.classList.toggle('active', section.id === targetId));
+                feather.replace();
+            };
+
+            navContainer.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (link) {
+                    e.preventDefault();
+                    const targetId = link.dataset.target;
+                    history.pushState(null, null, `#${targetId}`);
+                    switchTab(targetId);
+                }
+            });
+
+            const initialTab = window.location.hash.substring(1) || courseData.units[0].id;
+            switchTab(initialTab);
+        });
+    </script>
+</body>
+</html>
