@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inflammation Learning Module</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                    },
+                },
+            },
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // Mock authentication for demonstration purposes.
+        // In a real application, you would integrate with Firebase Auth or similar.
+        const mockAuth = {
+            onAuthStateChanged: (callback) => {
+                // Simulate a slight delay for auth state to be "ready"
+                setTimeout(() => callback({ uid: 'inflammation-user' }), 100);
+                return () => {}; // Return an unsubscribe function
+            },
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'inflammation-user' } }),
+        };
+
+        // Centralized content data for all learning modules
+        const contentData = {
+            'inflammation-core-concepts': {
+                title: 'Inflammation: Core Concepts',
+                color: 'from-sky-500 to-cyan-400',
+                description: 'Understand the fundamental definition, scope, and normal physiological processes of inflammation.',
+                steps: [
+                    { id: 'inflammation-definition', title: 'Definition', type: 'text', content: `The word "inflammation" comes from the Latin <em>inflammare</em>, meaning "to set on fire." Simply put, <strong>inflammation is your body's immune defense against injury, infection, or allergic reactions.</strong> The CDC describes it as "the body’s reaction to injury, irritation, or infection characterized by redness, swelling, warmth, and/or pain; caused by accumulation of immune cells and substances around the injury or infection." It’s a protective process designed to minimize harm from a trigger, remove it, and help healing. While infection always involves inflammation, inflammation can happen without an infection. Inflammation is how your body responds to damage, not the cause of the damage itself (like an infection would be). The process is quite similar regardless of what caused the cell injury, but the intensity varies based on how severe the injury is and the individual's overall health.` },
+                    { id: 'inflammation-scope', title: 'Scope', type: 'text', content: `Inflammation can range from no inflammation at all to active inflammation. Active inflammation is categorized as <strong>acute, chronic, or reparative/restorative</strong>. It can also be localized (in one spot) or systemic (affecting the whole body).<br><br>Injuries that trigger inflammation can come from many sources: physical harm (like cuts, splinters, or crushing injuries), burns (thermal, electrical, chemical), radiation damage, or biological attacks (from viruses, bacteria, or fungi). <strong>Acute inflammation</strong> is the immediate response to tissue damage, lasting a short time (minutes to a few days). Its job is to get rid of the harmful cause and start the repair process. If inflammation continues for a long time (weeks to years) after the initial injury, it's called <strong>chronic inflammation</strong>. In this case, tissue is repeatedly damaged and repaired, which can hinder proper healing. Localized chronic inflammation can lead to a granuloma, which is a collection of immune cells, fibroblasts, and collagen, as seen in untreated tuberculosis. Systemic chronic inflammation can be a result of many diseases, including autoimmune conditions like ulcerative colitis (UC) and Crohn disease. Chronic inflammation can be a complication of the inflammatory process itself or a consequence of other diseases, such as rheumatoid arthritis.` },
+                    { id: 'inflammation-physiologic-process', title: 'Normal Physiologic Process', type: 'text', content: `Inflammation is often directly linked to your immune system. Both work together to protect your body. The inflammatory process has two main goals for a positive outcome: (1) to restore normal cell function after injury, or (2) to create fibrous repair if normal cells can't be restored.<br><br>This process involves white blood cells (WBCs) and various chemicals that shield your body from invading germs or tissue damage. WBCs are drawn to inflamed areas through a complex process called <strong>chemotaxis</strong>, which involves many chemicals. These chemicals are released by triggers that fall into four main groups: (1) toxins from bacteria or viruses, (2) by-products from inflammation itself, (3) activated proteins from the complement system, and (4) substances from blood clotting in the inflamed area.<br><br><strong>Proinflammatory hormones</strong> are key players in the inflammatory response. They help make the response effective. The three main groups of these hormones are prostaglandins, cytokines, and histamines. Generally, these hormones increase blood flow to the injured area, make blood vessels leakier (increase vascular membrane permeability), activate parts of the immune system (like the complement system), attract WBCs to the injury, promote new blood vessel growth (angiogenesis), stimulate connective tissue growth, and cause fever. Here are some specific actions of these mediators:<br><br><strong>Prostaglandins & Leukotrienes:</strong> These come from cell membranes (like mast cells). They play a role in the later stages of acute inflammation, increasing blood vessel widening (vasodilation) and leakiness. They are also active in severe allergic reactions.<br><strong>Bradykinins:</strong> These are plasma proteins that increase blood vessel leakiness and widening, and are responsible for causing pain.<br><strong>Complement proteins:</strong> Mainly from proteins C3a, C4a, and C5a (from macrophages and liver). They attract neutrophils and macrophages, and tell mast cells and basophils to release histamine and other chemicals. This leads to more blood flow, leakier vessels, and plasma proteins leaking into surrounding tissues.<br><strong>Histamine & Serotonin:</strong> Released by mast cells and basophils. They are involved in the early acute inflammatory response, increasing blood vessel widening and leakiness.<br><strong>IL1 (Interleukin 1):</strong> Produced by macrophages, neutrophils, and other immune cells. It helps T lymphocytes multiply and specialize, promotes the release of acute-phase inflammatory proteins, helps neutrophils stick to blood vessel walls, and contributes to fever.<br><strong>IL8 (Interleukin 8):</strong> From T lymphocytes and monocytes/macrophages. It acts as a chemical signal (chemotactic factor) to attract neutrophils and T lymphocytes.<br><strong>IL17 (Interleukin 17):</strong> From Helper T lymphocytes. It increases the attraction of neutrophils and macrophages and boosts chemokine production in epithelial cells.<br><strong>Platelet-activating factor:</strong> From platelets. It encourages the release of chemical mediators, promotes blood vessel widening and increased leakiness, and activates neutrophils.<br><strong>Transforming growth factor-β:</strong> From T lymphocytes, activated macrophages, and fibroblasts. It slows down T and B lymphocyte activity, attracts macrophages, increases macrophage IL1 production, and can inhibit macrophages.<br><strong>TNF-α (Tumor Necrosis Factor alpha):</strong> From activated macrophages and some lymphocytes. It promotes cell growth, increases phagocytosis (cell eating), increases WBC count, causes fever, helps neutrophils stick to blood vessel walls, and can be toxic to some tumor cells.` },
+                    { id: 'core-concepts-quiz', title: 'Core Concepts Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which of the following is NOT a primary function of inflammation?", options: ["To promote healing", "To eradicate harmful stimuli", "To cause infection", "To initiate repair"], correctAnswer: "To cause infection" },
+                        { question: "What is the term for the process by which white blood cells are attracted to an area of inflammation?", options: ["Phagocytosis", "Vasodilation", "Chemotaxis", "Opsonization"], correctAnswer: "Chemotaxis" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-acute-response': {
+                title: 'Inflammation: Acute Response',
+                color: 'from-red-500 to-orange-400',
+                description: 'Detailed steps and cellular involvement in the body\'s immediate inflammatory reaction.',
+                steps: [
+                    { id: 'acute-inflammation-process', title: 'Acute Inflammation Process', type: 'text', content: `The processes involved in acute inflammation are complex but happen in a specific order. Here are the main steps in an acute inflammatory response:<br><br>1. <strong>Tissue Injury:</strong> Damage or death of tissue occurs, releasing chemical signals.<br>2. <strong>Blood Vessel Widening:</strong> Small blood vessels around the injury expand (vasodilation), increasing blood flow to the area.<br>3. <strong>Swelling Begins:</strong> Endothelial cells (lining blood vessels) swell and slightly pull apart.<br>4. <strong>Increased Leakiness:</strong> Blood vessels become more permeable, allowing water, salts, fibrinogen (which becomes fibrin), and other small proteins from the plasma to leak into the surrounding tissue.<br>5. <strong>"Walling Off":</strong> The inflamed area is "walled off" from surrounding healthy tissues. This helps to slow down the spread of germs and their toxic products.<br>6. <strong>WBC Migration:</strong> White blood cells like neutrophils, monocytes, lymphocytes, and macrophages move to the blood vessel walls and then out into the injured area. Neutrophils can stick to the vessel walls because the endothelial cells become more adhesive.<br>7. <strong>Exudate Formation:</strong> Fluid (exudates) leaks out of the blood vessels and fills the spaces left by damaged, dead tissue.<br>8. <strong>Nutrient Delivery:</strong> Glucose and oxygen are brought to the area to help remove dead tissue and support cell repair.<br>9. <strong>Chemical Release:</strong> Activated endothelial cells release various chemicals like nitric oxide, prostacyclin, endothelin, thromboxane A2, angiotensin II, growth factor, and chemokines.` },
+                    { id: 'neutrophils-phagocytosis', title: 'Neutrophils & Phagocytosis', type: 'text', content: `<strong>Neutrophils are key players in acute inflammation.</strong> Their movement is guided by chemical signals (chemotactic factors) from the damaged tissue. When these factors bind to neutrophils, the neutrophils release more substances that break down pathogens using enzymes from their lysosomes. Neutrophils also directly engulf and destroy pathogens (phagocytosis) after the pathogens have been "marked" by antibodies or complement proteins (a process called opsonization). During phagocytosis, neutrophils and macrophages produce <strong>reactive oxygen species (ROS)</strong>, which combine with lysosomes to help kill invading germs.<br><br>Within a few hours of severe acute inflammation, neutrophil counts in the blood can increase four to five times. This makes more neutrophils available to continue the inflammatory response. Neutrophils are the main type of WBC found in the fluid (exudate) produced during an acute inflammatory response to bacterial infections. Immature neutrophils, called <strong>band cells</strong>, may also appear in the blood to boost the neutrophil numbers needed for a severe response. The bone marrow also significantly increases the production of granulocytes and monocytes, though it takes 3 to 4 days for these cells to mature and leave the bone marrow.` },
+                    { id: 'other-wbcs-acute', title: 'Other WBCs in Acute Response', type: 'text', content: `<strong>Lymphocytes</strong> are most prominent when the body is fighting viral infections. They also play an important role in chronic inflammation alongside monocytes and macrophages. <strong>Eosinophils</strong> are most noticeable in inflammatory responses to parasitic infections and allergic reactions. <strong>Mast cells and basophils</strong> release histamine, which contributes to the increased leakiness of blood vessels seen during inflammation.<br><br>An acute inflammatory response can last from minutes to days, with most of the activity happening within the first 12 to 24 hours after tissue injury. This response can be localized (in one area) or systemic (affecting the whole body). Localized inflammation starts when damaged tissue or invading organisms activate the immune system. Complement system proteins and cytokines then trigger a chain of events that lead to the classic signs and symptoms of inflammation. Autoimmune reactions can cause systemic inflammation when the body's own cells are attacked. In most people, the inflammatory response may last up to 5 days, during which invading pathogens are destroyed, foreign substances and dead tissue are cleared (phagocytized), and fibroblasts begin the process of tissue healing.` },
+                    { id: 'acute-response-quiz', title: 'Acute Response Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which type of white blood cell is primarily involved in the early stages of an acute bacterial inflammatory response?", options: ["Lymphocytes", "Eosinophils", "Neutrophils", "Macrophages"], correctAnswer: "Neutrophils" },
+                        { question: "What is the term for immature neutrophils that may be present in the blood during a severe acute inflammatory response?", options: ["Basophils", "Band cells", "Monocytes", "Mast cells"], correctAnswer: "Band cells" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-chronic-systemic': {
+                title: 'Inflammation: Chronic & Systemic',
+                color: 'from-blue-400 to-indigo-600',
+                description: 'Explore the characteristics of chronic inflammation and its systemic effects, including age-related differences.',
+                steps: [
+                    { id: 'chronic-inflammation', title: 'Chronic Inflammation', type: 'text', content: `<strong>Macrophages are essential in a chronic inflammatory response.</strong> They release substances that help with blood clotting (hemostasis) and promote the activity of fibroblasts, which are cells involved in tissue repair. Macrophages are crucial for clearing away dead tissue and foreign material from the injured area (debridement), which allows for proper repair and healing. Most white blood cells (WBCs) found in the fluid (exudate) of a chronic inflammatory response are macrophages and lymphocytes. Unfortunately, when inflammation becomes chronic, the healing process can be disrupted by repeated injury or renewed inflammation and immune activity, causing the inflammatory cycle to restart.` },
+                    { id: 'subclinical-chronic', title: 'Subclinical Chronic Inflammation', type: 'text', content: `Chronic inflammation can also be <strong>subclinical</strong>, meaning it doesn't show obvious symptoms. Instead, it might be detected by elevated levels of non-specific blood markers like <strong>C-reactive protein (CRP)</strong> or an increased <strong>erythrocyte sedimentation rate (ESR)</strong>. Sometimes, a special scan (WBC scan or inflammatory scan) is needed to find areas of inflammation. Low-grade chronic inflammation has been linked to general body symptoms such as aches and pains, frequent infections, diarrhea, dry eyes, and shortness of breath.` },
+                    { id: 'systemic-manifestations', title: 'Systemic Manifestations', type: 'text', content: `Whether inflammation is acute or chronic, it can lead to several body-wide (systemic) effects. Localized symptoms depend on the extent of the injury and how well the body can resist it. <strong>Systemic responses include:</strong><br><ul><li><strong>Neutrophilia:</strong> An increase in neutrophils (a type of WBC).</li><li><strong>Fever:</strong> Elevated body temperature.</li><li><strong>Malaise:</strong> A general feeling of discomfort, illness, or uneasiness.</li><li><strong>Loss of appetite.</strong></li><li><strong>Muscle catabolism:</strong> Breakdown of muscle tissue.</li></ul>The liver also plays a role by releasing several proteins called <strong>acute phase proteins</strong>. These include complement system proteins, clotting factors, and protease inhibitors. Acute phase proteins also boost fibrinogen levels, which helps with blood clotting. CRP and serum amyloid are also released by the liver; CRP helps "tag" foreign pathogens (opsonization) to make them easier for immune cells to engulf.` },
+                    { id: 'age-related-differences', title: 'Age-Related Differences', type: 'text', content: `There are differences in how the inflammatory response works at different ages. <strong>Newborns (neonates)</strong> often have weaker inflammatory responses to bacteria or viruses. This is because they have fewer granulocytes (especially neutrophils) and monocytes, and these cells have a reduced ability to move to the site of inflammation (chemotaxis). Neonates also have significantly reduced complement responses due to not having enough complement components, particularly those from the alternative pathway. This deficiency is temporary, and the inflammatory response matures as a person grows from infancy to adulthood.<br><br><strong>Older adults</strong> are more prone to impaired inflammation and slower wound healing. They also tend to have weaker inflammatory responses due to chronic illnesses like cardiovascular disease and diabetes. The aging skin barrier, with less collagen and subcutaneous fat, offers less protection. Additionally, age-related thinning of capillary beds can lead to tissue oxygen deprivation (hypoxia) and delayed wound healing.` },
+                    { id: 'chronic-systemic-quiz', title: 'Chronic & Systemic Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which cell type is critical in a chronic inflammatory response, instrumental in removing necrotic tissue?", options: ["Neutrophils", "Macrophages", "Eosinophils", "Basophils"], correctAnswer: "Macrophages" },
+                        { question: "Which of the following is a common systemic manifestation of inflammation?", options: ["Localized redness", "Decreased body temperature", "Loss of appetite", "Increased blood pressure"], correctAnswer: "Loss of appetite" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-variations-consequences': {
+                title: 'Inflammation: Variations & Consequences',
+                color: 'from-purple-500 to-pink-500',
+                description: 'Understand how inflammation can vary and its potential negative consequences, including severe systemic reactions.',
+                steps: [
+                    { id: 'variations-context', title: 'Variations & Context', type: 'text', content: `Inflammation can vary greatly among individuals throughout life, leading to effects from minor symptoms (like mild skin redness) to life-threatening issues. These variations can stem from acute or chronic inflammation, or an autoimmune response. An acute inflammatory response to tissue damage or injury can turn into a chronic condition, like chronic sinusitis or cirrhosis, if the tissue continues to be damaged. An acute response might even cause more tissue damage than the initial injury. For example, if a mild ankle sprain with tendon or ligament damage isn't treated properly, swelling can lead to further tissue damage and cell death. Chronic cirrhosis can also result from an acute hepatitis C virus infection. Autoimmune diseases, such as rheumatoid arthritis, can also involve chronic inflammation.` },
+                    { id: 'negative-consequences', title: 'Negative Consequences', type: 'text', content: `While inflammation has important benefits for the body, it can also have negative consequences. These include an <strong>overly strong immune response</strong> to triggers, which can cause additional tissue damage, or an <strong>inadequate response</strong>, which might lead to infection or chronic illness. For example, in spinal cord injuries, the inflammatory response—with its increased blood flow, leaky blood vessels, and fluid movement to the damaged area—can cause more compression injury to an already vulnerable spinal cord if swelling isn't controlled.` },
+                    { id: 'hypersensitivity-sirs', title: 'Hypersensitivity & SIRS', type: 'text', content: `Excessive activation of the inflammatory response, leading to chronic inflammation, can also occur due to <strong>hypersensitivity reactions</strong> from the immune system, such as allergies. In autoimmune diseases like asthma, rheumatoid arthritis, multiple sclerosis, and systemic lupus erythematosus, the initial immune and inflammatory responses trigger a cycle of physiological reactions that lead to a disease process.<br><br><strong>Systemic Inflammatory Response Syndrome (SIRS)</strong> can develop from various underlying health conditions. SIRS progresses through three stages:<br><strong>Stage I:</strong> Characterized by increased production of cytokines (signaling proteins), a cellular inflammatory response, localized blood vessel widening, swelling, pain, increased heat, loss of function, and white blood cell migration to the site.<br><strong>Stage II:</strong> Involves the stimulation of growth factors and an increase in macrophages and platelets in the affected area, requiring proinflammatory mediators to keep the response in check.<br><strong>Stage III:</strong> If the body's balance (homeostasis) isn't restored, this stage leads to a body-wide reaction and organ dysfunction.` },
+                    { id: 'organ-dysfunction-chronic-diseases', title: 'Organ Dysfunction & Chronic Diseases', type: 'text', content: `<strong>Multi-organ failure</strong>, often seen with sepsis or septic shock, involves both a strong immune and inflammatory response. A negative outcome of inflammation during shock is that inflammatory mediators can activate substances that prevent blood clot breakdown (fibrinolysis) and may cause widespread blood vessel damage, organ dysfunction, or even death. Widespread inflammation can also lead to low blood volume (hypovolemia), fluid around the lungs (pleural effusion), breathing difficulties (respiratory distress), kidney failure, and death.<br><br><strong>Chronic inflammation has been linked to several systemic diseases</strong> (or diseases that affect the whole body, especially in compromised individuals). For instance, there's been recent focus on multisystem inflammatory syndrome in children and adults, a rare but serious inflammatory condition linked to COVID-19 that impacts organs like the heart, lungs, and kidneys. Research has shown connections between chronic kidney disease, inflammation, and cardiovascular diseases, highlighting the need to manage inflammation to prevent further tissue damage. Chronic inflammation is also associated with chronic conditions like Crohn disease, ulcerative colitis, anemia, neurological disorders, and kidney problems. The connections between autoimmune diseases (like asthma and diabetes), cancer, and inflammation are now widely accepted.` },
+                    { id: 'variations-consequences-quiz', title: 'Variations & Consequences Quiz', type: 'quiz',
+                      questions: [
+                        { question: "What is a potential negative consequence of an overly severe inflammatory response?", options: ["Faster healing", "Additional tissue damage", "Reduced pain", "Increased immunity"], correctAnswer: "Additional tissue damage" },
+                        { question: "Which stage of Systemic Inflammatory Response Syndrome (SIRS) involves end organ dysfunction if homeostasis is not restored?", options: ["Stage I", "Stage II", "Stage III", "Pre-SIRS"], correctAnswer: "Stage III" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-risk-factors': {
+                title: 'Inflammation: Risk Factors',
+                color: 'from-emerald-500 to-green-500',
+                description: 'Identify populations and individual factors that increase susceptibility to inflammatory processes.',
+                steps: [
+                    { id: 'populations-at-risk', title: 'Populations at Risk', type: 'text', content: `People of all ages, genders, ethnic backgrounds, socioeconomic levels, and health histories can experience acute or chronic inflammation. <strong>Age plays a significant role in how severe an inflammatory response might be.</strong> For very young children (neonates), their immature immune system might lead to a more severe inflammatory response because they can't control minor infections as well. For older adults, their immune system becomes less effective at responding to foreign invaders, which can result in a stronger inflammatory response than they might have had when younger. Individuals who are uninsured or underinsured face higher risks because they might not get timely healthcare intervention, allowing a simple inflammatory response to worsen into a more severe injury or chronic inflammation.` },
+                    { id: 'individual-risk-factors', title: 'Individual Risk Factors', type: 'text', content: `Individual risk factors for inflammation include having autoimmune diseases and allergies, being exposed to pathogens (with or without resulting infection), and being very young or old with a weakened immune system. <strong>Genetics</strong> plays a part in chronic inflammatory conditions, as many autoimmune diseases have a genetic predisposition and involve inflammation. Certain chronic diseases like atherosclerosis, rheumatoid arthritis, diabetes, and cancer can either cause or be caused by chronic inflammation. Research continues into the role of obesity and deficiencies in vitamin D and magnesium in developing chronic inflammation.<br><br>Anything that weakens the immune system increases the chance that a mild inflammatory response could turn into severe acute or chronic inflammation. Poor hand hygiene, sharing personal items, inadequate sanitation, poor nutrition, and living in crowded spaces all raise the risk of infection and accompanying inflammation. In healthcare settings, not using standard precautions properly increases an individual's risk of infection and subsequent inflammation. Environmental factors like pollution and smoking, or repeated physical trauma, also increase the risk of triggering an inflammatory response.` },
+                    { id: 'risk-factors-quiz', title: 'Risk Factors Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which age group is typically more susceptible to a more severe inflammatory response due to an immature immune system?", options: ["Adolescents", "Middle-aged adults", "Older adults", "Neonates"], correctAnswer: "Neonates" },
+                        { question: "Which of the following is an individual risk factor that can lead to chronic inflammation?", options: ["Regular exercise", "Balanced diet", "Autoimmune diseases", "Good hand hygiene"], correctAnswer: "Autoimmune diseases" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-assessment': {
+                title: 'Inflammation: Assessment',
+                color: 'from-orange-500 to-yellow-400',
+                description: 'Learn how to effectively assess for the presence and extent of inflammation through patient history, physical examination, and diagnostic tests.',
+                steps: [
+                    { id: 'assessment-history', title: 'Patient History', type: 'text', content: `Gathering information about the patient's history is crucial. You should ask questions to understand:<br><ul><li>The cause of the inflammation (e.g., a recent injury, exposure to allergens, or infectious agents).</li><li>The patient's body's ability to respond to inflammation.</li><li>Their risk of having an ineffective inflammatory response.</li></ul>Also, ask about common inflammation symptoms like swelling, pain, and fatigue. It's important to know how long the inflammation has been present and what treatments, if any, have already been tried.` },
+                    { id: 'assessment-local-systemic-signs', title: 'Examination Findings: Local & Systemic', type: 'text', content: `Several classic signs are associated with inflammation. Obvious injuries or minor wounds will likely appear red, feel warm, and cause some pain. Swelling might be present even without an open wound, such as with a sprained joint. Fluid (exudate) might be seen from a cut or other injury where the skin is broken. Anytime there's an infection, some level of inflammation will also be present. Inflammation related to an immune response, without external trauma, will show a combination of swelling, pain, fever, and reduced or absent function of the affected tissue or organ. Severe inflammation can lead to shock, multi-organ failure, very high fever, seizures, coma, or even death.<br><br><strong>Local Manifestations:</strong><br><ul><li>Swelling</li><li>Pain</li><li>Heat</li><li>Redness</li><li>Exudate (fluid that leaks from blood vessels, can be serous/clear, fibrinous/clot-like, purulent/pus, or hemorrhagic/bloody)</li></ul><br><strong>Systemic Manifestations:</strong><br><ul><li>Fever</li><li>Leukocytosis (increased white blood cell count)</li><li>Increase in plasma proteins</li><li>Malaise (general feeling of discomfort)</li><li>Fatigue</li></ul>` },
+                    { id: 'assessment-blood-tests', title: 'Diagnostic Tests: Blood', type: 'text', content: `Blood tests help diagnose inflammation. A <strong>White Blood Cell (WBC) count with differential</strong> can show if counts of neutrophils, lymphocytes, or macrophages are high, which indicates bacterial or viral infection and acute or chronic inflammation. <strong>C-reactive protein (CRP)</strong> and <strong>Erythrocyte Sedimentation Rate (ESR)</strong> are non-specific blood tests that confirm inflammation is present but don't tell you its location or cause. Various serologic tests for viruses or antibodies against pathogens (like hepatitis, HIV, Epstein–Barr virus, herpes simplex, syphilis, MRSA, C. difficile, and H. pylori) help determine the cause of inflammation and guide treatment to control infection and minimize inflammatory damage.` },
+                    { id: 'assessment-imaging', title: 'Diagnostic Tests: Imaging', type: 'text', content: `Imaging tests are useful for finding the location and extent of inflammation inside the body. These include:
+<ul><li><strong>Computerized (or Computed) Tomography (CT) scan</strong></li><li><strong>Magnetic Resonance Imaging (MRI)</strong></li><li><strong>Positron Emission Tomography (PET) scans</strong></li><li><strong>Colonoscopy</strong> (for intestinal inflammation)</li></ul>` },
+                    { id: 'assessment-quiz', title: 'Assessment Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which of the following is a local manifestation of inflammation?", options: ["Fever", "Malaise", "Swelling", "Fatigue"], correctAnswer: "Swelling" },
+                        { question: "Which blood test is non-specific but confirms the presence of inflammation?", options: ["WBC count with differential", "C-reactive protein (CRP)", "Serologic test for HIV", "Blood culture"], correctAnswer: "C-reactive protein (CRP)" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-clinical-management': {
+                title: 'Inflammation: Clinical Management',
+                color: 'from-green-500 to-teal-400',
+                description: 'Discover primary prevention strategies, collaborative interventions, and pharmacologic agents used to manage inflammation.',
+                steps: [
+                    { id: 'management-prevention', title: 'Prevention Strategies', type: 'text', content: `<strong>Primary prevention</strong> aims to stop inflammation from happening by reducing the risk of injury and infection. While accidents happen, some precautions can be taken:<br><ul><li><strong>Hand Hygiene:</strong> Following proper handwashing significantly lowers the risk of spreading germs, thus reducing potential inflammatory responses.</li><li><strong>Safety Equipment:</strong> Using designated safety gear during sports or physical activities can minimize injuries.</li><li><strong>Food and Water Safety:</strong> Being aware of food and water safety standards and potential contamination issues can prevent pathogen transmission and avoid inflammation linked to immune responses.</li></ul><br><strong>Secondary prevention (screening)</strong> for inflammation is not routine, making primary prevention strategies extremely important in reducing how often and how severely inflammatory responses occur.` },
+                    { id: 'management-collaborative-overview', title: 'Collaborative Interventions Overview', type: 'text', content: `The main goal of managing inflammation is to control the process to promote repair and healing, and to prevent an overly strong inflammatory response that could cause more tissue damage. General treatment guidelines depend on the cause of inflammation:<br><ul><li><strong>Infection:</strong> If inflammation is due to an infection, the underlying infection must be treated and eliminated.</li><li><strong>Hypersensitivity:</strong> If inflammation results from an immune hypersensitivity reaction (like allergies, asthma, or autoimmune diseases), managing inflammation must go hand-in-hand with managing the immune response and the disease caused by immune dysfunction (e.g., diabetes, inflammatory bowel syndrome, rheumatoid arthritis, multiple sclerosis).</li><li><strong>Uncomplicated Injury:</strong> For simple sprains or strains, the standard treatment of Rest, Ice, Compression, and Elevation (RICE) combined with nonsteroidal anti-inflammatory drugs (NSAIDs) will help manage pain and moderate the inflammatory response.</li></ul>Chronic inflammatory responses from diseases need careful monitoring to prevent or slow tissue damage that could lead to organ failure. Treatment focuses on addressing the root cause of the disease, supporting ongoing tissue function, and preventing organ or limb dysfunction or deformity. Sometimes, treatment involves finding new ways to achieve physiological outcomes, such as providing external insulin for individuals with type 1 diabetes whose pancreas no longer produces it.` },
+                    { id: 'management-rice-immobilization', title: 'RICE & Immobilization', type: 'text', content: `<strong>Rest, Ice, Compression, and Elevation (RICE)</strong> are actions aimed at minimizing swelling from a sprain or strain. Swelling around an injury is a normal part of the inflammatory response. By reducing swelling, the injured and surrounding tissues are protected from further damage caused by the swelling itself. The first 24 to 48 hours after injury are critical for RICE measures to be most effective. Typically, icing the sprain or strain for 10 minutes every 2 or 3 hours is recommended; leaving ice on for too long can cause more tissue damage. Compressing the injured area also helps reduce swelling; the wrap should be snug but not so tight that it cuts off circulation (watch for fingers or toes becoming cool, tingly, or blue). Whenever possible, elevating the injured area above heart level helps minimize swelling.<br><br><strong>Immobilization devices</strong> like splints or slings help rest the injured area. Wheelchairs, walkers, or crutches can also reduce weight-bearing on an injured limb. If bed rest is needed, leg exercises or pneumatic compression devices should be used to prevent blood clot formation in the legs.` },
+                    { id: 'management-pharmacology-steroids-nsaids', title: 'Pharmacologic Agents: Steroids & NSAIDs', type: 'text', content: `Medication options for inflammation vary widely depending on the cause. The three main goals of treatment are to reduce inflammation, manage fever, and relieve pain. Many prescribed medications for inflammation have one or more of these properties.<br><br><strong>Steroidal Agents:</strong> Glucocorticoids (e.g., prednisone) are steroids that suppress the immune system and, by doing so, reduce the inflammatory response. They are very effective at decreasing swelling and pain associated with inflammation. Steroids like prednisone are used for a wide range of inflammatory conditions, from swelling after trauma to inflammation in allergies and autoimmune diseases like rheumatoid arthritis or systemic lupus erythematosus.<br><br><strong>Nonsteroidal Anti-inflammatory Drugs (NSAIDs):</strong> NSAIDs, such as ibuprofen or naproxen, are important for managing pain, fever, and inflammation. These medications are available over-the-counter or can be prescribed, sometimes combined with narcotics (e.g., hydrocodone or oxycodone). For significant inflammation, cyclooxygenase (COX) inhibitors might be used. COX-1 is found in all tissues and has protective functions. COX-2 is mainly produced at injury sites, where it mediates inflammation and makes pain receptors more sensitive. It's also in the brain, helping to manage fever and pain perception. Inhibiting COX-2 reduces inflammation, controls pain, and lowers fever. However, most COX-2 inhibitors (except celecoxib/Celebrex) have not been available in the United States since 2011 due to adverse effects. Older NSAIDs inhibited both COX-1 and COX-2, while newer ones (like celecoxib) can specifically inhibit only COX-2.` },
+                    { id: 'management-pharmacology-biologics-antipyretics', title: 'Pharmacologic Agents: Biologics & Antipyretics', type: 'text', content: `<strong>Recombinant DNA and Monoclonal Antibodies (Biologics):</strong> Advances in recombinant DNA and monoclonal antibody technology have created entirely new treatments for inflammation. For example, Interleukin 1 (IL1) antagonists block IL1 receptors, while tumor necrosis factor alpha (TNF) inhibitors prevent IL1 from causing inflammation. However, TNF inhibitors can make individuals more prone to infections. Recombinant protein C helps the body break down small blood clots that form during inflammation. Infliximab (Remicade), a TNF inhibitor, has become crucial in recent treatments for lymphoma, rheumatoid arthritis, and inflammatory bowel diseases.<br><br><strong>Antipyretics:</strong> Since fever is a common response to inflammation, antipyretics are often used to manage it. Antipyretic agents like acetaminophen, aspirin, and NSAIDs reduce fever by inhibiting cyclooxygenase. These are sometimes given along with opioid pain relievers.` },
+                    { id: 'management-pharmacology-analgesics-antimicrobials', title: 'Pharmacologic Agents: Analgesics & Antimicrobials', type: 'text', content: `<strong>Analgesics (Pain Relievers):</strong> Non-opioid analgesics, such as acetaminophen or aspirin, are the most common type of pain reliever used for inflammation-related pain. NSAIDs are also considered analgesics because reducing inflammation often eases the associated pain. Opioid analgesics are used for severe inflammatory pain.<br><br><strong>Antimicrobials:</strong> Antibiotics, antivirals, and other antimicrobials are vital for treating the underlying infection that causes inflammation. Antimicrobials are a broad category of medications needed to treat diseases linked to immune and inflammatory responses. More details on these are covered in the "Infection" concept.` },
+                    { id: 'management-quiz', title: 'Clinical Management Quiz', type: 'quiz',
+                      questions: [
+                        { question: "What is the primary goal of RICE therapy for a sprain?", options: ["To increase blood flow", "To minimize swelling", "To strengthen the joint", "To prevent infection"], correctAnswer: "To minimize swelling" },
+                        { question: "Which type of medication suppresses the immune system and is effective at reducing swelling and pain in inflammatory conditions?", options: ["NSAIDs", "Antipyretics", "Glucocorticoids (Steroids)", "Analgesics"], correctAnswer: "Glucocorticoids (Steroids)" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-interrelated-concepts': {
+                title: 'Inflammation: Interrelated Concepts',
+                color: 'from-pink-500 to-red-400',
+                description: 'Explore how inflammation connects with other vital physiological concepts in healthcare.',
+                steps: [
+                    { id: 'interrelated-concepts-overview', title: 'Connections to Other Concepts', type: 'text', content: `Inflammation is deeply connected with several other important health concepts:<br><br><ul><li><strong>Immunity and Infection:</strong> These are perhaps the most closely related. Many processes in inflammation overlap with or are triggered by immunity and infection. For example, an immune system hypersensitivity reaction can trigger inflammation, or an infection can stimulate an inflammatory response.</li><li><strong>Tissue Integrity:</strong> The health of your tissues is at risk during an inflammatory response, as inflammation can cause damage.</li><li><strong>Mobility and Pain:</strong> Initial injuries and the resulting swelling from inflammation can lead to reduced movement and pain.</li><li><strong>Thermoregulation:</strong> Your body's ability to control its temperature (thermoregulation) can be affected by inflammation, especially if the response is severe, often leading to fever.</li><li><strong>Gas Exchange:</strong> Breathing can become difficult if inflammation causes fluid buildup around the lungs (pleural effusion), impacting gas exchange.</li><li><strong>Hemostasis and Perfusion:</strong> Inflammation, particularly if chronic, can lead to changes in blood clotting (hemostasis), causing small blood clots (microvascular clotting) that impair blood flow (perfusion).</li><li><strong>Fatigue and Stress & Coping:</strong> Both fatigue and stress are often linked to injury and recovery from acute inflammation. They can also be ongoing issues during chronic inflammation from autoimmune reactions.</li></ul>` },
+                    { id: 'interrelated-concepts-quiz', title: 'Interrelated Concepts Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Inflammation can directly impact which of the following, potentially leading to fever?", options: ["Mobility", "Tissue Integrity", "Thermoregulation", "Gas Exchange"], correctAnswer: "Thermoregulation" },
+                        { question: "Which two concepts are most closely related to inflammation, often overlapping or triggering each other?", options: ["Pain and Mobility", "Immunity and Infection", "Hemostasis and Perfusion", "Fatigue and Stress"], correctAnswer: "Immunity and Infection" },
+                      ]
+                    },
+                ]
+            },
+            'inflammation-exemplars-case-study': {
+                title: 'Inflammation: Exemplars & Case Study',
+                color: 'from-gray-500 to-slate-400',
+                description: 'Apply your knowledge through common clinical examples and a detailed patient case study.',
+                steps: [
+                    { id: 'exemplars-overview', title: 'Clinical Exemplars Overview', type: 'text', content: `Here are some common examples (exemplars) of inflammation, categorized by whether they represent acute inflammation, chronic inflammation, or inflammation due to an autoimmune hypersensitivity response. Keep in mind that acute and chronic inflammation often overlap; chronic conditions can have acute flare-ups, and acute responses can become chronic. Therefore, some distinctions are simplified for understanding.<br><br><strong>Acute Inflammation Examples:</strong> Acute infection (bacterial, viral, fungal, parasitic), Bronchitis, Burn, Bursitis, Foreign body injury, Insect bite or sting, Joint sprain or strain, Nephritis, Rheumatic fever, Tendonitis, Traumatic injury.<br><br><strong>Chronic Inflammation Examples:</strong> Atherosclerosis, Chronic infection, Chronic obstructive pulmonary disease (COPD), Cirrhosis, Diverticulitis, Fibromyalgia, Gingivitis, Inflammatory bowel disease, Myocarditis, Osteoarthritis, Psoriasis, Vasculitis.<br><br><strong>Autoimmune-Based Inflammation Examples:</strong> Asthma, Crohn disease, Goodpasture syndrome, Graves disease, Multiple sclerosis, Myasthenia gravis, Rheumatoid arthritis, Systemic lupus erythematosus.` },
+                    { id: 'exemplar-bronchitis', title: 'Bronchitis', type: 'text', content: `Bronchitis is the inflammation of the bronchial tubes (airways in your lungs). It can start as an acute irritation and sometimes become a chronic infection. It often follows a cold virus or other respiratory infection. Acute bronchitis typically causes symptoms like a cough (which might be dry or produce clear or discolored thick mucus), shortness of breath, fever and chills, and chest tightness when breathing in. The cough can last for days or weeks after the initial infection clears. If chronic bronchitis develops over time, it's considered a type of chronic obstructive pulmonary disease (COPD).` },
+                    { id: 'exemplar-gastroenteritis', title: 'Gastroenteritis', type: 'text', content: `Gastroenteritis is the inflammation of the stomach and intestines, often called "stomach flu." It can be caused by various viruses, contaminated food or water, or as a side effect of certain medications. In infants, it might occur when new foods introduce allergens. Symptoms usually last a few days and include nausea or vomiting, abdominal cramps, diarrhea, or a low-grade fever. The condition usually resolves on its own, but it might need more aggressive treatment if symptoms persist for more than 2 days. Dehydration is a common and potentially life-threatening complication if not detected and treated.` },
+                    { id: 'exemplar-atherosclerosis', title: 'Atherosclerosis', type: 'text', content: `Atherosclerosis is a disease where plaque builds up on the inner lining of arteries. This is a chronic inflammatory process. Plaque is made of fat, cholesterol, calcium, and other substances that harden and narrow the arteries over time. Atherosclerosis can affect any artery in the body, including those in the heart, limbs, brain, and kidneys. When it affects the heart's arteries, it leads to coronary artery disease and heart attacks. In the carotid arteries (leading to the brain), it can cause a stroke. If it affects the kidney arteries, it can lead to chronic kidney disease and eventually kidney failure.` },
+                    { id: 'exemplar-cirrhosis', title: 'Cirrhosis', type: 'text', content: `Cirrhosis is a liver disease where healthy liver tissue is destroyed and replaced with scar tissue. This chronic condition can develop from an acute injury or ongoing damage to liver tissue. The scar tissue can block blood flow through the liver or cause healthy cells to become scarred and non-functional. This prevents the liver from providing the necessary metabolic support to maintain the body's balance (homeostasis). Cirrhosis affects many body systems because the liver's ability to produce clotting factors, immune factors, and bile, and to remove waste products and medications, is diminished.` },
+                    { id: 'exemplar-asthma', title: 'Asthma', type: 'text', content: `Asthma is an example of autoimmune-based inflammation. It's a common, chronic disorder of the airways that is complex and involves varying and recurring symptoms, airway blockage, heightened sensitivity of the airways (bronchial hyperresponsiveness), and underlying inflammation. These features together determine how asthma presents and its severity. Airway inflammation leads to narrowing of the airways (bronchoconstriction), increased responsiveness to triggers, and swelling of the airways with excessive mucus production. Asthma can be influenced by innate immunity, genetics, exposure to tobacco smoke, or environmental factors like airborne allergens or viral infections.` },
+                    { id: 'exemplar-rheumatoid-arthritis', title: 'Rheumatoid Arthritis (RA)', type: 'text', content: `Rheumatoid arthritis (RA) is an autoimmune disease that causes inflammation primarily in the joints, characterized by periods of intense symptoms (flares) and periods of improvement (remission). While the exact cause is unknown, research points to links between genetics, environment, and hormones. There is no cure for RA, but it can go into complete remission without long-term effects. Treatment focuses on managing pain, controlling joint swelling, and preserving joint function. Current research is exploring immunotherapies to restore the immune system's tolerance of "self" and target key immune pathways involved in RA.` },
+                    { id: 'case-study-chris-shomni', title: 'Case Study: Chris Shomni', type: 'case_study', case: {
+                        scenario: `Chris Shomni, a 40-year-old male in a stressful professional position, recently developed abdominal pain, cramping, and intermittent (but more frequent lately) bloody diarrhea over several weeks. He has lost 10 pounds in the past 4 weeks and complains of nausea and fatigue. A colonoscopy showed significant inflammation and ulcers in his colon and rectum, with no strictures, perforations, or paralysis. Biopsy confirmed ulcerative colitis (UC), ruling out Crohn disease. He has no family history of inflammatory bowel disease. His skin showed erythema nodosum lesions, typical of UC. Lab tests revealed a low red blood cell (RBC) count and hemoglobin, an elevated platelet count, and a normal white blood cell count. Serum total protein and albumin levels were low.`,
+                        question: "Based on Chris Shomni's presentation, which of the following is the most likely primary diagnosis related to his chronic inflammatory condition?",
+                        options: ["Acute Gastroenteritis", "Crohn Disease", "Ulcerative Colitis", "Irritable Bowel Syndrome"],
+                        correctAnswer: "Ulcerative Colitis",
+                        explanation: "Chris Shomni's symptoms (abdominal pain, cramping, bloody diarrhea, weight loss, nausea, fatigue), colonoscopy findings (inflammation and ulcers in colon/rectum), and skin lesions (erythema nodosum) are classic indicators of Ulcerative Colitis. The biopsy confirmed UC and ruled out Crohn's. Acute gastroenteritis is typically short-term, and Irritable Bowel Syndrome does not involve inflammation or ulcers."
+                    }},
+                    { id: 'case-study-chris-shomni-analysis', title: 'Case Study: Analysis Questions', type: 'text', content: `<strong>1. Consider the scope of inflammation. Where does this case fit?</strong><br>This case clearly fits within the scope of <strong>chronic inflammation</strong>, specifically as a consequence of an autoimmune disease (Ulcerative Colitis). While he experiences acute exacerbations (more frequent bloody diarrhea recently), the underlying condition is long-term and involves ongoing tissue destruction and repair in the colon and rectum.<br><br><strong>2. What are the primary treatment options represented in this case?</strong><br>The primary treatment options for Mr. Shomni focus on:<br><ul><li><strong>Resting the bowel:</strong> This is a non-pharmacological approach to reduce irritation and promote healing.</li><li><strong>Reducing inflammation:</strong> This is the cornerstone of treatment for UC.</li><li><strong>Controlling diarrhea:</strong> To prevent dehydration and fluid/electrolyte imbalances.</li><li><strong>Ensuring adequate nutrition and hydration:</strong> To address weight loss, hypoalbuminemia, and anemia.</li><li><strong>Relieving pain:</strong> Though not significant, pain management is part of his care.</li></ul><br>Specific pharmacologic interventions mentioned include:<br><ul><li><strong>Aminosalicylates (5-ASA):</strong> First-line treatment to control inflammation.</li><li><strong>Corticosteroids:</strong> Used for exacerbations or severe, unresponsive disease.</li><li><strong>Immunomodulators (e.g., 6-mercaptopurine) or Monoclonal Antibodies (e.g., infliximab):</strong> Considered if 5-ASA or corticosteroids are insufficient.</li></ul>The case also highlights the potential for surgical intervention (colostomy or ileostomy) if tissue damage becomes too severe.` },
+                    { id: 'exemplars-quiz', title: 'Exemplars & Case Study Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which of the following is an example of a chronic inflammatory condition?", options: ["Insect bite", "Acute bronchitis", "Joint sprain", "Atherosclerosis"], correctAnswer: "Atherosclerosis" },
+                        { question: "Rheumatoid Arthritis is categorized as what type of inflammation?", options: ["Acute", "Chronic", "Reparative", "Autoimmune-Based"], correctAnswer: "Autoimmune-Based" },
+                      ]
+                    },
+                ]
+            },
+            'rheumatoid-arthritis-module': {
+                title: 'Rheumatoid Arthritis: Pathophysiology & Management',
+                color: 'from-purple-600 to-indigo-700',
+                description: 'A deep dive into the pathophysiology, assessment, and clinical management of Rheumatoid Arthritis.',
+                steps: [
+                    { id: 'ra-pathophysiology', title: 'Pathophysiology Review', type: 'text', content: `<strong>Rheumatoid arthritis (RA)</strong> is a chronic, progressive, systemic inflammatory autoimmune disease process that affects primarily the synovial joints. Systemic means that this disease can affect any or all parts of the body while affecting many joints.<br><br>In patients with RA, transformed autoantibodies (rheumatoid factors [RFs]) that attack healthy tissue, especially synovium, are formed, causing inflammation. The disease then begins to involve the articular cartilage, joint capsule, and surrounding ligaments and tendons. Immunity and inflammatory factors cause cartilage damage in patients with RA:<br><ul><li><strong>CD4 helper T cells</strong> and other immune cells in synovial fluid promote cytokine release, especially interleukin-1 (IL-1) and tumor necrosis factor–alpha (TNFA), which attack cartilage.</li><li><strong>Neutrophils</strong> and other inflammatory cells in the joint are activated and break down the cartilage.</li><li>Immune complexes deposit in synovium, and <strong>osteoclasts</strong> are activated.</li><li><strong>B and T lymphocytes</strong> of the immune system are stimulated and increase the inflammatory response.</li></ul>The synovium then thickens and becomes hyperemic, fluid accumulates in the joint space, and a <strong>pannus</strong> forms. The pannus is vascular granulation tissue composed of inflammatory cells; it erodes articular cartilage and eventually destroys bone. As a result, in late disease, fibrous adhesions, bony ankyloses (abnormal fusion of bones in the joint), and calcifications occur. Bone loses density, and secondary osteoporosis exists.<br><br>Permanent joint changes may be avoided if RA is diagnosed early. Early and aggressive treatment to suppress synovitis may lead to a remission. RA is a disease characterized by natural remissions and exacerbations (flare-ups). Interprofessional health care team management helps control the disease to decrease the intensity and number of exacerbations. Preventing flares helps prevent joint erosion and permanent joint damage.<br><br>Because RA is a systemic disease, areas of the body besides the synovial joints can be affected. Inflammatory responses similar to those occurring in synovial tissue may occur in any organ or body system in which connective tissue is prevalent. If blood vessel inflammation (vasculitis) occurs, the organ supplied by that vessel can be affected, leading to eventual failure of the organ or system in late disease.` },
+                    { id: 'ra-etiology-genetics-incidence', title: 'Etiology, Genetics & Incidence', type: 'text', content: `The etiology of RA remains unclear, but research suggests a combination of environmental and genetic factors. Some researchers also suspect that female reproductive hormones influence the development of RA because it affects women more often than men—usually young to middle-age women. Others suspect that infectious organisms may play a role, particularly the Epstein-Barr virus. Physical and emotional stressors have been linked to exacerbations of the disorder and may be contributing factors or “triggers” to its development.<br><br><strong>Genetics/Genomics:</strong> Research has shown that there is a strong association between RA and several human leukocyte antigen (HLA)–DR alleles. The cause of this association is not clear, but most HLA diseases are autoimmune. DR alleles, especially DR4 and DRB1, are the primary genetic factors contributing to the development of RA. DR4 is associated with more severe forms of the disease. Other contributing factors are being researched.<br><br><strong>Incidence and Prevalence:</strong> RA affects over 1.5 million people, and Whites have the disease more often than other groups. Women are two to three times more likely to have RA compared with men. The cause for these trends is not known.<br><br><strong>Health Disparities:</strong> Research data over a 13-year period from 2005 to 2018 demonstrate that when compared to other groups, African Americans have a higher prevalence of rheumatoid arthritis, particularly those who have an educational level of less than high school and a low family income. The impact of these social determinants of health needs further research, but the stress of poverty may contribute to the risk for developing the disease. Assess patients for these factors and incorporate into their plan of care.` },
+                    { id: 'ra-assessment-early-late', title: 'Assessment: Early & Late Signs', type: 'text', content: `The onset of rheumatoid arthritis (RA) may be acute and severe or slow and progressive; patients may have vague symptoms that last for several months before diagnosis. The onset of the disease is more common in the winter months than in the warmer months. The signs and symptoms of RA can be categorized as early or late disease and as joint (articular) or systemic (extraarticular):<br><br><strong>Common Early Signs and Symptoms (Early Disease):</strong><br><em>Joint:</em> Inflammation<br><em>Systemic:</em> Low-grade fever, Fatigue, Weakness, Anorexia, Paresthesias<br><br><strong>Common Late Signs and Symptoms (Advanced Disease):</strong><br><em>Joint:</em> Deformities (e.g., swan neck or ulnar deviation), Moderate-to-severe pain and morning stiffness<br><em>Systemic:</em> Osteoporosis, Severe fatigue, Anemia, Weight loss, Muscle atrophy, Subcutaneous nodules, Peripheral neuropathy, Vasculitis, Pericarditis, Fibrotic lung disease, Sjögren syndrome, Kidney disease` },
+                    { id: 'ra-physical-assessment', title: 'Physical Assessment & Critical Rescue', type: 'text', content: `In the early stage of RA the patient typically reports joint inflammation, generalized weakness, and fatigue. Anorexia, weight loss of about 2 to 3 lb (1 kg), and persistent low-grade fever are common. In patients with early disease, the upper-extremity joints are involved initially—often the proximal interphalangeal (PIP) and metacarpophalangeal (MCP) joints of the hands. These joints may be slightly reddened, warm, stiff, swollen, and tender or painful, particularly on palpation (caused by synovitis). The typical pattern of joint involvement in RA is bilateral and symmetric (e.g., both wrists). The number of joints involved usually increases as the disease progresses.<br><br>The presence of only one hot, swollen, painful joint (out of proportion to the other joints) may mean that the joint is infected. Refer the patient to the primary health care provider (generally the rheumatologist) immediately if this is the case. Single hot, swollen joints are considered infected until proven otherwise and require immediate long-term antibiotic treatment.<br><br>As the disease advances, the joints become progressively inflamed and very painful. The patient usually has frequent morning stiffness, which can last for several hours after awakening. On palpation the joints feel soft and look puffy because of synovitis and effusions. The fingers often appear spindlelike. Note any muscle atrophy (which can result from disuse secondary to joint pain) and a decreased range of motion in the affected joints.<br><br>Most or all synovial joints are eventually affected. The temporomandibular joint (TMJ) may be involved in severe disease, but such involvement is uncommon. When the TMJ is affected, the patient may have pain when chewing or opening the mouth.<br><br>When the spinal column is involved, the cervical joints are most likely to be affected. During clinical examination, gently palpate the posterior cervical spine and identify it as cervical pain, tenderness, or loss of motion.<br><br><strong>Critical Rescue:</strong> Cervical RA may result in subluxation, especially of the first and second vertebrae. This complication may be life-threatening because branches of the phrenic nerve that supply the diaphragm are restricted and respiratory function may be compromised. The patient is also in danger of becoming quadriparetic (weak in all extremities) or quadriplegic (paralyzed in all extremities). If cervical pain (may radiate down one arm) or loss of range of motion is present in the cervical spine, keep the neck straight in a neutral position to prevent permanent damage to the spinal cord or spinal nerves. Notify the Rapid Response Team and primary health care provider immediately about these neurologic changes!` },
+                    { id: 'ra-extraarticular-manifestations', title: 'Extraarticular Manifestations', type: 'text', content: `Joint deformity occurs as a late articular manifestation, and secondary osteoporosis can cause bone fractures. Observe common deformities, especially in the hands and feet (e.g., Boutonniere deformity, Swan neck deformity). Extensive wrist involvement can result in carpal tunnel syndrome.<br><br>Gently palpate the tissues around the joints to elicit pain or tenderness associated with other rheumatoid complications, unless the patient is having severe joint pain. For example, Baker cysts (enlarged popliteal bursae behind the knee) may occur and cause tissue compression and pain. Tendon rupture is also possible, particularly rupture of the Achilles tendon.<br><br>Numerous extraarticular signs and symptoms are associated with advanced disease. Assess the patient to ascertain systemic involvement. In addition to increased joint swelling and tenderness, moderate to severe weight loss, fever, and extreme fatigue are common in late disease exacerbations, often called flare-ups. Some patients have the characteristic soft, round, movable <strong>subcutaneous nodules</strong>, which usually appear on the ulnar surface of the arm, on the fingers, or along the Achilles tendon. These nodules can disappear and reappear at any time and are associated with severe, destructive disease. Rheumatoid nodules are usually not a problem themselves; however, they occasionally open and become infected and may interfere with ADLs. Accidentally bumping the nodules may cause discomfort. Occasionally nodules occur in the lungs.<br><br>Inflammation of the blood vessels results in <strong>vasculitis</strong>, particularly of small to medium-size vessels. When arterial involvement occurs, major organs can become ischemic and malfunction. Assess for ischemic skin lesions that appear in groups as small, brownish spots, most commonly around the nail bed. Monitor the number of lesions, note their location each day, and report vascular changes to the health care provider. Increased lesions indicate increased vasculitis, and a decreased number indicates decreased vasculitis. Also carefully assess any larger lesions that appear on the lower extremities. These lesions can lead to ulcerations, which heal slowly as a result of decreased circulation. <strong>Peripheral neuropathy</strong> associated with decreased circulation can cause footdrop and paresthesias (burning and tingling sensations), usually in older adults.<br><br>Respiratory complications may manifest as pleurisy, pneumonitis, diffuse interstitial fibrosis, and pulmonary hypertension. Cardiac complications include pericarditis and myocarditis. Assess for eye involvement, which typically manifests as iritis and scleritis. If either of these complications is present, the sclera of one or both eyes is reddened and the pupils have an irregular shape. Visual disturbances may occur.<br><br>Several syndromes are seen in patients with advanced RA. The most common is <strong>Sjögren syndrome</strong>, which includes a triad of:<ul><li>Dry eyes (keratoconjunctivitis sicca [KCS], or the sicca syndrome)</li><li>Dry mouth (xerostomia)</li><li>Dry vagina (in some cases)</li></ul>Note the patient’s report of dry mouth or dry eyes. Some patients state that their eyes feel “gritty,” as if sand is in their eyes. Inspect the mouth for dry, sticky membranes and the eyes for redness/hyperpigmentation and lack of tearing.` },
+                    { id: 'ra-psychosocial-assessment', title: 'Psychosocial Assessment', type: 'text', content: `Rheumatoid arthritis (RA) and other inflammatory types of arthritis are chronic diseases that can be disabling if not well controlled. Fear of becoming dependent, uncertainty about the disease process, altered body image, devaluation of self, frustration, and depression are common psychosocial problems. Physical limitations and persistent pain may limit the patient’s mobility. These limitations can result in role changes in the family and society. For example, the person may be unable to cook for the family or be an active sexual partner. In addition, extreme fatigue often causes patients to desire an early bedtime and napping, and may result in a reluctance to socialize.<br><br>Body changes caused by joint changes and drug therapy (if used) may also cause poor self-esteem and body image. Because many societies value people with physically fit, attractive bodies, the patient with RA may be embarrassed to be seen in public places. The patient may grieve or experience degrees of depression. The patient may have feelings of helplessness caused by a loss of control over a disease that can “consume” the body. Fortunately, newer drugs have improved the treatment of RA and provide the patient with hope and better disease control. Only a small percentage of patients with RA become wheelchair dependent.<br><br>Living with a chronic disease and its associated pain is difficult for the patient and family. Chronic suffering and pain affect quality of life. Assess the patient’s emotional and mental status in relation to the disease and its problems. Evaluate the patient’s support systems and resources. Patients who are knowledgeable about their disease and treatment options feel emotionally stronger to cope with their disease and better able to discuss treatment options with their primary health care provider.` },
+                    { id: 'ra-laboratory-assessment', title: 'Laboratory Assessment', type: 'text', content: `Laboratory tests help support a diagnosis of RA, but no single test or group of tests can confirm it. The test for <strong>rheumatoid factor (RF)</strong> measures the presence of unusual antibodies of the immunoglobulins G (IgG) and M (IgM) types that develop in a number of connective tissue diseases. Many patients with RA have a positive titer (greater than 1:80), especially in older adults. However, the presence of RF is not diagnostic for RA.<br><br>One of the newest laboratory tests, used to detect the level of <strong>anti–cyclic citrullinated peptide (anti-CCP)</strong>, is very specific and sensitive in detecting early RA. The presence of anti-CCP is also a marker for aggressive and erosive late-stage disease.<br><br>The <strong>antinuclear antibody (ANA)</strong> test measures the titer of a group of antibodies that destroy the nuclei of cells and cause tissue death in patients with autoimmune disease. The fluorescent method is sometimes referred to as FANA. If this test result is positive (a value higher than 1:40), various subtypes of this antibody are identified and measured.<br><br>An elevated <strong>erythrocyte sedimentation rate (ESR)</strong>, or “sed rate,” (greater than 20 mm/hr) can confirm inflammation or infection anywhere in the body. An elevated ESR helps support a diagnosis of an unspecified inflammatory disease. The test is most useful to monitor the course of a disease, especially for inflammatory autoimmune diseases. In general the more severe the disease gets, the higher the ESR rises; as the disease improves or goes into remission, the ESR level decreases.<br><br>Measurement of the <strong>high-sensitivity C-reactive protein, or hsCRP</strong>, is another useful test to measure inflammation and may be done with or instead of the ESR. As the name implies, it is more sensitive to inflammatory changes than the ESR. It is also very useful for detecting infection anywhere in the body.<br><br>The presence of most chronic diseases usually causes mild to moderate anemia, which contributes to the patient’s fatigue. Therefore, monitor the patient’s <strong>complete blood count (CBC)</strong> for a low hemoglobin, hematocrit, and red blood cell (RBC) count. An increase in white blood cell (WBC) count is consistent with an inflammatory response. A decrease in the WBC count may indicate Felty syndrome, a pulmonary complication associated with late RA. <strong>Thrombocytosis</strong> (increased platelets) can also occur in patients with late RA. Additional laboratory tests may be performed, depending on the body systems and organs that may be affected by the disease. For example, if heart involvement is suspected, the primary health care provider may request cardiac enzyme testing.` },
+                    { id: 'ra-diagnostic-assessment', title: 'Other Diagnostic Assessment', type: 'text', content: `A standard <strong>x-ray</strong> is used to visualize the joint changes and deformities typical of RA. A <strong>CT scan</strong> may help determine the presence and degree of cervical spine involvement.<br><br>An <strong>arthrocentesis</strong> is an invasive diagnostic procedure that may be used for patients with joint swelling caused by excess synovial fluid (effusion). It may be performed at the bedside or in a health care provider’s office or clinic. After administering a local anesthetic, the provider inserts a large-gauge needle into the joint (usually the knee) to aspirate a sample of synovial fluid and to relieve pressure caused by excess fluid. The fluid is analyzed for inflammatory cells and immune complexes, including RF. Fluid from patients with RA typically reveals increased WBCs, cloudiness, and volume.<br><br>Teach the patient to use ice and to rest the affected joint for 24 hours after arthrocentesis. Often the primary health care provider will recommend acetaminophen as needed for discomfort. If increased pain or swelling occurs, teach the patient or family to notify the primary health care provider immediately.<br><br><strong>MRI</strong> may be performed to assess spinal column disease or other joint involvement. Because RA can affect multiple body systems, tests to diagnose specific systemic manifestations are performed as needed. For example, nerve conduction studies help confirm peripheral neuropathy. Pulmonary function tests help determine the presence of lung involvement.` },
+                    { id: 'ra-collaborative-care', title: 'Interprofessional Collaborative Care & Planning', type: 'text', content: `The priority collaborative problems for patients with rheumatoid arthritis (RA) include:<br>1. Chronic inflammation and persistent pain due to systemic autoimmune disease process<br>2. Potential for decreased mobility due to joint deformity, muscle atrophy, and fatigue<br>3. Potential for decreased self-esteem image due to joint deformity<br><br>Patients who have RA are managed in the community under the supervision of a qualified primary health care provider. The expected outcome for management is that the disease goes into remission and its progression slows to decrease pain, prevent joint destruction, and increase mobility. When patients with RA are admitted to the inpatient acute care or long-term care facility, it is usually for health problems other than for complications of arthritis. Whether the patient is in a facility or community, be sure to plan interventions to manage persistent pain and inflammation, as well as the potential for decreased mobility and decreased self-esteem.` },
+                    { id: 'ra-drug-therapy-dmards', title: 'Drug Therapy: DMARDs', type: 'text', content: `Some drugs prescribed for RA have antiinflammatory and/or analgesic actions. For example, NSAIDs are sometimes used for early RA to help decrease pain and inflammation. The choice of which one to prescribe depends on the patient’s needs and tolerance and the scientific evidence supporting the drug therapy. To decrease GI problems, the NSAID may be given with an H2-blocking agent such as famotidine. If there is no clinical change after 6 to 8 weeks, the primary health care provider may discontinue the current NSAID and try another one or change to a different drug class.<br><br>Other drugs affect immunity through immunosuppression, thus modifying the progress of the disease to reduce pain and inflammation. Initially most patients are managed with <strong>disease-modifying antirheumatic drugs (DMARDs)</strong>. As the name implies, these drugs are given to slow the progression of the disease. For best results, they should be started early in the disease process.<br><br><strong>First-line DMARDs:</strong><br><strong>Methotrexate (MTX)</strong>, an immunosuppressive medication, in a low once-a-week dose is the mainstay of therapy for RA because it is effective and relatively inexpensive. It is a slow-acting drug, taking 4 to 6 weeks to begin to control joint inflammation. Observe for desired therapeutic drug effects, such as a decrease in joint pain and swelling.<br>Monitor patients for potential adverse effects, such as decreases in WBCs or platelets (as a result of bone marrow suppression) or elevations in liver enzymes or serum creatinine.<br><br><strong>Drug Alert (Methotrexate):</strong> Patients taking MTX are at risk for infection caused by impaired or decreased drug-induced immunity. Teach them to avoid crowds and people who are ill. Remind patients to avoid alcoholic beverages while taking MTX to prevent liver toxicity. Teach them to observe and report other side and toxic effects, which include mouth sores and acute dyspnea from pneumonitis. Although not commonly occurring, lymph node tumor (lymphoma) and pneumonitis (lung inflammation) have been associated in those who have RA and are taking MTX. Folic acid, one of the B vitamins, is often given to those who are taking MTX to help decrease some of the drug’s side effects. Pregnancy is not recommended while taking methotrexate because birth defects are possible. Strict birth control is recommended for childbearing women who are in need of MTX to control their RA. If pregnancy is ever desired, instruct the patient to consult the rheumatologist and an obstetric/gynecologic (OB/GYN) health care provider. Generally, the primary health care provider discontinues the drug at least 3 months before planned pregnancy. MTX may be restarted after birth if the patient does not breast-feed.<br><br>Another DMARD sometimes used for RA is <strong>hydroxychloroquine</strong>. This drug slows the progression of mild rheumatoid disease before it worsens. It is an antimalarial drug that helps suppress the immune response to decrease joint and muscle pain. Patients generally tolerate hydroxychloroquine quite well. In a few cases mild stomach discomfort, light-headedness, or headache has been reported. The drug should not be used for patients who have known cardiac disease or dysrhythmias.<br><br><strong>Drug Alert (Hydroxychloroquine):</strong> The most serious adverse effect of hydroxychloroquine is retinal damage. Teach patients to report blurred vision or headache. Remind them to have an eye examination before taking the drug and then every 6 months afterward to detect changes in the cornea, lens, or retina. If this rare complication occurs, the primary health care provider discontinues the drug.` },
+                    { id: 'ra-drug-therapy-brms-jak', title: 'Drug Therapy: BRMs & JAK Inhibitors', type: 'text', content: `As a group, <strong>biological response modifiers (BRMs)</strong>, sometimes called biologics, are one of the newest and most effective classes of DMARDs and include interleukins, tumor necrosis factor (TNF) inhibitors, and monoclonal antibodies. Any one of the BRMs may be tried. If one drug is not effective, the primary health care provider prescribes another drug in the same class. All these drugs are expensive, and insurance companies may not completely pay for their use.<br><br>Teach patients receiving any one of the BRMs that they are at a high risk for developing impaired immunity and subsequent infection. Instruct them to stay away from people with infections and to avoid large crowds if possible. Remind patients with multiple sclerosis (MS), tuberculosis (TB), or a positive TB test that they should not receive BRMs because they make patients susceptible to flare-ups of these diseases. Determine whether the patient has had a recent negative purified protein derivative (PPD) test for TB. If not, a PPD skin test is typically administered and the selected BRM is not started until a negative test result is confirmed. Collaborate with the primary health care provider to ensure that this process is complete. Most of these drugs are given parenterally and require health teaching for self-administration.<br><br>The newest classification of DMARDs is the <strong>Janus kinase (JAK)-inhibiting drugs</strong>, often called JAK inhibitors. Like other BRMs, these drugs have been approved for other types of arthritis and autoimmune disorders.<br><br><strong>Common Examples of Drug Therapy:</strong><br><em>Tumor Necrosis Factor (TNF) Inhibitor:</em> Etanercept, Infliximab, Golimumab. Teach patient to report injection site reaction, which may indicate a local allergic response and cause pain. Teach patients to report signs and symptoms of infection.<br><em>Interleukin (IL)-6 Receptor Antagonist:</em> Anakinra, Tocilizumab. Monitor the WBC count of patients receiving any of these drugs, which can cause a marked decrease, making patients susceptible to infection. Monitor liver enzymes because drugs can cause liver dysfunction.<br><em>Janus Kinase (JAK) Inhibitor:</em> Tofacitinib, Baricitinib, Upadacitinib. Be aware that tofacitinib has a black box warning about the increased risk of cardiac events, cancer, and blood clots when taking this drug. Teach patients to report signs and symptoms of infection.` },
+                    { id: 'ra-drug-therapy-other-nonpharm', title: 'Drug Therapy: Other & Nonpharmacologic', type: 'text', content: `A few drugs may be given in combination with or instead of the previously described drugs. It is not unusual for a patient to be taking several disease-modifying drugs, such as methotrexate, a BRM, and an adjunct medication. Each drug works differently to relieve symptoms and slow the progression of the disease. For example, <strong>sulfasalazine</strong>, a sulfa drug, may be given in combination with other drugs to reduce inflammation and pain. Be aware that this drug should not be used for patients who have a sulfa allergy. Common side effects of sulfasalazine include nausea, vomiting, and skin rash.<br><br><strong>Glucocorticoids (steroids)</strong>—usually prednisone—may be given for their fast-acting antiinflammatory and immunosuppressive effects. Prednisone may be given in high dose for short duration (pulse therapy) or as a low chronic dose. Moderate-dose short-term tapering bridge therapy may be used when inflammation is symptomatic and other RA medications are insufficient or have not yet had an effect.<br><br>Chronic steroid therapy can result in numerous complications, such as:<ul><li>Diabetes mellitus</li><li>Impaired or decreased immunity</li><li>Fluid and electrolyte imbalances</li><li>Hypertension</li><li>Osteoporosis</li><li>Glaucoma</li></ul>Some drug effects are dose related, whereas others are not. Observe the patient for complications associated with chronic steroid therapy, and report them to the primary health care provider. For example, if blood pressure becomes elevated or significant laboratory values change, notify the primary health care provider.<br><br>Patients with RA may experience one or a few joints that have more pain and inflammation than the others. <strong>Cortisone injections</strong> in single joints may be used to temporarily relieve local pain and inflammation. Have the patient ice and rest the joint for 24 hours after the procedure. Oral analgesics are also sometimes needed during that time.<br><br><strong>Nonpharmacologic Interventions:</strong> Adequate rest, proper positioning, and ice and heat applications are important in pain management. If acute inflammation is present, ice packs may be applied to “hot” joints for pain relief until the inflammation lessens. The ice pack should not be too heavy. At home the patient can use a small bag of frozen peas or corn as an ice pack.<br><br>Heated paraffin (wax) dips may help increase comfort of arthritic hands. Finger and hand exercises are often done more easily after paraffin treatment. To relieve morning stiffness or the pain of late-stage disease, recommend a hot shower rather than a sponge bath or a tub bath. It is often difficult for the patient with RA to get into and out of a bathtub, although special hydraulic lifts, tub chairs, and walk-in bathtubs are available to facilitate bathing. Safety (grab) bars and nonskid tread in the tub or shower floor are important safety features to discuss with all patients. Some older adults prefer using shower chairs and a walk-in shower that does not have a ledge that could cause falls.<br><br>Hot packs applied directly to involved joints may be beneficial if they are not too heavy. Most physical therapy departments have machines that keep hot packs ready for when they are needed. Teach patients to use the microwave or stovetop heating instructions to warm heat packs at home. Remind them to follow the instructions given with each heating device used.<br><br><strong>Plasmapheresis</strong> (sometimes called plasma exchange) is an in-hospital procedure prescribed by a primary health care provider in which the patient’s plasma is treated to remove the antibodies causing the disease. Although not commonly done, this procedure may be combined with steroid pulse therapy for patients with severe, life-threatening disease.` },
+                    { id: 'ra-complementary-integrative', title: 'Complementary & Integrative Health', type: 'text', content: `Some patients may have pain relief from hypnosis, acupuncture, imagery, music therapy, or other techniques. Stress management is also popular as a pain relief intervention.<br><br>Adequate nutrition is an important part of the management of RA. Obesity should be avoided or treated if present. The inflammatory state may place a greater burden on the metabolism of some essential nutrients. This catabolic state may be related to increased cytokine production, specifically tumor necrosis factor.<br><br>According to the Arthritis Foundation, no one food causes or cures arthritis; however, healthy nutrition in general is important. Refer patients to the Arthritis Foundation’s publications regarding diet and arthritis. Teach patients to take any herbal or nutrition supplement under the supervision of a qualified health care provider to prevent adverse events and drug-food or drug-drug interactions.<br><br>Other integrative therapies are safe and have been scientifically proven to be effective to help control RA pain for most people. Examples include mind-body therapies, such as relaxation techniques, imagery, and spiritual practices.` },
+                    { id: 'ra-promoting-mobility-self-esteem', title: 'Promoting Mobility & Enhancing Self-Esteem', type: 'text', content: `<strong>Promoting Mobility:</strong> Patients with RA often have decreased mobility related to multiple joint deformities and muscle atrophy. Fatigue and generalized weakness also contribute to decreased mobility. The expected outcome is that the patient will be able to independently perform ADLs with or without ambulatory and assistive devices.<br><br>Although the physical appearance of a patient with severe RA may create the image that ADL independence is not possible, a number of alternative and creative methods can be used to perform these activities. Do not perform these activities for the patient unless asked. Those with RA do not want to be dependent. For example, hand deformities often prevent a patient from opening packages of food such as a box of crackers; however, the patient may prefer to use the teeth to open the crackers rather than depend on someone else.<br><br>In the hospital or long-term care facility, a patient may not eat because of the barriers of heavy plate covers, milk cartons, small packages of condiments, and heavy containers. Styrofoam or paper cups may bend and collapse as the patient attempts to hold them. A china or heavy plastic cup with handles may be easier to manipulate. Collaborate with the registered dietitian nutritionist to help with access to food and total independence in eating.<br><br>Even though many patients with severe or late-stage rheumatoid arthritis (RA) often adapt to their pain and deformity, they may still need assistance with ADLs. For example, when fine motor activities (e.g., squeezing a tube of toothpaste) become impossible, patients often use larger joints or body surfaces that can substitute for smaller ones. Devices such as long-handled brushes can help patients brush their hair; dressing sticks can assist with putting on pants. Consult with OT to help patients learn to function as independently as possible.<br><br>Additional nursing interventions depend in part on identifying the factors contributing to fatigue. For example, persistent pain, sleep disturbances, and weakness are associated with increased fatigue. Anemia may also be a contributing factor and may be treated with iron (if an iron deficiency anemia is present), folic acid, or vitamin supplements prescribed by the primary health care provider. Chronic normochromic or chronic hypochromic anemia often occurs in most chronic systemic diseases. Assess for drug-related blood loss such as that caused by NSAIDs by checking the stool for gross or occult blood. Older white women are the most likely to experience GI bleeding as a result of taking these medications.<br><br>If fatigue and decreased mobility result from muscle atrophy, the primary health care provider prescribes an aggressive physical therapy program to strengthen muscles and prevent further atrophy. Patients also experience increased fatigue when pain prevents them from getting adequate rest and sleep. Measures to facilitate sleep include promoting a quiet environment, giving warm beverages, and administering hypnotics or relaxants as prescribed if necessary.<br><br>In addition to identifying and managing specific reasons for fatigue, determine the patient’s usual daily activities and teach principles of energy conservation. Suggestions for conserving energy and thus increasing activity tolerance and mobility include:<ul><li>Balance activity with rest. Take one or two naps each day.</li><li>Pace yourself; do not plan too much for one day.</li><li>Set priorities. Determine which activities are most important and do them first.</li><li>Delegate responsibilities and tasks to your family and friends.</li><li>Plan ahead to prevent last-minute rushing and stress.</li><li>Learn your own activity tolerance and do not exceed it.</li></ul><br><strong>Enhancing Self-Esteem:</strong> The patient with RA often has multiple joints that are inflamed or deformed, causing a potential for decreased self-esteem. Therefore, the expected outcome is that the patient will verbalize a positive perception of self as a result of interprofessional interventions.<br><br>Body image and self-esteem may be affected by the disease process. Determine the patient’s perception of these changes and the impact of the reactions of family and significant others. The most important intervention is to communicate acceptance of the patient. When a trusting relationship is established, encourage the patient to express personal feelings.<br><br>As a reaction to body changes and joint deformity and the presence of a chronic, painful disease, some patients display behaviors indicative of loss. They may use coping strategies that range from denial or fear to anger or depression. In an attempt to regain control over the effects of the disease process, they may appear to be “manipulative and demanding” and sometimes may be referred to as having an “arthritis personality.” This personality, which represents a negative label, is a myth; avoid using these terms. Patients are trying to cope with the effects of their illness and should be treated with patience and understanding. Continually assess and accept these behaviors, but remain realistic in discussing goals to improve self-esteem and body image. Emphasize their strengths and help them identify previously successful coping strategies. If needed, consult with mental health professionals or religious/spiritual leaders to help patients cope with this potentially debilitating chronic disease.` },
+                    { id: 'ra-care-coordination-resources', title: 'Care Coordination & Health Care Resources', type: 'text', content: `Patients with rheumatoid arthritis (RA) are usually managed at home, but in some cases they may be institutionalized in a long-term care facility if they become restricted to bed or a wheelchair. Some patients may be transferred to a rehabilitation facility for several weeks to help develop strategies, techniques, and skills for independent living at home.<br><br><strong>Home Care Management:</strong> The amount of home care preparation depends on the severity of the disease. Structural changes may be necessary if there are deficits in performing ADLs or mobility. Doors must be wide enough to accommodate a wheelchair or walker if one is used. Ramps are needed to prevent the patient in a wheelchair from becoming homebound. If the person cannot use stairs, access to facilities for all ADLs on one floor is needed. Handrails should be available in the bathroom and halls.<br><br>To promote continued homemaking functions, countertops and appliances may require structural changes. The patient may also require handrails and elevated chairs and toilet seats, which facilitate safe transfers. These devices are especially important for older adults with arthritis.<br><br><strong>Self-Management Education (SME):</strong> SME is a vital role for nurses in collaborative management of arthritis. Many people have signs and symptoms of joint inflammation but do not seek medical attention. Teach them to seek professional health care to reduce pain and prevent disability.<br><br>Teach patients to discuss any questions with their primary health care provider before trying any over-the-counter or home remedies. Some remedies may be harmful. Check with the Arthritis Foundation for the latest information on arthritis myths and quackery (www.arthritis.org).<br><br>Provide information to the patient and family about drug therapy, joint protection, energy conservation, rest, and exercise as summarized in the boxes presented earlier in the RA section.<br><br>Assess the patient’s coping strategies. The patient with RA often reports being on an “emotional roller coaster” from coping with a chronic illness every day. Control over one’s life is an important human need. The patient with an unpredictable chronic disease may lose this control, and this lowers self-esteem. Health care providers must allow the patient to make decisions about care. Families and significant others must also include the patient in decision making. Although the patient’s behavior may be perceived as demanding or manipulative, self-esteem cannot be improved without this important aspect of interpersonal relationships.<br><br>Increased dependency also affects a sense of control and self-esteem. Some people ignore their health needs and portray a tough image for others by insisting that they need no assistance. Emphasize to the patient and family that asking for help may be the best decision at times to prevent further joint damage and disease progression.<br><br>RA may also affect work and social roles. The patient may have physical difficulty doing tasks that require lifting, climbing, grasp, or gross motor or fine motor activities. The severity of RA disease may cause difficulty with the total number of hours worked. Some people with RA can do their jobs well without problem; others may have varying degrees of difficulty. Those who can no longer do their jobs may need to discuss the possibility of a lighter workload with their employers; others may need to file for disability with their company and the U.S. Social Security Administration.<br><br><strong>Health Care Resources:</strong> The need for health care resources for the patient with RA is often similar to that for the patient with osteoarthritis. A home care nurse or aide, physical therapist, or occupational therapist may be needed during severe exacerbations or as the disease progresses. In collaboration with the case manager, identify these resources, and make sure that they are available as needed. The Arthritis Foundation is an excellent source of information and support.<br><br>Arthritis support groups and self-help courses provide the education and support that patients, families, and friends need. Refer the patient to a psychological counselor or religious or spiritual leader for emotional support and guidance during times of crisis or as needed. Identify and recommend other support systems within the family and community when necessary.<br><br>Patients who have severe advanced RA often develop depression, anxiety, excessive stress, and a poor quality of life as a result of pain and deformity. Many patients also have anorexia and dyspnea, which could be best managed by palliative care providers. Refer patients and their families to a local palliative care program for symptom management to improve quality of life.` },
+                    { id: 'ra-evaluate-outcomes', title: 'Evaluate Outcomes', type: 'text', content: `Evaluate the care of the patient with RA on the basis of the identified priority problems. The expected outcomes are that the patient:<ul><li>Achieves pain control to a pain intensity level of 2 to 3 or less on a scale of 0 to 10 or at a level that is acceptable to the patient</li><li>Moves and functions in own environment independently with or without assistive devices</li><li>Verbalizes increased self-esteem and positive perception of self</li></ul>` },
+                    { id: 'ra-quiz', title: 'Rheumatoid Arthritis Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which of the following is an autoantibody formed in patients with Rheumatoid Arthritis that attacks healthy tissue?", options: ["Interleukin-1 (IL-1)", "Tumor Necrosis Factor–alpha (TNFA)", "Rheumatoid Factor (RF)", "C-reactive protein (CRP)"], correctAnswer: "Rheumatoid Factor (RF)" },
+                        { question: "What is a 'pannus' in the context of Rheumatoid Arthritis?", options: ["A type of cartilage cell", "A fluid accumulation in the joint space", "Vascular granulation tissue that erodes cartilage and bone", "A fibrous adhesion between bones"], correctAnswer: "Vascular granulation tissue that erodes cartilage and bone" },
+                        { question: "Which genetic factor is strongly associated with more severe forms of Rheumatoid Arthritis?", options: ["HLA-DRB1", "HLA-A", "HLA-B", "HLA-DQ"], correctAnswer: "HLA-DRB1" },
+                        { question: "Which of these is a common early systemic sign of Rheumatoid Arthritis?", options: ["Deformities", "Subcutaneous nodules", "Low-grade fever", "Vasculitis"], correctAnswer: "Low-grade fever" },
+                        { question: "What is a life-threatening complication of cervical RA?", options: ["Carpal tunnel syndrome", "Tendon rupture", "Compromised respiratory function due to phrenic nerve restriction", "Baker cysts"], correctAnswer: "Compromised respiratory function due to phrenic nerve restriction" },
+                        { question: "Which laboratory test is very specific and sensitive in detecting early RA and is also a marker for aggressive disease?", options: ["Rheumatoid Factor (RF)", "Erythrocyte Sedimentation Rate (ESR)", "Anti–cyclic citrullinated peptide (anti-CCP)", "Antinuclear Antibody (ANA)"], correctAnswer: "Anti–cyclic citrullinated peptide (anti-CCP)" },
+                        { question: "What is the most serious adverse effect of hydroxychloroquine that patients should be taught to report?", options: ["Stomach discomfort", "Headache", "Blurred vision/Retinal damage", "Light-headedness"], correctAnswer: "Blurred vision/Retinal damage" },
+                        { question: "Which nonpharmacologic intervention is recommended for relieving morning stiffness in patients with RA?", options: ["Ice packs", "Heated paraffin dips", "Cold showers", "Immobilization devices"], correctAnswer: "Heated paraffin dips" },
+                        { question: "Sjögren syndrome is characterized by a triad of symptoms. Which of the following is NOT part of this triad?", options: ["Dry eyes", "Dry mouth", "Dry vagina", "Dry skin"], correctAnswer: "Dry skin" },
+                        { question: "What is a key principle of energy conservation for patients with arthritis?", options: ["Perform all activities at once", "Avoid naps", "Delegate responsibilities", "Ignore activity tolerance"], correctAnswer: "Delegate responsibilities" },
+                      ]
+                    },
+                ]
+            },
+            'viral-infections-module': {
+                title: 'Viral Infections: Overview & Management',
+                color: 'from-teal-500 to-blue-600',
+                description: 'Understand various types of viral infections, their transmission, symptoms, and effective management strategies.',
+                steps: [
+                    { id: 'viral-types', title: 'Types of Viral Infections', type: 'text', content: `The influenza virus causes flu. <strong>Influenza A, B and C</strong> are the most common types that infect people. Influenza A and B are seasonal (most people get them in the winter) and have more severe symptoms. Influenza C doesn’t cause severe symptoms and it’s not seasonal — the number of cases stays about the same throughout the year. The flu is one of the most common infectious diseases. Every flu season, about <strong>20 to 40 million people in the U.S.</strong> catch the flu.<br><br>Other types of viral infections include:<br><ul><li><strong>Respiratory infections:</strong> Such as the common cold, influenza, and COVID-19.</li><li><strong>Digestive system infections:</strong> Like gastroenteritis (stomach flu) caused by norovirus or rotavirus.</li><li><strong>Viral hemorrhagic fevers:</strong> Severe, life-threatening illnesses like Ebola or Dengue fever.</li><li><strong>Sexually transmitted infections (STIs):</strong> Including HIV, herpes, and HPV.</li><li><strong>Neurological infections:</strong> Such as meningitis or encephalitis caused by viruses.</li><li><strong>Congenital infections:</strong> Transmitted from mother to child during pregnancy or birth, like rubella or cytomegalovirus.</li></ul>` },
+                    { id: 'viral-transmission', title: 'Transmission of Viral Infections', type: 'text', content: `Common ways you can get viral infections include:<br><ul><li><strong>From other people:</strong> Through respiratory droplets when someone coughs, sneezes, or through close contact (e.g., kissing, sharing utensils).</li><li><strong>From surfaces or objects:</strong> That someone with a virus has touched (like countertops, doorknobs, or phones), followed by touching your face.</li><li><strong>Through sexual contact:</strong> Via vaginal, oral, or anal sex.</li><li><strong>From animal or insect bites:</strong> Such as from an infected animal, mosquito (e.g., Zika, West Nile), or tick (e.g., Powassan virus).</li><li><strong>From contaminated food or water:</strong> Ingesting food or water tainted with viruses (e.g., Hepatitis A, norovirus).</li></ul>` },
+                    { id: 'viral-symptoms', title: 'Symptoms of Viral Infections', type: 'text', content: `Symptoms of a viral infection will depend on where you’re infected and the specific virus, but some common categories include:<br><ul><li><strong>Flu-like symptoms:</strong> Fever, chills, body aches, headache, and fatigue.</li><li><strong>Upper respiratory symptoms:</strong> Cough, sore throat, runny or stuffy nose, and sneezing.</li><li><strong>Digestive symptoms:</strong> Nausea, vomiting, abdominal cramps, and diarrhea.</li><li><strong>Skin conditions:</strong> Rashes, blisters, or lesions (e.g., measles, chickenpox, herpes).</li></ul>It's important to note that many viral infections, especially in their early stages or in individuals with strong immune systems, may not cause any noticeable symptoms (asymptomatic).` },
+                    { id: 'viral-risk-factors', title: 'Populations at Highest Risk', type: 'text', content: `Individuals at the highest risk for severe viral infections or complications include those who:<br><ul><li><strong>Age:</strong> Are very young (under 5) or older adults (over 65) due to immature or weakened immune systems.</li><li><strong>Pre-existing Health Conditions:</strong> Have certain chronic health conditions, like diabetes, asthma, Chronic Obstructive Pulmonary Disease (COPD), or other chronic lung diseases, which can compromise respiratory function or overall immunity.</li><li><strong>Weakened Immune System:</strong> From conditions like HIV/AIDS, cancer (especially during chemotherapy or radiation), or individuals taking immunosuppressive medications (e.g., organ transplant recipients, autoimmune disease patients).</li><li><strong>Pregnancy:</strong> Pregnant individuals may have altered immune responses, making them more susceptible to certain viral infections and their complications.</li><li><strong>Lifestyle Factors:</strong> Smokers and individuals with obesity often have compromised respiratory and immune health, increasing their risk.</li></ul>` },
+                    { id: 'viral-management', title: 'Management & Treatment Strategies', type: 'text', content: `Managing symptoms of the flu and other viral infections often involves supportive care to alleviate discomfort and aid recovery:<br><ul><li><strong>Rest:</strong> Getting plenty of rest allows the body to conserve energy and focus on fighting the infection.</li><li><strong>Hydration:</strong> Drinking fluids like water, broth, or electrolyte solutions helps prevent dehydration, especially with fever or digestive symptoms.</li><li><strong>Pain and Fever Relief:</strong> Applying heat packs or hot water bottles can help with aching muscles. Over-the-counter medications like acetaminophen (Tylenol®) or NSAIDs (e.g., Advil®, Motrin®, Aleve®) can help lower fever and relieve head and body aches.</li><li><strong>Symptom-Specific Relief:</strong> Using spray or oral decongestants for nasal congestion, taking cough suppressants for dry coughs, and using expectorants for productive coughs.</li></ul><strong>Antiviral drugs</strong> are specific medications that target viruses. For influenza, common antivirals include:<br><ul><li>Oseltamivir phosphate (Tamiflu®)</li><li>Zanamivir (Relenza®)</li><li>Peramivir (Rapivap®)</li></ul>These antiviral medications work by stopping viruses from making more copies of themselves (replicating), thereby reducing the severity and duration of the illness. Other treatments may include Convalescent plasma (containing antibodies from recovered patients) and Post-exposure prophylaxis (medication given after potential exposure to prevent infection).` },
+                    { id: 'viral-diagnosis-tests', title: 'Diagnosis & Testing', type: 'text', content: `Viral infections can be diagnosed using various laboratory tests that detect the virus itself, parts of the virus, or the body's immune response to the virus. Samples are typically collected from:<br><ul><li><strong>Blood:</strong> To detect viral antibodies, antigens, or viral genetic material (e.g., HIV, Hepatitis B, C).</li><li><strong>Spit (saliva):</strong> Useful for detecting respiratory viruses or oral infections.</li><li><strong>Phlegm or mucus (sputum):</strong> Collected for respiratory viral infections like influenza or RSV.</li><li><strong>Cells from your nose or nasopharynx (nasal/nasopharyngeal swab):</strong> Common for diagnosing respiratory viruses, including influenza and COVID-19.</li><li><strong>Skin or other affected tissue:</strong> Biopsies or swabs from rashes, blisters, or lesions can identify viruses like herpes simplex or varicella-zoster.</li><li><strong>Fluid around your brain and spinal cord (CNS fluid):</strong> Obtained via lumbar puncture to diagnose viral meningitis or encephalitis.</li><li><strong>Pee (urine):</strong> Can detect certain viral infections, especially in congenital infections (e.g., cytomegalovirus).</li><li><strong>Poop (stool):</strong> Used to diagnose viral gastroenteritis (e.g., norovirus, rotavirus).</li></ul>` },
+                    { id: 'viral-patient-education', title: 'Patient Education for Prevention', type: 'text', content: `Key patient education points for preventing viral infections and their spread include:<br><ul><li><strong>Hand Hygiene:</strong> Wash your hands frequently and thoroughly with soap and water for at least 20 seconds, especially during cold and flu season, after coughing/sneezing, and before eating.</li><li><strong>Food Safety:</strong> Practice safe food habits, including proper cooking temperatures, avoiding cross-contamination, and washing fruits and vegetables.</li><li><strong>Safe Sex Practices:</strong> Use condoms or dental dams consistently and correctly during any kind of sex to prevent sexually transmitted viral infections.</li><li><strong>Protection from Bug Bites:</strong> Use insect repellent, wear protective clothing, and eliminate standing water to reduce exposure to mosquito and tick-borne viruses.</li><li><strong>Avoid Wild Animals:</strong> Do not handle wild or aggressive animals, as they can carry viruses like rabies.</li><li><strong>Avoid Sick Individuals:</strong> If you are sick, avoid being around other people to prevent transmission. If others are sick, maintain distance and avoid close contact.</li><li><strong>Post-Exposure Prophylaxis:</strong> Understand and utilize post-exposure prophylaxis when recommended by a healthcare provider (e.g., for HIV exposure).</li><li><strong>Healthcare Setting Precautions:</strong> In healthcare settings, adhere to standard precautions, including wearing gowns, N95 masks, face shields, and protective eyewear as appropriate, and ensuring doors are kept closed to contain airborne pathogens (refer to Ignatavicius, Workman, Rebar & Heimgartner 10th edition, p. 568 under Key Features for more details).</li></ul>` },
+                    { id: 'viral-quiz', title: 'Viral Infections Quiz', type: 'quiz',
+                      questions: [
+                        { question: "Which type of influenza virus is typically seasonal and causes more severe symptoms?", options: ["Influenza A and B", "Influenza C", "Influenza D", "Influenza E"], correctAnswer: "Influenza A and B" },
+                        { question: "Which of the following is NOT a common way viral infections are transmitted?", options: ["Through coughing or sneezing", "From contaminated food or water", "Through direct sunlight exposure", "From a bite from an infected animal"], correctAnswer: "Through direct sunlight exposure" },
+                        { question: "Which age group is explicitly mentioned as being at highest risk for severe viral infections?", options: ["Adolescents", "Young adults (20-30 years old)", "Individuals under 5 or over 65", "Middle-aged adults (40-50 years old)"], correctAnswer: "Individuals under 5 or over 65" },
+                        { question: "What is the primary action of antiviral medications?", options: ["To boost the immune system", "To reduce fever", "To stop viruses from replicating", "To relieve pain"], correctAnswer: "To stop viruses from replicating" },
+                      ]
+                    },
+                ]
+            },
+        };
+
+        // Utility function for conditional class names
+        const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+        // Quiz Component: Handles displaying questions, options, and providing feedback.
+        const Quiz = ({ questions, onComplete }) => {
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [feedback, setFeedback] = useState(null);
+            const [answers, setAnswers] = useState([]);
+
+            const currentQuestion = questions[currentQuestionIndex];
+
+            // Handles user selecting an option
+            const handleOptionSelect = (option) => {
+                if (feedback) return; // Prevent changing selection after submission
+                setSelectedOption(option);
+            };
+            
+            // Handles submitting a quiz answer for immediate feedback
+            const handleRegularQuizSubmit = () => {
+                if (selectedOption === null) return; // Cannot submit without selection
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                setFeedback(isCorrect ? 'correct' : 'incorrect');
+            };
+
+            // Handles moving to the next question or completing the quiz
+            const handleRegularQuizNext = () => {
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                const finalAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    setAnswers(finalAnswers);
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null); // Reset for next question
+                    setFeedback(null); // Reset feedback
+                } else {
+                    // Quiz completed, calculate final score and call onComplete
+                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    onComplete({ score: finalScore, total: questions.length });
+                }
+            };
+
+            return (
+                <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Quiz: {currentQuestionIndex + 1} of {questions.length}</h4>
+                    <p className="font-semibold text-gray-700 mb-3">{currentQuestion.question}</p>
+                    <div className="space-y-2">
+                        {currentQuestion.options.map((option, index) => {
+                            const isSelected = selectedOption === option;
+                            const isCorrectOption = option.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
+
+                            // Apply feedback styling after submission
+                            if (feedback) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => handleOptionSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {feedback && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : <span className="text-red-600 mr-2">✗</span>
+                                        )}
+                                        <span className="flex-1">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-4 text-center">
+                        {!feedback ? (
+                            <button
+                                onClick={handleRegularQuizSubmit}
+                                disabled={selectedOption === null}
+                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Submit Answer
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleRegularQuizNext}
+                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                            >
+                                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        // Dashboard Component: Displays available modules and overall progress.
+        const Dashboard = ({ onSelectModule, progress, onResetProgress }) => {
+            let totalCompletedSteps = 0;
+            let totalPossibleSteps = 0;
+            let totalQuizCorrect = 0;
+            let totalQuizQuestions = 0;
+
+            // Calculate overall progress and quiz performance
+            Object.entries(contentData).forEach(([moduleId, module]) => {
+                totalPossibleSteps += module.steps.length;
+                const moduleProgress = progress[moduleId] || {};
+                
+                Object.values(moduleProgress).forEach(stepProgress => {
+                    if (stepProgress.completed) {
+                        totalCompletedSteps++;
+                    }
+                    if (stepProgress.score !== undefined) {
+                        totalQuizCorrect += stepProgress.score;
+                    }
+                });
+
+                module.steps.forEach(step => {
+                    if (step.type === 'quiz') {
+                        totalQuizQuestions += step.questions.length;
+                    }
+                });
+            });
+
+            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+            return (
+                <div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+                    <div className="w-full">
+                        <header className="mb-8 text-center">
+                            <div className="flex items-center justify-center gap-3 mb-2">
+                                <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">ILM</span>
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Inflammation Learning Module</h1>
+                                <span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1</span>
+                            </div>
+                            <p className="text-lg text-gray-500 max-w-2xl mx-auto">Explore key concepts of inflammation through interactive modules designed for comprehensive understanding.</p>
+                        </header>
+
+                        <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 w-full">
+                           <div className="flex justify-between items-center mb-3">
+                              <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+                              <button 
+                                onClick={onResetProgress}
+                                className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2"
+                               >
+                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
+                                 Reset Progress
+                               </button>
+                           </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4">
+                                <div
+                                    className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+                                    style={{ width: `${overallPercentage}%` }}
+                                ></div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-left text-sm text-gray-600 mt-2">
+                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+                                </p>
+                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                            {Object.entries(contentData).map(([id, module]) => {
+                                const moduleProgress = progress[id] || {};
+                                const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+                                const totalSteps = module.steps.length;
+                                const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+                                let statusText = "Not Started";
+                                let statusColor = "text-gray-500";
+                                if (completedCount === totalSteps) {
+                                    statusText = "Completed";
+                                    statusColor = "text-green-600";
+                                } else if (completedCount > 0) {
+                                    statusText = "In Progress";
+                                    statusColor = "text-yellow-600";
+                                }
+
+                                const quizStep = module.steps.find(step => step.type === 'quiz');
+                                const quizProgress = quizStep ? moduleProgress[quizStep.id] : null;
+
+                                return (
+                                    <div
+                                        key={id}
+                                        onClick={() => onSelectModule(id)}
+                                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-10 h-10 flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0")}>
+                                                {module.title.split(' ').map(word => word.charAt(0)).join('')}
+                                            </div>
+                                            <div className="relative w-12 h-12 flex-shrink-0">
+                                                <svg className="w-full h-full" viewBox="0 0 36 36">
+                                                    <path
+                                                        className="text-gray-200"
+                                                        d="M18 2.0845
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                    />
+                                                    <path
+                                                        className="text-indigo-500"
+                                                        d="M18 2.0845
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                        strokeDasharray={`${percentage}, 100`}
+                                                        strokeLinecap="round"
+                                                        transform="rotate(-90 18 18)"
+                                                    />
+                                                </svg>
+                                                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
+                                        <p className="text-gray-500 text-sm mb-2 h-10">{module.description}</p>
+                                        <div className="mt-auto">
+                                            <p className={cn("text-sm font-semibold", statusColor)}>{statusText}</p>
+                                            {quizProgress && quizProgress.score !== undefined && (
+                                                <p className="text-sm text-gray-600 mt-1">Quiz Score: {quizProgress.score} / {quizStep.questions.length}</p>
+                                            )}
+                                            <div className="flex items-center justify-end text-sm font-medium text-indigo-600 group-hover:text-indigo-700 mt-2">
+                                                Start Learning <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        // CaseStudy Component: Displays a case scenario and a multiple-choice question with explanation.
+        const CaseStudy = ({ caseData, onComplete }) => {
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+
+            // Handles user selecting an option for the case study question
+            const handleSelect = (option) => {
+                if (selectedAnswer) return; // Prevent changing selection after answering
+                setSelectedAnswer(option);
+                if (option.toLowerCase() === caseData.correctAnswer.toLowerCase()) {
+                    onComplete(); // Mark step as complete if correct
+                }
+            };
+
+            return (
+                <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Case Study Challenge</h4>
+                    <p className="bg-blue-100 text-blue-800 p-3 rounded-md mb-4 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+                    <p className="font-semibold text-gray-700 mb-3">{caseData.question}</p>
+                    <div className="space-y-2">
+                        {caseData.options.map(option => {
+                            const isSelected = selectedAnswer === option;
+                            const isCorrect = option.toLowerCase() === caseData.correctAnswer.toLowerCase();
+                            const showFeedback = selectedAnswer !== null;
+
+                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
+                            if (showFeedback) {
+                                if (isCorrect) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                } else if (isSelected && !isCorrect) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                            }
+
+                            return (
+                                <div
+                                    key={option}
+                                    onClick={() => handleSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {showFeedback && (
+                                            isCorrect ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>)
+                                        )}
+                                        <span className="flex-1">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {selectedAnswer && (
+                        <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
+                            <h5 className="font-bold text-indigo-800">Explanation</h5>
+                            <p className="text-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        
+        // StaticContentStep Component: Displays plain text content.
+        const StaticContentStep = ({ step, onComplete }) => {
+            // Mark the step as complete as soon as it's viewed
+            useEffect(() => {
+                onComplete();
+            }, [onComplete]); // Dependency array ensures it runs only once per step
+
+            return (
+                <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50 rounded-lg shadow-inner space-y-4" dangerouslySetInnerHTML={{ __html: step.content }}>
+                </div>
+            );
+        };
+
+        // CompletionModal Component: Appears when a module is fully completed.
+        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+                        <h3 className="text-2xl font-bold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+                        <p className="text-gray-700 mb-6">You've successfully completed all steps in this module. Great job!</p>
+                        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
+                            >
+                                Back to Dashboard
+                            </button>
+                            {hasNextModule && (
+                                <button
+                                    onClick={onNextModule}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    Continue to Next Module
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // LearningModule Component: Displays the steps of a selected module.
+        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+            const [activeStep, setActiveStep] = useState(0);
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+            // Callback to update progress for a specific step
+            const handleStepComplete = useCallback((stepId, data = {}) => {
+                onProgressUpdate(module.id, stepId, { completed: true, ...data });
+            }, [onProgressUpdate, module.id]);
+
+            const moduleProgress = progress[module.id] || {};
+            
+            // Check if all steps in the current module are completed
+            const allStepsCompletedInModule = module.steps.every(step =>
+                moduleProgress[step.id] && moduleProgress[step.id].completed
+            );
+
+            // Handles moving to the next step
+            const handleNextStep = () => {
+                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
+                    setIsCompletionModalOpen(true); // Open completion modal if last step and all completed
+                } else if (activeStep < module.steps.length - 1) {
+                    setActiveStep(activeStep + 1);
+                }
+            };
+
+            // Handles moving to the previous step
+            const handlePrevStep = () => {
+                if (activeStep > 0) {
+                    setActiveStep(activeStep - 1);
+                }
+            };
+            
+            // Handle loading state or invalid module
+            if (!module || !module.steps) {
+                return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Loading module...</div>;
+            }
+
+            const currentStep = module.steps[activeStep];
+            
+            // Renders the appropriate component based on step type
+            const renderStepContent = (step) => {
+                if (!step) return <p>Please select a step.</p>;
+
+                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+                switch (step.type) {
+                    case 'text':
+                        return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study':
+                        return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz':
+                        return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    default:
+                        return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+                }
+            };
+
+            // Handlers for the completion modal
+            const handleModalClose = () => {
+                setIsCompletionModalOpen(false);
+                onBack(); // Go back to dashboard
+            };
+
+            const handleModalNextModule = () => {
+                setIsCompletionModalOpen(false);
+                onNextModule(); // Move to the next module
+            };
+
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+                    <header className="bg-white shadow-md p-4 flex items-center justify-between z-30 flex-shrink-0">
+                        <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                            <span className="hidden sm:inline">Dashboard</span>
+                        </button>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-bold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+                        </div>
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                    </header>
+                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+                    <div className="flex flex-1 overflow-hidden">
+                        <aside className={cn(
+                            "bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        )}>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700 px-3">Module Steps</h3>
+                            <nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+                                {module.steps.map((step, index) => (
+                                    <button
+                                        key={step.id}
+                                        onClick={() => {
+                                            setActiveStep(index);
+                                            setIsSidebarOpen(false); // Close sidebar on mobile after selection
+                                        }}
+                                        className={cn(
+                                            'w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors',
+                                            activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700'
+                                        )}
+                                    >
+                                        <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                                            {moduleProgress[step.id]?.completed ? (
+                                                <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                            ) : (
+                                                <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+                                            )}
+                                        </div>
+                                        <span className="flex-1 text-sm">{step.title}</span>
+                                    </button>
+                                ))}
+                            </nav>
+                        </aside>
+
+                        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                            <div className="max-w-5xl mx-auto">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentStep.title}</h3>
+                                {renderStepContent(currentStep)}
+
+                                <div className="flex justify-between mt-8">
+                                    <button
+                                        onClick={handlePrevStep}
+                                        disabled={activeStep === 0}
+                                        className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                    >
+                                        Previous
+                                    </button>
+
+                                    <button
+                                        onClick={handleNextStep}
+                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+                                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+                                    >
+                                        {activeStep === module.steps.length - 1 ? 'Finish Module' : 'Next'}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                    <CompletionModal
+                        isOpen={isCompletionModalOpen}
+                        onClose={handleModalClose}
+                        onNextModule={handleModalNextModule}
+                        hasNextModule={hasNextModule}
+                    />
+                </div>
+            );
+        };
+        
+        // Main App Component: Manages module selection and overall progress.
+        function App() {
+            const [currentModuleId, setCurrentModuleId] = useState(null);
+            const [userId, setUserId] = useState(null);
+            const [progress, setProgress] = useState({});
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            // Simulate authentication and set user ID
+            useEffect(() => {
+                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+                    if (user) setUserId(user.uid);
+                    setIsAuthReady(true);
+                });
+                return () => unsubscribe();
+            }, []);
+
+            // Load progress from local storage when auth is ready
+            useEffect(() => {
+                if (!isAuthReady || !userId) return;
+                const storedProgress = localStorage.getItem(`inflammation-learning-module-progress-${userId}`);
+                if (storedProgress) {
+                    try {
+                        setProgress(JSON.parse(storedProgress));
+                    } catch (e) {
+                        console.error("Failed to parse stored progress, resetting.", e);
+                        setProgress({});
+                    }
+                }
+            }, [isAuthReady, userId]);
+
+            // Callback to update progress for a specific step and save to local storage
+            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+                if (!isAuthReady || !userId) return;
+
+                setProgress(currentProgress => {
+                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+                    const newStepProgress = { ...currentStepProgress, ...data };
+
+                    // Only update if there's a change to prevent unnecessary localStorage writes
+                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+                        return currentProgress;
+                    }
+
+                    const newProgress = {
+                        ...currentProgress,
+                        [moduleId]: {
+                            ...(currentProgress[moduleId] || {}),
+                            [stepId]: newStepProgress
+                        }
+                    };
+
+                    localStorage.setItem(`inflammation-learning-module-progress-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [isAuthReady, userId]);
+            
+            // Callback to reset all progress
+            const handleResetProgress = useCallback(() => {
+                if (!isAuthReady || !userId) return;
+                setProgress({});
+                localStorage.removeItem(`inflammation-learning-module-progress-${userId}`);
+            }, [isAuthReady, userId]);
+
+            // Callback to navigate to the next module in sequence
+            const handleNextModule = useCallback(() => {
+                const moduleIds = Object.keys(contentData);
+                const currentIndex = moduleIds.indexOf(currentModuleId);
+                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+                    setCurrentModuleId(moduleIds[currentIndex + 1]);
+                } else {
+                    setCurrentModuleId(null); // Go back to dashboard if no next module
+                }
+            }, [currentModuleId]);
+
+            // Determine the currently selected module
+            const selectedModule = currentModuleId && contentData[currentModuleId]
+                                            ? { ...contentData[currentModuleId], id: currentModuleId }
+                                            : null;
+
+            // Determine if there's a next module for the completion modal
+            const moduleIds = Object.keys(contentData);
+            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+            return (
+                <div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+                    {selectedModule ? (
+                        <LearningModule
+                            key={selectedModule.id} // Key ensures component remounts for new module
+                            module={selectedModule}
+                            onBack={() => setCurrentModuleId(null)}
+                            progress={progress}
+                            onProgressUpdate={handleProgressUpdate}
+                            onNextModule={handleNextModule}
+                            hasNextModule={hasNextModule}
+                        />
+                    ) : (
+                        <Dashboard 
+                            onSelectModule={setCurrentModuleId} 
+                            progress={progress} 
+                            onResetProgress={handleResetProgress}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // Render the React application into the root div
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
