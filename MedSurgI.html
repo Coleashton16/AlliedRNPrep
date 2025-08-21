@@ -117,12 +117,12 @@
             <main class="md:col-span-9 lg:col-span-10">
                 
                 <!-- Page Header -->
-                <header class="relative bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-200 mb-8 overflow-hidden">
-                    <div class="absolute -top-10 -left-10 w-48 h-48 bg-sky-100/50 rounded-full float-anim opacity-50"></div>
-                    <div class="absolute -bottom-16 -right-8 w-56 h-56 bg-teal-100/50 rounded-full float-anim" style="animation-delay: -5s;"></div>
+                <header class="relative bg-sky-600 p-8 md:p-10 rounded-2xl shadow-lg mb-8 overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-sky-500/50 rounded-full"></div>
+                    <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-sky-500/50 rounded-full"></div>
                     <div class="relative z-10">
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Med Surg 1 Resources</h1>
-                        <p class="mt-3 max-w-3xl text-slate-600">Your central hub for professionally curated materials, practice exams, and learning modules.</p>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Med Surg 1 Resources</h1>
+                        <p class="mt-3 max-w-3xl text-sky-100">Your central hub for professionally curated materials, practice exams, and learning modules.</p>
                     </div>
                 </header>
 
@@ -315,7 +315,7 @@
             };
             
             // Populate navigation and content
-            courseData.units.forEach((unit, index) => {
+            courseData.units.forEach((unit) => {
                 // Create and append navigation link
                 const navLink = document.createElement('a');
                 navLink.href = `#${unit.id}`;
@@ -337,11 +337,55 @@
                 `;
 
                 if (unit.resources.length > 0) {
-                    contentHTML += `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                            ${unit.resources.map(createResourceCard).join('')}
-                        </div>
-                    `;
+                    // ** NEW: Group resources by type **
+                    const learningModules = unit.resources.filter(r => r.type === 'learn');
+                    const exams = unit.resources.filter(r => r.type === 'exam');
+                    const finalExams = unit.resources.filter(r => r.type === 'final');
+
+                    let resourcesHTML = '';
+
+                    if (learningModules.length > 0) {
+                        resourcesHTML += `
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
+                                    <i data-feather="book-open" class="w-5 h-5 text-sky-600"></i>
+                                    <span>Learning Modules</span>
+                                </h3>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    ${learningModules.map(createResourceCard).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (exams.length > 0) {
+                        resourcesHTML += `
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
+                                    <i data-feather="clipboard" class="w-5 h-5 text-rose-600"></i>
+                                    <span>Diagnostic Exams</span>
+                                </h3>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    ${exams.map(createResourceCard).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (finalExams.length > 0) {
+                        resourcesHTML += `
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
+                                    <i data-feather="award" class="w-5 h-5 text-indigo-600"></i>
+                                    <span>Comprehensive Exam</span>
+                                </h3>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    ${finalExams.map(createResourceCard).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    contentHTML += resourcesHTML;
                 } else {
                     contentHTML += `
                         <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
@@ -360,14 +404,14 @@
             const contentSections = document.querySelectorAll('.content-section');
 
             const switchTab = (targetId) => {
-                // Update nav links
                 navLinks.forEach(link => {
                     link.classList.toggle('nav-link-active', link.dataset.target === targetId);
                 });
-                // Update content sections
                 contentSections.forEach(section => {
                     section.classList.toggle('active', section.id === targetId);
                 });
+                // Re-initialize icons after content is shown
+                feather.replace();
             };
 
             navContainer.addEventListener('click', (e) => {
@@ -375,17 +419,12 @@
                 if (link) {
                     e.preventDefault();
                     const targetId = link.dataset.target;
-                    // Update URL hash without jumping
                     history.pushState(null, null, `#${targetId}`);
                     switchTab(targetId);
                 }
             });
 
             // --- INITIALIZATION ---
-            // Activate Feather Icons
-            feather.replace();
-            
-            // Set initial state based on URL hash or default to first unit
             const initialTab = window.location.hash.substring(1) || courseData.units[0].id;
             switchTab(initialTab);
         });
