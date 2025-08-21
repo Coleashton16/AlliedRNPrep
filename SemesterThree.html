@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlliedRNPrep - Semester Three Resources</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS (can be shared or specific) */
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-sans antialiased text-gray-800">
+
+    <!-- Header Section (similar to main page) -->
+    <header class="bg-white shadow-lg py-4 relative z-10">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-extrabold text-blue-700 rounded-lg p-2 hover:bg-blue-50 transition duration-300 transform hover:scale-105">
+                AlliedRNPrep
+            </a>
+            <nav aria-label="Semester navigation">
+                <ul class="flex space-x-8">
+                    <li><a href="index.html" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Contact</a></li>
+                    <li><a href="#" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-bold transform hover:scale-105">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Semester Three Content Section -->
+    <section class="py-20 md:py-32 bg-white">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-800">
+                Semester Three Resources
+            </h1>
+            <p class="text-lg text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+                Deepen your knowledge with resources for advanced medical-surgical concepts and specialized maternal-child health. Click on a class below to explore its dedicated resources.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Medical Surgical II Class Card -->
+                <a href="med-surg-two.html" class="block bg-gray-50 rounded-lg p-6 shadow-md border border-gray-100 hover:shadow-lg hover:border-blue-300 transform hover:-translate-y-1 transition duration-300">
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-3">Medical Surgical II</h2>
+                    <p class="text-gray-600 mb-6">Explore advanced concepts in medical-surgical nursing, focusing on complex diseases and critical care management.</p>
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold w-full">
+                        Explore Resources
+                    </button>
+                </a>
+
+                <!-- Mother/Baby Class Card -->
+                <a href="mother-baby.html" class="block bg-gray-50 rounded-lg p-6 shadow-md border border-gray-100 hover:shadow-lg hover:border-blue-300 transform hover:-translate-y-1 transition duration-300">
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-3">Mother/Baby Nursing</h2>
+                    <p class="text-gray-600 mb-6">Access comprehensive materials on maternal-child health, including prenatal, intrapartum, postpartum, and newborn care.</p>
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold w-full">
+                        Explore Resources
+                    </button>
+                </a>
+
+                <!-- Add more class cards as needed -->
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section (similar to main page) -->
+    <footer class="bg-gray-900 text-gray-300 py-10">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <p class="text-sm mb-4 md:mb-0">&copy; <span id="current-year-semester-three"></span> AlliedRNPrep. All rights reserved.</p>
+            <div class="flex justify-center space-x-8">
+                <a href="#" class="hover:text-white text-sm transition duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-white text-sm transition duration-300">Terms of Service</a>
+                <a href="#" class="hover:text-white text-sm transition duration-300">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set the current year for the footer
+        document.getElementById('current-year-semester-three').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
