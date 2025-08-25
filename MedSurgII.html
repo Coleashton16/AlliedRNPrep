@@ -133,8 +133,18 @@
                     id: 'cardiovascular-perfusion-unit',
                     title: 'Unit 1: Cardiovascular/Perfusion',
                     subtitle: 'In-depth study of cardiac function, circulatory dynamics, and perfusion management.',
-                    resources: [] // All modules have been removed
+                    resources: [
+                        // New learning module added here
+                        {
+                            type: 'learn',
+                            title: 'Cardiac ECG Learning Module',
+                            description: 'An interactive module for understanding Electrocardiograms in cardiovascular care.',
+                            icon: 'activity', // Using 'activity' for heart rhythm/ECG related content
+                            link: 'MSIICaridacEKGLearningModule.html'
+                        }
+                    ]
                 }
+                // Add more units here as needed
             ]
         };
 
@@ -251,4 +261,3 @@
     </script>
 </body>
 </html>
-
