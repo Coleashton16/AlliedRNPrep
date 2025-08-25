@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Health Promotion Module</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration to use the Inter font.
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                    },
+                },
+            },
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- React and Library Setup ---
+        // Destructure necessary hooks from the global React object.
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // --- Mock Authentication Setup for Standalone Demo ---
+        // This mock object simulates basic user authentication to allow progress tracking via localStorage.
+        // In a real application, this would be replaced with actual Firebase authentication.
+        const mockAuth = {
+            onAuthStateChanged: (callback) => {
+                // Simulate an asynchronous authentication check, providing a unique user ID.
+                setTimeout(() => callback({ uid: 'standalone-childhealth-user' }), 100);
+                return () => {}; // Returns an empty function as a cleanup/unsubscribe placeholder.
+            },
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-childhealth-user' } }), // Mock anonymous sign-in.
+        };
+
+        // --- Content & Data Structure for the Learning Modules ---
+        // The main content is broken down into smaller, focused modules based on concepts from the PDF.
+        const contentData = {
+            'foundations-gd': {
+                title: 'Foundations of Growth & Development',
+                color: 'from-blue-500 to-indigo-600',
+                description: 'Define key terms, understand principles, and identify factors influencing child development.',
+                steps: [
+                    { id: 'gd-definitions', title: 'Growth, Development, Maturation, Learning', type: 'text', content: `
+                        <p>As nurses, understanding the nuances of <strong>growth</strong> and <strong>development</strong> is foundational. While often used interchangeably, they represent distinct, yet interconnected, processes.</p>
+                        <ul>
+                            <li><strong>Growth:</strong> Refers to an <strong>increase in physical size</strong> of the whole body or any of its parts, or an increase in the number and size of cells. It's easily measured and observed.
+                                <ul>
+                                    <li><em>Example:</em> An infant's rapid increase in weight and length during the first year of life.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Development:</strong> A more complex and subtle concept, signifying a <strong>continuous, orderly series of conditions leading to increased function and complexity</strong>. It involves new motives for activities and patterns of behavior.
+                                <ul>
+                                    <li><em>Example:</em> The progression of language acquisition, from single words to complex sentences.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Maturation:</strong> The <strong>physical change in the complexity of body structures</strong> that enables a child to function at increasingly higher levels. It's genetically programmed.
+                                <ul>
+                                    <li><em>Example:</em> Myelinization of nerve fibers and overall weight gain contribute to central nervous system maturation.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Learning:</strong> Involves <strong>changes in behavior that occur as a result of both maturation and experience</strong> with the environment. Learning follows predictable, sequential, orderly, and progressive patterns.
+                                <ul>
+                                    <li><em>Example:</em> A baby learning to walk, progressing from head control to rolling, sitting, crawling, and finally walking.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>These processes are highly interrelated; optimal development relies on healthy growth, maturation, and learning opportunities.</p>
+                    `},
+                    { id: 'gd-stages', title: 'Stages of Child Growth & Development', type: 'text', content: `
+                        <p>To simplify the analysis and discussion of the complex processes of growth and development, researchers and theorists have identified specific stages or age-groupings. These serve as crucial reference points for nurses when assessing and planning care.</p>
+                        <table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
+                            <thead class="bg-sky-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age Range</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Key Characteristics (Brief)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Newborn</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Birth to 1 month</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">Primarily reflexive, rapid physical adjustments to extrauterine life.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Infancy</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 month - 1 year</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">Dramatic physical growth, motor skill development (rolling, sitting, crawling), beginning language, trust formation.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Toddlerhood</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 - 3 years</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">Increased mobility (walking, running), autonomy, negativism, ritualism, rapid language growth.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Preschool Age</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 - 6 years</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">Refined motor skills, imaginative play, initiative, egocentric thinking, expanding vocabulary.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">School Age</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6 - 11 or 12 years</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">Slower physical growth, concrete operational thought, industry, peer relationships, moral development.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Adolescence</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">11 or 12 - 18 years</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">Puberty, abstract thought, identity formation, independence, sexual development.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p>These stages provide a general framework; remember that individual children may progress at varying rates within normal limits.</p>
+                    `},
+                    { id: 'gd-parameters', title: 'Parameters of Growth: Measuring Progress', type: 'text', content: `
+                        <p>Monitoring physical growth is a crucial indicator of a child's overall health. Nurses regularly measure and evaluate these parameters to identify normal patterns and detect potential deviations early.</p>
+                        <ul>
+                            <li><strong>Weight:</strong>
+                                <ul>
+                                    <li>Average term newborn: ~7.5 lb (3.4 kg).</li>
+                                    <li>Doubles by 6 months, triples by 1 year, quadruples by 2-3 years.</li>
+                                    <li>Slow, steady gain in childhood, followed by an adolescent growth spurt.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Length (or Height):</strong>
+                                <ul>
+                                    <li>Average newborn: ~20 inches (50 cm).</li>
+                                    <li>Increases ~1 inch (2.5 cm)/month for the first 6 months, then ~0.5 inch (1.2 cm)/month for the remainder of the first year.</li>
+                                    <li>Gains ~3 inches (7.6 cm)/year from age 1-7 years, then ~2 inches (5 cm)/year from 8-15 years.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Head Circumference (HC):</strong>
+                                <ul>
+                                    <li>Normal term newborn: 13-15 inches (32-38 cm).</li>
+                                    <li>Indicates brain growth. Average growth: 4.8 inches (12 cm) in the first year.</li>
+                                    <li>Posterior fontanel closes by 2-3 months; anterior fontanel may remain open until 18 months.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Body Mass Index (BMI):</strong>
+                                <ul>
+                                    <li>Important measure of growth and nutritional status for children older than 2 years.</li>
+                                    <li>BMI percentile for age is used to assess overweight and obesity, not adult BMI values.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Dentition (Eruption of Teeth):</strong>
+                                <ul>
+                                    <li>Primary dentition usually begins to emerge at ~6-8 months.</li>
+                                    <li>Most children have 20 primary teeth by 2.5 years. Permanent teeth erupt starting around age 6.</li>
+                                    <li><em>Important:</em> <strong>Dentition is NOT related to the level or rate of development.</strong></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>All measurements should be plotted on standardized growth charts (WHO for 0-2 years, NCHS for 2-20 years). <strong>Any change of more than two growth channels</strong> warrants further in-depth assessment.</p>
+                    `},
+                    { id: 'gd-principles', title: 'Principles of Growth & Development: Directional Patterns', type: 'text', content: `
+                        <p>Growth and development are not random; they follow predictable, directional patterns that help nurses anticipate changes and assess normalcy.</p>
+                        <div class="bg-sky-100 border-l-4 border-sky-500 text-sky-800 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-sky-900">Key Patterns:</h4>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><strong>Cephalocaudal Pattern (Head to Toe):</strong> Development proceeds from the head downward.
+                                    <ul>
+                                        <li><em>Example:</em> An infant gains head control before trunk control, and can sit before standing. The head is proportionally larger at birth and body proportions change as the child matures.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Proximodistal Pattern (Center Outward):</strong> Development proceeds from the center of the body outward to the extremities.
+                                    <ul>
+                                        <li><em>Example:</em> An infant gains control of their arms before their hands, and hand control before finger control. The respiratory tract branches from the trachea outward.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>General to Specific:</strong> Activities become less generalized and more focused as a child matures.
+                                    <ul>
+                                        <li><em>Example:</em> A neonate's whole-body response to pain (flailing arms and legs) becomes a more localized response in an older child (guarding the abdomen for abdominal pain).</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Simple to Complex:</strong> Functions progress from simpler to more intricate.
+                                    <ul>
+                                        <li><em>Example:</em> A toddler's first sentences are simple noun-verb combinations, evolving into detailed stories with complex modifiers by preschool age.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <p>The rate of growth is not constant; <strong>growth spurts</strong> often precede the mastery of significant developmental tasks (e.g., a growth spurt around the first birthday may promote neuromuscular maturation for walking). Nurses must be familiar with these patterns to identify deviations early.</p>
+                    `},
+                    { id: 'gd-factors', title: 'Factors Influencing Growth & Development', type: 'text', content: `
+                        <p>A multitude of interacting factors, both internal and external, profoundly influence a child's growth and developmental trajectory. Nurses must consider these when providing holistic care.</p>
+                        <ul>
+                            <li><strong>Genetics:</strong> The child's inherited genetic potential sets the framework for growth rate and predispositions. However, the environment significantly influences how and to what extent these traits are manifested.</li>
+                            <li><strong>Environment (Physical & Psychosocial):</strong>
+                                <ul>
+                                    <li><strong>Prenatal Exposures:</strong> Maternal smoking, alcohol, chemical exposures, infectious diseases, and chronic conditions (e.g., diabetes) can adversely affect fetal development.</li>
+                                    <li><strong>Socioeconomic Status:</strong> Poverty is a significant determinant, impacting access to nutrition, safe housing, and healthcare.</li>
+                                    <li><strong>Environmental Hazards:</strong> Lead, air/water pollution, household chemicals, and unsafe toys pose risks. Nurses provide anticipatory guidance on avoiding these exposures (e.g., hand hygiene, sun protection, lead screening).</li>
+                                    <li><strong>Climate Change:</strong> Recognized by AAP as affecting children's health (respiratory conditions, food supply, vector-borne illnesses).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Culture:</strong> The way of life, including habits, beliefs, language, and values, significantly shapes a child's development. Cultural background must be considered in assessments and interventions.</li>
+                            <li><strong>Nutrition:</strong> Children have higher proportional nutrient needs than adults. Adequate micronutrients are essential. Childhood obesity is a major concern, influenced by diet and physical activity patterns.</li>
+                            <li><strong>Health Status:</strong> Inherited or acquired diseases (e.g., malabsorptive disorders, heart defects, metabolic diseases) can directly impact nutrient delivery, organ function, and overall growth.</li>
+                            <li><strong>Family:</strong> The child is an inseparable part of the family unit. Family relationships, dynamics (marriage, divorce, death), and societal forces (economics, migration) profoundly influence child-rearing and developmental outcomes. Nursing care must involve the entire family.</li>
+                            <li><strong>Parental Attitudes:</strong> Influenced by education, experiences, financial pressures, marital status, and support systems. These attitudes, along with the child's temperament, shape parenting practices and developmental outcomes.</li>
+                            <li><strong>Child-rearing Philosophies:</strong> Vary widely and affect the provision of enriched learning opportunities. Children develop best when ready to learn; overzealous approaches before readiness can be frustrating.</li>
+                        </ul>
+                        <p>By understanding these multifactorial influences, nurses can provide tailored and effective health promotion strategies.</p>
+                    `},
+                    { id: 'foundations-quiz', title: 'Foundations of G&D Quiz', type: 'quiz',
+                        questions: [
+                            { question: "Which term refers to an increase in physical size that is easily measured?", options: ["Development", "Maturation", "Growth", "Learning"], correctAnswer: "Growth" },
+                            { question: "An infant lifting their head before they can sit is an example of which developmental pattern?", options: ["Proximodistal", "General to Specific", "Simple to Complex", "Cephalocaudal"], correctAnswer: "Cephalocaudal" },
+                            { question: "At what age does an infant's birth weight typically double?", options: ["3 months", "6 months", "9 months", "12 months"], correctAnswer: "6 months" },
+                            { question: "Which of the following is NOT considered a critical period for optimal growth and development?", options: ["Learning to walk", "Organ formation during fetal life", "Adolescent growth spurt", "Adult career development"], correctAnswer: "Adult career development" },
+                            { question: "A nurse is assessing a 4-year-old child. Which growth parameter is most appropriate for assessing the risk of obesity?", options: ["Head Circumference", "Dentition", "Body Mass Index (BMI) percentile for age", "Length"], correctAnswer: "Body Mass Index (BMI) percentile for age" }
+                        ]
+                    }
+                ]
+            },
+            'developmental-theories': {
+                title: 'Developmental Theories in Nursing',
+                color: 'from-purple-500 to-pink-600',
+                description: 'Explore the foundational theories of Piaget, Freud, Erikson, and Kohlberg and their nursing implications.',
+                steps: [
+                    { id: 'piaget-theory', title: 'Piaget\'s Theory of Cognitive Development', type: 'text', content: `
+                        <p>Jean Piaget's theory provides a cornerstone for understanding how children think and reason differently from adults. It describes intellectual progression through distinct stages, with ages being averages.</p>
+                        <ul>
+                            <li><strong>Sensorimotor Period (Birth to 2 years):</strong>
+                                <ul>
+                                    <li>Infant thinking involves the entire body; reflexive behavior is gradually replaced by more complex, purposeful activities.</li>
+                                    <li>Development of <strong>object permanence</strong>: awareness that objects continue to exist even when out of sight.</li>
+                                    <li>By the end of this stage, infants show rudimentary reasoning.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Preoperational Period (2 to 7 years):</strong>
+                                <ul>
+                                    <li>Language becomes increasingly useful.</li>
+                                    <li>Thinking is dominated by perception and is often illogical.</li>
+                                    <li><strong>Egocentrism:</strong> Inability to think about another person's viewpoint; belief that everyone perceives situations as they do.</li>
+                                    <li><strong>Magical Thinking:</strong> Belief that events occur due to wishing.</li>
+                                    <li><strong>Animism:</strong> Perception that all inanimate objects have life and feelings.</li>
+                                    <li><strong>Transductive Reasoning:</strong> Reasoning from particular to particular, not understanding relationships or whole-to-part.</li>
+                                    <li><strong>Centration:</strong> Tendency to focus on only one aspect of an experience, ignoring others.</li>
+                                    <li><strong>Irreversibility:</strong> Inability to mentally reverse a process or order of events.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Concrete Operations Period (7 to 11 years):</strong>
+                                <ul>
+                                    <li>Child is no longer bound by perceptions and can distinguish fact from fantasy.</li>
+                                    <li>Concept of time becomes clearer.</li>
+                                    <li>Reasoning powers increase, but the child cannot yet deal with abstractions or socialized thinking.</li>
+                                    <li>Grasps <strong>reversibility</strong> (e.g., $3+1=4$ and $4-1=3$).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Formal Operations Period (11+ years):</strong>
+                                <ul>
+                                    <li>Adolescent progresses from concrete to <strong>abstract and symbolic thought</strong>.</li>
+                                    <li>Can develop hypotheses and systematically deduce strategies for problem-solving.</li>
+                                    <li>Moves from self-centered to other-centered thinking.</li>
+                                    <li>Newer theories link this to brain maturation and executive function development.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="font-semibold italic">Nursing Implications:</p>
+                        <p>Nurses use Piaget's theory to tailor teaching plans to a child's cognitive level, ensuring active participation. Understanding egocentrism and magical thinking helps nurses address fears related to illness and treatment, especially in toddlers and preschoolers. Assess individual readiness to learn, as children may vary from expected age ranges.</p>
+                    `},
+                    { id: 'freud-theory', title: 'Freud\'s Theory of Psychosexual Development', type: 'text', content: `
+                        <p>Sigmund Freud's psychosexual theory posits that early childhood experiences provide unconscious motivation for later actions, with specific body parts assuming psychological significance as foci of sexual energy.</p>
+                        <ul>
+                            <li><strong>Oral Stage (Infancy):</strong>
+                                <ul>
+                                    <li>Sexual behavior focuses around the mouth (most erogenous area).</li>
+                                    <li>Infants derive pleasure from sucking and oral exploration.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Anal Stage (Early Childhood/Toddlerhood):</strong>
+                                <ul>
+                                    <li>Sensations shift towards the anus, coinciding with toilet training.</li>
+                                    <li>A time of "holding on and letting go," developing a sense of control and autonomy.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Phallic Stage (Preschool Years):</strong>
+                                <ul>
+                                    <li>Interest in genitalia begins; children are curious about anatomic differences, childbirth, and sexuality.</li>
+                                    <li>Common behaviors: asking many questions, exhibiting own sexual organs, masturbation.</li>
+                                    <li><strong>Oedipus Complex (boys) / Electra Complex (girls):</strong> Possessiveness of the child for the opposite-sex parent, with aggression toward the same-sex parent. Resolved by identifying with the same-sex parent.</li>
+                                    <li>Development of the <strong>superego</strong> (conscience).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Latency Stage (School Age):</strong>
+                                <ul>
+                                    <li>Sexuality plays a less prominent role.</li>
+                                    <li>Focus on same-sex peer groups and friendships.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Genital Stage (Adolescence):</strong>
+                                <ul>
+                                    <li>Interest in sex flourishes as children search for identity.</li>
+                                    <li>Dramatic physical changes and fluctuating hormone levels lead to a more adult view of sexuality.</li>
+                                    <li>Cognitive skills (especially in young adolescents) are still developing, leading to potentially questionable judgments.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="font-semibold italic">Nursing Implications:</p>
+                        <p>Nurses need to understand normal sexual growth and development to help parents and children form healthy attitudes about sex. This knowledge allows for creating an accepting climate where adolescents can discuss sexual concerns openly and receive accurate sex education.</p>
+                    `},
+                    { id: 'erikson-theory', title: 'Erikson\'s Psychosocial Theory', type: 'text', content: `
+                        <p>Erik Erikson's theory describes development as a lifelong series of psychosocial conflicts, each requiring resolution for emotional progression. Unsuccessful resolution can lead to emotional challenges.</p>
+                        <ul>
+                            <li><strong>Trust vs. Mistrust (Infancy):</strong>
+                                <ul>
+                                    <li><strong>Task:</strong> Establish a sense of basic trust in the world, caregivers, and self.</li>
+                                    <li><strong>Resolution:</strong> Achieved when physical and emotional needs are met consistently and timely, fostering a sense of worthiness and security.</li>
+                                    <li><strong>Negative Outcome:</strong> Mistrust develops if needs are ignored or met haphazardly, leading to tension, fretfulness, and insecurity.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Autonomy vs. Shame and Doubt (Toddlerhood):</strong>
+                                <ul>
+                                    <li><strong>Task:</strong> Acquire a sense of autonomy and control over one's body and functions, especially elimination.</li>
+                                    <li><strong>Resolution:</strong> Success in asserting independence, often seen in behaviors like negativism and ritualism.</li>
+                                    <li><strong>Negative Outcome:</strong> Shame and self-doubt if independent impulses are punished or if the child is overly controlled.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Initiative vs. Guilt (Preschool Years):</strong>
+                                <ul>
+                                    <li><strong>Task:</strong> Achieve a sense of initiative by learning to do things and taking pride in new accomplishments.</li>
+                                    <li><strong>Resolution:</strong> Encouraged by opportunities to explore in a safe, stimulating environment, with praise for appropriate behavior.</li>
+                                    <li><strong>Negative Outcome:</strong> Guilt, anxiety, shame, or fear if attempts to explore and learn are met with criticism or punishment, leading to feelings of inferiority.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Industry vs. Inferiority (School Age):</strong>
+                                <ul>
+                                    <li><strong>Task:</strong> Develop a sense of <strong>industry</strong> by learning to do things well and gaining competence in skills needed for the adult world.</li>
+                                    <li><strong>Resolution:</strong> Fostered by success in school, peer relationships, and activities.</li>
+                                    <li><strong>Negative Outcome:</strong> Inferiority if expectations are too high, or if the child believes success is unattainable, leading to a lack of confidence.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Identity vs. Role Confusion (Adolescence):</strong>
+                                <ul>
+                                    <li><strong>Task:</strong> Form a strong sense of personal identity and self-perception.</li>
+                                    <li><strong>Resolution:</strong> Achieved by exploring new roles, often with peer group influence, and establishing independence from family.</li>
+                                    <li><strong>Negative Outcome:</strong> Role confusion if unable to integrate various roles and develop a coherent self-image.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="font-semibold italic">Nursing Implications:</p>
+                        <p>Erikson's theory is highly relevant for emotional care. Nurses understand that children may use <strong>regression</strong> (reactivating earlier behaviors) during stress (e.g., hospitalization). Educate parents about regression, encourage support, and provide constructive suggestions for stress management. Promoting a sense of control and security (e.g., incorporating home routines in the hospital) is vital.</p>
+                    `},
+                    { id: 'kohlberg-theory', title: 'Kohlberg\'s Theory of Moral Development', type: 'text', content: `
+                        <p>Lawrence Kohlberg's theory describes moral development as a complex process of accepting societal values and rules, closely paralleling Piaget's cognitive stages. It emphasizes understanding <em>why</em> behaviors should or should not be exhibited.</p>
+                        <ul>
+                            <li><strong>Level 1: Premorality (Preconventional Morality) - Ages 4 to 7 years (and younger):</strong>
+                                <ul>
+                                    <li><strong>Stage 1: Punishment-Obedience Orientation:</strong> Child demonstrates acceptable behavior due to <strong>fear of punishment</strong> from a superior force (e.g., parent). No real understanding of right or wrong; morality is external.
+                                        <ul>
+                                            <li><em>Example:</em> "I won't steal the cookie because I'll get spanked."</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Stage 2: Instrumental Relativist Orientation (Individualism &amp; Exchange):</strong> Conforms to rules out of <strong>self-interest</strong> or in terms of what others can do in return ("I'll do this for you if you do that for me"). An "eye-for-an-eye" philosophy.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Level 2: Morality of Conventional Role Conformity (Conventional Morality) - Ages 7 to 12 years:</strong>
+                                <ul>
+                                    <li><strong>Stage 3: "Good Boy/Good Girl" Orientation:</strong> Conforms to rules to <strong>please others</strong> and avoid disapproval. Increased awareness of others' feelings; good behavior is what authority figures approve. Develops a moral identity.</li>
+                                    <li><strong>Stage 4: Law and Order Orientation:</strong> Shifts focus from family to peer groups and society. Conforms to rules to <strong>maintain social order</strong> and avoid guilt. Develops an internal locus of control, considering circumstances when judging behavior.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Level 3: Morality of Self-Accepted Moral Principles (Postconventional Morality) - Begins in Adolescence:</strong>
+                                <ul>
+                                    <li><strong>Stage 5: Social Contract Orientation:</strong> Focuses on <strong>individual rights and principles of conscience</strong>. Concern for what is best for all; conformity occurs because individuals have basic rights and society needs improvement.</li>
+                                    <li><strong>Stage 6: Universal Ethical Principle Orientation:</strong> Conformity based on <strong>universal principles of justice</strong> to avoid self-condemnation. Few individuals reach this stage, living and dying for moral ideals.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="font-semibold italic">Nursing Implications:</p>
+                        <p>Nurses use Kohlberg's theory to provide anticipatory guidance to parents regarding expectations and discipline. Reassure parents that young children's seemingly selfish behavior (e.g., not showing remorse for misdeeds, only fearing punishment) is age-appropriate for their stage of moral development. This understanding helps parents respond effectively and promote moral growth.</p>
+                    `},
+                    { id: 'language-development', title: 'Theories of Language Development', type: 'text', content: `
+                        <p>Human language is a complex process involving extensive neuromuscular maturation, closely paralleling cognitive development. It provides meaning, a mechanism for thought, and tremendous creativity.</p>
+                        <ul>
+                            <li><strong>Passive (Receptive) Language:</strong> The ability to understand the spoken word. This develops earlier and faster than expressive language.</li>
+                            <li><strong>Expressive Language:</strong> The ability to produce meaningful vocalizations.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Stages of Language Acquisition:</h4>
+                        <ul>
+                            <li><strong>Infancy:</strong>
+                                <ul>
+                                    <li><strong>Crying:</strong> The infant's first method of communication, quickly becoming distinct for different needs (hunger, pain).</li>
+                                    <li><strong>Vowel Sounds:</strong> Appear as early as 2 weeks.</li>
+                                    <li><strong>Consonants &amp; Babbling:</strong> Around 5 months (e.g., "ma," "da"). Repeated consonant sounds facilitate later word production.</li>
+                                    <li><strong>Finger Pointing:</strong> Indicates cognitive readiness for language.</li>
+                                    <li><strong>Social Smile:</strong> Develops by 3-5 weeks, fostering attachment and differentiation.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Toddlerhood (1-3 years):</strong>
+                                <ul>
+                                    <li><strong>Vocabulary Spurt:</strong> Rapid development between 15-24 months, reaching ~300 words by 2 years.</li>
+                                    <li><strong>Simple Sentences:</strong> Construction of two-word sentences (e.g., "Me want").</li>
+                                    <li><strong>Understand More Than They Express:</strong> Receptive language still ahead of expressive.</li>
+                                    <li><strong>Egocentric Language:</strong> Use of "me," "I," "mine."</li>
+                                </ul>
+                            </li>
+                            <li><strong>Preschool Age (3-6 years):</strong>
+                                <ul>
+                                    <li><strong>Rapid Vocabulary Increase:</strong> From 300 words at 2 years to &gt;2100 words at 5 years.</li>
+                                    <li><strong>Telegraphic Sentences:</strong> Short, concise sentences.</li>
+                                    <li><strong>Monologues &amp; Imaginary Friends:</strong> Common for practicing speech and symbolic play.</li>
+                                    <li><strong>"How" and "Why" Questions:</strong> Incessant questioning as curiosity grows.</li>
+                                    <li><strong>Proficient Storytellers:</strong> By 5 years, use adult-length sentences and all parts of speech.</li>
+                                </ul>
+                            </li>
+                            <li><strong>School Age (6-12 years):</strong>
+                                <ul>
+                                    <li><strong>More Complex &amp; Articulate:</strong> Learn language construction, use sophisticated terminology, varied word meanings.</li>
+                                    <li><strong>Writing Skills:</strong> Express ideas in paragraphs and stories.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="font-semibold italic">Nursing Implications:</p>
+                        <p>Nurses assess for language delays at well visits, especially if parents express concerns or there's a family history. Encourage parents to talk, read aloud, and interact verbally with their children. In clinical situations, use simple, age-appropriate words, remembering that children understand more than they can verbalize. Adequate hearing is crucial for language development.</p>
+                    `},
+                    { id: 'theories-quiz', title: 'Developmental Theories Quiz', type: 'quiz',
+                        questions: [
+                            { question: "According to Piaget, a child who believes that inanimate objects have life and feelings is demonstrating:", options: ["Egocentrism", "Object Permanence", "Animism", "Centration"], correctAnswer: "Animism" },
+                            { question: "Which of Erikson's stages is characterized by a toddler's struggle to gain control over body functions and assert independence?", options: ["Trust vs. Mistrust", "Initiative vs. Guilt", "Autonomy vs. Shame and Doubt", "Industry vs. Inferiority"], correctAnswer: "Autonomy vs. Shame and Doubt" },
+                            { question: "A 6-year-old child avoids taking cookies without permission because they fear punishment from their parents. According to Kohlberg, this child is in which stage of moral development?", options: ["\"Good Boy/Good Girl\" Orientation", "Punishment-Obedience Orientation", "Law and Order Orientation", "Social Contract Orientation"], correctAnswer: "Punishment-Obedience Orientation" },
+                            { question: "Which of the following is an example of receptive language development in an infant?", options: ["Babbling 'mama' and 'dada'", "Pointing to a desired toy", "Understanding the word 'no'", "Constructing a two-word sentence"], correctAnswer: "Understanding the word 'no'"},
+                            { question: "In Freud's psychosexual theory, the preschool years are associated with which stage, where interest in genitalia begins?", options: ["Oral Stage", "Anal Stage", "Phallic Stage", "Latency Stage"], correctAnswer: "Phallic Stage" }
+                        ]
+                    }
+                ]
+            },
+            'assessment-play': {
+                title: 'Assessment & The Power of Play',
+                color: 'from-green-500 to-emerald-400',
+                description: 'Learn how to assess growth and development, and understand the critical role of play.',
+                steps: [
+                    { id: 'assessment-growth', title: 'Assessment of Growth: Monitoring Physical Progress', type: 'text', content: `
+                        <p>Accurate and regular assessment of growth is paramount as it's an excellent indicator of a child's physical well-being. Nurses must use reliable methods and tools to track progress.</p>
+                        <ul>
+                            <li><strong>Methods:</strong>
+                                <ul>
+                                    <li>Measurements (weight, length/height, head circumference) should be performed by trained individuals using calibrated equipment.</li>
+                                    <li>Data should be collected under consistent conditions and plotted immediately on standardized growth charts.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Standardized Growth Charts:</strong>
+                                <ul>
+                                    <li><strong>World Health Organization (WHO) Growth Charts:</strong> Recommended for infants and children up to 2 years of age (reflects growth patterns of breastfed infants).</li>
+                                    <li><strong>National Center for Health Statistics (NCHS) Growth Charts:</strong> Most commonly used for boys and girls aged 2 to 20 years.</li>
+                                    <li><strong>Body Mass Index (BMI) Charts:</strong> Essential for children older than 2 years to screen for overweight and obesity (BMI percentile for age).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Interpretation:</strong>
+                                <ul>
+                                    <li>Growth rate is measured in percentiles, establishing a "growth channel."</li>
+                                    <li><strong>Deviations of more than two growth channels</strong> from a child's established pattern indicate a need for more in-depth assessment.</li>
+                                    <li>Early detection and intervention for growth disorders significantly improve long-term prognosis.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>Nurses play a vital role in recognizing abnormal growth patterns and initiating appropriate referrals.</p>
+                    `},
+                    { id: 'assessment-development', title: 'Assessment of Development: Beyond Physical Milestones', type: 'text', content: `
+                        <p>Assessing development is more complex than measuring growth, requiring a multifaceted approach to capture a child's overall functioning.</p>
+                        <ul>
+                            <li><strong>American Academy of Pediatrics (AAP) Recommendations:</strong>
+                                <ul>
+                                    <li><strong>Developmental Surveillance:</strong> Performed at <strong>every</strong> well visit during infancy and early childhood. This involves:
+                                        <ul>
+                                            <li>Eliciting parent concerns.</li>
+                                            <li>Assessing for developmental risk factors.</li>
+                                            <li>Direct observation of the child.</li>
+                                            <li>Maintaining an accurate developmental history.</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Developmental Screening:</strong> Formalized screening using sensitive and specific instruments at specific ages: <strong>9 months, 18 months, and 30 months (or 24 months)</strong>.
+                                        <ul>
+                                            <li><strong>Autism-specific screening</strong> is also recommended at 18 and 24 months.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><strong>Data Sources:</strong>
+                                <ul>
+                                    <li><strong>Observations:</strong> Watching a child during daily activities (eating, playing, toileting) provides insight into problem-solving, communication, interaction, and emotional responses.</li>
+                                    <li><strong>Interviews:</strong> Gathering information from parents about the child's cognitive, language, motor, and emotional development, considering parental emotional state, education, and culture.</li>
+                                    <li><strong>Physical Examinations:</strong> Can reveal information about functional abilities.</li>
+                                    <li><strong>Standardized Assessment Tools:</strong>
+                                        <ul>
+                                            <li><strong>General Screening:</strong> Ages and Stages Questionnaire (ASQ), Parents' Evaluations of Developmental Status (PEDS), Survey of Well-being of Young Children (SWYC) Milestones. These are often parent-completed.</li>
+                                            <li><strong>In-depth Screening:</strong> Denver Developmental Screening Test II (DDST-II) – requires training and is time-intensive.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p class="font-semibold italic">Nurse's Role:</p>
+                        <p>Nurses are crucial in promoting optimal development by providing anticipatory guidance, conducting thorough assessments, identifying delays early, and facilitating appropriate referrals for early intervention. This proactive approach significantly improves child outcomes.</p>
+                    `},
+                    { id: 'play-importance', title: 'The Importance of Play: Children\'s Work', type: 'text', content: `
+                        <p>For children, <strong>play is not merely recreation; it is their work.</strong> It is through play that children learn, grow, and master their environment. Play is intricately woven with meaning and purpose, contributing profoundly to all domains of development.</p>
+                        <div class="bg-indigo-50 text-indigo-800 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-indigo-900">Functions of Play:</h4>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><strong>Physical Development:</strong> Enhances both fine and gross motor skills. Repetitive movements aid body control (e.g., hitting, grasping, shaking a rattle).</li>
+                                <li><strong>Cognitive Development:</strong> A key element in learning. Children increase problem-solving abilities (games, puzzles), language (role-playing), and understanding of concepts like size, shape, and texture. Books and videos also contribute.</li>
+                                <li><strong>Emotional Development:</strong> A vital coping mechanism for emotional conflict and anxiety-producing situations. Role-playing helps children make sense of their world, explore self-awareness, and cope with fears. Positive adult responses to play boost self-esteem.</li>
+                                <li><strong>Social Development:</strong> Helps children distinguish self from others, learn interaction skills, and experiment with roles. Most games involve interaction, teaching boundaries, turn-taking, teamwork, and negotiation.</li>
+                                <li><strong>Moral Development:</strong> Children learn acceptable behaviors, the importance of teamwork, sharing, and awareness of others' feelings through play with peers and family.</li>
+                            </ul>
+                        </div>
+                        <p>Nurses should encourage parents to play with their children and provide diverse, safe play environments. Understanding the power of play allows nurses to integrate it into care, especially for hospitalized children (e.g., dramatic play with medical equipment).</p>
+                    `},
+                    { id: 'play-classifications', title: 'Classifications & Social Aspects of Play', type: 'text', content: `
+                        <p>Play can be categorized by its nature (Piaget's classifications) and by the level of social interaction involved.</p>
+                        <h4 class="font-semibold text-gray-700">Piaget's Classifications of Play:</h4>
+                        <ul>
+                            <li><strong>Sensorimotor (Functional) Play:</strong> Occurs when a child activates or manipulates an object and derives enjoyment from the result. Common in infancy as children explore cause and effect.
+                                <ul>
+                                    <li><em>Example:</em> An infant repeatedly throwing a spoon to see it fall.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Symbolic (Pretend) Play:</strong> A young child plays with an object but uses it to represent another, or engages in pretend situations. There are no strict rules, limited only by imagination. Important for emotional development.
+                                <ul>
+                                    <li><em>Example:</em> Using a cardboard box as a spaceship or a toy cell phone to talk to a friend.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Games with Rules:</strong> Organized play, usually by more than one person, involving specific rules. Most commonly seen in school-age children, teaching turn-taking and competition.
+                                <ul>
+                                    <li><em>Example:</em> Playing board games or team sports.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Social Aspects of Play:</h4>
+                        <ul>
+                            <li><strong>Solitary Play:</strong> Independent play where the child plays alone with toys different from those of other children nearby. Common in infancy and toddlerhood.</li>
+                            <li><strong>Parallel Play:</strong> Children play side-by-side with similar toys but without interacting. Typically seen in toddlers.</li>
+                            <li><strong>Associative Play:</strong> Group play without group goals. Children may play with similar toys and trade them, but there's a lack of formal organization. Can begin in toddlerhood and continue into preschool.</li>
+                            <li><strong>Cooperative Play:</strong> Organized play with group goals, often with a leader. Begins in late preschool years.</li>
+                            <li><strong>Onlooker Play:</strong> The child observes others playing, may ask questions, but does not attempt to join. Usually seen during toddler years.</li>
+                            <li><strong>Dramatic Play:</strong> Children act out roles and experiences (real, feared, or observed). Can be spontaneous or guided, often using medical equipment in healthcare settings to cope with procedures.</li>
+                            <li><strong>Familiarization Play:</strong> Allows children to handle and explore healthcare materials in non-threatening, fun ways, preparing them for procedures or hospitalization.
+                                <ul>
+                                    <li><em>Example:</em> Using sponge swabs for painting or making jewelry from bandages.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    `},
+                    { id: 'assessment-play-quiz', title: 'Assessment & Play Quiz', type: 'quiz',
+                        questions: [
+                            { question: "Which developmental assessment method involves eliciting parent concerns, assessing risks, and direct observation at every well visit?", options: ["Formalized Developmental Screening", "Denver Developmental Screening Test II (DDST-II)", "Developmental Surveillance", "BMI Screening"], correctAnswer: "Developmental Surveillance" },
+                            { question: "A 2-year-old child is playing next to another child with similar toys but without interacting. What type of play is this?", options: ["Solitary Play", "Associative Play", "Cooperative Play", "Parallel Play"], correctAnswer: "Parallel Play" },
+                            { question: "According to Piaget, using a cardboard box as a 'spaceship' is an example of which type of play?", options: ["Sensorimotor Play", "Functional Play", "Symbolic Play", "Games with Rules"], correctAnswer: "Symbolic Play" },
+                            { question: "Which of the following is NOT a primary function of play in child development?", options: ["Enhancing cognitive skills", "Promoting physical growth", "Coping with emotional conflict", "Replacing formal education"], correctAnswer: "Replacing formal education" },
+                            { question: "A nurse is preparing a child for a procedure by allowing them to handle and explore a syringe (without a needle) and bandages. This is an example of:", options: ["Dramatic Play", "Familiarization Play", "Cooperative Play", "Onlooker Play"], correctAnswer: "Familiarization Play" }
+                        ]
+                    }
+                ]
+            },
+            'health-promotion-infancy': {
+                title: 'Health Promotion: Infancy (1 Month - 1 Year)',
+                color: 'from-orange-500 to-red-400',
+                description: 'Focus on immunizations, nutrition, dental care, sleep, and safety for infants.',
+                steps: [
+                    { id: 'infancy-immunizations', title: 'Immunizations: Protecting Our Youngest Patients', type: 'text', content: `
+                        <p>Infants are particularly vulnerable to infectious diseases due to their immature immune systems, making immunizations a critical component of health promotion. Nurses play a pivotal role in ensuring infants receive timely and appropriate vaccinations.</p>
+                        <div class="bg-sky-100 border-l-4 border-sky-500 text-sky-800 p-4 rounded-lg mb-4">
+                            <h4 class="font-semibold text-sky-900">Key Immunization Concepts:</h4>
+                            <ul class="list-disc list-inside ml-4">
+                                <li><strong>Passive Immunity:</strong> Transplacental maternal antibodies offer protection for about 3 months. Breast milk provides additional IgA.</li>
+                                <li><strong>Active Immunity:</strong> Acquired through illness or immunization, leading to the body producing its own antibodies for long-term protection.</li>
+                                <li><strong>Vaccine Types:</strong>
+                                    <ul>
+                                        <li><strong>Live/Attenuated:</strong> Weakened pathogens (e.g., MMR, Varicella).</li>
+                                        <li><strong>Killed/Inactivated:</strong> Inactivated pathogens (e.g., Polio, Pertussis).</li>
+                                        <li><strong>Toxoids:</strong> Inactivated bacterial toxins (e.g., Diphtheria, Tetanus).</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <h4 class="font-semibold text-gray-700">Nursing Responsibilities:</h4>
+                        <ul>
+                            <li><strong>Assessment:</strong> Evaluate current immunization status, identify barriers (e.g., misconceptions, access issues).</li>
+                            <li><strong>Education:</strong> Provide accurate, research-based information to parents about vaccine benefits, risks, and side effects. Address vaccine hesitancy.</li>
+                            <li><strong>Administration:</strong>
+                                <ul>
+                                    <li>Follow manufacturer's recommendations for handling, storage, site, dosage, and route.</li>
+                                    <li><strong>Intramuscular (IM) site:</strong> Anterolateral thigh for infants; deltoid for children 18 months+.</li>
+                                    <li>Administer multiple injections with separate syringes at different sites (e.g., different thighs). Record lot numbers.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Documentation:</strong> Ensure informed consent (VIS provided), document vaccine type, date, manufacturer, lot number, expiration, site, and any reactions.</li>
+                            <li><strong>Contraindications &amp; Precautions:</strong>
+                                <ul>
+                                    <li><strong>Anaphylaxis:</strong> Always ask about allergies and previous reactions. Epinephrine 1:1000 must be available.</li>
+                                    <li><strong>Immunocompromised Children:</strong> Generally avoid live bacterial/viral vaccines (exceptions for HIV, cancer remission).</li>
+                                    <li><strong>Mild illness with low-grade fever</strong> is NOT a contraindication.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>Nurses are frontline advocates for childhood immunization, crucial for public health.</p>
+                    `},
+                    { id: 'infancy-nutrition', title: 'Nutrition in Infancy: Fueling Rapid Growth', type: 'text', content: `
+                        <p>Infancy is a period of unparalleled growth, making optimal nutrition critically important. Nurses provide anticipatory guidance to parents on feeding practices and nutritional needs.</p>
+                        <h4 class="font-semibold text-gray-700">Feeding Choices:</h4>
+                        <ul>
+                            <li><strong>Breastfeeding:</strong>
+                                <ul>
+                                    <li><strong>Optimal Nutrition:</strong> Provides complete nutrition, immunologic properties, and is associated with reduced risk of overweight/obesity.</li>
+                                    <li><strong>Recommendation:</strong> Exclusive breastfeeding for the first 6 months, continuation with solids until 1 year or longer.</li>
+                                    <li><strong>Supplementation:</strong> Breastfed infants need <strong>Vitamin D (400 IU/day)</strong> to prevent rickets. Iron and zinc may also be needed.</li>
+                                    <li><strong>Nursing Role:</strong> Provide instruction and support (e.g., latching, overcoming barriers like embarrassment or return to work).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Formula Feeding:</strong>
+                                <ul>
+                                    <li><strong>Choice:</strong> A valid choice, especially if mothers return to work or for specific medical contraindications to breastfeeding (e.g., maternal HIV, galactosemia).</li>
+                                    <li><strong>Type:</strong> Commercially prepared <strong>iron-fortified formula</strong> is recommended.</li>
+                                    <li><strong>Preparation:</strong> Follow manufacturer's instructions carefully for mixing and storage.</li>
+                                    <li><strong>Cow's Milk:</strong> <strong>NOT recommended for the first 12 months</strong> due to low iron, high renal solute load (dehydration risk), and digestibility issues.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Introduction of Solid Foods:</h4>
+                        <ul>
+                            <li><strong>Timing:</strong> Begin no earlier than 4 months, typically around <strong>6 months of age</strong>, when the infant shows readiness (e.g., can sit, extrusion reflex disappears, indicates desire for food).</li>
+                            <li><strong>Method:</strong> Introduce one new food at a time, in small amounts (1-2 tablespoons) for several days, to identify intolerances. Feed by spoon, not mixed with formula in a bottle.</li>
+                            <li><strong>First Foods:</strong> Iron-fortified rice cereal is common. Pureed cooked meats, poultry, vegetables (carrots, peas, sweet potato), and mashed fruits (banana) can follow.</li>
+                            <li><strong>Avoid:</strong> Honey before 12 months (botulism risk), added salt/sugar, home-prepared orange/dark green leafy vegetables (high nitrates).</li>
+                            <li><strong>Finger Foods:</strong> Introduce between 8-10 months as pincer grasp develops (e.g., arrowroot biscuits, chopped soft fruits, dry cereals).</li>
+                            <li><strong>Choking Hazards:</strong> Avoid small, round, or hard foods (hot dogs, whole grapes, nuts, hard candy, popcorn) for infants and young children. Cut foods into small, irregularly shaped pieces. Supervise eating.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Weaning:</h4>
+                        <ul>
+                            <li><strong>Timing:</strong> Typically begins between 6 and 12 months, when the infant shows decreasing interest in breast/bottle.</li>
+                            <li><strong>Process:</strong> Gradual, replacing one feeding at a time. Avoid during times of stress (illness, new childcare).</li>
+                            <li><strong>Cup Use:</strong> Infants can be weaned to a regular plastic cup; sippy cups are an option. Discourage carrying bottles/sippy cups as toys or taking to bed (risk of dental caries).</li>
+                        </ul>
+                    `},
+                    { id: 'infancy-dental', title: 'Dental Care in Infancy: Starting Early', type: 'text', content: `
+                        <p>Dental care begins in infancy, even before teeth fully erupt, to protect primary teeth and lay the foundation for lifelong oral health.</p>
+                        <ul>
+                            <li><strong>Teething:</strong>
+                                <ul>
+                                    <li><strong>Onset:</strong> Usually between 5-9 months, with lower central incisors appearing first.</li>
+                                    <li><strong>Symptoms:</strong> Night wakening, restlessness, drooling, increased nonnutritive sucking, temporary loss of appetite. Investigate elevated temperature, irritability, ear tugging, or diarrhea.</li>
+                                    <li><strong>Comfort Measures:</strong> Cool liquids, hard foods for chewing (dry toast, frozen bagels), hard cold teethers.</li>
+                                    <li><strong>Avoid:</strong> Benzocaine gels or belladonna tablets. Acetaminophen can relieve discomfort.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Cleaning Teeth:</strong>
+                                <ul>
+                                    <li>Begin in infancy: Use cotton swabs or a soft washcloth with water to clean gums and erupting teeth.</li>
+                                    <li>After 6 months: Use a rice-grain sized amount of fluoridated toothpaste twice daily. Parents should floss.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Fluoride:</strong>
+                                <ul>
+                                    <li><strong>Supplementation:</strong> Recommended for children &gt;6 months with insufficient fluoride in their water supply and at risk for caries.</li>
+                                    <li><strong>Topical Varnish:</strong> AAP recommends application by pediatric providers every 3-6 months as soon as teeth erupt.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Bottle-Mouth Caries (Nursing-Bottle Caries):</strong>
+                                <ul>
+                                    <li><strong>Cause:</strong> Prolonged exposure of teeth to carbohydrate-rich liquids (milk, juice) from a bottle (or breast) especially at night or frequent sugary drinks.</li>
+                                    <li><strong>Prevention:</strong> Discourage bedtime bottles of milk/juice; use plain water if a nighttime bottle is necessary. Avoid dipping pacifiers in sugary substances.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>Nurses assess dental risk, provide dietary counseling (limiting sugar), and recommend regular dental visits.</p>
+                    `},
+                    { id: 'infancy-sleep-rest', title: 'Sleep &amp; Rest in Infancy: Patterns and Safety', type: 'text', content: `
+                        <p>Infant sleep patterns vary widely, and establishing healthy routines is crucial for both infant development and parental well-being. Nurses provide guidance on normal sleep, rest, and critical safety measures.</p>
+                        <h4 class="font-semibold text-gray-700">Sleep Patterns:</h4>
+                        <ul>
+                            <li><strong>Newborns:</strong> May sleep 17-20 hours/day, often in short bursts.</li>
+                            <li><strong>3-4 Months:</strong> Most infants begin to sleep for longer periods at night.</li>
+                            <li><strong>Establishing Routines:</strong> Important for preventing later sleep problems. Placing the infant in the crib after cuddling but before being fully asleep facilitates self-consoling.</li>
+                            <li><strong>Fussiness:</strong> A certain amount of fussiness at bedtime is normal.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">SUID/SIDS Prevention (AAP Recommendations):</h4>
+                        <p>Sudden Unexpected Infant Death (SUID) includes Sudden Infant Death Syndrome (SIDS), unknown cause, and accidental suffocation/strangulation. Nurses educate on critical prevention strategies:</p>
+                        <ul>
+                            <li><strong>Sleep Position:</strong> Place infant in a <strong>supine (back) position for sleep for the first year</strong>. If the infant can roll over both ways independently, they do not need to be repositioned.</li>
+                            <li><strong>Sleep Surface:</strong> Infant should sleep in a <strong>separate crib, bassinet, or cradle in the parent's room</strong> for at least 6 months, preferably 1 year.</li>
+                            <li><strong>Safe Crib Environment:</strong>
+                                <ul>
+                                    <li><strong>Firm mattress</strong> that fits snugly, covered with a fitted sheet.</li>
+                                    <li><strong>NO soft or loose bedding</strong> (blankets, quilts, bumpers), pillows, or toys in the crib.</li>
+                                <li><strong>Avoid:</strong>
+                                    <ul>
+                                        <li>Sleeping in car seats, infant carriers, or other sitting devices.</li>
+                                        <li>Co-sleeping (sharing a bed) with parents.</li>
+                                        <li>Exposure to environmental smoke (prenatal and postnatal).</li>
+                                        <li>Overheating the infant.</li>
+                                        <li>Commercially marketed products claiming to reduce SIDS risk.</li>
+                                    </ul>
+                                </li>
+                                    <li><strong>Pacifier Use:</strong> Offer a pacifier at nap and bedtime; ensure it's not attached to a string.</li>
+                                    <li><strong>"Tummy Time":</strong> Provide opportunities for supervised "tummy play" when awake.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>Nurses reinforce these evidence-based practices to significantly reduce the risk of SUID/SIDS.</p>
+                    `},
+                    { id: 'infancy-safety', title: 'Safety in Infancy: Protecting the Exploring Child', type: 'text', content: `
+                        <p>Infants are entirely dependent on caregivers for safety. Their rapid motor development, coupled with natural curiosity and lack of danger perception, places them at high risk for unintentional injuries. Nurses provide critical anticipatory safety guidance.</p>
+                        <h4 class="font-semibold text-gray-700">Motor Vehicle Safety:</h4>
+                        <ul>
+                            <li><strong>Car Seats:</strong> Infants must be in a correctly installed, snugly tethered, <strong>rear-facing car safety seat</strong> in the rear seat (preferably center) for as long as possible, until they reach the upper weight/height limits for that seat.</li>
+                            <li><strong>Airbags:</strong> Children younger than 13 years should <strong>NEVER</strong> be in the front seat of cars with airbags.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Burn Prevention:</h4>
+                        <ul>
+                            <li><strong>Water Heater:</strong> Set to <strong>less than 120°F (49°C)</strong> to prevent scalds. Always test bathwater temperature.</li>
+                            <li><strong>Hot Liquids:</strong> Avoid holding infants while consuming hot liquids or cooking.</li>
+                            <li><strong>Electrical:</strong> Cover electrical sockets. Guard open stoves/fireplaces. Avoid steam vaporizers.</li>
+                            <li><strong>Sun Exposure:</strong> Infants younger than 6 months should <strong>NOT be exposed to direct sunlight</strong>. Use protective clothing/hats. Sunscreen for older infants (SPF 15+, broad spectrum, reapply every 2 hours).</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Safe Baby Furnishings:</h4>
+                        <ul>
+                            <li><strong>Cribs:</strong>
+                                <ul>
+                                    <li>Slat distance: <strong>No more than 2 3/8 inches wide</strong>.</li>
+                                    <li>Mattress: <strong>Firm, fits snugly</strong> (gap less than width of two adult fingers).</li>
+                                    <li><strong>No large toys in crib</strong> (climbing hazard).</li>
+                                    <li><strong>Position away from curtains/blind cords</strong> (strangulation risk).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Mobiles/Hanging Toys:</strong> Position well out of reach; remove before infant can sit up.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Preventing Falls:</h4>
+                        <ul>
+                            <li><strong>Supervision:</strong> Constant adult supervision is required when infants are on elevated surfaces (changing tables, counters).</li>
+                            <li><strong>Restraints:</strong> Use safety straps in highchairs, infant seats, and strollers.</li>
+                            <li><strong>Stairs:</strong> Install gates at top and bottom of stairs as infants begin to crawl.</li>
+                            <li><strong>Infant Walkers:</strong> <strong>NOT recommended</strong> due to high injury risk (falls down stairs, reaching hazards).</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Preventing Asphyxiation (Suffocation, Choking, Strangulation):</h4>
+                        <ul>
+                            <li><strong>Feeding:</strong> Position infants on their sides after feeding (but not for sleep) to prevent aspiration. Avoid propping bottles.</li>
+                            <li><strong>Choking Hazards:</strong> Avoid small, round, or hard foods (hot dogs, whole grapes, nuts, hard candy, popcorn) for young children. Cut foods into small, irregularly shaped pieces. Supervise eating.</li>
+                            <li><strong>Small Objects:</strong> Inspect surroundings for small objects (coins, buttons, toy parts). Do not give balloons.</li>
+                            <li><strong>Strangulation:</strong> No pacifiers/teethers on strings around neck. No bibs during sleep. Cribs away from cords.</li>
+                            <li><strong>Emergency Preparedness:</strong> Parents should know infant choking emergency procedures.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Preventing Lead Exposure:</h4>
+                        <ul>
+                            <li><strong>Risk Assessment:</strong> Begin at 6 months (especially in old housing, near environmental sources, or with family history).</li>
+                            <li><strong>Screening:</strong> Routine capillary lead screening at 9 or 12 months if at risk.</li>
+                            <li><strong>Prevention:</strong> Educate parents on avoiding sources (peeling paint, contaminated soil, imported items).</li>
+                        </ul>
+                    `},
+                    { id: 'infancy-concerns', title: 'Common Concerns in Infancy', type: 'text', content: `
+                        <p>New parents often face challenges and concerns during infancy. Nurses provide vital support and anticipatory guidance to help manage these common issues.</p>
+                        <ul>
+                            <li><strong>Patterns of Crying:</strong>
+                                <ul>
+                                    <li><strong>Communication:</strong> Crying is the infant's primary mode of communication. Parents learn to interpret distinct cries (hunger, discomfort, pain).</li>
+                                    <li><strong>Consoling:</strong> After ruling out physiological causes, console by holding, talking softly, humming, gentle stroking, infant massage, "centering" (arms/legs to midline), swaddling.</li>
+                                    <li><strong>Strategies:</strong> Car rides, carrying in a front pack, infant swings, football-carry position with patting.</li>
+                                    <li><strong>Irritability:</strong> Some infants are more fretful. If no clear cause, temperament may play a role. Irritability often improves by 3-4 months.</li>
+                                </ul>
+                            </li>
+                            <li><strong>The Infant With Colic:</strong>
+                                <ul>
+                                    <li><strong>Definition:</strong> Unexplained paroxysmal crying or fussing, often characterized by pulling up arms/legs, occurring at the same time of day (often late afternoon/evening), several times daily for several days/week. Most outgrow by 3-4 months.</li>
+                                    <li><strong>Etiology:</strong> Unknown, but theories include allergy, cow's milk intolerance, maternal anxiety, familial stress, rapid feeding, overfeeding, or sensitive temperament.</li>
+                                    <li><strong>Management:</strong>
+                                        <ul>
+                                            <li>Rule out acute medical conditions (e.g., intussusception, otitis media, fracture).</li>
+                                            <li>Avoid medications due to limited success and side effects; consult provider for herbal remedies.</li>
+                                            <li>Thorough history (feeding, crying patterns, associated symptoms).</li>
+                                            <li>Support parents: Reassure that colic is not related to "bad parenting."</li>
+                                            <li>Strategies: Rocking, cuddling, massage, pacifier, warm bath, background noise, swing. Reduce stimuli during high-activity times.</li>
+                                            <li><strong>Risk:</strong> Colic can increase the risk for infant abuse; educate parents on taking breaks when overwhelmed (placing baby safely in crib).</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><strong>Separation Anxiety:</strong>
+                                <ul>
+                                    <li><strong>Onset:</strong> Begins around 6-7 months as infants differentiate caregivers from strangers and develop object permanence.</li>
+                                    <li><strong>Manifestation:</strong> Crying, clinging, turning away from strangers. Peaks around 7-9 months and again in toddlerhood.</li>
+                                    <li><strong>Nursing Role:</strong> Reassure parents it's a normal sign of healthy attachment. Advise swift, loving departures, emphasizing return. Transition objects (blankets, toys) can provide comfort.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    `},
+                    { id: 'infancy-quiz', title: 'Infancy Health Promotion Quiz', type: 'quiz',
+                        questions: [
+                            { question: "Which of the following is a primary recommendation for SIDS prevention?", options: ["Placing the infant prone to sleep", "Co-sleeping with parents", "Using soft bedding in the crib", "Placing the infant supine to sleep"], correctAnswer: "Placing the infant supine to sleep" },
+                            { question: "At what age is it generally recommended to begin introducing solid foods to an infant?", options: ["2 months", "4-6 months", "8-10 months", "12 months"], correctAnswer: "4-6 months" },
+                            { question: "A parent reports their 7-month-old infant is experiencing increased drooling and fussiness. The nurse suspects teething. Which comfort measure should the nurse recommend?", options: ["Applying benzocaine gel to the gums", "Giving the infant a frozen bagel to chew on", "Rubbing whiskey on the infant's gums", "Administering belladonna tablets"], correctAnswer: "Giving the infant a frozen bagel to chew on" },
+                            { question: "Which food is considered a significant choking hazard for infants and young children and should be avoided or modified?", options: ["Pureed sweet potato", "Iron-fortified rice cereal", "Whole grapes", "Mashed banana"], correctAnswer: "Whole grapes" },
+                            { question: "What is the recommended car seat position for an infant younger than 1 year?", options: ["Forward-facing in the front seat", "Rear-facing in the front seat", "Forward-facing in the rear seat", "Rear-facing in the rear seat"], correctAnswer: "Rear-facing in the rear seat" }
+                        ]
+                    }
+                ]
+            },
+            'health-promotion-early-childhood': {
+                title: 'Health Promotion: Early Childhood (Toddler &amp; Preschool)',
+                color: 'from-purple-600 to-pink-500',
+                description: 'Address physical, cognitive, psychosocial development, and health strategies for toddlers and preschoolers.',
+                steps: [
+                    { id: 'early-childhood-growth', title: 'Growth &amp; Motor Development: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Early childhood (toddler and preschool years) is marked by a slower, yet significant, progression in physical growth and the mastery of crucial motor skills, fostering independence.</p>
+                        <h4 class="font-semibold text-gray-700">Physical Growth:</h4>
+                        <ul>
+                            <li><strong>Toddler (1-3 years):</strong>
+                                <ul>
+                                    <li><strong>Weight gain:</strong> ~5 lb (2.25 kg)/year. Birth weight quadruples by 2-3 years.</li>
+                                    <li><strong>Height gain:</strong> ~3 inches (7.5 cm)/year. Attain half their adult height by 2-3 years.</li>
+                                    <li><strong>Body shape:</strong> Potbellied appearance with exaggerated lumbar curve due to immature abdominal musculature. Legs may appear slightly bowed. Muscle tissue gradually replaces adipose tissue.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Preschooler (3-6 years):</strong>
+                                <ul>
+                                    <li><strong>Growth rate:</strong> Continues to slow. Accumulation of adipose tissue declines, leading to a leaner, more agile appearance.</li>
+                                    <li><strong>Muscles grow faster than bones.</strong></li>
+                                    <li><strong>Knock-knees</strong> are common in 3-year-olds, usually correcting by 4-5 years.</li>
+                                    <li><strong>Vital capacity:</strong> Increases, respiratory rate slows. Heart rate decreases, blood pressure rises.</li>
+                                    <li><strong>All 20 deciduous teeth are present by age 3.</strong> Deciduous teeth may begin to fall out by the end of preschool.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Motor Development:</h4>
+                        <ul>
+                            <li><strong>Toddler (1-3 years):</strong>
+                                <ul>
+                                    <li><strong>Walking:</strong> Crowning achievement; most walk alone by 15 months. Walk well and try to run by 18 months (fall often).</li>
+                                    <li><strong>Climbing:</strong> Avid climbers by ~15 months (chairs, tables, bookcases).</li>
+                                    <li><strong>Fine Motor:</strong> Hand-eye coordination improves. Can hold a cup with both hands by 18 months. Can feed self with a spoon by 2 years (with practice).</li>
+                                    <li><strong>Self-Care:</strong> Enjoys removing clothing by 18 months. Can put on simple items (not front-from-back), zip large zippers, put on shoes, wash/dry hands by 24 months. Brushes teeth with help.</li>
+                                    <li><strong>Safety Concern:</strong> Motor development outpaces judgment, increasing injury risk.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Preschooler (3-6 years):</strong>
+                                <ul>
+                                    <li><strong>Coordination and muscle strength increase rapidly.</strong></li>
+                                    <li><strong>Handedness:</strong> Begins to emerge at ~3 years, clearly established by 4 years. Encourage appropriate tools for left-handed children.</li>
+                                    <li><strong>Fine Motor:</strong> Eye-hand coordination good enough by 5 years for tasks like hitting a nail with a hammer, cutting on curved lines, printing name. Manipulative and creative materials stimulate development.</li>
+                                    <li><strong>Gross Motor:</strong> Jumps, hops, climbs well, throws a ball overhead. Tricycles and climbing toys develop muscles.</li>
+                                    <li><strong>Independence:</strong> By 4-5 years, largely independent in dressing, eating, toileting. Can often heed verbal warnings of danger.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-cognitive', title: 'Cognitive &amp; Sensory Development: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Cognitive development in early childhood is characterized by immense curiosity and the transition from sensorimotor to preoperational thought, shaping how children perceive and interact with their world.</p>
+                        <h4 class="font-semibold text-gray-700">Toddler (1-3 years) - Piaget's Sensorimotor (final stage) &amp; Preconceptual Phase:</h4>
+                        <ul>
+                            <li><strong>Sensorimotor (12-18 months):</strong> Learning by trial and error (dumping, filling, exploring). Object permanence firmly established.</li>
+                            <li><strong>Preconceptual Phase (19 months - 4 years):</strong>
+                                <ul>
+                                    <li><strong>Symbolic Thought:</strong> Beginning ability to use symbols and words to represent absent people/objects (e.g., a box is a spaceship). Rapidly growing vocabulary enhances this.</li>
+                                    <li><strong>Mental Problem Solving:</strong> Begins to think about alternative solutions and consequences without acting them out.</li>
+                                    <li><strong>Domestic Mimicry &amp; Deferred Imitation:</strong> Imitating household tasks or actions observed hours earlier.</li>
+                                    <li><strong>Immature Thinking:</strong> Still limited in logic, bound to the present.</li>
+                                    <li><strong>Egocentrism:</strong> Views everything in relation to self; unable to consider another's viewpoint.</li>
+                                    <li><strong>Animism:</strong> Believes inert objects are alive and have wills of their own.</li>
+                                    <li><strong>Irreversibility:</strong> Cannot see a process in reverse order.</li>
+                                    <li><strong>Magical Thought:</strong> Believes thoughts cause events to happen.</li>
+                                    <li><strong>Centration:</strong> Focuses on only one aspect of an experience, ignoring others.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Concept of Time:</strong> Immature; understands time in relation to familiar activities (e.g., "after your nap").</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Preschooler (3-6 years) - Piaget's Preoperational (Preconceptual &amp; Intuitive Phases):</h4>
+                        <ul>
+                            <li><strong>Brain Maturation:</strong> Contributes to increasing cognitive abilities. Can retain mental images of loved ones.</li>
+                            <li><strong>Symbolic Play:</strong> Continues to be important for emotional development, allowing children to work through distressing feelings (e.g., giving dolls "shots" after an injection).</li>
+                            <li><strong>Transductive Reasoning:</strong> Reasoning from particular to particular (e.g., if parent didn't follow routine, something bad will happen).</li>
+                            <li><strong>Intuitive Phase (4-7 years):</strong> Characterized by continued centration and irreversibility. Difficulty following multiple directions.</li>
+                            <li><strong>Magical &amp; Egocentric Thinking:</strong> Still believes thoughts are powerful; may feel guilt for negative events (e.g., sibling's illness).</li>
+                            <li><strong>Curiosity:</strong> "How" and "why" questions are prominent.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Sensory Development:</h4>
+                        <ul>
+                            <li><strong>Vision:</strong> Eyes fully developed by age 6. Visual acuity, ocular muscle control, peripheral vision, and color discrimination fully developed by 7 years.</li>
+                            <li><strong>Hearing:</strong> Acute even at birth. Myelination of auditory nerve tracts improves responses to sound. Newborns screened for hearing impairment.</li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-psychosocial', title: 'Psychosocial Development: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Early childhood is a dynamic period for psychosocial development, marked by the struggle for independence, the formation of identity, and the beginnings of complex social interactions.</p>
+                        <h4 class="font-semibold text-gray-700">Toddler (1-3 years) - Erikson's Autonomy vs. Shame and Doubt:</h4>
+                        <ul>
+                            <li><strong>Task:</strong> Acquire a sense of <strong>autonomy</strong> and control, separating from parents.</li>
+                            <li><strong>Negativism:</strong> Frequent use of "no," testing wills with parents. A normal expression of independence. Nurses help parents understand this as developmental progress.</li>
+                            <li><strong>Ritualism:</strong> Insistence on sameness and routines. Provides a sense of control and security, especially important during stressful times like hospitalization.</li>
+                            <li><strong>Separation Anxiety:</strong> Peaks again. Toddlers fear parents leaving, even as they desire independence. Games like hide-and-seek help mastery. Transition objects provide comfort.</li>
+                            <li><strong>Play:</strong> Primarily <strong>parallel play</strong> (playing alongside, not with, others). Imitation and acting out adult roles are common. Active, large-muscle play helps vent frustrations.</li>
+                            <li><strong>Psychosexual (Freud's Anal Stage):</strong> Focus on bowel/bladder mastery; awareness of gender differences begins. Sex play and masturbation are common and normal. Parents should respond calmly, teaching privacy.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Preschooler (3-6 years) - Erikson's Initiative vs. Guilt:</h4>
+                        <ul>
+                            <li><strong>Task:</strong> Achieve a sense of <strong>initiative</strong> by learning to do things and taking pride in accomplishments.</li>
+                            <li><strong>Negative Outcome:</strong> Guilt if attempts to explore and learn are criticized or punished. Nurses encourage parents to foster exploration and praise appropriate behavior.</li>
+                            <li><strong>Socialization:</strong> Critical period for learning to relate to age mates. 3-year-olds share more; 4-year-olds may be argumentative (testing roles); 5-year-olds enjoy cooperative play.</li>
+                            <li><strong>Play:</strong> Enjoys <strong>parallel and associative play</strong>, moving towards <strong>cooperative play</strong>. Play is often imitative, dramatic, and creative (dress-up, housekeeping toys). Tricycles and climbing toys develop muscles.</li>
+                            <li><strong>Imaginary Friends:</strong> Common around age 3; serve as companions, scapegoats for misbehavior. Boundaries between reality and fantasy are blurred.</li>
+                            <li><strong>Psychosexual (Freud's Phallic Stage Resolution):</strong> Child identifies with and imitates the same-sex parent. Gender identity is well-established by 6 years.</li>
+                            <li><strong>Moral Development (Kohlberg's Premorality):</strong> Learning right from wrong. Behavior driven by avoiding punishment. Rituals provide comfort.</li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-nutrition', title: 'Nutrition &amp; Activity: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Nutritional needs continue to be important in early childhood, although growth slows. Nurses guide parents on healthy eating habits and activity levels to prevent issues like obesity.</p>
+                        <h4 class="font-semibold text-gray-700">Nutrition:</h4>
+                        <ul>
+                            <li><strong>Appetite Changes:</strong> Rate of growth slows, leading to <strong>physiologic anorexia</strong> (decreased appetite). Children are often picky eaters.</li>
+                            <li><strong>Serving Sizes:</strong> A good rule of thumb is <strong>1 tablespoon of solid food per year of age</strong>. Offer smaller portions.</li>
+                            <li><strong>Mealtimes:</strong> Should be pleasant; avoid discussing discipline or poor appetite. Focus on weekly intake rather than daily, as consumption balances over time.</li>
+                            <li><strong>Milk Intake:</strong>
+                                <ul>
+                                    <li>Children 1-8 years: 2 cups/day.</li>
+                                    <li>Children &gt;2 years: Use fat-free or low-fat milk.</li>
+                                    <li>Children &gt;9 years: 3 cups/day.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Juice:</strong> Limit to no more than 4 oz/day; use 100% fruit juice, not juice drinks with added sugar. Avoid at bedtime (tooth decay risk).</li>
+                            <li><strong>Fats:</strong> Total daily fat intake 30-35% of calories for 2-3 years; 25-35% for 4-18 years. Emphasize polyunsaturated and monounsaturated fats.</li>
+                            <li><strong>Obesity Risk:</strong> High prevalence in the U.S. Influenced by diet (fast foods, sweetened drinks), decreased activity, genetics, and parental knowledge. Nurses provide counseling on healthy food choices, label reading, and family meal planning.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Physical Activity:</h4>
+                        <ul>
+                            <li><strong>Recommendations:</strong> At least <strong>60 minutes/day of moderate to vigorous physical activity</strong> for children older than 6 years. Include muscle and bone strengthening activities 3 times/week.</li>
+                            <li><strong>Encouragement:</strong> Make exercise fun and habitual. Parental role modeling is key. Limit screen time (no more than 1 hour/day for children 2-17 years).</li>
+                            <li><strong>Community Resources:</strong> Advise parents to explore city recreation centers, parks, and YMCAs.</li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-dental', title: 'Dental Care: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Proper dental care in early childhood is essential for the health of deciduous teeth, which impact jaw development, speech, and the alignment of permanent teeth.</p>
+                        <ul>
+                            <li><strong>Deciduous Teeth:</strong> All 20 primary teeth are present by age 3. Their care is crucial as premature loss can lead to malocclusion of permanent teeth.</li>
+                            <li><strong>Cleaning:</strong>
+                                <ul>
+                                    <li>Toddlers lack dexterity; parents must clean teeth thoroughly. Encourage children to brush after parents.</li>
+                                    <li>Use a small, soft, nylon-bristle brush.</li>
+                                    <li>Parents should help with flossing.</li>
+                                    <li>Use a rice-sized amount of fluoridated toothpaste; teach not to swallow.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Dental Visits:</strong> Recommend twice-yearly visits to the dentist. The first dental visit should occur when the first tooth erupts or by age 1.</li>
+                            <li><strong>Fluoride:</strong>
+                                <ul>
+                                    <li>Oral fluoride supplementation for children &gt;6 months in non-fluoridated areas and at risk for caries.</li>
+                                    <li>Topical fluoride varnish applied by pediatric providers during well visits (every 3-6 months).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Bottle-Mouth Caries:</strong> Continue to discourage bedtime bottles of milk/juice. Pacifier use should stop by age 3 to prevent malocclusion.</li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-sleep', title: 'Sleep &amp; Rest: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Sleep patterns evolve in early childhood, and sleep-related issues are common. Nurses help parents establish healthy routines and manage challenges like nightmares and night terrors.</p>
+                        <ul>
+                            <li><strong>Toddler Sleep:</strong>
+                                <ul>
+                                    <li>Total sleep: 12-14 hours/day, usually with one or two naps.</li>
+                                    <li>May resist going to bed; benefit from a consistent bedtime routine.</li>
+                                    <li>Encourage self-consoling techniques.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Preschooler Sleep:</strong>
+                                <ul>
+                                    <li>Total sleep: 10-12 hours/day, often without a nap.</li>
+                                    <li><strong>Nightmares:</strong> Frightening dreams that awaken the child. Provide comfort, hugs, and verbal reassurance to help them return to sleep.</li>
+                                    <li><strong>Night Terrors:</strong> Occur during deep sleep; child remains asleep but may moan, scream, or cry. They do not awaken or recognize parents. Efforts to comfort may cause agitation. The child will not remember the episode.
+                                        <ul>
+                                            <li><strong>Nursing Action:</strong> Instruct parents NOT to attempt to comfort or awaken the child during a night terror; allow the child to sleep through it.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><strong>Promoting Sleep:</strong>
+                                <ul>
+                                    <li>Establish a period of quiet activity before bedtime, away from screens.</li>
+                                    <li>Consistent bedtime routines are key.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-safety', title: 'Safety: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Toddlers and preschoolers, with their increasing mobility and curiosity but still-developing judgment, remain highly vulnerable to unintentional injuries. Nurses provide age-specific anticipatory safety guidance.</p>
+                        <h4 class="font-semibold text-gray-700">Motor Vehicle Safety:</h4>
+                        <ul>
+                            <li><strong>Toddlers:</strong> Should remain in a <strong>rear-facing car safety seat</strong> until they reach the maximum weight/height for that seat, then transition to a <strong>forward-facing car safety seat</strong> with a harness. Always in the rear seat.</li>
+                            <li><strong>Preschoolers:</strong> Continue in a forward-facing car safety seat. Children under 13 years old should always ride in the back seat.</li>
+                            <li><strong>Airplane Safety:</strong> Children should be restrained in an age-appropriate, government-approved restraint system during takeoff, landing, and turbulence.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Water Safety:</h4>
+                        <ul>
+                            <li><strong>Drowning:</strong> Leading cause of unintentional injury death in early childhood.</li>
+                            <li><strong>Prevention:</strong> NEVER leave a child unattended in or near any body of water (bathtubs, pails, pools). All pools must have a climb-resistant fence with a locked gate.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Poison Prevention:</h4>
+                        <ul>
+                            <li>Toddlers explore by mouthing objects. Store all potential poisons (cleaning agents, medicines, cosmetics, plants, pesticides) in locked, child-resistant cabinets.</li>
+                            <li>Keep alcohol out of reach.</li>
+                            <li><strong>Lead Exposure:</strong> Continue risk assessment and screening.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Fire Safety:</h4>
+                        <ul>
+                            <li><strong>Prevention:</strong> Teach children that lighters/matches are adult tools. Practice fire drills.</li>
+                            <li><strong>"Stop, Drop, and Roll":</strong> Teach preschoolers this technique if clothing ignites.</li>
+                            <li>Ensure working smoke detectors.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Pedestrian Safety:</h4>
+                        <ul>
+                            <li>Preschoolers lack full understanding of traffic dangers. Teach "look both ways" and practice street crossing.</li>
+                            <li>Supervise near roads and driveways.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Personal Safety:</h4>
+                        <ul>
+                            <li><strong>Stranger Awareness:</strong> Teach children about "tricky people" rather than "strangers."</li>
+                            <li><strong>Sexual Abuse Prevention:</strong> Teach children about normal body boundaries and inappropriate touch. Encourage them to tell a trusted adult if someone touches them inappropriately.</li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-concerns', title: 'Common Concerns: Toddlers &amp; Preschoolers', type: 'text', content: `
+                        <p>Nurses frequently address common behavioral and developmental concerns in early childhood, providing strategies and reassurance to parents.</p>
+                        <ul>
+                            <li><strong>Temper Tantrums (Toddlerhood):</strong>
+                                <ul>
+                                    <li><strong>Cause:</strong> Normal expression of frustration and developing autonomy.</li>
+                                    <li><strong>Management:</strong> Once safety is assured, the most effective method is to <strong>safely isolate and ignore the tantrum</strong>. Giving in or scolding reinforces the behavior.</li>
+                                    <li><strong>Strategies:</strong> Set clear limits, allow natural/logical consequences, positive reinforcement, diversion, <strong>time-out (1 minute per year of age)</strong>. Avoid physical punishment.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Sibling Rivalry:</strong>
+                                <ul>
+                                    <li><strong>Cause:</strong> Competition for parental love and attention, common with new siblings.</li>
+                                    <li><strong>Prevention/Management:</strong> Prepare older child for new baby, involve them in care, acknowledge their feelings, provide individual time with each child.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Stuttering (Developmental Dysfluency):</strong>
+                                <ul>
+                                    <li><strong>Cause:</strong> Common in preschoolers who have many ideas but difficulty forming words. Often involves repeating whole words/phrases.</li>
+                                    <li><strong>Management:</strong> Most children outgrow it. If persistent or severe, refer to a speech and language therapist.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Daycare/Preschool:</strong>
+                                <ul>
+                                    <li><strong>Selection:</strong> Advise parents to evaluate quality (caregiver qualifications, child-to-staff ratio, safety, disciplinary practices).</li>
+                                    <li><strong>Preparation:</strong> Prepare child for what to expect in simple terms, emphasizing positive aspects.</li>
+                                </ul>
+                            </li>
+                            <li><strong>School Readiness:</strong>
+                                <ul>
+                                    <li><strong>Factors:</strong> Chronologic age and developmental maturity are key. Boys may lag girls developmentally by ~6 months.</li>
+                                    <li><strong>Promotion:</strong> Encourage language development (reading, talking), fine/gross motor skills (art, building), social interaction. Kindergarten provides a structured transition.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    `},
+                    { id: 'early-childhood-quiz', title: 'Early Childhood Health Promotion Quiz', type: 'quiz',
+                        questions: [
+                            { question: "Which of the following is a characteristic of a toddler's physical growth?", options: ["Rapid increase in height (5 inches/year)", "Lean, agile body shape", "Potbellied appearance with exaggerated lumbar curve", "All 20 permanent teeth present"], correctAnswer: "Potbellied appearance with exaggerated lumbar curve" },
+                            { question: "A preschooler believes that their doll is 'sad' because it fell. This is an example of which cognitive characteristic?", options: ["Egocentrism", "Object Permanence", "Animism", "Irreversibility"], correctAnswer: "Animism" },
+                            { question: "According to Erikson, what is the primary developmental task for a preschooler?", options: ["Trust vs. Mistrust", "Autonomy vs. Shame and Doubt", "Initiative vs. Guilt", "Industry vs. Inferiority"], correctAnswer: "Initiative vs. Guilt" },
+                            { question: "What is the recommended duration for a 'time-out' for a 3-year-old child?", options: ["1 minute", "2 minutes", "3 minutes", "5 minutes"], correctAnswer: "3 minutes" },
+                            { question: "Which of the following is NOT a recommended strategy for preventing drowning in early childhood?", options: ["Never leaving a child unattended near water", "Teaching the child to swim independently by age 2", "Ensuring all pools have a climb-resistant fence with a locked gate", "Knowing infant CPR and first aid"], correctAnswer: "Teaching the child to swim independently by age 2" }
+                        ]
+                    }
+                ]
+            },
+            'health-promotion-school-adolescence': {
+                title: 'Health Promotion: School-Age &amp; Adolescence',
+                color: 'from-sky-700 to-cyan-600',
+                description: 'Understand health promotion, developmental changes, and common concerns for school-age children and adolescents.',
+                steps: [
+                    { id: 'school-age-gd', title: 'School-Age: Growth, Development &amp; Health', type: 'text', content: `
+                        <p>The school-age period (6-12 years) is a time of slower, steady physical growth, significant cognitive advances, and increasing social independence. Nurses focus on health promotion related to school, peers, and emerging health risks.</p>
+                        <h4 class="font-semibold text-gray-700">Physical Growth &amp; Maturation:</h4>
+                        <ul>
+                            <li><strong>Growth Rate:</strong> Slower and steadier than earlier years. Appear thinner and more graceful.</li>
+                            <li><strong>Musculoskeletal:</strong> Increased coordination and strength. Muscles are still immature, prone to overuse injuries.</li>
+                            <li><strong>Dentition:</strong> All 20 primary teeth are lost and replaced by 28 of the 32 permanent teeth. Dental sealants are important.</li>
+                            <li><strong>Body Systems:</strong> Lymphatic tissues grow until ~9 years. Frontal sinuses develop at 7 years. Brain growth complete by 10 years. Respiratory system matures, leading to fewer infections.</li>
+                            <li><strong>Puberty:</strong> Onset varies, but occurring earlier than in the past (e.g., Black girls often enter puberty ~1 year earlier than White girls).</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Cognitive Development (Piaget's Concrete Operations):</h4>
+                        <ul>
+                            <li><strong>Egocentrism Declines:</strong> Children learn that their viewpoint is not the only one.</li>
+                            <li><strong>Logical Thinking:</strong> Problem-solving becomes more efficient and reliable. Can form hypotheses.</li>
+                            <li><strong>Reversibility:</strong> Grasp the concept of mentally retracing a process (e.g., in math).</li>
+                            <li><strong>Conservation:</strong> Understand that quantity remains the same despite changes in shape/arrangement.</li>
+                            <li><strong>Classification &amp; Seriation:</strong> Can group objects by common characteristics and order them by size/grade.</li>
+                            <li><strong>Attention Span:</strong> Increases, facilitating classroom learning.</li>
+                            <li><strong>Humor:</strong> Develops a sense of humor (riddles, jokes).</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Psychosocial Development (Erikson's Industry vs. Inferiority):</h4>
+                        <ul>
+                            <li><strong>Task:</strong> Develop a sense of <strong>industry</strong> by learning to do things well and gaining competence in skills needed for the adult world.</li>
+                            <li><strong>Negative Outcome:</strong> Inferiority if expectations are too high, or if the child believes success is unattainable, leading to a lack of confidence.</li>
+                            <li><strong>Self-Esteem:</strong> Fostered by positive feedback, opportunities for success, and supportive relationships.</li>
+                            <li><strong>Peer Group:</strong> Becomes increasingly important. Friendships evolve from proximity-based to emotional bonds and trust. Tend to form same-sex friendships.</li>
+                            <li><strong>Moral Development (Kohlberg's Conventional Level):</strong>
+                                <ul>
+                                    <li><strong>"Good Boy/Good Girl" Orientation (Stage 3):</strong> Conforms to rules to please others and avoid disapproval.</li>
+                                    <li><strong>Law and Order Orientation (Stage 4):</strong> Conforms to maintain social order.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Spiritual Development:</strong> Become acquainted with faith basics. Thinking is concrete; may associate illness with punishment.</li>
+                        </ul>
+                    `},
+                    { id: 'school-age-health-promo', title: 'School-Age: Health Promotion Strategies', type: 'text', content: `
+                        <p>Nurses provide anticipatory guidance to school-age children and their families on nutrition, dental health, sleep, safety, and managing stress.</p>
+                        <h4 class="font-semibold text-gray-700">Nutrition &amp; Activity:</h4>
+                        <ul>
+                            <li><strong>Dietary Guidelines:</strong> Encourage adherence to MyPlate. Teach children about balanced meals, reading food labels, and making healthy choices.</li>
+                            <li><strong>Breakfast:</strong> Emphasize a nutritious breakfast.</li>
+                            <li><strong>Calcium &amp; Iron:</strong> Monitor intake.</li>
+                            <li><strong>Obesity:</strong> High prevalence. Limit screen time to &lt;2 hours/day. Encourage at least 60 minutes/day of moderate-to-vigorous physical activity, with muscle/bone strengthening 3 times/week.</li>
+                            <li><strong>Team Sports:</strong> Provide exercise, motor skill refinement, sportsmanship, and teamwork. Nurses advise on preventing injuries and assessing programs.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Dental Health:</h4>
+                        <ul>
+                            <li><strong>Regular Care:</strong> Twice-yearly dental visits.</li>
+                            <li><strong>Brushing/Flossing:</strong> Children can brush their own teeth, but parents should monitor and assist with flossing. Use fluoride toothpaste.</li>
+                            <li><strong>Fluoride/Sealants:</strong> Continue fluoride supplementation if needed. Dental sealants are recommended for permanent molars.</li>
+                            <li><strong>Malocclusion:</strong> Common; may require orthodontic treatment. Pacifier/thumb sucking should cease by age 5.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Sleep &amp; Rest:</h4>
+                        <ul>
+                            <li><strong>Needs:</strong> 6-7 year olds need ~12 hours/night; 12-year-olds need 9-10 hours/night.</li>
+                            <li><strong>Problems:</strong> Sleepwalking and sleep terrors can occur during deep sleep. Inadequate sleep affects school performance and mood.</li>
+                            <li><strong>Promotion:</strong> Quiet activity before bedtime (no screens). Consistent bedtime routines.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Safety &amp; Injury Prevention:</h4>
+                        <ul>
+                            <li><strong>Motor Vehicle:</strong> Continue using approved car safety seats or booster seats until 4 feet 9 inches tall (8-12 years). Children &lt;13 in back seat.</li>
+                            <li><strong>Water Safety:</strong> Learn to swim, but always swim with a buddy and adult supervision.</li>
+                            <li><strong>Fire Safety:</strong> Practice escape plans. Teach "Stop, Drop, and Roll."</li>
+                            <li><strong>Bicycle/Scooter/Skateboard:</strong> Mandatory helmet use. Teach rules of the road. Proper sizing of equipment.</li>
+                            <li><strong>Pedestrian Safety:</strong> Teach "look both ways." Children often misjudge speed/distance of cars.</li>
+                            <li><strong>Firearms:</strong> If in home, must be locked, ammunition stored separately.</li>
+                            <li><strong>Bullying (Peer Victimization):</strong> Significant problem. Nurses identify victims, provide support, and educate on prevention strategies (physical, verbal, social, electronic).</li>
+                            <li><strong>Stress:</strong> Children experience stress from academics, social pressures, media. Nurses help identify sources and teach coping strategies (resourcefulness, optimism).</li>
+                            <li><strong>Screen Time:</strong> Limit to &lt;2 hours/day. Monitor digital media use (texting, social media, video games).</li>
+                            <li><strong>Sex Education:</strong> Provide honest, age-appropriate information about anatomy, body changes, and responsible decision-making before puberty.</li>
+                        </ul>
+                    `},
+                    { id: 'adolescence-gd', title: 'Adolescence: Growth, Development &amp; Health', type: 'text', content: `
+                        <p>Adolescence (11/12-18 years) is a period of profound transition, marked by rapid physical growth, sexual maturation, and the crucial developmental task of identity formation. Nurses provide comprehensive health promotion tailored to this unique stage.</p>
+                        <h4 class="font-semibold text-gray-700">Physical Growth &amp; Sexual Maturation:</h4>
+                        <ul>
+                            <li><strong>Growth Spurt:</strong> Second only to infancy in rapidity. Girls attain most height before sexual maturation; boys grow during sexual maturation and continue until 18-20 years.</li>
+                            <li><strong>Sexual Maturity Rating (SMR) / Tanner Stages:</strong> Predictable stages of sexual maturation based on breast/pubic hair development in girls and genital/pubic hair development in boys.
+                                <ul>
+                                    <li><strong>Nursing Implication:</strong> Knowledge of Tanner staging is essential for assessing normal development and providing anticipatory guidance.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Girls:</strong> Breast development (thelarche) is often the first sign of puberty. Menarche (first menstruation) occurs later. Axillary hair, apocrine sweat glands develop (need for deodorants).</li>
+                            <li><strong>Boys:</strong> Testicular enlargement is often the first sign. Followed by pubic hair, penis growth, voice changes, nocturnal emissions.</li>
+                            <li><strong>Athletics:</strong> Group adolescents by size/SMR, not just chronologic age, to prevent injuries. Annual physicals and concussion screenings are important.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Cognitive Development (Piaget's Formal Operations):</h4>
+                        <ul>
+                            <li><strong>Abstract Thinking:</strong> Transition from concrete to abstract, logical, inductive, and deductive reasoning.</li>
+                            <li><strong>Future Orientation:</strong> Ability to connect separate events and understand long-term consequences.</li>
+                            <li><strong>Egocentrism (Early Adolescence):</strong> Still present, leading to "<strong>imaginary audience</strong>" (feeling constantly observed) and "<strong>personal fable</strong>" (feeling unique and invulnerable).</li>
+                            <li><strong>Nursing Implication:</strong> Tailor communication; focus on present consequences for younger adolescents, abstract reasoning for older teens. Listen nonjudgmentally.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Psychosocial Development (Erikson's Identity vs. Role Confusion):</h4>
+                        <ul>
+                            <li><strong>Task:</strong> Develop a sense of <strong>identity</strong> and self-perception, exploring roles outside the family.</li>
+                            <li><strong>Peer Group:</strong> Plays an essential role in identity formation, influencing appearance, social behavior, and language. Provides a safe haven for trying new roles.</li>
+                            <li><strong>Independence:</strong> Ambivalence towards independence is common.</li>
+                            <li><strong>Self-Image &amp; Social Relationships:</strong> Intense feelings. Middle adolescence often transitions from same-sex to opposite-sex friendships.</li>
+                            <li><strong>Moral Development (Kohlberg's Postconventional Level):</strong>
+                                <ul>
+                                    <li>Question family values, explore different religions.</li>
+                                    <li>Focus on individual rights and universal justice.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Emancipation:</strong> Major issue in late adolescence, preparing for leaving home through education/vocational training.</li>
+                        </ul>
+                    `},
+                    { id: 'adolescence-health-promo', title: 'Adolescence: Health Promotion Strategies', type: 'text', content: `
+                        <p>Adolescence presents unique health promotion challenges, including nutrition, mental health, safety, and sexual health. Nurses are key in providing guidance and support.</p>
+                        <h4 class="font-semibold text-gray-700">Nutrition:</h4>
+                        <ul>
+                            <li><strong>Increased Needs:</strong> Accelerated growth and sexual maturation increase needs for protein, calories, zinc, calcium, iron.</li>
+                            <li><strong>Challenges:</strong> Influenced by body image concerns (undereating), skipping meals, eating away from home (fast food), peer pressure, emotional problems.</li>
+                            <li><strong>Nursing Role:</strong> Guide on nutritious fast food/snack choices. Address vegetarian diets (ensure adequate nutrients). Screen for eating disorders.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Dental Health:</h4>
+                        <ul>
+                            <li><strong>Regular Care:</strong> Continue dental exams, brushing with fluoride toothpaste, and flossing.</li>
+                            <li><strong>Concerns:</strong> Gingivitis (due to hormonal activity, high sugar, braces), malocclusion (may require orthodontics), dental trauma.</li>
+                            <li><strong>Wisdom Teeth:</strong> Erupt by late adolescence.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Sleep &amp; Rest:</h4>
+                        <ul>
+                            <li><strong>Needs:</strong> 9-10 hours/night. Often sleep deprived due to school, social life, electronic devices.</li>
+                            <li><strong>Effects of Deprivation:</strong> Fatigue, distracted attention, poor school performance, obesity, depression.</li>
+                            <li><strong>Nursing Role:</strong> Educate on adequate sleep, healthy sleep hygiene (limit screens before bed).</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Safety &amp; Injury Prevention:</h4>
+                        <ul>
+                            <li><strong>Unintentional Injury:</strong> Leading cause of death. Often preventable. Feelings of invulnerability contribute to risk-taking.</li>
+                            <li><strong>Motor Vehicle:</strong> Leading cause of injury/death. Promote seatbelt use, avoid distracted/impaired driving. Establish ride-home agreements.</li>
+                            <li><strong>Water Safety:</strong> Drowning is a significant cause of death. Risk-taking behaviors contribute.</li>
+                            <li><strong>Violence:</strong> Associated with low socioeconomic status, crowded housing, family violence, gun access, peer pressure, substance use, racism. Nurses intervene by identifying risk factors.</li>
+                            <li><strong>Suicide:</strong> Increasing problem. Depression, poor impulse control, poor school performance, family disorganization are risk factors. ALL suicidal gestures must be taken seriously.</li>
+                            <li><strong>Nonsuicidal Self-Injury (NSSI):</strong> Cutting, scratching, burning without suicidal intent. Identify triggers and provide coping strategies.</li>
+                            <li><strong>Body Art (Tattoos/Piercings):</strong> Educate on infection risks, proper hygiene, qualified personnel, and permanence.</li>
+                            <li><strong>Tanning:</strong> Harmful; risk factor for skin cancer. Discourage indoor/outdoor tanning. Promote sunscreen use.</li>
+                            <li><strong>Substance Use:</strong> Vaping (e-cigarettes) is a concern (nicotine addiction, gateway to smoking). Educate on risks of alcohol, drugs.</li>
+                            <li><strong>Digital Media:</strong> Sexting, cyberbullying, exposure to inappropriate content. Monitor use, educate on consequences.</li>
+                        </ul>
+                        <h4 class="font-semibold text-gray-700">Sexual Health:</h4>
+                        <ul>
+                            <li><strong>Sexual Activity:</strong> Rates declining, but still significant. Often impulsive, erratic, unplanned.</li>
+                            <li><strong>Nursing Role:</strong> Provide accurate, confidential information on sexuality, sexual behavior, and contraception. Encourage parent-child communication.</li>
+                            <li><strong>STIs &amp; Pregnancy:</strong> High risk due to inconsistent contraception.</li>
+                            <li><strong>LGBTQ+ Youth:</strong> Increased risk for homelessness, sexual exploitation. Nurses identify vulnerabilities and provide support.</li>
+                        </ul>
+                    `},
+                    { id: 'adolescence-case-study', title: 'Case Study: Adolescent Health', type: 'case_study', case: {
+                        scenario: `You are a school nurse assessing a 16-year-old female student, Sarah, during her annual well-visit. Sarah reports feeling "tired all the time" and has recently started skipping breakfast. She mentions that her friends are all trying a new "detox" diet, and she feels pressured to lose weight, even though her BMI is within a healthy range. She also confides that she's been spending more time alone in her room, often on social media, and has noticed her grades slipping. Her parents are concerned about her recent moodiness and decreased interest in school activities.`,
+                        question: `Based on Sarah's presentation, which of the following nursing interventions are most appropriate? (Select all that apply.)`,
+                        options: [
+                            "Option A: Advise Sarah to continue the 'detox' diet if it makes her feel better about her body image.",
+                            "Option B: Discuss healthy eating habits, emphasizing the importance of breakfast and balanced nutrition for energy.",
+                            "Option C: Recommend increasing her screen time to stay connected with her friends and reduce feelings of isolation.",
+                            "Option D: Screen Sarah for signs of depression and refer her for mental health support if indicated.",
+                            "Option E: Educate Sarah on the importance of adequate sleep and healthy sleep hygiene.",
+                            "Option F: Encourage Sarah to engage in more physical activity to boost her mood and energy levels.",
+                            "Option G: Dismiss her weight concerns, stating her BMI is healthy, and tell her to ignore her friends.",
+                        ],
+                        correctAnswer: [
+                            "Option B: Discuss healthy eating habits, emphasizing the importance of breakfast and balanced nutrition for energy.",
+                            "Option D: Screen Sarah for signs of depression and refer her for mental health support if indicated.",
+                            "Option E: Educate Sarah on the importance of adequate sleep and healthy sleep hygiene.",
+                            "Option F: Encourage Sarah to engage in more physical activity to boost her mood and energy levels.",
+                        ],
+                        explanation: `<strong>Rationale:</strong>
+                        Sarah is presenting with several concerns common in adolescence, including fatigue, body image issues, peer pressure, social withdrawal, declining grades, and moodiness. These point to potential nutritional deficiencies, sleep deprivation, and mental health challenges like depression.
+
+                        Let's break down the options:
+                        <ul>
+                            <li><strong>Option B: Discuss healthy eating habits, emphasizing the importance of breakfast and balanced nutrition for energy. (Correct)</strong> Sarah is skipping breakfast and trying a "detox" diet, indicating poor nutritional habits that contribute to fatigue and potential deficiencies. Education on healthy nutrition is crucial.</li>
+                            <li><strong>Option D: Screen Sarah for signs of depression and refer her for mental health support if indicated. (Correct)</strong> Her fatigue, social withdrawal, moodiness, and declining interest in activities are classic signs of depression in adolescents. A mental health screening and referral are highly appropriate.</li>
+                            <li><strong>Option E: Educate Sarah on the importance of adequate sleep and healthy sleep hygiene. (Correct)</strong> Her complaint of being "tired all the time" and parents' concern about moodiness suggest sleep deprivation. Good sleep hygiene can significantly improve her energy and mood.</li>
+                            <li><strong>Option F: Encourage Sarah to engage in more physical activity to boost her mood and energy levels. (Correct)</strong> Physical activity is a known mood booster and can combat fatigue. It's a healthy coping mechanism.</li>
+                            <li><strong>Option A: Advise Sarah to continue the 'detox' diet if it makes her feel better about her body image. (Incorrect)</strong> "Detox" diets are often unhealthy and can lead to nutrient deficiencies, especially in growing adolescents. This would reinforce unhealthy body image concerns and potentially harmful eating behaviors.</li>
+                            <li><strong>Option C: Recommend increasing her screen time to stay connected with her friends and reduce feelings of isolation. (Incorrect)</strong> Sarah is already spending more time on social media, and excessive screen time is linked to sleep deprivation, social isolation (despite being "connected"), and mental health issues. The goal is balanced interaction, not more screen time.</li>
+                            <li><strong>Option G: Dismiss her weight concerns, stating her BMI is healthy, and tell her to ignore her friends. (Incorrect)</strong> While her BMI may be healthy, dismissing her concerns invalidates her feelings and fails to address the underlying body image and peer pressure issues. It's important to acknowledge her feelings and provide healthy coping strategies, rather than simply telling her to ignore her friends.</li>
+                        </ul>
+                        <strong>Key takeaway:</strong> A holistic approach addressing physical, nutritional, sleep, and mental health aspects is essential when caring for adolescents like Sarah.`
+                    }},
+                    { id: 'school-adolescence-quiz', title: 'School-Age &amp; Adolescence Review Quiz', type: 'quiz',
+                        questions: [
+                            { question: "Which of Erikson's developmental tasks is central to the school-age period?", options: ["Trust vs. Mistrust", "Autonomy vs. Shame and Doubt", "Initiative vs. Guilt", "Industry vs. Inferiority"], correctAnswer: "Industry vs. Inferiority" },
+                            { question: "The first physical sign of puberty in boys is typically:", options: ["Voice changes", "Pubic hair development", "Testicular enlargement", "Growth spurt"], correctAnswer: "Testicular enlargement" },
+                            { question: "According to Kohlberg, an adolescent who focuses on individual rights and universal justice is in which level of moral development?", options: ["Premorality", "Conventional Morality", "Postconventional Morality", "Egocentric Morality"], correctAnswer: "Postconventional Morality" },
+                            { question: "Which of the following is a key nursing intervention for preventing bullying (peer victimization) in school-age children?", options: ["Ignoring bullying behavior to avoid escalating it", "Encouraging children to fight back against bullies", "Identifying victims and providing support, educating on prevention strategies", "Advising children to spend more time alone to avoid bullies"], correctAnswer: "Identifying victims and providing support, educating on prevention strategies" },
+                            { question: "A 15-year-old reports feeling invulnerable and believes bad things won't happen to them. This cognitive characteristic is known as:", options: ["Imaginary Audience", "Formal Operations", "Personal Fable", "Abstract Thinking"], correctAnswer: "Personal Fable" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // The pre-assessment quiz data now includes questions for all new modules.
+        const preAssessmentQuizData = [
+            // Questions for Module 1: Foundations of Growth & Development
+            { moduleId: 'foundations-gd', question: "Which term refers to an increase in physical size that is easily measured?", options: ["Development", "Maturation", "Growth", "Learning"], correctAnswer: "Growth" },
+            { moduleId: 'foundations-gd', question: "An infant lifting their head before they can sit is an example of which developmental pattern?", options: ["Proximodistal", "General to Specific", "Simple to Complex", "Cephalocaudal"], correctAnswer: "Cephalocaudal" },
+            { moduleId: 'foundations-gd', question: "At what age does an infant's birth weight typically double?", options: ["3 months", "6 months", "9 months", "12 months"], correctAnswer: "6 months" },
+
+            // Questions for Module 2: Developmental Theories
+            { moduleId: 'developmental-theories', question: "According to Piaget, a child who believes that inanimate objects have life and feelings is demonstrating:", options: ["Egocentrism", "Object Permanence", "Animism", "Centration"], correctAnswer: "Animism" },
+            { moduleId: 'developmental-theories', question: "Which of Erikson's stages is characterized by a toddler's struggle to gain control over body functions and assert independence?", options: ["Trust vs. Mistrust", "Initiative vs. Guilt", "Autonomy vs. Shame and Doubt", "Industry vs. Inferiority"], correctAnswer: "Autonomy vs. Shame and Doubt" },
+            { moduleId: 'developmental-theories', question: "A 6-year-old child avoids taking cookies without permission because they fear punishment from their parents. According to Kohlberg, this child is in which stage of moral development?", options: ["\"Good Boy/Good Girl\" Orientation", "Punishment-Obedience Orientation", "Law and Order Orientation", "Social Contract Orientation"], correctAnswer: "Punishment-Obedience Orientation" },
+
+            // Questions for Module 3: Assessment & Play
+            { moduleId: 'assessment-play', question: "Which developmental assessment method involves eliciting parent concerns, assessing risks, and direct observation at every well visit?", options: ["Formalized Developmental Screening", "Denver Developmental Screening Test II (DDST-II)", "Developmental Surveillance", "BMI Screening"], correctAnswer: "Developmental Surveillance" },
+            { moduleId: 'assessment-play', question: "A 2-year-old child is playing next to another child with similar toys but without interacting. What type of play is this?", options: ["Solitary Play", "Associative Play", "Cooperative Play", "Parallel Play"], correctAnswer: "Parallel Play" },
+            { moduleId: 'assessment-play', question: "According to Piaget, using a cardboard box as a 'spaceship' is an example of which type of play?", options: ["Sensorimotor Play", "Functional Play", "Symbolic Play", "Games with Rules"], correctAnswer: "Symbolic Play" },
+
+            // Questions for Module 4: Health Promotion: Infancy
+            { moduleId: 'health-promotion-infancy', question: "Which of the following is a primary recommendation for SIDS prevention?", options: ["Placing the infant prone to sleep", "Co-sleeping with parents", "Using soft bedding in the crib", "Placing the infant supine to sleep"], correctAnswer: "Placing the infant supine to sleep" },
+            { moduleId: 'health-promotion-infancy', question: "At what age is it generally recommended to begin introducing solid foods to an infant?", options: ["2 months", "4-6 months", "8-10 months", "12 months"], correctAnswer: "4-6 months" },
+            { moduleId: 'health-promotion-infancy', question: "Which food is considered a significant choking hazard for infants and young children and should be avoided or modified?", options: ["Pureed sweet potato", "Iron-fortified rice cereal", "Whole grapes", "Mashed banana"], correctAnswer: "Whole grapes" },
+
+            // Questions for Module 5: Health Promotion: Early Childhood (Toddler & Preschool)
+            { moduleId: 'health-promotion-early-childhood', question: "A preschooler believes that their doll is 'sad' because it fell. This is an example of which cognitive characteristic?", options: ["Egocentrism", "Object Permanence", "Animism", "Irreversibility"], correctAnswer: "Animism" },
+            { moduleId: 'health-promotion-early-childhood', question: "What is the recommended duration for a 'time-out' for a 3-year-old child?", options: ["1 minute", "2 minutes", "3 minutes", "5 minutes"], correctAnswer: "3 minutes" },
+            { moduleId: 'health-promotion-early-childhood', question: "Which of the following is NOT a recommended strategy for preventing drowning in early childhood?", options: ["Never leaving a child unattended near water", "Teaching the child to swim independently by age 2", "Ensuring all pools have a climb-resistant fence with a locked gate", "Knowing infant CPR and first aid"], correctAnswer: "Teaching the child to swim independently by age 2" },
+
+            // Questions for Module 6: Health Promotion: School-Age & Adolescence
+            { moduleId: 'health-promotion-school-adolescence', question: "Which of Erikson's developmental tasks is central to the school-age period?", options: ["Trust vs. Mistrust", "Autonomy vs. Shame and Doubt", "Initiative vs. Guilt", "Industry vs. Inferiority"], correctAnswer: "Industry vs. Inferiority" },
+            { moduleId: 'health-promotion-school-adolescence', question: "The first physical sign of puberty in boys is typically:", options: ["Voice changes", "Pubic hair development", "Testicular enlargement", "Growth spurt"], correctAnswer: "Testicular enlargement" },
+            { moduleId: 'health-promotion-school-adolescence', question: "A 15-year-old reports feeling invulnerable and believes bad things won't happen to them. This cognitive characteristic is known as:", options: ["Imaginary Audience", "Formal Operations", "Personal Fable", "Abstract Thinking"], correctAnswer: "Personal Fable" }
+        ];
+
+        // --- Helper Functions ---
+        // Utility for conditionally joining Tailwind CSS classes.
+        const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+        // --- Child Components ---
+
+        /**
+         * Quiz component for interactive multiple-choice questions.
+         * Users answer questions and receive immediate feedback.
+         */
+        const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [selectedOption, setSelectedOption] = useState([]); // Changed to array for multi-select
+            const [feedback, setFeedback] = useState(null);
+            const [answers, setAnswers] = useState([]);
+
+            const currentQuestion = questions[currentQuestionIndex];
+
+            // Handle option selection for both single and multiple choice
+            const handleOptionSelect = (option) => {
+                if (feedback && !isPreAssessment) return; // Prevent changing answer after feedback in regular quiz
+
+                if (Array.isArray(currentQuestion.correctAnswer)) {
+                    // Multi-select (SATA)
+                    setSelectedOption(prevSelected => {
+                        if (prevSelected.includes(option)) {
+                            return prevSelected.filter(item => item !== option);
+                        } else {
+                            return [...prevSelected, option];
+                        }
+                    });
+                } else {
+                    // Single select
+                    setSelectedOption(option);
+                }
+            };
+            
+            const handlePreAssessmentNext = () => {
+                if (selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)) return;
+                
+                // Logic for checking correctness for both single and multi-select
+                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
+                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
+                    : selectedOption === currentQuestion.correctAnswer;
+                
+                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                setAnswers(updatedAnswers);
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption([]); // Reset for next question
+                    setFeedback(null);
+                } else {
+                    onComplete(updatedAnswers);
+                }
+            };
+            
+            const handleRegularQuizSubmit = () => {
+                if (selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)) return;
+                
+                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
+                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
+                    : selectedOption === currentQuestion.correctAnswer;
+                
+                setFeedback(isCorrect ? 'correct' : 'incorrect');
+            };
+
+            const handleRegularQuizNext = () => {
+                // Ensure the current answer is recorded before moving to the next question
+                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
+                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
+                    : selectedOption === currentQuestion.correctAnswer;
+                const finalAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    setAnswers(finalAnswers);
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption([]); // Reset for next question
+                    setFeedback(null);
+                } else {
+                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    onComplete({ score: finalScore, total: questions.length });
+                }
+            };
+
+            return (
+                <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Quiz: {currentQuestionIndex + 1} of {questions.length}</h4>
+                    <p className="font-semibold text-gray-700 mb-3">{currentQuestion.question}</p>
+                    <div className="space-y-2">
+                        {currentQuestion.options.map((option, index) => {
+                            const isSelected = Array.isArray(selectedOption) ? selectedOption.includes(option) : selectedOption === option;
+                            const isCorrectOption = Array.isArray(currentQuestion.correctAnswer)
+                                ? currentQuestion.correctAnswer.includes(option)
+                                : option === currentQuestion.correctAnswer;
+                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
+
+                            if (feedback && !isPreAssessment) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => handleOptionSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : <span className="text-red-600 mr-2">✗</span>
+                                        )}
+                                        <span className="flex-1">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-4 text-center">
+                        {isPreAssessment ? (
+                                <button
+                                    onClick={handlePreAssessmentNext}
+                                    disabled={selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                                </button>
+                        ) : (
+                            <>
+                            {!feedback ? (
+                                <button
+                                    onClick={handleRegularQuizSubmit}
+                                    disabled={selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Submit Answer
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleRegularQuizNext}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    Next Question
+                                </button>
+                            )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        /**
+         * PreAssessmentQuiz component to handle the initial diagnostic quiz.
+         * Displays quiz questions and then results, allowing users to "test out" of modules.
+         */
+        const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+            const [results, setResults] = useState(null);
+
+            const handleQuizComplete = (finalAnswers) => {
+                const moduleResults = {};
+                finalAnswers.forEach(answer => {
+                    const { moduleId } = answer.question;
+                    if (!moduleResults[moduleId]) {
+                        moduleResults[moduleId] = { correct: 0, total: 0 };
+                    }
+                    if (answer.isCorrect) {
+                        moduleResults[moduleId].correct++;
+                    }
+                    moduleResults[moduleId].total++;
+                });
+
+                const completedModules = [];
+                for (const moduleId in moduleResults) {
+                    // For pre-assessment, a module is "completed" if all its questions in the pre-assessment quiz were answered correctly.
+                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+                        completedModules.push(moduleId);
+                    }
+                }
+                setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+                onComplete(completedModules);
+            };
+
+            if (results) {
+                return (
+                    <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
+                            <p className="text-lg text-gray-600 mb-6">
+                                You correctly answered {results.correct} out of {results.total} questions.
+                            </p>
+                            {results.completedModules.length > 0 ? (
+                                <>
+                                    <p className="text-green-600 font-semibold mb-4">You've tested out of the following modules:</p>
+                                    <ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-lg">
+                                        {results.completedModules.map(id => <li key={id}>{contentData[id].title}</li>)}
+                                    </ul>
+                                </>
+                            ) : (
+                                <p className="text-yellow-600 font-semibold mb-6">You haven't tested out of any modules. You can proceed to the main modules for learning.</p>
+                            )}
+                            <button
+                                onClick={onExit}
+                                className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                            >
+                                Return to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
+                        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Diagnostic Quiz</h2>
+                        <Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+                    </div>
+                </div>
+            );
+        };
+
+
+        /**
+         * Dashboard component to display the available learning modules.
+         * It allows users to select a module to start learning.
+         * Shows progress for each module using a circular progress bar and status.
+         */
+        const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+            let totalCompletedSteps = 0;
+            let totalPossibleSteps = 0;
+            let totalQuizCorrect = 0;
+            let totalQuizQuestions = 0;
+
+            // Calculate overall progress and gather quiz scores
+            Object.entries(contentData).forEach(([moduleId, module]) => {
+                totalPossibleSteps += module.steps.length;
+                const moduleProgress = progress[moduleId] || {};
+                
+                Object.values(moduleProgress).forEach(stepProgress => {
+                    if (stepProgress.completed) {
+                        totalCompletedSteps++;
+                    }
+                    if (stepProgress.score !== undefined) {
+                        totalQuizCorrect += stepProgress.score;
+                    }
+                });
+
+                module.steps.forEach(step => {
+                    if (step.type === 'quiz') {
+                        totalQuizQuestions += step.questions.length;
+                    }
+                });
+            });
+
+            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+            return (
+                <div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+                    <div className="w-full">
+                        <header className="mb-8 text-center">
+                            <div className="flex items-center justify-center gap-3 mb-2">
+                                {/* Text placeholder for the main application identifier */}
+                                <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">CHP</span>
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Child Health Promotion Module</h1>
+                                <span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
+                            </div>
+                            <p className="text-lg text-gray-500 max-w-2xl mx-auto">Master essential concepts in child health promotion, developmental theories, and nursing interventions.</p>
+                        </header>
+
+                        {/* Skip Ahead Button */}
+                        <div className="mb-8 text-center">
+                            <button
+                                onClick={onStartPreAssessment}
+                                className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+                            >
+                                <div className="text-xl">Skip Ahead: Take Diagnostic Quiz</div>
+                                <div className="text-sm font-normal">Test your knowledge and potentially skip modules.</div>
+                            </button>
+                        </div>
+
+                        {/* Overall Progress Bar & Reset Button */}
+                        <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 w-full">
+                           <div className="flex justify-between items-center mb-3">
+                             <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+                             <button 
+                                    onClick={onResetProgress}
+                                    className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" />
+                                    </svg>
+                                    Reset Progress
+                                </button>
+                           </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4">
+                                <div
+                                    className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+                                    style={{ width: `${overallPercentage}%` }}
+                                ></div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-left text-sm text-gray-600 mt-2">
+                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+                                </p>
+                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                            {/* Iterate over all modules defined in contentData */}
+                            {Object.entries(contentData).map(([id, module]) => {
+                                const moduleProgress = progress[id] || {};
+                                // Calculate completion count for steps within the module.
+                                const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+                                const totalSteps = module.steps.length;
+                                const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+                                let statusText = "Not Started";
+                                let statusColor = "text-gray-500";
+                                if (completedCount === totalSteps) {
+                                    statusText = "Completed";
+                                    statusColor = "text-green-600";
+                                } else if (completedCount > 0) {
+                                    statusText = "In Progress";
+                                    statusColor = "text-yellow-600";
+                                }
+
+                                // Get quiz score for this module if available
+                                const quizStep = module.steps.find(step => step.type === 'quiz');
+                                const quizProgress = quizStep ? moduleProgress[quizStep.id] : null;
+
+                                return (
+                                    <div
+                                        key={id}
+                                        onClick={() => onSelectModule(id)}
+                                        // Styling for module cards, including hover effects.
+                                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            {/* Placeholder for module icon: Displays the first letter of the module title. */}
+                                            <div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-10 h-10 flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0")}>
+                                                {module.title.split(' ').map(word => word.charAt(0)).join('')}
+                                            </div>
+                                            {/* Progress Circle */}
+                                            <div className="relative w-12 h-12 flex-shrink-0">
+                                                <svg className="w-full h-full" viewBox="0 0 36 36">
+                                                    {/* Background circle for the progress bar. */}
+                                                    <path
+                                                        className="text-gray-200"
+                                                        d="M18 2.0845
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                    />
+                                                    {/* Foreground arc representing the completion percentage. */}
+                                                    <path
+                                                        className="text-indigo-500"
+                                                        d="M18 2.0845
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                        strokeDasharray={`${percentage}, 100`}
+                                                        strokeLinecap="round"
+                                                        transform="rotate(-90 18 18)"
+                                                    />
+                                                </svg>
+                                                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
+                                        <p className="text-gray-500 text-sm mb-2 h-10">{module.description}</p>
+                                        <div className="mt-auto">
+                                            <p className={cn("text-sm font-semibold", statusColor)}>{statusText}</p>
+                                            {quizProgress && quizProgress.score !== undefined && (
+                                                <p className="text-sm text-gray-600 mt-1">Quiz Score: {quizProgress.score} / {quizStep.questions.length}</p>
+                                            )}
+                                            <div className="flex items-center justify-end text-sm font-medium text-indigo-600 group-hover:text-indigo-700 mt-2">
+                                                Start Learning <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /**
+         * CaseStudy component for a multiple-choice case study challenge.
+         * Presents a scenario and a question with multiple options.
+         */
+        const CaseStudy = ({ caseData, onComplete }) => {
+            // State to store the user's selected answer.
+            const [selectedAnswers, setSelectedAnswers] = useState([]); // Changed to array for multi-select
+            const [showFeedback, setShowFeedback] = useState(false);
+
+            // Handles the selection of an answer option.
+            const handleSelect = (option) => {
+                if (showFeedback) return; // Prevents changing the answer once feedback is shown.
+
+                if (Array.isArray(caseData.correctAnswer)) {
+                    // Multi-select (SATA)
+                    setSelectedAnswers(prevSelected => {
+                        if (prevSelected.includes(option)) {
+                            return prevSelected.filter(item => item !== option);
+                        } else {
+                            return [...prevSelected, option];
+                        }
+                    });
+                } else {
+                    // Single select
+                    setSelectedAnswers([option]);
+                }
+            };
+
+            const handleSubmit = () => {
+                setShowFeedback(true);
+                // Logic for checking correctness for both single and multi-select
+                const isCorrect = Array.isArray(caseData.correctAnswer)
+                    ? caseData.correctAnswer.every(ans => selectedAnswers.includes(ans)) && selectedAnswers.length === caseData.correctAnswer.length
+                    : selectedAnswers[0] === caseData.correctAnswer;
+                
+                if (isCorrect) {
+                    onComplete(); // Marks the step as complete if the correct answer is chosen.
+                }
+            };
+
+            return (
+                <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Case Study Challenge</h4>
+                    {/* Scenario description, using dangerouslySetInnerHTML to render HTML bold tags */}
+                    <p className="bg-blue-100 text-blue-800 p-3 rounded-md mb-4 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+                    <p className="font-semibold text-gray-700 mb-3">{caseData.question}</p>
+                    <div className="space-y-2">
+                        {caseData.options.map(option => {
+                            const isSelected = selectedAnswers.includes(option);
+                            // Case-insensitive comparison for correct answer highlight
+                            const isCorrectOption = Array.isArray(caseData.correctAnswer)
+                                ? caseData.correctAnswer.includes(option)
+                                : option === caseData.correctAnswer;
+                            
+                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200'; // Default styling for options.
+                            if (showFeedback) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800'; // Correct answer always green when feedback is shown 
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800'; // Incorrect selected answer is red 
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800'; // Highlight selected before submission 
+                            } 
+
+                            return (
+                                <div
+                                    key={option}
+                                    onClick={() => handleSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {showFeedback && ( // Display a checkmark or cross icon if feedback is active 
+                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>)
+                                        )}
+                                        <span className="flex-1">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {!showFeedback && (
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={handleSubmit}
+                                disabled={selectedAnswers.length === 0}
+                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Submit Answer
+                            </button>
+                        </div>
+                    )}
+                    {showFeedback && ( // Display the explanation after an answer has been selected.
+                        <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
+                            <h5 className="font-bold text-indigo-800">Explanation</h5>
+                            <p className="text-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        /**
+         * StaticContentStep component for displaying basic text content.
+         * Marks itself as complete immediately on render.
+         */
+        const StaticContentStep = ({ step, onComplete }) => {
+            // For 'text' type steps, mark them as complete immediately upon rendering.
+            // The effect should only run once when the component mounts to prevent an infinite loop.
+            useEffect(() => {
+                onComplete();
+            }, []); // Empty dependency array ensures this runs only once.
+
+            // Using dangerouslySetInnerHTML to render HTML content (e.g., <strong> tags).
+            return (
+                <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50 rounded-lg shadow-inner space-y-4" dangerouslySetInnerHTML={{ __html: step.content }}>
+                </div>
+            );
+        };
+
+        /**
+         * CompletionModal component displayed when a module is completed.
+         */
+        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+                        <h3 className="text-2xl font-bold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+                        <p className="text-gray-700 mb-6">You've successfully completed all steps in this module. Great job!</p>
+                        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
+                            >
+                                Back to Dashboard
+                            </button>
+                            {hasNextModule && (
+                                <button
+                                    onClick={onNextModule}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    Continue to Next Module
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /**
+         * LearningModule component to manage steps within the selected module.
+         * Provides navigation between steps and renders the appropriate content for each.
+         */
+        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+            const [activeStep, setActiveStep] = useState(0); // Manages the index of the currently active step.
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Controls the visibility of the sidebar on mobile.
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false); // State for completion modal 
+
+            // Callback function to update the completion status of a specific step.
+            const handleStepComplete = useCallback((stepId, data = {}) => {
+                onProgressUpdate(module.id, stepId, { completed: true, ...data });
+            }, [onProgressUpdate, module.id]);
+
+            const moduleProgress = progress[module.id] || {};
+            
+            // Check if all steps in the current module are completed
+            const allStepsCompletedInModule = module.steps.every(step =>
+                moduleProgress[step.id] && moduleProgress[step.id].completed
+            );
+
+            // Navigates to the next step, if available.
+            const handleNextStep = () => {
+                // If it's the last step and all steps in the module are completed, open the modal 
+                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
+                    setIsCompletionModalOpen(true);
+                } else if (activeStep < module.steps.length - 1) {
+                    setActiveStep(activeStep + 1);
+                }
+            };
+
+            // Navigates to the previous step, if available.
+            const handlePrevStep = () => {
+                if (activeStep > 0) {
+                    setActiveStep(activeStep - 1);
+                }
+            };
+            
+            // Ensure module and its steps are defined before accessing properties 
+            if (!module || !module.steps) {
+                console.error("LearningModule received invalid module prop:", module);
+                return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Loading module...</div>;
+            }
+
+            const currentStep = module.steps[activeStep];
+            
+            // Renders the appropriate content component based on the current step's type.
+            // This function acts as a router for different interactive and static content types.
+            const renderStepContent = (step) => {
+                if (!step) return <p>Please select a step.</p>;
+
+                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+                switch (step.type) {
+                    case 'text':
+                        return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study':
+                        return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz':
+                        return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    default:
+                        // Fallback for unrecognized step types, ensuring robust error handling.
+                        return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+                }
+            };
+
+            const handleModalClose = () => {
+                setIsCompletionModalOpen(false);
+                onBack(); // Go back to dashboard when modal is closed 
+            };
+
+            const handleModalNextModule = () => {
+                setIsCompletionModalOpen(false);
+                onNextModule(); // Proceed to next module 
+            };
+
+
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+                    {/* Header for the learning module, including back button and module title. */}
+                    <header className="bg-white shadow-md p-4 flex items-center justify-between z-30 flex-shrink-0">
+                        <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                            <span className="hidden sm:inline">Dashboard</span>
+                        </button>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-bold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+                        </div>
+                        {/* Mobile sidebar toggle button using text/emoji placeholders. */}
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                    </header>
+                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+                    <div className="flex flex-1 overflow-hidden">
+                        {/* Sidebar for navigation steps within the module. */}
+                        <aside className={cn(
+                            "bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        )}>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700 px-3">Module Steps</h3>
+                            <nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+                                {module.steps.map((step, index) => (
+                                    <button
+                                        key={step.id}
+                                        onClick={() => {
+                                            setActiveStep(index);
+                                            setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
+                                        }}
+                                        className={cn(
+                                            'w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors',
+                                            activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700'
+                                        )}
+                                    >
+                                        {/* Step completion indicator */}
+                                        <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                                            {moduleProgress[step.id]?.completed ? (
+                                                <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                            ) : (
+                                                <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+                                            )}
+                                        </div>
+                                        <span className="flex-1 text-sm">{step.title}</span>
+                                    </button>
+                                ))}
+                            </nav>
+                        </aside>
+
+                        {/* Main content area for the current step. */}
+                        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                            <div className="max-w-5xl mx-auto">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentStep.title}</h3>
+                                {renderStepContent(currentStep)}
+
+                                {/* Navigation buttons for moving between steps. */}
+                                <div className="flex justify-between mt-8">
+                                    <button
+                                        onClick={handlePrevStep}
+                                        disabled={activeStep === 0}
+                                        className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                    >
+                                        Previous
+                                    </button>
+
+                                    <button
+                                        onClick={handleNextStep}
+                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+                                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+                                    >
+                                        {activeStep === module.steps.length - 1 ? 'Finish Module' : 'Next'}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                    <CompletionModal
+                        isOpen={isCompletionModalOpen}
+                        onClose={handleModalClose}
+                        onNextModule={handleModalNextModule}
+                        hasNextModule={hasNextModule}
+                    />
+                </div>
+            );
+        };
+
+        // --- Main App Component ---
+        /**
+         * The root component of the Child Health Promotion learning module application.
+         * Manages overall application state, including module selection, user ID, and progress.
+         */
+        function App() {
+            // State for the currently selected learning module's ID. Null means Dashboard is active.
+            const [currentModuleId, setCurrentModuleId] = useState(null);
+            const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+            // State for the authenticated user's ID, used for local storage progress tracking.
+            const [userId, setUserId] = useState(null);
+            // State for storing the user's progress across all modules and steps.
+            const [progress, setProgress] = useState({});
+            // State to indicate if authentication is complete and user ID is available.
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            // Effect hook for handling initial authentication and setting the user ID.
+            useEffect(() => {
+                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+                    if (user) setUserId(user.uid);
+                    setIsAuthReady(true); // Mark authentication as ready once user is determined.
+                });
+                return () => unsubscribe(); // Cleanup the auth state listener on component unmount.
+            }, []); // Empty dependency array ensures this runs only once on mount.
+
+            // Effect hook for loading user progress from localStorage after authentication is ready.
+            useEffect(() => {
+                if (!isAuthReady || !userId) return; // Only proceed if auth is ready and userId is available.
+                const storedProgress = localStorage.getItem(`child-health-promo-progress-${userId}`);
+                if (storedProgress) {
+                    try {
+                        setProgress(JSON.parse(storedProgress)); // Attempt to parse and set stored progress.
+                    } catch (e) {
+                        console.error("Failed to parse stored progress, resetting.", e);
+                        setProgress({}); // Reset progress if parsing fails (e.g., corrupted data).
+                    }
+                }
+            }, [isAuthReady, userId]); // Reruns when auth status or userId changes.
+
+            // Callback function to update and persist the user's progress for a specific step.
+            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+                if (!isAuthReady || !userId) return;
+
+                setProgress(currentProgress => {
+                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+                    const newStepProgress = { ...currentStepProgress, ...data };
+
+                    // If the old and new step data are identical, do not update state.
+                    // This prevents the infinite re-render loop.
+                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+                        return currentProgress;
+                    }
+
+                    // Otherwise, proceed with the update.
+                    const newProgress = {
+                        ...currentProgress,
+                        [moduleId]: {
+                            ...(currentProgress[moduleId] || {}),
+                            [stepId]: newStepProgress
+                        }
+                    };
+
+                    localStorage.setItem(`child-health-promo-progress-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [isAuthReady, userId]);
+
+            const handlePreAssessmentComplete = (completedModuleIds) => {
+                const newProgress = { ...progress };
+                completedModuleIds.forEach(moduleId => {
+                    const module = contentData[moduleId];
+                    if (module) {
+                        newProgress[moduleId] = {};
+                        module.steps.forEach(step => {
+                            newProgress[moduleId][step.id] = { completed: true };
+                        });
+                    }
+                });
+                setProgress(newProgress);
+                localStorage.setItem(`child-health-promo-progress-${userId}`, JSON.stringify(newProgress));
+                // The results screen is now part of the PreAssessmentQuiz component.
+                // We just need to handle exiting it.
+            };
+            
+            // Callback to reset all progress
+            const handleResetProgress = useCallback(() => {
+                if (!isAuthReady || !userId) return;
+                // Clear from state
+                setProgress({});
+                // Clear from localStorage
+                localStorage.removeItem(`child-health-promo-progress-${userId}`);
+            }, [isAuthReady, userId]);
+
+            // Function to navigate to the next module in the sequence
+            const handleNextModule = useCallback(() => {
+                const moduleIds = Object.keys(contentData);
+                const currentIndex = moduleIds.indexOf(currentModuleId);
+                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+                    setCurrentModuleId(moduleIds[currentIndex + 1]);
+                } else {
+                    // If it's the last module, go back to the dashboard.
+                    setCurrentModuleId(null);
+                }
+            }, [currentModuleId]);
+
+            // Determine which module is currently selected based on `currentModuleId`.
+            const selectedModule = currentModuleId && contentData[currentModuleId]
+                                                              ? { ...contentData[currentModuleId], id: currentModuleId }
+                                                              : null;
+
+            const moduleIds = Object.keys(contentData);
+            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+
+            return (
+                <div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+                    {isPreAssessmentActive ? (
+                        <PreAssessmentQuiz 
+                            onComplete={handlePreAssessmentComplete} 
+                            onExit={() => setIsPreAssessmentActive(false)}
+                        />
+                    ) : selectedModule ? (
+                        <LearningModule
+                            key={selectedModule.id}
+                            module={selectedModule}
+                            onBack={() => setCurrentModuleId(null)}
+                            progress={progress}
+                            onProgressUpdate={handleProgressUpdate}
+                            onNextModule={handleNextModule}
+                            hasNextModule={hasNextModule}
+                        />
+                    ) : (
+                        <Dashboard 
+                            onSelectModule={setCurrentModuleId} 
+                            progress={progress} 
+                            onResetProgress={handleResetProgress}
+                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // --- Render the App into the DOM ---
+        // Get the DOM element where the React application will be mounted.
+        const container = document.getElementById('root');
+        // Create a React root, which is the entry point for React 18+ applications.
+        const root = ReactDOM.createRoot(container);
+        // Render the main App component into the root.
+        root.render(<App />);
+    </script>
+</body>
+</html>
