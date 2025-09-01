@@ -49,6 +49,33 @@
         .password-toggle-icon:hover {
             color: #374151; /* gray-700 */
         }
+        /* Style for custom modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-width: 400px;
+            width: 90%;
+            animation: slideInFromTop 0.3s ease-out;
+        }
+        @keyframes slideInFromTop {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-sans antialiased text-gray-800">
@@ -57,8 +84,8 @@
     <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4">
         <div class="w-full max-w-md">
             <div class="text-center mb-8">
-                   <h1 class="text-4xl font-extrabold text-blue-700">AlliedRNPrep</h1>
-                   <p class="text-gray-600 mt-2">Secure Portal for Nursing Students</p>
+                     <h1 class="text-4xl font-extrabold text-blue-700">AlliedRNPrep</h1>
+                     <p class="text-gray-600 mt-2">Secure Portal for Nursing Students</p>
             </div>
             <div class="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100">
                 <!-- Login/Signup Toggle -->
@@ -101,7 +128,20 @@
                     </div>
                 </form>
                 <!-- Message Area -->
-                   <p id="auth-message" class="mt-4 text-center text-sm font-medium min-h-[20px]"></p>
+                    <p id="auth-message" class="mt-4 text-center text-sm font-medium min-h-[20px]"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Classroom Code Input -->
+    <div id="classroom-modal" class="modal">
+        <div class="modal-content text-center">
+            <h3 class="text-2xl font-bold mb-4 text-blue-800">Join a Classroom</h3>
+            <p id="modal-message" class="text-red-500 mb-4 text-sm min-h-[20px]"></p>
+            <input type="text" id="classroom-code-input" placeholder="Enter classroom code" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition mb-4">
+            <div class="flex justify-center space-x-4">
+                <button id="join-classroom-btn" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Join</button>
+                <button id="cancel-classroom-btn" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition duration-300">Cancel</button>
             </div>
         </div>
     </div>
@@ -119,6 +159,12 @@
                         <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
                         <li><a href="About.html" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
                         <li><a href="#contact-us" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Contact</a></li>
+                        <!-- New "Join Classroom" button -->
+                        <li>
+                            <button id="open-classroom-modal-btn" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">
+                                Join Classroom
+                            </button>
+                        </li>
                         <li id="logout-button-container" class="hidden">
                             <span id="welcome-user-name" class="text-gray-600 mr-4"></span>
                             <button id="logout-button" class="bg-red-500 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-red-600 transition duration-300 font-bold transform hover:scale-105">Logout</button>
@@ -164,7 +210,7 @@
                     <!-- Semester Two Card -->
                     <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
                         <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
                         <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Two</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Additional materials for intermediate clinical skills, pharmacology, and common health alterations.</p>
@@ -173,7 +219,7 @@
                     <!-- Semester Three Card -->
                     <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
                         <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
                         <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Three</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
@@ -182,10 +228,21 @@
                     <!-- Semester Four Card -->
                     <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
                         <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
                         <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Four</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Preparation aids for leadership, management, community health, and NCLEX study strategies.</p>
+                        <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                    </div>
+                    <!-- New "Ians Classroom" Card (initially hidden) -->
+                    <div id="ians-classroom-card" class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 text-center border border-gray-100 hover:border-blue-300 group hidden">
+                        <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v-2m0 0a4 4 0 10-4-4v2l4 4 4-4v-2a4 4 0 10-4 4z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Ians Classroom</h3>
+                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Access to Ian's private study resources and exclusive materials for your cohort.</p>
                         <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
                     </div>
                 </div>
@@ -255,6 +312,12 @@
             browserLocalPersistence,
             browserSessionPersistence
         } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -266,10 +329,12 @@
             appId: "1:833328760520:web:c25191e71a3ae31a55c7fd",
             measurementId: "G-WQKB2E7CLH"
         };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
         // --- DOM Element References ---
         const authContainer = document.getElementById('auth-container');
@@ -287,10 +352,28 @@
         const showSignupButton = document.getElementById('show-signup');
         const confirmPasswordGroup = document.getElementById('confirm-password-group');
         const welcomeUserName = document.getElementById('welcome-user-name');
+        const iansClassroomCard = document.getElementById('ians-classroom-card');
+        const classroomModal = document.getElementById('classroom-modal');
+        const openModalBtn = document.getElementById('open-classroom-modal-btn');
+        const joinBtn = document.getElementById('join-classroom-btn');
+        const cancelBtn = document.getElementById('cancel-classroom-btn');
+        const classroomCodeInput = document.getElementById('classroom-code-input');
+        const modalMessage = document.getElementById('modal-message');
 
         let isLoginMode = true;
+        const correctClassroomCode = 's76tu5hjeo';
 
         // --- UI Helper Functions ---
+
+        /**
+         * Displays a custom modal message.
+         * @param {string} message - The message to display.
+         * @param {boolean} isSuccess - True for a success message, false for an error.
+         */
+        function displayModalMessage(message, isSuccess = false) {
+            modalMessage.textContent = message;
+            modalMessage.style.color = isSuccess ? '#16a34a' : '#dc2626'; // green-600 or red-600
+        }
 
         /**
          * Toggles the authentication form between login and signup modes.
@@ -348,18 +431,42 @@
                 } else {
                     welcomeUserName.textContent = `Welcome!`;
                 }
+
+                // Check and set up Firestore listener for user data
+                const userId = user.uid;
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/userData/preferences`);
+
+                onSnapshot(userDocRef, (docSnap) => {
+                    // This is the core logic that checks for the flag and updates the card's display.
+                    if (docSnap.exists() && docSnap.data().hasIansClassroom) {
+                        iansClassroomCard.classList.remove('hidden');
+                        iansClassroomCard.classList.add('flex', 'flex-col');
+                        // NEW LOGIC: Hide the modal only after the card is confirmed to be visible.
+                        if (classroomModal.style.display === 'flex') {
+                            classroomModal.style.display = 'none';
+                        }
+                    } else {
+                        iansClassroomCard.classList.add('hidden');
+                        iansClassroomCard.classList.remove('flex', 'flex-col');
+                    }
+                }, (error) => {
+                    console.error("Error listening to user data:", error);
+                });
+
             } else {
                 authContainer.classList.remove('hidden');
                 appContent.classList.add('hidden');
                 logoutButtonContainer.classList.add('hidden');
                 welcomeUserName.textContent = '';
+                iansClassroomCard.classList.add('hidden');
+                iansClassroomCard.classList.remove('flex', 'flex-col');
             }
         }
 
         // --- Firebase Authentication Logic ---
 
         onAuthStateChanged(auth, (user) => {
-            updateUI(user);
+             updateUI(user);
         });
 
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
@@ -453,6 +560,42 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             setAuthMode('login');
+        });
+
+        // --- Classroom Modal Logic ---
+        openModalBtn.addEventListener('click', () => {
+            classroomModal.style.display = 'flex';
+            classroomCodeInput.value = '';
+            displayModalMessage('');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            classroomModal.style.display = 'none';
+        });
+
+        joinBtn.addEventListener('click', async () => {
+            const code = classroomCodeInput.value.trim();
+            if (code === correctClassroomCode) {
+                displayModalMessage('Joining classroom...', true);
+                try {
+                    const userId = auth.currentUser.uid;
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/userData/preferences`);
+                    await setDoc(userDocRef, { hasIansClassroom: true }, { merge: true });
+                    displayModalMessage('Success! Welcome to Ian\'s Classroom.', true);
+                } catch (error) {
+                    console.error("Error adding classroom preference to Firestore:", error);
+                    displayModalMessage('An error occurred. Please try again.', false);
+                }
+            } else {
+                displayModalMessage('Incorrect classroom code. Please try again.', false);
+            }
+        });
+
+        // Close modal if user clicks outside of it
+        window.addEventListener('click', (e) => {
+            if (e.target === classroomModal) {
+                classroomModal.style.display = 'none';
+            }
         });
     </script>
 </body>
