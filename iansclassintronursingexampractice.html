@@ -207,903 +207,1228 @@
 
 <script>
     const fullQuizData = [ 
-   {
-    "questionText": "According to the Module Overview, what is the fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication?",
-    "type": "mc",
-    "section": "Professional Identity",
-    "options": {
-      "a": "Therapeutic communication",
-      "b": "Self-care",
-      "c": "Professional identity",
-      "d": "Interdisciplinary collaboration"
-    },
-    "correctAnswer": "c",
-    "rationale": "The Module Overview for Professional Identity explicitly states that professional identity is a fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication."
-  },
-  {
-    "questionText": "Professional identity is demonstrated through which of the following? Select all that apply.",
-    "type": "sata",
-    "section": "Professional Identity",
-    "options": {
-      "a": "Behavior",
-      "b": "Presence",
-      "c": "Actively listening to the client",
-      "d": "Critical thinking"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "The Module Overview for Professional Identity states that professional identity is demonstrated through behavior, presence, and actively listening to the client."
-  },
-  {
-    "questionText": "According to the Student Learning Outcomes, a student should be able to differentiate among what?",
-    "type": "mc",
-    "section": "Professional Identity",
-    "options": {
-      "a": "The various types of communication.",
-      "b": "Medical and surgical asepsis.",
-      "c": "The functions and roles of nurses.",
-      "d": "The links that form the chain of infection."
-    },
-    "correctAnswer": "c",
-    "rationale": "The Student Learning Outcomes for Professional Identity explicitly state this as a goal."
-  },
-  {
-    "questionText": "Based on the provided content, what is a key topic of the Professional Identity module?",
-    "type": "mc",
-    "section": "Professional Identity",
-    "options": {
-      "a": "I-SBAR and hand-off communication",
-      "b": "Caring encounters and self-care",
-      "c": "Therapeutic communication and delegation",
-      "d": "Nursing process and decision-making"
-    },
-    "correctAnswer": "b",
-    "rationale": "The Professional Identity Module Overview lists caring encounters and self-care as key topics."
-  },
-  {
-    "questionText": "Which of the following are Course-Level Outcomes for the Professional Identity module? Select all that apply.",
-    "type": "sata",
-    "section": "Professional Identity",
-    "options": {
-      "a": "Utilize communication skills with clients/faculty and healthcare team to facilitate client care.",
-      "b": "Incorporate client cultural beliefs and values when managing the care of the client.",
-      "c": "Collaborate with the healthcare team to coordinate client care.",
-      "d": "Integrate clinical decision-making based on professional nursing standards."
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "The provided content lists 'Utilize communication skills with clients/faculty and healthcare team...', 'Incorporate client cultural beliefs and values...', and 'Collaborate with the healthcare team...' as Course-Level Outcomes for the Professional Identity module."
-  },
-  {
-    "questionText": "According to the Communication Module Overview, clear and effective communication is essential to ensure what?",
-    "type": "mc",
-    "section": "Communication",
-    "options": {
-      "a": "Efficient hand-off reports.",
-      "b": "Safe patient outcomes.",
-      "c": "Patient satisfaction with care.",
-      "d": "Ethical behavior from all staff."
-    },
-    "correctAnswer": "b",
-    "rationale": "The Communication Module Overview explicitly states that clear and effective communication is essential with interdisciplinary departments/personnel to ensure safe patient outcomes."
-  },
-  {
-    "questionText": "According to the Student Learning Outcomes for Communication, what should a student be able to do regarding communication types?",
-    "type": "mc",
-    "section": "Communication",
-    "options": {
-      "a": "Identify the phases of nurse/patient communication.",
-      "b": "Define compassion fatigue.",
-      "c": "Differentiate between medical and surgical asepsis.",
-      "d": "Discuss vital sign assessment."
-    },
-    "correctAnswer": "a",
-    "rationale": "This is one of the explicitly listed Student Learning Outcomes for the Communication module."
-  },
-  {
-    "questionText": "Which of the following topics is associated with communication, according to the Module Overview? Select all that apply.",
-    "type": "sata",
-    "section": "Communication",
-    "options": {
-      "a": "Therapeutic communication",
-      "b": "Delegation",
-      "c": "I-SBAR",
-      "d": "Self-care"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "The Module Overview for Communication lists therapeutic communication, delegation, collaboration, I-SBAR, and hand-off communication as key topics."
-  },
-  {
-    "questionText": "According to the Infection Control Module Overview, what is the purpose of the module?",
-    "type": "mc",
-    "section": "Infection Control",
-    "options": {
-      "a": "To introduce the basic concept of infection control and the nurse's role in preventing infection in all care settings.",
-      "b": "To develop critical thinking and decision-making skills.",
-      "c": "To prepare a nursing care plan based on subjective data.",
-      "d": "To demonstrate caregiver skills development."
-    },
-    "correctAnswer": "a",
-    "rationale": "The Module Overview for Infection Control states this as its purpose."
-  },
-  {
-    "questionText": "What is the definition of infection according to Giddens (2021)?",
-    "type": "mc",
-    "section": "Infection Control",
-    "options": {
-      "a": "A fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication.",
-      "b": "An interpretation or conclusion about a patient's needs, concerns, or health problems.",
-      "c": "The invasion and multiplication of microorganisms in the body tissues, which may be clinically unapparent or result in local cellular injury due to competitive metabolism, toxins, intracellular replication, or antigen-antibody response.",
-      "d": "An abnormal connection between 2 internal organs or between an internal organ and the outside of the body."
-    },
-    "correctAnswer": "c",
-    "rationale": "The Module Overview for Infection (Continued) provides this exact definition from Giddens (2021)."
-  },
-  {
-    "questionText": "Which of the following is a key topic associated with the Infection module? Select all that apply.",
-    "type": "sata",
-    "section": "Infection Control",
-    "options": {
-      "a": "Personal protective equipment",
-      "b": "Asepsis",
-      "c": "Standard Precautions",
-      "d": "I-SBAR"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "The Module Overview for Infection lists personal protective equipment, asepsis, sterile technique, hospital acquired infections (HAI), and Standard Precautions as key topics."
-  },
-  {
-    "questionText": "What is the definition of clinical judgment according to Tanner (2006)?",
-    "type": "mc",
-    "section": "Clinical Judgment",
-    "options": {
-      "a": "The psychomotor ability in delivering patient care.",
-      "b": "The invasion and multiplication of microorganisms in the body tissues.",
-      "c": "An interpretation or conclusion about a patient's needs, concerns, or health problems, and/or the decision to take action (or not).",
-      "d": "A fundamental principle that helps shape one's behavior and ethics."
-    },
-    "correctAnswer": "c",
-    "rationale": "The Module Overview for Clinical Judgment provides this exact definition from Tanner (2006)."
-  },
-  {
-    "questionText": "To overcome daily challenges and deliver safe and effective patient care, nurses must utilize which of the following? Select all that apply.",
-    "type": "sata",
-    "section": "Clinical Judgment",
-    "options": {
-      "a": "Effective communication skills",
-      "b": "Critical thinking",
-      "c": "Critical reasoning",
-      "d": "Psychomotor ability"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "The Module Overview for Clinical Judgment states nurses must utilize effective communication skills, critical thinking, critical reasoning, and make a conclusion to deliver safe and effective patient care."
-  },
-  {
-    "questionText": "A wound that has damage and exposure to muscle, bone, or supporting structures is classified as what stage of pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Stage 1",
-      "b": "Stage 2",
-      "c": "Stage 3",
-      "d": "Stage 4"
-    },
-    "correctAnswer": "d",
-    "rationale": "Stage 4 is defined as skin loss with damage and exposure to muscle, bone, or supporting structures."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following is a type of wound drainage? Select all that apply.",
-    "type": "sata",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Serous",
-      "b": "Serosanguineous",
-      "c": "Purulent",
-      "d": "Exudate"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "Slide 21 lists four types of wound drainage: Serous, Serosanguineous, Sanguineous, and Purulent."
-  },
-  {
-    "questionText": "The three phases of wound healing are: Inflammatory, Proliferative, and what?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Maturation",
-      "b": "Tertiary",
-      "c": "Dehiscence",
-      "d": "Asepsis"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 9 lists the three phases of wound healing as Inflammatory, Proliferative, and Maturation."
-  },
-  {
-    "questionText": "Which of the following is an example of an open wound?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Bruising",
-      "b": "Abrasion",
-      "c": "Fracture",
-      "d": "Pressure related injury"
-    },
-    "correctAnswer": "b",
-    "rationale": "Slide 3 states that an open wound is a break in the skin surface and provides abrasion, puncture, and incision as examples."
-  },
-  {
-    "questionText": "A wound that is initially left open to resolve edema or infection, and is then closed later, is healing by what intention?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Primary intention",
-      "b": "Secondary intention",
-      "c": "Tertiary intention",
-      "d": "Closed wound"
-    },
-    "correctAnswer": "c",
-    "rationale": "Slide 8 defines tertiary intention as a wound initially left open before being closed later."
-  },
-  {
-    "questionText": "Which of the following is a complication of wounds, as listed on the provided slides? Select all that apply.",
-    "type": "sata",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Dehiscence",
-      "b": "Evisceration",
-      "c": "Fistulas",
-      "d": "Bruising"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "Slide 11 lists Dehiscence and Evisceration as wound complications, and Slide 12 lists Fistulas as a wound complication."
-  },
-  {
-    "questionText": "What is an abnormal connection between two internal organs or between an internal organ and the outside of the body?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Dehiscence",
-      "b": "Evisceration",
-      "c": "Fistula",
-      "d": "Bruising"
-    },
-    "correctAnswer": "c",
-    "rationale": "Slide 12 defines a fistula as an abnormal connection between two internal organs or between an internal organ and the outside of the body."
-  },
-  {
-    "questionText": "According to the provided content, what is the primary cause of a pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Friction and shear",
-      "b": "Malnutrition",
-      "c": "Pressure",
-      "d": "Moisture (MASD)"
-    },
-    "correctAnswer": "c",
-    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure, with intensity and duration being key components."
-  },
-  {
-    "questionText": "Which of the following is a key topic of the Professional Identity module, according' to the Module Overview?",
-    "type": "mc",
-    "section": "Professional Identity",
-    "options": {
-      "a": "I-SBAR and hand-off communication",
-      "b": "Caring encounters and self-care",
-      "c": "Therapeutic communication and delegation",
-      "d": "Nursing process and decision-making"
-    },
-    "correctAnswer": "b",
-    "rationale": "The Professional Identity Module Overview lists caring encounters and self-care as key topics."
-  },
-  {
-    "questionText": "According to the Student Learning Outcomes for the Clinical Judgment module, what should a student be able to do regarding a nursing care plan?",
-    "type": "sata",
-    "section": "Clinical Judgment",
-    "options": {
-      "a": "Implement a nursing care plan utilizing critical thinking.",
-      "b": "Prepare a nursing care plan based upon objective and subjective data.",
-      "c": "Demonstrate accurately measuring a patient's vital signs.",
-      "d": "Identify essential behaviors that demonstrate caring."
-    },
-    "correctAnswer": "b,c",
-    "rationale": "The Student Learning Outcomes for the Clinical Judgment module explicitly list 'Prepare nursing care plan based upon objective and subjective data' and 'Demonstrate accurately measuring a patient's vital signs'."
-  },
-  {
-    "questionText": "A wound that extends into the subcutaneous tissue, but not to the muscle or bone, is classified as what stage of pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Stage 1",
-      "b": "Stage 2",
-      "c": "Stage 3",
-      "d": "Stage 4"
-    },
-    "correctAnswer": "c",
-    "rationale": "Slide 17 defines Stage 3 as extending into the subcutaneous tissue, but not to the muscle or bone."
-  },
-  {
-    "questionText": "According to the provided content, what is the role of clear and effective communication in a complex health care environment?",
-    "type": "mc",
-    "section": "Communication",
-    "options": {
-      "a": "It is an essential component of professional identity.",
-      "b": "It is a key topic of the Professional Identity module.",
-      "c": "It is essential with interdisciplinary departments/personnel to ensure safe patient outcomes.",
-      "d": "It is primarily used for hand-off communication."
-    },
-    "correctAnswer": "c",
-    "rationale": "The Communication Module Overview explicitly states that clear and effective communication is essential with interdisciplinary departments/personnel to ensure safe patient outcomes."
-  },
-  {
-    "questionText": "According to the provided content, what is a key topic of the Clinical Judgment module?",
-    "type": "mc",
-    "section": "Clinical Judgment",
-    "options": {
-      "a": "I-SBAR and hand-off communication",
-      "b": "Nursing process, critical thinking, problem-solving, and decision making",
-      "c": "Asepsis, sterile technique, and HAIs",
-      "d": "Principles of caring and self-care"
-    },
-    "correctAnswer": "b",
-    "rationale": "The Module Overview for Clinical Judgment lists these as key topics."
-  },
-  {
-    "questionText": "What is the primary cause of a pressure injury, as stated in the 'Skin Integrity' slides?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Friction and shear",
-      "b": "Pressure",
-      "c": "Malnutrition",
-      "d": "Sensory loss or immobility"
-    },
-    "correctAnswer": "b",
-    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
-  },
-  {
-    "questionText": "A wound described as having minimal or no tissue loss and tissue surfaces that are approximated (closed) is healing by what intention?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Primary intention",
-      "b": "Secondary intention",
-      "c": "Tertiary intention",
-      "d": "Closed intention"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 6 defines primary intention as having tissue surfaces approximated (closed), minimal or no tissue loss, and quick healing."
-  },
-  {
-    "questionText": "What is the key difference between a closed wound and an open wound, according to the provided content?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "A closed wound has bruising, while an open wound has a break in the skin surface.",
-      "b": "An open wound can become infected, but a closed wound cannot.",
-      "c": "An open wound is always more severe than a closed wound.",
-      "d": "A closed wound is always a fracture, while an open wound is always an incision."
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 3 defines an open wound as a break in the skin surface and a closed wound as having bruising with intact skin."
-  },
-  {
-    "questionText": "Which of the following is a core concept that shapes professional behavior, clinical judgment, ethics, and communication?",
+ {
+    "questionText": "A newly graduated nurse is orienting on a medical-surgical unit. The preceptor observes the new nurse's interactions with a client who is anxious about an upcoming procedure. The preceptor notes that the new nurse sits at the bedside, makes direct eye contact, and asks open-ended questions about the client's feelings. This behavior best demonstrates which core component of professional identity?",
     "type": "mc",
     "section": "Professional Identity",
     "options": {
       "a": "Self-care",
-      "b": "Professional identity",
-      "c": "Compassion fatigue",
-      "d": "Delegation"
+      "b": "Collaborative practice",
+      "c": "Caring encounters",
+      "d": "Evidence-based practice"
+    },
+    "correctAnswer": "c",
+    "rationale": "The behaviors described—sitting at the bedside, making eye contact, and actively listening through open-ended questions—are all essential elements of a caring encounter, a key component of a nurse's professional identity."
+  },
+  {
+    "questionText": "A student nurse is caring for a client with a chronic wound. The student notes the wound edges are not approximated and the wound bed is deep with visible granulation tissue. The student's preceptor asks about the wound healing process. The student should identify that this wound is healing by which intention?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Quaternary intention"
     },
     "correctAnswer": "b",
-    "rationale": "The Module Overview for Professional Identity explicitly states that professional identity is a fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication."
+    "rationale": "Wounds that have extensive tissue loss and cannot have their edges approximated heal by secondary intention. This process involves filling the wound bed with granulation tissue, which is a key characteristic described in the scenario."
   },
   {
-    "questionText": "Which of the following is a Student Learning Outcome for the Professional Identity module?",
+    "questionText": "The nurse is preparing to perform a sterile procedure. After donning sterile gloves, the nurse's hand brushes against the client's bed rail. The most appropriate action for the nurse to take is to:",
     "type": "mc",
-    "section": "Professional Identity",
+    "section": "Infection Control",
     "options": {
-      "a": "Explain the primary purpose of the various types of communication.",
-      "b": "Discuss nursing and non-nursing theories that impact nursing practice.",
-      "c": "Describe conditions that promote the transmission of healthcare-associated infections (HAI).",
-      "d": "Discuss vital sign assessment."
+      "a": "Proceed with the procedure, as the bed rail is not a sterile field.",
+      "b": "Disinfect the bed rail and continue the procedure.",
+      "c": "Remove the sterile gloves, perform hand hygiene, and don a new pair of sterile gloves.",
+      "d": "Inform the client of the error and ask for their preference on how to proceed."
     },
-    "correctAnswer": "b",
-    "rationale": "This is an explicitly listed Student Learning Outcome for the Professional Identity module."
+    "correctAnswer": "c",
+    "rationale": "Brushing against a non-sterile object, such as a bed rail, breaks the sterile field. According to the principles of surgical asepsis, any contamination of sterile equipment or a sterile field requires starting over to prevent the transmission of microorganisms and ensure patient safety."
   },
   {
-    "questionText": "What is the purpose of the Communication module?",
-    "type": "mc",
-    "section": "Communication",
-    "options": {
-      "a": "To introduce the basic concept of communication.",
-      "b": "To identify populations at higher risk for acquiring infections.",
-      "c": "To introduce the basic concept of clinical judgment.",
-      "d": "To define compassion fatigue."
-    },
-    "correctAnswer": "a",
-    "rationale": "The Module Overview for Communication states that its purpose is to introduce the basic concept of communication."
-  },
-  {
-    "questionText": "Which of the following are key topics associated with communication? Select all that apply.",
+    "questionText": "A charge nurse is observing a new graduate nurse perform a wound assessment. Which of the following observations by the charge nurse would require intervention? The new graduate nurse:",
     "type": "sata",
-    "section": "Communication",
+    "section": "Skin Integrity",
     "options": {
-      "a": "Therapeutic communication",
-      "b": "Collaboration",
-      "c": "I-SBAR",
-      "d": "Pain"
+      "a": "Measures the length, width, and depth of the wound.",
+      "b": "Palpates the wound for tunneling and undermining.",
+      "c": "Identifies a yellowish, viscous drainage from the wound.",
+      "d": "Classifies the drainage as serosanguineous."
     },
-    "correctAnswer": "a,b,c",
-    "rationale": "Therapeutic communication, collaboration, and I-SBAR are listed as key topics in the Communication Module Overview."
+    "correctAnswer": "c",
+    "rationale": "Yellowish, viscous drainage is purulent, which is a sign of infection and requires intervention. The other actions (measuring, palpating for tunneling, and classifying drainage) are all appropriate steps in a comprehensive wound assessment."
   },
   {
-    "questionText": "The purpose of the Infection Control module is to introduce the basic concept of infection control. Applying the principles of infection control is vital for providing what?",
-    "type": "mc",
-    "section": "Infection Control",
-    "options": {
-      "a": "Effective communication with interdisciplinary teams.",
-      "b": "Safe care environments for patients and the entire health care team.",
-      "c": "Asepsis and sterile technique.",
-      "d": "Clinical judgment and critical thinking."
-    },
-    "correctAnswer": "b",
-    "rationale": "The Module Overview for Infection Control states that applying infection control principles is vital for providing safe care environments for patients and the entire health care team."
-  },
-  {
-    "questionText": "According to the Student Learning Outcomes for the Infection Control module, a student should be able to do which of the following?",
-    "type": "mc",
-    "section": "Infection Control",
-    "options": {
-      "a": "Explain the primary purpose of the various types of communication.",
-      "b": "Discuss the rationale for standard precautions.",
-      "c": "Prepare a nursing care plan based upon objective and subjective data.",
-      "d": "Define compassion fatigue."
-    },
-    "correctAnswer": "b",
-    "rationale": "This is an explicitly listed Student Learning Outcome for the Infection Control module."
-  },
-  {
-    "questionText": "Clinical judgment and communication are described as the cognitive aspect rather than the what?",
+    "questionText": "The nurse is reviewing a client's chart and notes a documented nursing diagnosis of 'Impaired Skin Integrity'. Which of the following is the most likely supporting data for this diagnosis?",
     "type": "mc",
     "section": "Clinical Judgment",
     "options": {
-      "a": "Critical thinking",
-      "b": "Psychomotor ability",
-      "c": "Decision making",
-      "d": "Problem-solving"
+      "a": "The client reports a pain level of 6/10.",
+      "b": "The client has a reddened, non-blanchable area on their sacrum.",
+      "c": "The client's dressing has serous drainage.",
+      "d": "The client states, 'I feel so tired today.'"
     },
     "correctAnswer": "b",
-    "rationale": "The Clinical Judgment Module Overview states that clinical judgment and communication are the cognitive aspect rather than the psychomotor ability in delivering patient care."
+    "rationale": "A reddened, non-blanchable area on the sacrum is the defining characteristic of a Stage 1 pressure injury, which directly supports the nursing diagnosis of Impaired Skin Integrity. While pain (A) can be a factor, it is a subjective symptom. Serous drainage (C) is a normal finding. A statement about being tired (D) is not directly related to skin integrity."
   },
   {
-    "questionText": "Which of the following is a Student Learning Outcome for the Clinical Judgment module? Select all that apply.",
+    "questionText": "A newly admitted client is at high risk for developing a pressure injury. The nurse plans to implement evidence-based prevention strategies. Which of the following is the most appropriate initial intervention?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Applying a hydrocolloid dressing to all bony prominences.",
+      "b": "Elevating the head of the bed to at least 45 degrees.",
+      "c": "Determining the client's risk factors using a validated scale.",
+      "d": "Massaging reddened areas to promote circulation."
+    },
+    "correctAnswer": "c",
+    "rationale": "According to the provided content on pressure injury prevention, the first step is to 'Determine risk factors.' A validated scale like the Braden Scale is the gold standard for this assessment, which then guides subsequent interventions."
+  },
+  {
+    "questionText": "The nurse is providing care for a client with a closed, full-thickness wound. The nurse understands that this wound:",
     "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Has a break in the skin surface.",
+      "b": "Involves the subcutaneous layer, muscle, or bone.",
+      "c": "Is likely a bruise or fracture.",
+      "d": "Is less severe than a superficial wound."
+    },
+    "correctAnswer": "b,c",
+    "rationale": "A full-thickness wound is defined as extending into the subcutaneous layer, muscle, or bone. A closed wound is one where the skin surface is intact, and common examples are bruises or fractures. The other options are incorrect. An open wound has a break in the skin (A). The severity of the damage is not always reflected by skin integrity alone (D), and a full-thickness wound is more severe than a superficial wound."
+  },
+  {
+    "questionText": "The nurse is working with a client who requires complex care. The nurse must communicate the client's current status and needs to the interdisciplinary team. Which of the following communication strategies would be most appropriate to ensure safe patient outcomes?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Sending a detailed email to each team member.",
+      "b": "Using a standardized hand-off tool like I-SBAR.",
+      "c": "Discussing the client's status in a casual conversation.",
+      "d": "Writing a detailed note in the client's chart without verbally communicating the information."
+    },
+    "correctAnswer": "b",
+    "rationale": "The Communication Module Overview lists I-SBAR and hand-off communication as key topics that are essential for clear and effective communication to ensure safe patient outcomes. Standardized tools like I-SBAR prevent miscommunication and ensure all critical information is conveyed."
+  },
+  {
+    "questionText": "A student nurse is observed by their clinical instructor as they prepare to take a client's vital signs. The instructor asks the student to explain the rationale for this assessment. The student's response should be guided by which of the following nursing concepts?",
+    "type": "mc",
     "section": "Clinical Judgment",
     "options": {
-      "a": "Discuss vital sign assessment.",
-      "b": "List factors that affect a patient's vital and signs.",
-      "c": "Discuss methods of communication with health care personnel.",
-      "d": "Differentiate among the functions and roles of nurses."
+      "a": "Professional identity",
+      "b": "Infection control",
+      "c": "Clinical judgment",
+      "d": "Interdisciplinary collaboration"
     },
-    "correctAnswer": "a,b,c",
-    "rationale": "These are all explicitly listed Student Learning Outcomes for the Clinical Judgment module."
+    "correctAnswer": "c",
+    "rationale": "The Clinical Judgment Module focuses on the nursing process, which begins with assessment (including vital signs), and requires critical thinking and decision-making to deliver safe and effective care. This type of rationale falls under the scope of clinical judgment."
   },
   {
-    "questionText": "The purpose of the Static Skill Demonstration (SSD) for PPE is for students to do what?",
+    "questionText": "A nurse is caring for a client with a history of diabetes. The nurse understands that this medical condition can affect wound healing due to impaired:",
     "type": "mc",
-    "section": "Infection Control",
+    "section": "Skin Integrity",
     "options": {
-      "a": "Learn about the chain of infection.",
-      "b": "Apply and remove personal protective equipment.",
-      "c": "Prepare a nursing care plan.",
-      "d": "Discuss the rationale for standard precautions."
+      "a": "Pain sensation",
+      "b": "Blood glucose levels",
+      "c": "Nutrition and oxygenation",
+      "d": "Skin integrity"
+    },
+    "correctAnswer": "c",
+    "rationale": "According to the 'Factors' slide, diabetes is a factor affecting wound healing. Diabetes can impair both nutrition and oxygenation, which are crucial for the healing process."
+  },
+  {
+    "questionText": "The nurse notes that a client's wound is discharging a thick, yellowish, and foul-smelling fluid. The nurse should document this type of drainage as:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Serous",
+      "b": "Sanguineous",
+      "c": "Purulent",
+      "d": "Serosanguineous"
+    },
+    "correctAnswer": "c",
+    "rationale": "Purulent drainage is typically thick, opaque, and can have a foul odor, indicating infection. The other options are incorrect: serous is clear/watery, sanguineous is bloody, and serosanguineous is a mixed clear and bloody drainage."
+  },
+  {
+    "questionText": "The nurse is caring for a client who is immobile and has been diagnosed with a pressure injury on their coccyx. The nurse notes the wound is deep and has a black, hard eschar covering the wound bed. Based on this assessment, the nurse should stage the wound as:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Stage 4",
+      "b": "Unstageable",
+      "c": "Suspected deep-tissue injury",
+      "d": "Stage 3"
     },
     "correctAnswer": "b",
-    "rationale": "The content explicitly states the purpose of the SSD is 'Applying and Removing Personal Protective Equipment (PPE).'"
+    "rationale": "According to the provided content, a pressure injury with eschar that impairs the ability to stage the wound is classified as 'unstageable.' The black, hard eschar prevents the nurse from assessing the full depth of the wound."
   },
   {
-    "questionText": "Which of the following is listed as a factor affecting wound healing?",
+    "questionText": "During a wound assessment, the nurse notes that the wound edges are separated and a portion of the client's bowel is visible through the opening. The nurse should immediately recognize this complication as:",
     "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Malnutrition",
-      "b": "Sutures and dressings",
-      "c": "Patient response",
-      "d": "Sensory loss or immobility"
-    },
-    "correctAnswer": "a",
-    "rationale": "Malnutrition is listed on Slide 10 as a factor affecting wound healing."
-  },
-  {
-    "questionText": "A pressure injury with intact, nonblanchable erythema is what stage?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Stage 1",
-      "b": "Stage 2",
-      "c": "Stage 3",
-      "d": "Stage 4"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 17 defines Stage 1 as intact, nonblanchable erythema."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following is a type of wound depth classification?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Superficial",
-      "b": "Chronic",
-      "c": "Bruising",
-      "d": "Absence of infection"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 4 lists Superficial, Partial-thickness, and Full-thickness as types of wound depth."
-  },
-  {
-    "questionText": "What is the primary cause of a pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Pressure",
-      "b": "Malnutrition",
-      "c": "Friction and shear",
-      "d": "Medical device-related injury"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following are listed as complications of wounds? Select all that apply.",
-    "type": "sata",
     "section": "Skin Integrity",
     "options": {
       "a": "Dehiscence",
       "b": "Evisceration",
-      "c": "Fistulas",
-      "d": "Bruising"
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "Dehiscence and evisceration are listed on Slide 11, and fistulas on Slide 12 as complications of wounds."
-  },
-  {
-    "questionText": "Which of the following describes a Stage 2 pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Intact, nonblanchable erythema.",
-      "b": "Partial-thickness skin loss involving epidermis and/or dermis.",
-      "c": "Extends into the subcutaneous tissue, not to muscle or bone.",
-      "d": "Skin loss with damage and exposure to muscle, bone, or supporting structures."
+      "c": "A fistula",
+      "d": "A hematoma"
     },
     "correctAnswer": "b",
-    "rationale": "Slide 17 defines Stage 2 as partial-thickness skin loss involving epidermis and/or dermis."
+    "rationale": "Evisceration is the protrusion of internal organs through a wound opening, which is what is described in the scenario. Dehiscence is the separation of wound edges without organ protrusion. A fistula is an abnormal connection, and a hematoma is a localized collection of blood."
   },
   {
-    "questionText": "What is the key nursing action in the Planning phase, according to the 'Planning' slide?",
+    "questionText": "A nurse is planning care for a client with a wound. The most critical step in the planning phase, after prioritizing nursing diagnoses, is to:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Identify all possible nursing interventions.",
+      "b": "Collaborate with the client to determine goals.",
+      "c": "Select the appropriate dressing type.",
+      "d": "Document the nursing diagnoses in the chart."
+    },
+    "correctAnswer": "b",
+    "rationale": "According to the 'Planning' slide, goals are determined after collaboration with the patient. This collaboration is a critical step that ensures the care plan is patient-centered and effective."
+  },
+  {
+    "questionText": "The nurse is providing education to a new nurse about the principles of medical asepsis. Which statement by the new nurse indicates a correct understanding of medical asepsis?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "It is the complete elimination of all microorganisms.",
+      "b": "It is a technique used only in surgical settings.",
+      "c": "It is focused on reducing the number of microorganisms.",
+      "d": "It requires the use of sterile gloves at all times."
+    },
+    "correctAnswer": "c",
+    "rationale": "Medical asepsis, also known as clean technique, focuses on reducing the number of microorganisms to prevent their spread. Surgical asepsis, or sterile technique, aims to eliminate them completely. The other options are incorrect."
+  },
+  {
+    "questionText": "A student nurse is preparing to take a client's vital signs. The instructor asks, 'What factors might affect this client's vital signs?' The student's ability to answer this question correctly demonstrates which core component of clinical judgment?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Recognizing cues",
+      "b": "Analyzing cues",
+      "c": "Taking action",
+      "d": "Evaluating outcomes"
+    },
+    "correctAnswer": "b",
+    "rationale": "Analyzing cues involves linking recognized cues (like vital signs) to the client's clinical presentation and identifying factors that may be affecting those cues. This is a cognitive process that demonstrates a key component of clinical judgment."
+  },
+  {
+    "questionText": "A nurse is preparing to perform a sterile dressing change. The nurse enters the client's room and notices the client's food tray is on the over-bed table. The nurse should:",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Ask the client to move the tray to the bedside table.",
+      "b": "Use a new over-bed table for the sterile field.",
+      "c": "Place the sterile field on the bedside table.",
+      "d": "Remove the food tray from the room before preparing the sterile field."
+    },
+    "correctAnswer": "d",
+    "rationale": "A food tray is a non-sterile object and should be removed from the immediate area before preparing a sterile field to prevent contamination. The most appropriate action is to remove it from the room, as this ensures a clean environment for the procedure."
+  },
+  {
+    "questionText": "A client presents with an intact, nonblanchable, reddened area on their heel. The nurse should document this as a:",
     "type": "mc",
     "section": "Skin Integrity",
     "options": {
-      "a": "Goals are chosen after collaboration with the patient.",
-      "b": "Wound cleansing and irrigation.",
-      "c": "Assessing the wound bed.",
-      "d": "Evaluating goal achievement."
+      "a": "Stage 1 pressure injury",
+      "b": "Stage 2 pressure injury",
+      "c": "Suspected deep-tissue pressure injury",
+      "d": "Unstageable pressure injury"
     },
     "correctAnswer": "a",
-    "rationale": "Slide 23 states that after prioritizing nursing diagnoses, 'Goals are chosen' and 'Goals are determined after collaboration with the patient'."
+    "rationale": "The description 'intact, nonblanchable, reddened area' is the textbook definition of a Stage 1 pressure injury. The other options are incorrect based on the provided content."
   },
   {
-    "questionText": "According to the 'Wound Assessment' slide, which of the following should be assessed? Select all that apply.",
+    "questionText": "A nurse is caring for a client with a deep wound that has been left open to drain exudate. The wound is now ready to be closed with sutures. This type of wound healing is known as:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Quaternary intention"
+    },
+    "correctAnswer": "c",
+    "rationale": "The scenario describes a wound that is initially left open to resolve issues like drainage before being closed with sutures. This delayed closure is the hallmark of tertiary intention healing."
+  },
+  {
+    "questionText": "A nurse is preparing to apply a dressing to a client's surgical incision that has minimal tissue loss. The nurse anticipates that this wound will heal by:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Unstageable intention"
+    },
+    "correctAnswer": "a",
+    "rationale": "Wounds with minimal or no tissue loss and approximated edges heal by primary intention, as is typical with a surgical incision."
+  },
+  {
+    "questionText": "A nurse is teaching a client about a new medication. The nurse notes that the client appears distracted and is not making eye contact. The nurse's next best action is to:",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Speak louder and repeat the information.",
+      "b": "Continue with the teaching to save time.",
+      "c": "Stop the teaching and ask the client about their concerns or feelings.",
+      "d": "Document that the client is non-compliant with the teaching."
+    },
+    "correctAnswer": "c",
+    "rationale": "Effective communication requires active listening and a recognition of factors that affect the timing of communication. Stopping the teaching and assessing the client's state demonstrates empathy and therapeutic communication, which are essential to ensuring the client receives the information they need."
+  },
+  {
+    "questionText": "A client is admitted with a new onset of severe pain. The nurse plans to create a nursing care plan. Based on the provided content, the most appropriate initial nursing diagnosis would be:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Acute Pain",
+      "b": "Impaired Skin Integrity",
+      "c": "Risk for Infection",
+      "d": "Deficient Knowledge"
+    },
+    "correctAnswer": "a",
+    "rationale": "The 'Nursing Diagnosis' slide explicitly lists 'Acute Pain' as a nursing diagnosis, and the scenario describes a client with severe pain, making it the most appropriate and direct diagnosis to address."
+  },
+  {
+    "questionText": "The nurse is teaching a group of student nurses about professional identity. Which of the following statements by a student indicates a correct understanding of the concept?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Professional identity is a fixed trait that a nurse is born with.",
+      "b": "Professional identity is demonstrated through behavior, presence, and active listening.",
+      "c": "Professional identity is only important when dealing with clients, not with colleagues.",
+      "d": "Professional identity is developed only after a nurse has worked for several years."
+    },
+    "correctAnswer": "b",
+    "rationale": "The Module Overview for Professional Identity states that professional identity is 'demonstrated through behavior, presence, and actively listening to the client.'"
+  },
+  {
+    "questionText": "A nurse is caring for a client with a full-thickness burn. The nurse understands that this wound:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Is a partial-thickness skin loss.",
+      "b": "Extends to the subcutaneous layer, muscle, or bone.",
+      "c": "Has bruising with intact skin.",
+      "d": "Will heal by primary intention."
+    },
+    "correctAnswer": "b",
+    "rationale": "The 'Wound Depth' slide classifies a full-thickness wound as extending to the subcutaneous layer, muscle, or bone. The other options are incorrect based on the provided content."
+  },
+  {
+    "questionText": "The nurse is providing care for an 80-year-old client with a history of vascular disease. The nurse understands that these two factors place the client at a higher risk for which of the following?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Developing a fistula",
+      "b": "Delayed wound healing",
+      "c": "Dehiscence",
+      "d": "Medical adhesive-related skin injuries (MARSIs)"
+    },
+    "correctAnswer": "b",
+    "rationale": "The 'Skin Integrity' slides list vascular disease and aging as factors that can cause skin injuries and affect wound healing. Both conditions impair circulation and tissue integrity, leading to delayed healing."
+  },
+  {
+    "questionText": "The nurse notes that a client's wound is draining a watery, light pink fluid. The nurse should accurately document this type of drainage as:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Serous",
+      "b": "Sanguineous",
+      "c": "Purulent",
+      "d": "Serosanguineous"
+    },
+    "correctAnswer": "d",
+    "rationale": "Serosanguineous drainage is a mixed fluid that is light pink or reddish-brown, which is a combination of serous (clear) and sanguineous (bloody) drainage."
+  },
+  {
+    "questionText": "A nurse is caring for a client with an infected surgical wound. The nurse understands that this wound will most likely heal by:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Unstageable intention"
+    },
+    "correctAnswer": "c",
+    "rationale": "Infected wounds are often left open to resolve the infection or drain exudate before being closed later. This delayed closure is known as tertiary intention."
+  },
+  {
+    "questionText": "The nurse is planning care for a client who is immobile. The nurse's goal is to prevent pressure injuries. Which of the following interventions should the nurse include in the care plan? Select all that apply.",
     "type": "sata",
     "section": "Skin Integrity",
     "options": {
-      "a": "Location",
-      "b": "Size",
-      "c": "Undermining or tunneling",
-      "d": "Patient response"
+      "a": "Turning and repositioning the client frequently.",
+      "b": "Ensuring the client has adequate nutrition.",
+      "c": "Applying a pressure-reducing mattress.",
+      "d": "Massaging any areas of non-blanchable erythema."
     },
-    "correctAnswer": "a,b,c,d",
-    "rationale": "Slide 20 lists Location, Size, Undermining or tunneling, Drainage, Edges and surrounding tissue, Wound bed, and Patient response as components of wound assessment."
+    "correctAnswer": "a,b,c",
+    "rationale": "The 'Pressure Injury Prevention' slide lists determining risk factors, reducing pressure on bony prominences (through turning and positioning and pressure-reducing mattresses), and ensuring adequate nutrition as prevention strategies. Massaging reddened areas is no longer an evidence-based practice and can cause further tissue damage."
   },
   {
-    "questionText": "Which type of pressure injury is described as having intact skin with discoloration or blistering?",
+    "questionText": "A nurse is documenting a client's wound in the chart. The nurse notes that the wound is located on the client's elbow, is 2 cm in length, and has a small amount of serous drainage. This documentation is a part of which step of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "a",
+    "rationale": "Assessing a wound involves collecting objective data like location, size, and drainage. This is the first step of the nursing process."
+  },
+  {
+    "questionText": "A nurse is caring for a client who reports a sharp, stabbing pain in their right lower quadrant. The nurse should use which of the following nursing diagnoses from the provided content to guide the plan of care?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Risk for Infection",
+      "b": "Impaired Tissue Integrity",
+      "c": "Impaired Skin Integrity",
+      "d": "Acute Pain"
+    },
+    "correctAnswer": "d",
+    "rationale": "The client's complaint of new-onset, severe pain directly correlates with the nursing diagnosis of 'Acute Pain,' which is listed on the 'Nursing Diagnosis' slide."
+  },
+  {
+    "questionText": "A nurse is teaching a student about professional communication. Which of the following statements by the student indicates a correct understanding of the concept?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "I can use slang and personal abbreviations to save time with colleagues.",
+      "b": "Effective communication is only necessary during hand-off reports.",
+      "c": "Respect and assertiveness are important roles in professional nursing communication.",
+      "d": "I should always agree with a physician's order to avoid conflict."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Student Learning Outcomes for Communication explicitly state that a student should 'Recognize the roles of respect, assertiveness, collaboration, delegation, and advocacy in professional nursing communication.'"
+  },
+  {
+    "questionText": "A nurse is preparing to administer an intramuscular injection. The nurse must use a sterile technique to prevent infection. The primary purpose of this technique is to:",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Reduce the number of microorganisms.",
+      "b": "Prevent microorganisms from entering the client's body.",
+      "c": "Ensure the client's comfort during the injection.",
+      "d": "Allow for partial credit in documentation."
+    },
+    "correctAnswer": "b",
+    "rationale": "Surgical asepsis (sterile technique) is used to prevent microorganisms from entering the body during invasive procedures, such as an injection. The goal is to create a sterile field where no microorganisms can enter the wound or body."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a suspected deep-tissue pressure injury on their heel. The nurse recognizes that this injury is characterized by:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Partial-thickness skin loss.",
+      "b": "An open wound with a break in the skin.",
+      "c": "Intact skin with discoloration or blistering.",
+      "d": "Extensive tissue loss and unapproximated edges."
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Pressure Injury' slides describe a suspected deep-tissue pressure injury as having 'intact, discoloration, blistering'."
+  },
+  {
+    "questionText": "A client is experiencing signs of sepsis. The nurse understands that this is a consequence of infection and is caused by the invasion and multiplication of microorganisms in the body. This is best described by the definition of infection according to:",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Yoost & Crawford (2023)",
+      "b": "Giddens (2021)",
+      "c": "Starkweather (2025)",
+      "d": "Tanner (2006)"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Infection Module Overview explicitly defines infection using the quote from Giddens (2021) as 'the invasion and multiplication of microorganisms in the body tissues...'"
+  },
+  {
+    "questionText": "A nurse is assessing a client's wound. The nurse notes that the wound has a black, hard eschar covering the wound bed. The nurse knows that this wound:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Is a Stage 4 pressure injury.",
+      "b": "Is unstageable and cannot be accurately assessed.",
+      "c": "Is a Stage 3 pressure injury with tunneling.",
+      "d": "Is a suspected deep-tissue injury."
+    },
+    "correctAnswer": "b",
+    "rationale": "The 'Pressure Injury' slides state that an unstageable pressure injury is one where 'eschar impairs staging process'. The black, hard eschar prevents the nurse from accurately assessing the wound depth, making it unstageable."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a history of malnutrition. The nurse understands that this places the client at risk for:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "A closed wound",
+      "b": "Surgical asepsis",
+      "c": "Impaired wound healing",
+      "d": "A fistula"
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Factors' slide lists 'Nutrition' as a key factor affecting wound healing. Malnutrition can impair the body's ability to heal wounds, so it places the client at risk for impaired wound healing."
+  },
+  {
+    "questionText": "The nurse is planning care for a client with a pressure injury. The nurse's goal is to improve pressure tolerance. Which of the following interventions would best support this goal?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Ensuring the client is adequately hydrated.",
+      "b": "Providing a high-protein diet.",
+      "c": "Applying a pressure-reducing mattress.",
+      "d": "Documenting the wound's size and drainage."
+    },
+    "correctAnswer": "c",
+    "rationale": "Applying a pressure-reducing mattress is an intervention specifically aimed at improving pressure tolerance by reducing pressure on bony prominences. While the other options are part of care, the mattress is the most direct intervention for this specific goal."
+  },
+  {
+    "questionText": "A nurse is conducting a dressing change on a client's wound. The nurse notes that the dressing is saturated with drainage that is mostly clear with some streaks of blood. The nurse should document the drainage as:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Sanguineous",
+      "b": "Purulent",
+      "c": "Serous",
+      "d": "Serosanguineous"
+    },
+    "correctAnswer": "d",
+    "rationale": "Serosanguineous drainage is a mixed fluid that contains both serous (clear) and sanguineous (bloody) components. This is consistent with the 'watery, light pink fluid' description."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a full-thickness wound. The nurse understands that this wound:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Will always heal by primary intention.",
+      "b": "Is only a superficial injury.",
+      "c": "Involves the subcutaneous layer, muscle, or bone.",
+      "d": "Is less severe than a partial-thickness wound."
+    },
+    "correctAnswer": "c",
+    "rationale": "Full-thickness wounds extend into the subcutaneous layer, muscle, or bone. The other options are incorrect based on the provided content."
+  },
+  {
+    "questionText": "The nurse is teaching a student about the phases of wound healing. The nurse explains that the proliferative phase is characterized by:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "The initial response to injury.",
+      "b": "Remodeling and scarring.",
+      "c": "Granulation and resurfacing.",
+      "d": "Delayed closure."
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Phases of wound healing' slide (Slide 9) lists the proliferative phase as involving 'granulation, resurfacing.'"
+  },
+  {
+    "questionText": "A nurse is preparing to perform wound irrigation on a client. The nurse understands that this is a key step in which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Implementation and Evaluation"
+    },
+    "correctAnswer": "d",
+    "rationale": "Wound cleansing and irrigation are listed as interventions on the 'Intervention and Evaluation' slide, which is the final phase of the nursing process."
+  },
+  {
+    "questionText": "A nurse is teaching a student about the rationale for Standard Precautions. Which statement by the student indicates a correct understanding?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Standard Precautions are only used for clients with known infections.",
+      "b": "Standard Precautions apply to all clients, regardless of their diagnosis.",
+      "c": "Standard Precautions only require the use of gloves.",
+      "d": "Standard Precautions are only used in a surgical setting."
+    },
+    "correctAnswer": "b",
+    "rationale": "Standard Precautions are a set of infection control practices used to prevent the spread of infection regardless of the client's diagnosis. This is the rationale for their use."
+  },
+  {
+    "questionText": "A nurse is preparing a client for a procedure. The client states, 'I'm so worried about what will happen.' The nurse recognizes this as a verbal cue indicating a need for which type of communication?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "I-SBAR",
+      "b": "Hand-off communication",
+      "c": "Therapeutic communication",
+      "d": "Delegation"
+    },
+    "correctAnswer": "c",
+    "rationale": "The client's statement of worry requires a therapeutic communication response, such as active listening and empathy, to address their concerns. This is a key topic of the Communication module."
+  },
+  {
+    "questionText": "A nurse is observing a client with an existing pressure injury. The nurse notes that the wound is showing signs of healing but the patient's nutritional status has declined. The nurse understands that this could lead to:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "The wound advancing to the next stage.",
+      "b": "The wound healing by primary intention.",
+      "c": "A fistula.",
+      "d": "Impaired wound healing."
+    },
+    "correctAnswer": "d",
+    "rationale": "Nutrition is listed as a factor affecting wound healing. A decline in a patient's nutritional status could impair the healing process, even if the wound was previously improving."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a closed wound on their lower leg. The nurse understands that this wound:",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Is a break in the skin surface.",
+      "b": "Has intact skin.",
+      "c": "Could be a bruising or fracture.",
+      "d": "Will heal by primary intention."
+    },
+    "correctAnswer": "b,c",
+    "rationale": "A closed wound is defined as having an intact skin surface. Bruising and fractures are examples of closed wounds. The wound's healing intention depends on its specific characteristics and is not guaranteed to be primary intention."
+  },
+  {
+    "questionText": "The nurse is providing wound care for a client with a deep wound. The nurse notes that the wound has some tunneling. The nurse should document this finding as a part of which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Diagnosis",
+      "b": "Assessment",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "b",
+    "rationale": "Tunneling is a key component of wound assessment, which is the first step of the nursing process. The 'Wound Assessment' slide lists 'Undermining or tunneling' as an element to assess."
+  },
+  {
+    "questionText": "A nurse is preparing to perform a sterile procedure. The nurse knows that the purpose of surgical asepsis is to:",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Reduce the number of microorganisms.",
+      "b": "Eliminate all microorganisms.",
+      "c": "Reduce friction and shear.",
+      "d": "Prevent pressure injuries."
+    },
+    "correctAnswer": "b",
+    "rationale": "Surgical asepsis, or sterile technique, aims to eliminate all microorganisms to prevent infection during invasive procedures. This is a key difference from medical asepsis."
+  },
+  {
+    "questionText": "The nurse is evaluating the effectiveness of a client's pain management plan. The client reports that their pain has decreased from a 7/10 to a 2/10 after receiving medication. The nurse notes that the goal has been:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Unmet",
+      "b": "Partially met",
+      "c": "Met",
+      "d": "Not evaluated"
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Intervention and Evaluation' slide mentions evaluating goal achievement as 'Met, partially met, unmet'. A significant decrease in a client's pain score indicates that the goal of pain management has been met."
+  },
+  {
+    "questionText": "A nurse is planning care for a client who requires a sterile dressing change. The nurse understands that this intervention falls under which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "d",
+    "rationale": "Interventions, such as a sterile dressing change, are actions taken to carry out the nursing care plan. This is a key component of the Implementation phase of the nursing process."
+  },
+  {
+    "questionText": "A student nurse is caring for a client with a pressure injury. The student notes that the injury has a dark, intact, discolored area. The student knows that this is a sign of a:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Stage 1 pressure injury",
+      "b": "Unstageable pressure injury",
+      "c": "Suspected deep-tissue pressure injury",
+      "d": "Stage 2 pressure injury"
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Pressure Injury' slide (Slide 18) describes a suspected deep-tissue pressure injury as 'intact, discoloration, blistering'."
+  },
+  {
+    "questionText": "The nurse is providing care for a client with a wound. The client has a history of vascular disease. The nurse understands that this condition can lead to:",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Delayed wound healing",
+      "b": "A break in the skin surface",
+      "c": "An abnormal connection between two organs",
+      "d": "A full-thickness burn"
+    },
+    "correctAnswer": "a,b",
+    "rationale": "The 'Skin Integrity' slides (Slide 1) list vascular disease as a factor that can cause skin injuries and affect wound healing. It can lead to a break in the skin surface and impaired healing."
+  },
+  {
+    "questionText": "The nurse is collaborating with the healthcare team to coordinate care for a client with a complex health history. This action is a core component of which module?",
+    "type": "sata",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Professional Identity",
+      "b": "Communication",
+      "c": "Infection",
+      "d": "Clinical Judgment"
+    },
+    "correctAnswer": "a,b,c,d",
+    "rationale": "Collaboration with the healthcare team is a course-level outcome for all four modules provided in the content: Professional Identity, Communication, Infection, and Clinical Judgment. This is a fundamental skill that spans all of them."
+  },
+  {
+    "questionText": "A client is admitted to the hospital with a deep, open wound. The nurse understands that this wound is at a higher susceptibility for infection because:",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "The wound is deep.",
+      "b": "The wound is open.",
+      "c": "The client is in a hospital.",
+      "d": "It is healing by secondary intention."
+    },
+    "correctAnswer": "d",
+    "rationale": "The 'Secondary Intention' slide (Slide 7) explicitly states that this type of wound has a 'Susceptibility to infection is greater.' A wound with extensive tissue loss (deep) and unapproximated edges (open) would heal by secondary intention."
+  },
+  {
+    "questionText": "The nurse is reviewing a client's care plan. The plan includes the nursing diagnosis 'Impaired Tissue Integrity' with supporting data. The nurse understands that this diagnosis is appropriate for:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "A client with a new onset of pain.",
+      "b": "A client with a documented wound.",
+      "c": "A client at risk for infection.",
+      "d": "A client with a closed wound."
+    },
+    "correctAnswer": "b",
+    "rationale": "The 'Nursing Diagnosis' slide lists 'Impaired Tissue Integrity' and 'Impaired Skin Integrity' with supporting data related to actual wounds. Therefore, a client with a documented wound would be the most appropriate candidate for this diagnosis."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a suspected fistula. The nurse knows this complication involves:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "A separation of wound edges.",
+      "b": "The protrusion of internal organs.",
+      "c": "An abnormal connection between two internal organs or an organ and the skin.",
+      "d": "Non-blanchable erythema."
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 12 defines a fistula as an 'Abnormal connection between 2 internal organs or between an internal organ, through skin, outside body.'"
+  },
+  {
+    "questionText": "A nurse is preparing to take a client's vital signs. The nurse recognizes that this action is part of the nursing process, which is a key topic of the:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Professional Identity module",
+      "b": "Communication module",
+      "c": "Infection module",
+      "d": "Clinical Judgment module"
+    },
+    "correctAnswer": "d",
+    "rationale": "The Clinical Judgment Module Overview lists the nursing process as a key topic. Taking vital signs is a fundamental part of the assessment phase of the nursing process."
+  },
+  {
+    "questionText": "A nurse is explaining wound healing to a student nurse. The nurse mentions that the process involves an initial inflammatory response, followed by granulation and remodeling. The student should recognize these as the phases of wound healing.",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary, Secondary, and Tertiary.",
+      "b": "Superficial, Partial, and Full thickness.",
+      "c": "Inflammatory, Proliferative, and Maturation.",
+      "d": "Asepsis, Sterile, and Clean."
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Pre-Req Snap (PRS)' slide (Slide 9) lists the phases of wound healing as Inflammatory (initial response), Proliferative (granulation, resurfacing), and Maturation (remodeling, scarring)."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a Stage 4 pressure injury. The nurse knows that this stage is characterized by:",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Partial-thickness skin loss.",
+      "b": "Extending to the subcutaneous tissue.",
+      "c": "Damage to muscle or bone.",
+      "d": "Risk for osteomyelitis."
+    },
+    "correctAnswer": "c,d",
+    "rationale": "A Stage 4 pressure injury involves skin loss with 'damage and exposure to muscle, bone, or supporting structures' and a 'risk for osteomyelitis.'"
+  },
+  {
+    "questionText": "A nurse is planning to change a client's dressing. The nurse understands that this is an action that must be taken to implement the nursing care plan, and is a key component of the:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment phase",
+      "b": "Diagnosis phase",
+      "c": "Planning phase",
+      "d": "Implementation phase"
+    },
+    "correctAnswer": "d",
+    "rationale": "The Implementation phase of the nursing process involves taking action to carry out the nursing plan of care. A dressing change is a direct action or intervention."
+  },
+  {
+    "questionText": "A nurse is caring for a client who is immobile. The nurse identifies 'Impaired Skin Integrity' as a potential nursing diagnosis. This diagnosis is supported by the nursing assessment, which includes which of the following?",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Use of the Braden Scale.",
+      "b": "Skin is intact.",
+      "c": "Reddened, non-blanchable area on the coccyx.",
+      "d": "The client reports a pain level of 5/10."
+    },
+    "correctAnswer": "a,c",
+    "rationale": "The Braden Scale is a tool used to assess risk factors for pressure ulcers, which can lead to impaired skin integrity. A reddened, non-blanchable area on the coccyx is a sign of a Stage 1 pressure injury, which is a form of impaired skin integrity."
+  },
+  {
+    "questionText": "A nurse is preparing to administer medication to a client. The nurse performs hand hygiene and dons non-sterile gloves. This action is an example of which type of asepsis?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Surgical asepsis",
+      "b": "Medical asepsis",
+      "c": "Sterile asepsis",
+      "d": "Contaminated asepsis"
+    },
+    "correctAnswer": "b",
+    "rationale": "Medical asepsis, or 'clean technique,' involves reducing the number of microorganisms and preventing their spread through actions like hand hygiene and using non-sterile gloves."
+  },
+  {
+    "questionText": "The nurse is preparing to take a client's vital signs. The nurse understands that the information gathered from this assessment, along with other objective and subjective data, will be used to:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Select the appropriate dressing type.",
+      "b": "Determine the client's risk for infection.",
+      "c": "Prepare a nursing care plan.",
+      "d": "Prevent pressure injuries."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Student Learning Outcomes for Clinical Judgment include 'Prepare nursing care plan based upon objective and subjective data.' Vital signs are a key part of this data collection."
+  },
+  {
+    "questionText": "A nurse is caring for a client who has a dressing over a wound. The nurse notes that the bandage has some dried blood on it. The nurse understands that this type of drainage is:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Purulent",
+      "b": "Serous",
+      "c": "Sanguineous",
+      "d": "Serosanguineous"
+    },
+    "correctAnswer": "c",
+    "rationale": "Sanguineous drainage is bloody, which is consistent with the dried blood on the bandage. The other options are incorrect."
+  },
+  {
+    "questionText": "A nurse is providing wound care for a client. The nurse notes that the wound is deep, with a large open area that cannot be closed with sutures. The nurse understands that this type of wound will heal by:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Unstageable intention"
+    },
+    "correctAnswer": "b",
+    "rationale": "Wounds with extensive tissue loss and unapproximated edges heal by secondary intention, where the wound bed fills in over time with granulation tissue."
+  },
+  {
+    "questionText": "A nurse is assessing a client's wound. The nurse notes that the wound has a break in the skin surface and is a small, linear incision. The nurse understands that this is an example of a:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Closed wound",
+      "b": "Full-thickness wound",
+      "c": "Open wound",
+      "d": "Pressure injury"
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 3 defines an open wound as a 'Break in skin surface' and lists an incision as an example."
+  },
+  {
+    "questionText": "A nurse is reviewing a client's chart and notes that the client has a history of diabetes, poor nutrition, and advanced age. The nurse understands that these factors can affect wound healing by impacting:",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Oxygenation",
+      "b": "Perfusion",
+      "c": "Moisture",
+      "d": "Infection"
+    },
+    "correctAnswer": "a,b,d",
+    "rationale": "The 'Factors affecting wound healing' slide (Slide 10) lists Oxygenation and perfusion, Diabetes, Nutrition, Age, and Infection as key factors. All of the options except for moisture are listed."
+  },
+  {
+    "questionText": "A nurse is explaining the healing process to a client with a wound. The nurse explains that the wound will first have an inflammatory response. The client asks what comes next. The nurse should describe the:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Maturation phase",
+      "b": "Proliferative phase",
+      "c": "Tertiary intention",
+      "d": "Sanguineous drainage"
+    },
+    "correctAnswer": "b",
+    "rationale": "The 'Phases of wound healing' slide (Slide 9) lists the proliferative phase as following the inflammatory phase."
+  },
+  {
+    "questionText": "A nurse is working with a client who is complaining of pain. The nurse plans to apply a hot pack to the area. The nurse understands that this intervention falls under which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "d",
+    "rationale": "The 'Intervention and Evaluation' slide (Slide 24) lists 'Heat and cold application' as a nursing intervention, which is part of the implementation phase."
+  },
+  {
+    "questionText": "A nurse is preparing to care for a client who is on isolation precautions. The nurse knows that personal protective equipment (PPE) is vital to providing safe care environments for the client and the entire health care team. This is a key principle of the:",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Professional Identity module",
+      "b": "Communication module",
+      "c": "Infection module",
+      "d": "Clinical Judgment module"
+    },
+    "correctAnswer": "c",
+    "rationale": "The Infection Module Overview states that applying the principles of infection control is vital to providing safe care environments for patients and the entire health care team. PPE is a key topic within this module."
+  },
+  {
+    "questionText": "A nurse is teaching a group of students about communication. The nurse explains the importance of I-SBAR and hand-off communication. These topics are associated with which module?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Professional Identity",
+      "b": "Communication",
+      "c": "Infection",
+      "d": "Clinical Judgment"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Communication Module Overview lists I-SBAR and hand-off communication as key topics associated with communication."
+  },
+  {
+    "questionText": "A nurse is assessing a client's wound. The nurse notes that the wound has some tunneling. The nurse should document this finding as a part of which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Diagnosis",
+      "b": "Assessment",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "b",
+    "rationale": "Tunneling is a key component of wound assessment, which is the first step of the nursing process. The 'Wound Assessment' slide lists 'Undermining or tunneling' as an element to assess."
+  },
+  {
+    "questionText": "A nurse is teaching a student about wound care. The student asks about the purpose of wound classification. The nurse should explain that it is used to determine which of the following? Select all that apply.",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "The cause of the wound.",
+      "b": "The wound depth.",
+      "c": "The presence of infection.",
+      "d": "The type of dressing to be used."
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "The 'Wound classification' slide (Slide 2) lists cause, wound depth, and presence of infection as components of wound classification. The type of dressing is an intervention based on the classification, not part of the classification itself."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a full-thickness burn. The nurse understands that this burn:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Is a partial-thickness skin loss.",
+      "b": "Is an open wound.",
+      "c": "Has a quick healing time.",
+      "d": "Is less severe than a superficial burn."
+    },
+    "correctAnswer": "b",
+    "rationale": "A full-thickness burn is a break in the skin surface, making it an open wound."
+  },
+  {
+    "questionText": "A nurse is assessing a client's vital signs. The nurse understands that the information gathered from this assessment, along with other objective and subjective data, will be used to:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Select the appropriate dressing type.",
+      "b": "Determine the client's risk for infection.",
+      "c": "Prepare a nursing care plan.",
+      "d": "Prevent pressure injuries."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Student Learning Outcomes for Clinical Judgment include 'Prepare nursing care plan based upon objective and subjective data.' Vital signs are a key part of this data collection."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a suspected fistula. The nurse knows that a fistula is a complication that can lead to:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "A pressure injury.",
+      "b": "Delayed wound healing.",
+      "c": "More complications.",
+      "d": "A skin tear."
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Complications' slide on Fistulas states that they 'Predispose person to more complications.'"
+  },
+  {
+    "questionText": "A nurse is evaluating the effectiveness of a client's care plan. The nurse notes that the client's pressure injury has improved but is still present. The nurse should document that the goal has been:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Unmet",
+      "b": "Partially met",
+      "c": "Met",
+      "d": "Not evaluated"
+    },
+    "correctAnswer": "b",
+    "rationale": "The 'Intervention and Evaluation' slide (Slide 24) lists 'Met, partially met, unmet' as possible outcomes for goal achievement. An improvement in a wound without complete healing indicates that the goal has been partially met."
+  },
+  {
+    "questionText": "The nurse is providing wound care for a client. The nurse understands that the healing process is characterized by an initial inflammatory response. The nurse also knows that this process can be affected by:",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Age",
+      "b": "Diabetes",
+      "c": "Infection",
+      "d": "Nutrition"
+    },
+    "correctAnswer": "a,b,c,d",
+    "rationale": "The 'Factors' slide (Slide 10) lists all of the options as factors affecting wound healing."
+  },
+  {
+    "questionText": "A nurse is preparing to take a client's vital signs. The nurse understands that this assessment is a key component of the:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Nursing process",
+      "b": "Pain management",
+      "c": "Professional identity",
+      "d": "Wound care"
+    },
+    "correctAnswer": "a",
+    "rationale": "The Clinical Judgment Module Overview lists the nursing process as a key topic. Taking vital signs is a fundamental part of the assessment phase of the nursing process."
+  },
+  {
+    "questionText": "A nurse is caring for a client who is recovering from a surgical procedure. The nurse notes that the client has minimal pain, a stable vital sign, and no signs of infection. The nurse is using which phase of the nursing process to make these observations?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Evaluation"
+    },
+    "correctAnswer": "d",
+    "rationale": "Evaluating is the final step of the nursing process, where the nurse assesses the client's response to interventions and determines if goals have been met. The nurse is evaluating the client's response to the surgical procedure."
+  },
+  {
+    "questionText": "The nurse is providing education to a student nurse about the steps of the nursing process. Which of the following statements by the student indicates a correct understanding of the correct order of the steps?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment, Planning, Diagnosis, Implementation, Evaluation.",
+      "b": "Assessment, Diagnosis, Planning, Implementation, Evaluation.",
+      "c": "Diagnosis, Assessment, Planning, Implementation, Evaluation.",
+      "d": "Assessment, Planning, Implementation, Diagnosis, Evaluation."
+    },
+    "correctAnswer": "b",
+    "rationale": "The correct order of the nursing process is Assessment, Diagnosis, Planning, Implementation, and Evaluation, as per the provided content."
+  },
+  {
+    "questionText": "A nurse is caring for a client with a history of diabetes. The nurse understands that this condition can lead to which of the following?",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Pressure injury",
+      "b": "Delayed wound healing",
+      "c": "Bruising",
+      "d": "A fistula"
+    },
+    "correctAnswer": "a,b",
+    "rationale": "The 'Skin Integrity' slides list diabetes as a factor that can cause skin injuries, such as pressure injuries, and affect wound healing."
+  },
+  {
+    "questionText": "A nurse is performing a wound assessment. The nurse notes that the wound has a black, hard eschar covering the wound bed. The nurse knows that this wound is:",
     "type": "mc",
     "section": "Skin Integrity",
     "options": {
       "a": "Unstageable",
       "b": "Stage 1",
-      "c": "Suspected deep-tissue pressure injury",
-      "d": "Stage 2"
-    },
-    "correctAnswer": "c",
-    "rationale": "Slide 18 defines a suspected deep-tissue pressure injury as intact skin with discoloration or blistering."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, what is the role of goals in the Planning phase of nursing care?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Goals are chosen after collaboration with the patient.",
-      "b": "Goals are determined before prioritizing nursing diagnoses.",
-      "c": "Goals are chosen by the nurse alone.",
-      "d": "Goals are not a part of the Planning phase."
+      "c": "Stage 2",
+      "d": "Stage 3"
     },
     "correctAnswer": "a",
-    "rationale": "Slide 23 states that 'Goals are determined after collaboration with the patient.'"
+    "rationale": "The 'Pressure Injury' slides (Slide 18) state that a wound is 'Unstageable' when 'eschar impairs staging process.'"
   },
   {
-    "questionText": "According to the 'Skin Integrity' slides, skin integrity is not an indicator of what?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "The severity of damage underlying.",
-      "b": "The type of wound.",
-      "c": "The location of the wound.",
-      "d": "The patient's age."
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 3 explicitly states, 'Skin integrity is not an indicator of severity of damage underlying'."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following is an intervention for wound care?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Turning and positioning",
-      "b": "Wound assessment",
-      "c": "Braden Scale",
-      "d": "Patient's response to treatment"
-    },
-    "correctAnswer": "a",
-    "rationale": "Turning and positioning is listed as an intervention on Slide 24."
-  },
-  {
-    "questionText": "What is the key topic for the Professional Identity module, according to the Module Overview?",
-    "type": "mc",
-    "section": "Professional Identity",
-    "options": {
-      "a": "Principles of caring",
-      "b": "I-SBAR",
-      "c": "Asepsis",
-      "d": "Nursing process"
-    },
-    "correctAnswer": "a",
-    "rationale": "Principles of caring is listed as a key topic in the Professional Identity Module Overview."
-  },
-  {
-    "questionText": "What is the purpose of the Communication module, as stated in the Module Overview?",
-    "type": "mc",
-    "section": "Communication",
-    "options": {
-      "a": "To introduce the basic concept of communication.",
-      "b": "To introduce the basic concept of professional identity.",
-      "c": "To discuss factors affecting the timing of patient communication.",
-      "d": "To define compassion fatigue."
-    },
-    "correctAnswer": "a",
-    "rationale": "The Module Overview for Communication states that its purpose is to introduce the basic concept of communication."
-  },
-  {
-    "questionText": "Which of the following is a key topic for the Infection module?",
+    "questionText": "A nurse is providing education to a new nurse about the principles of medical asepsis. Which statement by the new nurse indicates a correct understanding of medical asepsis?",
     "type": "mc",
     "section": "Infection Control",
     "options": {
-      "a": "Hand-off communication",
-      "b": "Hospital acquired infections (HAI)",
-      "c": "Problem-solving",
-      "d": "Self-care"
+      "a": "It is the complete elimination of all microorganisms.",
+      "b": "It is a technique used only in surgical settings.",
+      "c": "It is focused on reducing the number of microorganisms.",
+      "d": "It requires the use of sterile gloves at all times."
     },
-    "correctAnswer": "b",
-    "rationale": "Hospital acquired infections (HAI) are listed as a key topic in the Infection module."
+    "correctAnswer": "c",
+    "rationale": "Medical asepsis, also known as clean technique, focuses on reducing the number of microorganisms to prevent their spread. Surgical asepsis, or sterile technique, aims to eliminate them completely. The other options are incorrect."
   },
   {
-    "questionText": "According to the Module Overview, what is the purpose of the Clinical Judgment module?",
+    "questionText": "A nurse is preparing to perform a sterile procedure. The nurse enters the client's room and notices the client's food tray is on the over-bed table. The nurse should:",
     "type": "mc",
-    "section": "Clinical Judgment",
+    "section": "Infection Control",
     "options": {
-      "a": "To introduce the basic concept of clinical judgment.",
-      "b": "To implement a nursing care plan.",
-      "c": "To discuss factors affecting a patient's vital signs.",
-      "d": "To understand one's professional identity."
+      "a": "Ask the client to move the tray to the bedside table.",
+      "b": "Use a new over-bed table for the sterile field.",
+      "c": "Place the sterile field on the bedside table.",
+      "d": "Remove the food tray from the room before preparing the sterile field."
     },
-    "correctAnswer": "a",
-    "rationale": "The Module Overview for Clinical Judgment states its purpose is to introduce the basic concept of clinical judgment."
+    "correctAnswer": "d",
+    "rationale": "A food tray is a non-sterile object and should be removed from the immediate area before preparing a sterile field to prevent contamination. The most appropriate action is to remove it from the room, as this ensures a clean environment for the procedure."
   },
   {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following are examples of skin injuries? Select all that apply.",
-    "type": "sata",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Wounds",
-      "b": "Burns",
-      "c": "Vascular disease",
-      "d": "Pressure injury"
-    },
-    "correctAnswer": "a,b,c,d",
-    "rationale": "Wounds and vascular disease are listed on Slide 1, burns on Slide 13, and pressure injury on Slide 14 as examples of skin injuries or related conditions."
-  },
-  {
-    "questionText": "What is the primary cause of a pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Pressure",
-      "b": "Malnutrition",
-      "c": "Friction and shear",
-      "d": "Moisture (MASD)"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
-  },
-  {
-    "questionText": "Which of the following is a key topic of the Professional Identity module?",
+    "questionText": "A nurse is teaching a group of student nurses about professional identity. Which of the following statements by a student indicates a correct understanding of the concept?",
     "type": "mc",
     "section": "Professional Identity",
     "options": {
-      "a": "Pain",
+      "a": "Professional identity is a fixed trait that a nurse is born with.",
+      "b": "Professional identity is demonstrated through behavior, presence, and active listening.",
+      "c": "Professional identity is only important when dealing with clients, not with colleagues.",
+      "d": "Professional identity is developed only after a nurse has worked for several years."
+    },
+    "correctAnswer": "b",
+    "rationale": "The Module Overview for Professional Identity states that professional identity is 'demonstrated through behavior, presence, and actively listening to the client.'"
+  },
+  {
+    "questionText": "The nurse is providing care for a client with a history of vascular disease. The nurse understands that this medical condition can affect wound healing due to impaired:",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Pain sensation",
+      "b": "Blood glucose levels",
+      "c": "Nutrition and oxygenation",
+      "d": "Skin integrity"
+    },
+    "correctAnswer": "c",
+    "rationale": "The 'Factors' slide lists 'Vascular disease' as a factor affecting wound healing. It can impair blood flow, which in turn affects nutrition and oxygenation, which are crucial for healing."
+  },
+  {
+    "questionText": "A nurse is documenting a client's wound. The nurse notes that the wound has a linear shape, is 2 cm in length, and has a small amount of serosanguineous drainage. This documentation is a part of which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "a",
+    "rationale": "Assessing a wound involves collecting objective data like location, size, and drainage. This is the first step of the nursing process, which is part of clinical judgment."
+  },
+  {
+    "questionText": "A nurse is providing education to a group of student nurses. The nurse asks the students to explain the rationale for standard precautions. The student's response should be guided by which of the following nursing concepts?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Professional identity",
       "b": "Communication",
-      "c": "Infection",
+      "c": "Infection control",
       "d": "Clinical judgment"
     },
-    "correctAnswer": "a",
-    "rationale": "Pain is listed as a key topic in the Professional Identity Module Overview."
+    "correctAnswer": "c",
+    "rationale": "Standard precautions are a key topic of the Infection Control module, and the rationale for their use is a learning outcome for that module."
   },
   {
-    "questionText": "According to the 'Skin Integrity' slides, what are the three classifications of burns?",
-    "type": "mc",
+    "questionText": "A nurse is caring for a client with an infected wound. The nurse understands that this wound:",
+    "type": "sata",
     "section": "Skin Integrity",
     "options": {
-      "a": "Superficial, Partial thickness, Full thickness",
-      "b": "Acute, Chronic, Tertiary",
-      "c": "Stage 1, Stage 2, Stage 3",
-      "d": "Minor, Moderate, Severe"
+      "a": "Will heal by primary intention.",
+      "b": "Will have greater scarring.",
+      "c": "Is susceptible to infection.",
+      "d": "Will heal by secondary intention."
+    },
+    "correctAnswer": "b,c,d",
+    "rationale": "Infected wounds are typically left open and heal by secondary intention. This process has a longer repair time and greater scarring, and the wound is more susceptible to infection."
+  },
+  {
+    "questionText": "A nurse is preparing to take a client's vital signs. The nurse understands that this action is part of the nursing process, which is a key topic of the:",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Professional identity module",
+      "b": "Communication module",
+      "c": "Infection module",
+      "d": "Clinical Judgment module"
+    },
+    "correctAnswer": "d",
+    "rationale": "The Clinical Judgment Module Overview lists the nursing process as a key topic. Taking vital signs is a fundamental part of the assessment phase of the nursing process."
+  },
+  {
+    "questionText": "A nurse is caring for a client who is complaining of pain. The nurse plans to administer a prescribed medication. The nurse understands that this intervention falls under which phase of the nursing process?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Assessment",
+      "b": "Diagnosis",
+      "c": "Planning",
+      "d": "Implementation"
+    },
+    "correctAnswer": "d",
+    "rationale": "Interventions, such as administering a medication, are actions taken to carry out the nursing care plan. This is a key component of the Implementation phase of the nursing process."
+  },
+  {
+    "questionText": "A student nurse is observed by their clinical instructor performing a wound assessment. The instructor notes that the student is accurately assessing the wound bed for tunneling. This action demonstrates which core component of clinical judgment?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Recognizing cues",
+      "b": "Analyzing cues",
+      "c": "Taking action",
+      "d": "Evaluating outcomes"
     },
     "correctAnswer": "a",
-    "rationale": "Slide 13 lists Superficial, Partial thickness, and Full thickness as classifications of burns."
+    "rationale": "Recognizing cues is the process of filtering information from different sources, such as physical examination findings (tunneling), to identify relevant information about the client's condition. This is the first step in the clinical judgment process."
   },
   {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following is an example of wound depth (thickness)?",
+    "questionText": "A nurse is providing wound care for a client. The nurse notes that the wound has a black, hard eschar covering the wound bed. The nurse understands that this wound is:",
     "type": "mc",
     "section": "Skin Integrity",
     "options": {
-      "a": "Open wound",
-      "b": "Full-thickness",
-      "c": "Chronic",
-      "d": "Abrasions"
+      "a": "A Stage 4 pressure injury.",
+      "b": "Unstageable and cannot be accurately assessed.",
+      "c": "A Stage 3 pressure injury with tunneling.",
+      "d": "A suspected deep-tissue injury."
     },
     "correctAnswer": "b",
-    "rationale": "Full-thickness is listed as a wound depth classification on Slide 4."
+    "rationale": "The 'Pressure Injury' slides state that an unstageable pressure injury is one where 'eschar impairs staging process'. The black, hard eschar prevents the nurse from accurately assessing the wound depth, making it unstageable."
   },
   {
-    "questionText": "What is the primary cause of a pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Pressure",
-      "b": "Malnutrition",
-      "c": "Friction and shear",
-      "d": "Moisture (MASD)"
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
-  },
-  {
-    "questionText": "Which of the following is a type of wound healing intention, according to the 'Skin Integrity' slides?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Primary intention",
-      "b": "Superficial intention",
-      "c": "Open intention",
-      "d": "Debridement intention"
-    },
-    "correctAnswer": "a",
-    "rationale": "Primary intention is listed as a wound healing process on Slide 5."
-  },
-  {
-    "questionText": "What is the key difference between a Stage 1 and Stage 2 pressure injury?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Stage 1 is intact, while Stage 2 involves partial-thickness skin loss.",
-      "b": "Stage 1 extends to the muscle, while Stage 2 does not.",
-      "c": "Stage 1 has a blister, while Stage 2 does not.",
-      "d": "Stage 1 is unstageable, while Stage 2 is not."
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 17 states that Stage 1 is intact, while Stage 2 is partial-thickness skin loss."
-  },
-  {
-    "questionText": "According to the provided content, what is the key difference between medical and surgical asepsis?",
-    "type": "mc",
-    "section": "Infection Control",
-    "options": {
-      "a": "The content does not provide this information.",
-      "b": "Medical asepsis is a type of wound healing, and surgical asepsis is a type of wound complication.",
-      "c": "Medical asepsis focuses on reducing microorganisms, while surgical asepsis focuses on eliminating them completely.",
-      "d": "Medical asepsis is for home care, while surgical asepsis is for hospital care."
-    },
-    "correctAnswer": "c",
-    "rationale": "This is the generally accepted difference between the two terms, which the provided text implies in the Student Learning Outcome of differentiating between them."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, what is the role of goals in the Planning phase of nursing care?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Goals are chosen after collaboration with the patient.",
-      "b": "Goals are determined before prioritizing nursing diagnoses.",
-      "c": "Goals are chosen by the nurse alone.",
-      "d": "Goals are not a part of the Planning phase."
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 23 states that 'Goals are determined after collaboration with the patient.'"
-  },
-  {
-    "questionText": "Which of the following is a Course-Level Outcome for the Professional Identity module? Select all that apply.",
-    "type": "sata",
-    "section": "Professional Identity",
-    "options": {
-      "a": "Utilize communication skills with clients/faculty and healthcare team to facilitate client care.",
-      "b": "Incorporate client cultural beliefs and values when managing the care of the client.",
-      "c": "Collaborate with the healthcare team to coordinate client care.",
-      "d": "Utilize information technology/informatics to document safe client care."
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "These are all listed as Course-Level Outcomes for the Professional Identity module."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, skin integrity is not an indicator of what?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "The severity of damage underlying.",
-      "b": "The type of wound.",
-      "c": "The location of the wound.",
-      "d": "The patient's age."
-    },
-    "correctAnswer": "a",
-    "rationale": "Slide 3 explicitly states, 'Skin integrity is not an indicator of severity of damage underlying'."
-  },
-  {
-    "questionText": "According to the 'Skin Integrity' slides, which of the following is an intervention for wound care?",
-    "type": "mc",
-    "section": "Skin Integrity",
-    "options": {
-      "a": "Turning and positioning",
-      "b": "Wound assessment",
-      "c": "Braden Scale",
-      "d": "Patient's response to treatment"
-    },
-    "correctAnswer": "a",
-    "rationale": "Turning and positioning is listed as an intervention on Slide 24."
-  },
-  {
-    "questionText": "What is a key topic of the Communication module, according to the Module Overview?",
+    "questionText": "A nurse is teaching a client about a new dressing change. The client states, 'I don't think I can do that myself.' The nurse should use which of the following communication strategies?",
     "type": "mc",
     "section": "Communication",
     "options": {
-      "a": "Therapeutic communication",
-      "b": "Self-care",
-      "c": "Infection control",
-      "d": "Wound healing"
+      "a": "Delegation",
+      "b": "Advocacy",
+      "c": "Assertiveness",
+      "d": "Collaboration"
     },
-    "correctAnswer": "a",
-    "rationale": "Therapeutic communication is listed as a key topic in the Communication Module Overview."
-  },
-  {
-    "questionText": "According to the Student Learning Outcomes for the Clinical Judgment module, what should a student be able to do regarding vital signs? Select all that apply.",
-    "type": "sata",
-    "section": "Clinical Judgment",
-    "options": {
-      "a": "Discuss vital sign assessment.",
-      "b": "List factors that affect a patient's vital and signs.",
-      "c": "Demonstrate accurately measuring a patient's vital signs.",
-      "d": "Differentiate among the functions and roles of nurses."
-    },
-    "correctAnswer": "a,b,c",
-    "rationale": "All three are explicitly listed as Student Learning Outcomes for the Clinical Judgment module."
-  }    
+    "correctAnswer": "d",
+    "rationale": "Collaboration involves working with the client to find a solution that meets their needs. The nurse can collaborate with the client to find a way to perform the dressing change that they are comfortable with."
+  }
     ];
 
     let finalQuizData = [];
