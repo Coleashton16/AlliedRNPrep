@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTRO NURSING SDE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #3498db;
+            --primary-dark-blue: #2980b9;
+            --secondary-orange: #f39c12;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #ecf0f1;
+            --bg-white: #FFFFFF;
+            --border-light: #e0e4eb;
+            --success-green: #2ecc71;
+            --danger-red: #e74c3c;
+            --shadow-color: rgba(44, 62, 80, 0.1);
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            box-sizing: border-box;
+        }
+
+        .quiz-wrapper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .quiz-header {
+            background: var(--bg-white);
+            color: var(--text-dark);
+            padding: 0.75rem 2rem;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .animated-icon {
+            position: absolute;
+            right: 0;
+            animation: inspect 4s ease-in-out infinite;
+        }
+
+        .animated-icon svg { width: 30px; height: 30px; fill: var(--primary-blue); }
+        .quiz-header h1 { margin: 0; font-size: 1.4rem; font-weight: 600; }
+        .version-info { font-size: 0.7rem; color: var(--text-light); margin-top: 0.2rem; }
+        
+        .quiz-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        #initial-screen { text-align: center; padding: 2rem; }
+        #initial-screen h2 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-dark-blue); }
+        #initial-screen p { font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 1rem auto 2rem auto; color: var(--text-light); }
+        #start-btn { background-color: var(--primary-blue); color: white; padding: 1rem 2.5rem; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
+        #start-btn:hover { background-color: var(--primary-dark-blue); transform: scale(1.05); }
+        
+        #quiz-form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 15px 40px var(--shadow-color);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            box-sizing: border-box;
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+        
+        #quiz-form.is-transitioning { opacity: 0; transform: scale(0.98); }
+
+        .question-header { font-size: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; flex-shrink: 0; border-bottom: 1px dashed var(--border-light); color: var(--text-light); font-weight: 500; }
+        .question-header strong { font-weight: 700; color: var(--primary-blue); }
+        .question-text { font-size: 1.25rem; font-weight: 500; line-height: 1.6; margin-top: 0; margin-bottom: 1rem; flex-shrink: 0; }
+        
+        .options-container { 
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 0.5rem 0;
+        }
+
+        .options-container label { padding: 0.8rem 1.2rem; margin-bottom: 0.75rem; font-size: 1rem; border: 2px solid var(--border-light); border-radius: 10px; display: flex; align-items: center; transition: all 0.2s ease-in-out; cursor: pointer; }
+        .options-container label:hover { background-color: var(--bg-light); border-color: var(--primary-blue); }
+        .options-container input { margin-right: 1rem; flex-shrink: 0; transform: scale(1.2); accent-color: var(--primary-blue); }
+        
+        .question-footer { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .flag-container label { cursor: pointer; font-weight: 500; color: var(--text-light); display: flex; align-items: center; }
+        .flag-container input { margin-right: 0.5rem; }
+        .confidence-slider-container { display: flex; align-items: center; gap: 1rem; }
+        .confidence-slider-container label { font-weight: 500; color: var(--text-light); }
+        .confidence-slider { max-width: 150px; }
+
+        #navigation-btn { padding: 0.8rem 2rem; font-size: 1rem; background-color: var(--primary-blue); color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        #navigation-btn:hover { background-color: var(--primary-dark-blue); transform: scale(1.05); }
+
+        #results-area { animation: fadeIn 0.8s ease-out; box-sizing: border-box; width: 100%; height: 100%; overflow-y: auto; padding: 2rem; }
+        .results-summary, #confidence-analysis, #study-focus, #results-details { background-color: var(--bg-white); margin: 0 auto 2rem auto; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px var(--shadow-color); max-width: 1000px; }
+        .results-summary { text-align: center; }
+
+        .score-animation-container { width: 150px; height: 150px; border-radius: 50%; border: 8px solid var(--primary-blue); display: flex; justify-content: center; align-items: center; margin: 1.5rem auto; position: relative; background-color: var(--bg-white); }
+        .score-animation-circle { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--success-green) 0% 0%, var(--border-light) 0% 100%); transition: background 1.5s ease-out; }
+        .score-animation-inner { position: relative; z-index: 2; background-color: var(--bg-white); width: calc(100% - 16px); height: calc(100% - 16px); border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .score-animation-text { font-size: 2.5rem; font-weight: 800; color: var(--text-dark); }
+        
+        #confidence-analysis h3, #study-focus h3, #results-details h2 { margin-top: 0; border-bottom: 2px solid; padding-bottom: 1rem; font-size: 1.5rem; margin-bottom: 1.5rem; }
+        #confidence-analysis h3 { color: var(--primary-dark-blue); border-color: var(--primary-blue); }
+        #study-focus h3 { color: #c0392b; border-color: #e74c3c; }
+        #results-details h2 { color: var(--text-dark); border-color: var(--border-light); }
+        
+        .result-question { border: 1px solid var(--border-light); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 12px; }
+        .result-question p strong { display: block; margin-bottom: 1rem; font-size: 1.1em; color: var(--text-dark); }
+        .result-question ul { list-style-type: none; padding: 0; margin: 0; }
+        .result-question li { padding: 0.8rem 1.2rem; border-radius: 8px; margin-bottom: 0.6rem; font-size: 1rem; }
+        .correct-answer-label { background-color: var(--light-green-bg); color: #27ae60; font-weight: 600; }
+        .incorrect-answer-label { background-color: var(--light-red-bg); color: var(--danger-red); text-decoration: line-through; }
+        .missed-correct-answer-label { border: 2px dashed var(--success-green); }
+        .rationale { margin-top: 1.5rem; padding: 1.2rem; border-radius: 10px; border-left: 4px solid var(--primary-blue); background-color: var(--light-blue-bg); font-size: 0.95rem; }
+
+        .hidden { display: none !important; }
+        .confetti { position: fixed; width: 10px; height: 10px; opacity: 0; animation: confetti-fall 5s linear forwards; border-radius: 50%; z-index: 9999; }
+        @keyframes confetti-fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        @keyframes inspect { 0% { transform: rotate(-15deg); } 50% { transform: rotate(10deg); } 100% { transform: rotate(-15deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <header class="quiz-header">
+            <div class="header-content">
+                <div class="logo">VSREP</div>
+                <div>
+                    <h1>Intro to Nursing unit 1 - SDE</h1>
+                    <div class="version-info">
+                        <span>Engine: V4.0</span> | <span>Test: V1.0</span>
+                    </div>
+                </div>
+                <div class="animated-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                </div>
+            </div>
+        </header>
+
+        <main class="quiz-content">
+            <div id="initial-screen">
+                <h2>Welcome to the Diagnostic Exam</h2>
+                <p>You will be presented with one question at a time. Once you answer, you cannot go back. Please read each question carefully before proceeding.</p>
+                <button id="start-btn">Start Exam</button>
+            </div>
+
+            <form id="quiz-form" class="hidden"></form>
+
+            <div id="results-area" class="hidden"></div>
+        </main>
+    </div>
+
+<script>
+    const fullQuizData = [ 
+   {
+    "questionText": "According to the Module Overview, what is the fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Therapeutic communication",
+      "b": "Self-care",
+      "c": "Professional identity",
+      "d": "Interdisciplinary collaboration"
+    },
+    "correctAnswer": "c",
+    "rationale": "The Module Overview for Professional Identity explicitly states that professional identity is a fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication."
+  },
+  {
+    "questionText": "Professional identity is demonstrated through which of the following? Select all that apply.",
+    "type": "sata",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Behavior",
+      "b": "Presence",
+      "c": "Actively listening to the client",
+      "d": "Critical thinking"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "The Module Overview for Professional Identity states that professional identity is demonstrated through behavior, presence, and actively listening to the client."
+  },
+  {
+    "questionText": "According to the Student Learning Outcomes, a student should be able to differentiate among what?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "The various types of communication.",
+      "b": "Medical and surgical asepsis.",
+      "c": "The functions and roles of nurses.",
+      "d": "The links that form the chain of infection."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Student Learning Outcomes for Professional Identity explicitly state this as a goal."
+  },
+  {
+    "questionText": "Based on the provided content, what is a key topic of the Professional Identity module?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "I-SBAR and hand-off communication",
+      "b": "Caring encounters and self-care",
+      "c": "Therapeutic communication and delegation",
+      "d": "Nursing process and decision-making"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Professional Identity Module Overview lists caring encounters and self-care as key topics."
+  },
+  {
+    "questionText": "Which of the following are Course-Level Outcomes for the Professional Identity module? Select all that apply.",
+    "type": "sata",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Utilize communication skills with clients/faculty and healthcare team to facilitate client care.",
+      "b": "Incorporate client cultural beliefs and values when managing the care of the client.",
+      "c": "Collaborate with the healthcare team to coordinate client care.",
+      "d": "Integrate clinical decision-making based on professional nursing standards."
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "The provided content lists 'Utilize communication skills with clients/faculty and healthcare team...', 'Incorporate client cultural beliefs and values...', and 'Collaborate with the healthcare team...' as Course-Level Outcomes for the Professional Identity module."
+  },
+  {
+    "questionText": "According to the Communication Module Overview, clear and effective communication is essential to ensure what?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Efficient hand-off reports.",
+      "b": "Safe patient outcomes.",
+      "c": "Patient satisfaction with care.",
+      "d": "Ethical behavior from all staff."
+    },
+    "correctAnswer": "b",
+    "rationale": "The Communication Module Overview explicitly states that clear and effective communication is essential with interdisciplinary departments/personnel to ensure safe patient outcomes."
+  },
+  {
+    "questionText": "According to the Student Learning Outcomes for Communication, what should a student be able to do regarding communication types?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Identify the phases of nurse/patient communication.",
+      "b": "Define compassion fatigue.",
+      "c": "Differentiate between medical and surgical asepsis.",
+      "d": "Discuss vital sign assessment."
+    },
+    "correctAnswer": "a",
+    "rationale": "This is one of the explicitly listed Student Learning Outcomes for the Communication module."
+  },
+  {
+    "questionText": "Which of the following topics is associated with communication, according to the Module Overview? Select all that apply.",
+    "type": "sata",
+    "section": "Communication",
+    "options": {
+      "a": "Therapeutic communication",
+      "b": "Delegation",
+      "c": "I-SBAR",
+      "d": "Self-care"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "The Module Overview for Communication lists therapeutic communication, delegation, collaboration, I-SBAR, and hand-off communication as key topics."
+  },
+  {
+    "questionText": "According to the Infection Control Module Overview, what is the purpose of the module?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "To introduce the basic concept of infection control and the nurse's role in preventing infection in all care settings.",
+      "b": "To develop critical thinking and decision-making skills.",
+      "c": "To prepare a nursing care plan based on subjective data.",
+      "d": "To demonstrate caregiver skills development."
+    },
+    "correctAnswer": "a",
+    "rationale": "The Module Overview for Infection Control states this as its purpose."
+  },
+  {
+    "questionText": "What is the definition of infection according to Giddens (2021)?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "A fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication.",
+      "b": "An interpretation or conclusion about a patient's needs, concerns, or health problems.",
+      "c": "The invasion and multiplication of microorganisms in the body tissues, which may be clinically unapparent or result in local cellular injury due to competitive metabolism, toxins, intracellular replication, or antigen-antibody response.",
+      "d": "An abnormal connection between 2 internal organs or between an internal organ and the outside of the body."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Module Overview for Infection (Continued) provides this exact definition from Giddens (2021)."
+  },
+  {
+    "questionText": "Which of the following is a key topic associated with the Infection module? Select all that apply.",
+    "type": "sata",
+    "section": "Infection Control",
+    "options": {
+      "a": "Personal protective equipment",
+      "b": "Asepsis",
+      "c": "Standard Precautions",
+      "d": "I-SBAR"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "The Module Overview for Infection lists personal protective equipment, asepsis, sterile technique, hospital acquired infections (HAI), and Standard Precautions as key topics."
+  },
+  {
+    "questionText": "What is the definition of clinical judgment according to Tanner (2006)?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "The psychomotor ability in delivering patient care.",
+      "b": "The invasion and multiplication of microorganisms in the body tissues.",
+      "c": "An interpretation or conclusion about a patient's needs, concerns, or health problems, and/or the decision to take action (or not).",
+      "d": "A fundamental principle that helps shape one's behavior and ethics."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Module Overview for Clinical Judgment provides this exact definition from Tanner (2006)."
+  },
+  {
+    "questionText": "To overcome daily challenges and deliver safe and effective patient care, nurses must utilize which of the following? Select all that apply.",
+    "type": "sata",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Effective communication skills",
+      "b": "Critical thinking",
+      "c": "Critical reasoning",
+      "d": "Psychomotor ability"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "The Module Overview for Clinical Judgment states nurses must utilize effective communication skills, critical thinking, critical reasoning, and make a conclusion to deliver safe and effective patient care."
+  },
+  {
+    "questionText": "A wound that has damage and exposure to muscle, bone, or supporting structures is classified as what stage of pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Stage 1",
+      "b": "Stage 2",
+      "c": "Stage 3",
+      "d": "Stage 4"
+    },
+    "correctAnswer": "d",
+    "rationale": "Stage 4 is defined as skin loss with damage and exposure to muscle, bone, or supporting structures."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following is a type of wound drainage? Select all that apply.",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Serous",
+      "b": "Serosanguineous",
+      "c": "Purulent",
+      "d": "Exudate"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "Slide 21 lists four types of wound drainage: Serous, Serosanguineous, Sanguineous, and Purulent."
+  },
+  {
+    "questionText": "The three phases of wound healing are: Inflammatory, Proliferative, and what?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Maturation",
+      "b": "Tertiary",
+      "c": "Dehiscence",
+      "d": "Asepsis"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 9 lists the three phases of wound healing as Inflammatory, Proliferative, and Maturation."
+  },
+  {
+    "questionText": "Which of the following is an example of an open wound?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Bruising",
+      "b": "Abrasion",
+      "c": "Fracture",
+      "d": "Pressure related injury"
+    },
+    "correctAnswer": "b",
+    "rationale": "Slide 3 states that an open wound is a break in the skin surface and provides abrasion, puncture, and incision as examples."
+  },
+  {
+    "questionText": "A wound that is initially left open to resolve edema or infection, and is then closed later, is healing by what intention?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Closed wound"
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 8 defines tertiary intention as a wound initially left open before being closed later."
+  },
+  {
+    "questionText": "Which of the following is a complication of wounds, as listed on the provided slides? Select all that apply.",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Dehiscence",
+      "b": "Evisceration",
+      "c": "Fistulas",
+      "d": "Bruising"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "Slide 11 lists Dehiscence and Evisceration as wound complications, and Slide 12 lists Fistulas as a wound complication."
+  },
+  {
+    "questionText": "What is an abnormal connection between two internal organs or between an internal organ and the outside of the body?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Dehiscence",
+      "b": "Evisceration",
+      "c": "Fistula",
+      "d": "Bruising"
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 12 defines a fistula as an abnormal connection between two internal organs or between an internal organ and the outside of the body."
+  },
+  {
+    "questionText": "According to the provided content, what is the primary cause of a pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Friction and shear",
+      "b": "Malnutrition",
+      "c": "Pressure",
+      "d": "Moisture (MASD)"
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure, with intensity and duration being key components."
+  },
+  {
+    "questionText": "Which of the following is a key topic of the Professional Identity module, according' to the Module Overview?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "I-SBAR and hand-off communication",
+      "b": "Caring encounters and self-care",
+      "c": "Therapeutic communication and delegation",
+      "d": "Nursing process and decision-making"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Professional Identity Module Overview lists caring encounters and self-care as key topics."
+  },
+  {
+    "questionText": "According to the Student Learning Outcomes for the Clinical Judgment module, what should a student be able to do regarding a nursing care plan?",
+    "type": "sata",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Implement a nursing care plan utilizing critical thinking.",
+      "b": "Prepare a nursing care plan based upon objective and subjective data.",
+      "c": "Demonstrate accurately measuring a patient's vital signs.",
+      "d": "Identify essential behaviors that demonstrate caring."
+    },
+    "correctAnswer": "b,c",
+    "rationale": "The Student Learning Outcomes for the Clinical Judgment module explicitly list 'Prepare nursing care plan based upon objective and subjective data' and 'Demonstrate accurately measuring a patient's vital signs'."
+  },
+  {
+    "questionText": "A wound that extends into the subcutaneous tissue, but not to the muscle or bone, is classified as what stage of pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Stage 1",
+      "b": "Stage 2",
+      "c": "Stage 3",
+      "d": "Stage 4"
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 17 defines Stage 3 as extending into the subcutaneous tissue, but not to the muscle or bone."
+  },
+  {
+    "questionText": "According to the provided content, what is the role of clear and effective communication in a complex health care environment?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "It is an essential component of professional identity.",
+      "b": "It is a key topic of the Professional Identity module.",
+      "c": "It is essential with interdisciplinary departments/personnel to ensure safe patient outcomes.",
+      "d": "It is primarily used for hand-off communication."
+    },
+    "correctAnswer": "c",
+    "rationale": "The Communication Module Overview explicitly states that clear and effective communication is essential with interdisciplinary departments/personnel to ensure safe patient outcomes."
+  },
+  {
+    "questionText": "According to the provided content, what is a key topic of the Clinical Judgment module?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "I-SBAR and hand-off communication",
+      "b": "Nursing process, critical thinking, problem-solving, and decision making",
+      "c": "Asepsis, sterile technique, and HAIs",
+      "d": "Principles of caring and self-care"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Module Overview for Clinical Judgment lists these as key topics."
+  },
+  {
+    "questionText": "What is the primary cause of a pressure injury, as stated in the 'Skin Integrity' slides?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Friction and shear",
+      "b": "Pressure",
+      "c": "Malnutrition",
+      "d": "Sensory loss or immobility"
+    },
+    "correctAnswer": "b",
+    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
+  },
+  {
+    "questionText": "A wound described as having minimal or no tissue loss and tissue surfaces that are approximated (closed) is healing by what intention?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Secondary intention",
+      "c": "Tertiary intention",
+      "d": "Closed intention"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 6 defines primary intention as having tissue surfaces approximated (closed), minimal or no tissue loss, and quick healing."
+  },
+  {
+    "questionText": "What is the key difference between a closed wound and an open wound, according to the provided content?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "A closed wound has bruising, while an open wound has a break in the skin surface.",
+      "b": "An open wound can become infected, but a closed wound cannot.",
+      "c": "An open wound is always more severe than a closed wound.",
+      "d": "A closed wound is always a fracture, while an open wound is always an incision."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 3 defines an open wound as a break in the skin surface and a closed wound as having bruising with intact skin."
+  },
+  {
+    "questionText": "Which of the following is a core concept that shapes professional behavior, clinical judgment, ethics, and communication?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Self-care",
+      "b": "Professional identity",
+      "c": "Compassion fatigue",
+      "d": "Delegation"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Module Overview for Professional Identity explicitly states that professional identity is a fundamental principle that helps shape one's behavior, clinical judgment, ethics, and communication."
+  },
+  {
+    "questionText": "Which of the following is a Student Learning Outcome for the Professional Identity module?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Explain the primary purpose of the various types of communication.",
+      "b": "Discuss nursing and non-nursing theories that impact nursing practice.",
+      "c": "Describe conditions that promote the transmission of healthcare-associated infections (HAI).",
+      "d": "Discuss vital sign assessment."
+    },
+    "correctAnswer": "b",
+    "rationale": "This is an explicitly listed Student Learning Outcome for the Professional Identity module."
+  },
+  {
+    "questionText": "What is the purpose of the Communication module?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "To introduce the basic concept of communication.",
+      "b": "To identify populations at higher risk for acquiring infections.",
+      "c": "To introduce the basic concept of clinical judgment.",
+      "d": "To define compassion fatigue."
+    },
+    "correctAnswer": "a",
+    "rationale": "The Module Overview for Communication states that its purpose is to introduce the basic concept of communication."
+  },
+  {
+    "questionText": "Which of the following are key topics associated with communication? Select all that apply.",
+    "type": "sata",
+    "section": "Communication",
+    "options": {
+      "a": "Therapeutic communication",
+      "b": "Collaboration",
+      "c": "I-SBAR",
+      "d": "Pain"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "Therapeutic communication, collaboration, and I-SBAR are listed as key topics in the Communication Module Overview."
+  },
+  {
+    "questionText": "The purpose of the Infection Control module is to introduce the basic concept of infection control. Applying the principles of infection control is vital for providing what?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Effective communication with interdisciplinary teams.",
+      "b": "Safe care environments for patients and the entire health care team.",
+      "c": "Asepsis and sterile technique.",
+      "d": "Clinical judgment and critical thinking."
+    },
+    "correctAnswer": "b",
+    "rationale": "The Module Overview for Infection Control states that applying infection control principles is vital for providing safe care environments for patients and the entire health care team."
+  },
+  {
+    "questionText": "According to the Student Learning Outcomes for the Infection Control module, a student should be able to do which of the following?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Explain the primary purpose of the various types of communication.",
+      "b": "Discuss the rationale for standard precautions.",
+      "c": "Prepare a nursing care plan based upon objective and subjective data.",
+      "d": "Define compassion fatigue."
+    },
+    "correctAnswer": "b",
+    "rationale": "This is an explicitly listed Student Learning Outcome for the Infection Control module."
+  },
+  {
+    "questionText": "Clinical judgment and communication are described as the cognitive aspect rather than the what?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Critical thinking",
+      "b": "Psychomotor ability",
+      "c": "Decision making",
+      "d": "Problem-solving"
+    },
+    "correctAnswer": "b",
+    "rationale": "The Clinical Judgment Module Overview states that clinical judgment and communication are the cognitive aspect rather than the psychomotor ability in delivering patient care."
+  },
+  {
+    "questionText": "Which of the following is a Student Learning Outcome for the Clinical Judgment module? Select all that apply.",
+    "type": "sata",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Discuss vital sign assessment.",
+      "b": "List factors that affect a patient's vital and signs.",
+      "c": "Discuss methods of communication with health care personnel.",
+      "d": "Differentiate among the functions and roles of nurses."
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "These are all explicitly listed Student Learning Outcomes for the Clinical Judgment module."
+  },
+  {
+    "questionText": "The purpose of the Static Skill Demonstration (SSD) for PPE is for students to do what?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Learn about the chain of infection.",
+      "b": "Apply and remove personal protective equipment.",
+      "c": "Prepare a nursing care plan.",
+      "d": "Discuss the rationale for standard precautions."
+    },
+    "correctAnswer": "b",
+    "rationale": "The content explicitly states the purpose of the SSD is 'Applying and Removing Personal Protective Equipment (PPE).'"
+  },
+  {
+    "questionText": "Which of the following is listed as a factor affecting wound healing?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Malnutrition",
+      "b": "Sutures and dressings",
+      "c": "Patient response",
+      "d": "Sensory loss or immobility"
+    },
+    "correctAnswer": "a",
+    "rationale": "Malnutrition is listed on Slide 10 as a factor affecting wound healing."
+  },
+  {
+    "questionText": "A pressure injury with intact, nonblanchable erythema is what stage?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Stage 1",
+      "b": "Stage 2",
+      "c": "Stage 3",
+      "d": "Stage 4"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 17 defines Stage 1 as intact, nonblanchable erythema."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following is a type of wound depth classification?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Superficial",
+      "b": "Chronic",
+      "c": "Bruising",
+      "d": "Absence of infection"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 4 lists Superficial, Partial-thickness, and Full-thickness as types of wound depth."
+  },
+  {
+    "questionText": "What is the primary cause of a pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Pressure",
+      "b": "Malnutrition",
+      "c": "Friction and shear",
+      "d": "Medical device-related injury"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following are listed as complications of wounds? Select all that apply.",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Dehiscence",
+      "b": "Evisceration",
+      "c": "Fistulas",
+      "d": "Bruising"
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "Dehiscence and evisceration are listed on Slide 11, and fistulas on Slide 12 as complications of wounds."
+  },
+  {
+    "questionText": "Which of the following describes a Stage 2 pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Intact, nonblanchable erythema.",
+      "b": "Partial-thickness skin loss involving epidermis and/or dermis.",
+      "c": "Extends into the subcutaneous tissue, not to muscle or bone.",
+      "d": "Skin loss with damage and exposure to muscle, bone, or supporting structures."
+    },
+    "correctAnswer": "b",
+    "rationale": "Slide 17 defines Stage 2 as partial-thickness skin loss involving epidermis and/or dermis."
+  },
+  {
+    "questionText": "What is the key nursing action in the Planning phase, according to the 'Planning' slide?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Goals are chosen after collaboration with the patient.",
+      "b": "Wound cleansing and irrigation.",
+      "c": "Assessing the wound bed.",
+      "d": "Evaluating goal achievement."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 23 states that after prioritizing nursing diagnoses, 'Goals are chosen' and 'Goals are determined after collaboration with the patient'."
+  },
+  {
+    "questionText": "According to the 'Wound Assessment' slide, which of the following should be assessed? Select all that apply.",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Location",
+      "b": "Size",
+      "c": "Undermining or tunneling",
+      "d": "Patient response"
+    },
+    "correctAnswer": "a,b,c,d",
+    "rationale": "Slide 20 lists Location, Size, Undermining or tunneling, Drainage, Edges and surrounding tissue, Wound bed, and Patient response as components of wound assessment."
+  },
+  {
+    "questionText": "Which type of pressure injury is described as having intact skin with discoloration or blistering?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Unstageable",
+      "b": "Stage 1",
+      "c": "Suspected deep-tissue pressure injury",
+      "d": "Stage 2"
+    },
+    "correctAnswer": "c",
+    "rationale": "Slide 18 defines a suspected deep-tissue pressure injury as intact skin with discoloration or blistering."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, what is the role of goals in the Planning phase of nursing care?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Goals are chosen after collaboration with the patient.",
+      "b": "Goals are determined before prioritizing nursing diagnoses.",
+      "c": "Goals are chosen by the nurse alone.",
+      "d": "Goals are not a part of the Planning phase."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 23 states that 'Goals are determined after collaboration with the patient.'"
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, skin integrity is not an indicator of what?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "The severity of damage underlying.",
+      "b": "The type of wound.",
+      "c": "The location of the wound.",
+      "d": "The patient's age."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 3 explicitly states, 'Skin integrity is not an indicator of severity of damage underlying'."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following is an intervention for wound care?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Turning and positioning",
+      "b": "Wound assessment",
+      "c": "Braden Scale",
+      "d": "Patient's response to treatment"
+    },
+    "correctAnswer": "a",
+    "rationale": "Turning and positioning is listed as an intervention on Slide 24."
+  },
+  {
+    "questionText": "What is the key topic for the Professional Identity module, according to the Module Overview?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Principles of caring",
+      "b": "I-SBAR",
+      "c": "Asepsis",
+      "d": "Nursing process"
+    },
+    "correctAnswer": "a",
+    "rationale": "Principles of caring is listed as a key topic in the Professional Identity Module Overview."
+  },
+  {
+    "questionText": "What is the purpose of the Communication module, as stated in the Module Overview?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "To introduce the basic concept of communication.",
+      "b": "To introduce the basic concept of professional identity.",
+      "c": "To discuss factors affecting the timing of patient communication.",
+      "d": "To define compassion fatigue."
+    },
+    "correctAnswer": "a",
+    "rationale": "The Module Overview for Communication states that its purpose is to introduce the basic concept of communication."
+  },
+  {
+    "questionText": "Which of the following is a key topic for the Infection module?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Hand-off communication",
+      "b": "Hospital acquired infections (HAI)",
+      "c": "Problem-solving",
+      "d": "Self-care"
+    },
+    "correctAnswer": "b",
+    "rationale": "Hospital acquired infections (HAI) are listed as a key topic in the Infection module."
+  },
+  {
+    "questionText": "According to the Module Overview, what is the purpose of the Clinical Judgment module?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "To introduce the basic concept of clinical judgment.",
+      "b": "To implement a nursing care plan.",
+      "c": "To discuss factors affecting a patient's vital signs.",
+      "d": "To understand one's professional identity."
+    },
+    "correctAnswer": "a",
+    "rationale": "The Module Overview for Clinical Judgment states its purpose is to introduce the basic concept of clinical judgment."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following are examples of skin injuries? Select all that apply.",
+    "type": "sata",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Wounds",
+      "b": "Burns",
+      "c": "Vascular disease",
+      "d": "Pressure injury"
+    },
+    "correctAnswer": "a,b,c,d",
+    "rationale": "Wounds and vascular disease are listed on Slide 1, burns on Slide 13, and pressure injury on Slide 14 as examples of skin injuries or related conditions."
+  },
+  {
+    "questionText": "What is the primary cause of a pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Pressure",
+      "b": "Malnutrition",
+      "c": "Friction and shear",
+      "d": "Moisture (MASD)"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
+  },
+  {
+    "questionText": "Which of the following is a key topic of the Professional Identity module?",
+    "type": "mc",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Pain",
+      "b": "Communication",
+      "c": "Infection",
+      "d": "Clinical judgment"
+    },
+    "correctAnswer": "a",
+    "rationale": "Pain is listed as a key topic in the Professional Identity Module Overview."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, what are the three classifications of burns?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Superficial, Partial thickness, Full thickness",
+      "b": "Acute, Chronic, Tertiary",
+      "c": "Stage 1, Stage 2, Stage 3",
+      "d": "Minor, Moderate, Severe"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 13 lists Superficial, Partial thickness, and Full thickness as classifications of burns."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following is an example of wound depth (thickness)?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Open wound",
+      "b": "Full-thickness",
+      "c": "Chronic",
+      "d": "Abrasions"
+    },
+    "correctAnswer": "b",
+    "rationale": "Full-thickness is listed as a wound depth classification on Slide 4."
+  },
+  {
+    "questionText": "What is the primary cause of a pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Pressure",
+      "b": "Malnutrition",
+      "c": "Friction and shear",
+      "d": "Moisture (MASD)"
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 16 explicitly states that the primary cause of a pressure injury is pressure."
+  },
+  {
+    "questionText": "Which of the following is a type of wound healing intention, according to the 'Skin Integrity' slides?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Primary intention",
+      "b": "Superficial intention",
+      "c": "Open intention",
+      "d": "Debridement intention"
+    },
+    "correctAnswer": "a",
+    "rationale": "Primary intention is listed as a wound healing process on Slide 5."
+  },
+  {
+    "questionText": "What is the key difference between a Stage 1 and Stage 2 pressure injury?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Stage 1 is intact, while Stage 2 involves partial-thickness skin loss.",
+      "b": "Stage 1 extends to the muscle, while Stage 2 does not.",
+      "c": "Stage 1 has a blister, while Stage 2 does not.",
+      "d": "Stage 1 is unstageable, while Stage 2 is not."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 17 states that Stage 1 is intact, while Stage 2 is partial-thickness skin loss."
+  },
+  {
+    "questionText": "According to the provided content, what is the key difference between medical and surgical asepsis?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "The content does not provide this information.",
+      "b": "Medical asepsis is a type of wound healing, and surgical asepsis is a type of wound complication.",
+      "c": "Medical asepsis focuses on reducing microorganisms, while surgical asepsis focuses on eliminating them completely.",
+      "d": "Medical asepsis is for home care, while surgical asepsis is for hospital care."
+    },
+    "correctAnswer": "c",
+    "rationale": "This is the generally accepted difference between the two terms, which the provided text implies in the Student Learning Outcome of differentiating between them."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, what is the role of goals in the Planning phase of nursing care?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Goals are chosen after collaboration with the patient.",
+      "b": "Goals are determined before prioritizing nursing diagnoses.",
+      "c": "Goals are chosen by the nurse alone.",
+      "d": "Goals are not a part of the Planning phase."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 23 states that 'Goals are determined after collaboration with the patient.'"
+  },
+  {
+    "questionText": "Which of the following is a Course-Level Outcome for the Professional Identity module? Select all that apply.",
+    "type": "sata",
+    "section": "Professional Identity",
+    "options": {
+      "a": "Utilize communication skills with clients/faculty and healthcare team to facilitate client care.",
+      "b": "Incorporate client cultural beliefs and values when managing the care of the client.",
+      "c": "Collaborate with the healthcare team to coordinate client care.",
+      "d": "Utilize information technology/informatics to document safe client care."
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "These are all listed as Course-Level Outcomes for the Professional Identity module."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, skin integrity is not an indicator of what?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "The severity of damage underlying.",
+      "b": "The type of wound.",
+      "c": "The location of the wound.",
+      "d": "The patient's age."
+    },
+    "correctAnswer": "a",
+    "rationale": "Slide 3 explicitly states, 'Skin integrity is not an indicator of severity of damage underlying'."
+  },
+  {
+    "questionText": "According to the 'Skin Integrity' slides, which of the following is an intervention for wound care?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Turning and positioning",
+      "b": "Wound assessment",
+      "c": "Braden Scale",
+      "d": "Patient's response to treatment"
+    },
+    "correctAnswer": "a",
+    "rationale": "Turning and positioning is listed as an intervention on Slide 24."
+  },
+  {
+    "questionText": "What is a key topic of the Communication module, according to the Module Overview?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Therapeutic communication",
+      "b": "Self-care",
+      "c": "Infection control",
+      "d": "Wound healing"
+    },
+    "correctAnswer": "a",
+    "rationale": "Therapeutic communication is listed as a key topic in the Communication Module Overview."
+  },
+  {
+    "questionText": "According to the Student Learning Outcomes for the Clinical Judgment module, what should a student be able to do regarding vital signs? Select all that apply.",
+    "type": "sata",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Discuss vital sign assessment.",
+      "b": "List factors that affect a patient's vital and signs.",
+      "c": "Demonstrate accurately measuring a patient's vital signs.",
+      "d": "Differentiate among the functions and roles of nurses."
+    },
+    "correctAnswer": "a,b,c",
+    "rationale": "All three are explicitly listed as Student Learning Outcomes for the Clinical Judgment module."
+  }    
+    ];
+
+    let finalQuizData = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = {};
+    let confidenceRatings = {};
+    let flaggedForReview = new Set();
+    const NUM_QUESTIONS_TO_SELECT = 30;
+
+    const initialScreen = document.getElementById('initial-screen');
+    const startBtn = document.getElementById('start-btn');
+    const quizForm = document.getElementById('quiz-form');
+    const resultsArea = document.getElementById('results-area');
+
+    function prepareQuizData() {
+        const shuffledPool = [...fullQuizData].sort(() => 0.5 - Math.random());
+        const questionsNeeded = Math.min(NUM_QUESTIONS_TO_SELECT, shuffledPool.length);
+        finalQuizData = shuffledPool.slice(0, questionsNeeded);
+    }
+
+    function prepareAndStartQuiz() {
+        prepareQuizData();
+        if (finalQuizData.length === 0) {
+            alert("No questions loaded.");
+            return;
+        }
+        initialScreen.classList.add('hidden');
+        quizForm.classList.remove('hidden');
+        displayCurrentQuestion();
+    }
+
+    function displayCurrentQuestion() {
+        if (currentQuestionIndex >= finalQuizData.length) return;
+        const qData = finalQuizData[currentQuestionIndex];
+        
+        let optionsHTML = '<div class="options-container">';
+        const inputType = qData.type === 'sata' ? 'checkbox' : 'radio';
+        
+        for (const [key, text] of Object.entries(qData.options)) {
+            optionsHTML += `<label><input type="${inputType}" name="answer" value="${key}"> ${text}</label>`;
+        }
+        optionsHTML += '</div>';
+
+        quizForm.innerHTML = `
+            <div class="question-header">
+                Question <strong>${currentQuestionIndex + 1}</strong> of ${finalQuizData.length}
+            </div>
+            <p class="question-text">${qData.questionText}</p>
+            ${optionsHTML}
+            <div class="question-footer">
+                <div class="flag-container">
+                    <label><input type="checkbox" class="flag-for-review"> Flag for Review</label>
+                </div>
+                <div class="confidence-slider-container">
+                    <label>Confidence:</label>
+                    <input type="range" min="1" max="5" value="3" class="confidence-slider">
+                </div>
+                 <button type="submit" id="navigation-btn">${(currentQuestionIndex === finalQuizData.length - 1) ? "Submit Exam" : "Next Question"}</button>
+            </div>
+        `;
+    }
+    
+    function saveAnswer() {
+        const qData = finalQuizData[currentQuestionIndex];
+        if (!qData) return;
+
+        const selectedOptions = quizForm.querySelectorAll('input[name="answer"]:checked');
+        if (qData.type === 'sata') {
+            userAnswers[currentQuestionIndex] = Array.from(selectedOptions).map(cb => cb.value);
+        } else {
+            userAnswers[currentQuestionIndex] = selectedOptions.length ? selectedOptions[0].value : null;
+        }
+
+        const flagInput = quizForm.querySelector('.flag-for-review');
+        if(flagInput && flagInput.checked) {
+            flaggedForReview.add(currentQuestionIndex);
+        }
+
+        const confidenceInput = quizForm.querySelector('.confidence-slider');
+        if(confidenceInput) {
+            confidenceRatings[currentQuestionIndex] = parseInt(confidenceInput.value, 10);
+        }
+    }
+    
+    // --- FUNCTION RESTORED ---
+    function handleNavigation() {
+        saveAnswer();
+        quizForm.classList.add('is-transitioning');
+        
+        setTimeout(() => {
+            if (currentQuestionIndex < finalQuizData.length - 1) {
+                currentQuestionIndex++;
+                displayCurrentQuestion();
+                quizForm.classList.remove('is-transitioning');
+            } else {
+                submitQuiz();
+            }
+        }, 300);
+    }
+
+    function submitQuiz() {
+        quizForm.classList.add('hidden');
+        resultsArea.classList.remove('hidden');
+        displayResults();
+    }
+    
+    function checkAnswerCorrectness(qData, userAnswer) {
+        if (userAnswer === null || userAnswer === undefined) return false;
+        if (qData.type === 'sata') {
+            if (!Array.isArray(userAnswer) || typeof qData.correctAnswer !== 'string') return false;
+            const sortedUser = [...userAnswer].sort();
+            const sortedCorrect = [...(qData.correctAnswer.split(','))].sort();
+            return JSON.stringify(sortedUser) === JSON.stringify(sortedCorrect);
+        }
+        return userAnswer === qData.correctAnswer;
+    }
+
+    function displayResults() {
+        let correctCount = 0;
+        finalQuizData.forEach((q, i) => { if (checkAnswerCorrectness(q, userAnswers[i])) correctCount++; });
+        const score = finalQuizData.length > 0 ? (correctCount / finalQuizData.length) * 100 : 0;
+
+        let resultsHTML = `
+            <div class="results-summary">
+                 <h2>Exam Complete!</h2>
+                 <div class="score-animation-container">
+                    <div class="score-animation-circle"></div>
+                    <div class="score-animation-inner">
+                        <span class="score-animation-text">${score.toFixed(0)}%</span>
+                    </div>
+                 </div>
+                 <p>You answered <strong>${correctCount}</strong> out of <strong>${finalQuizData.length}</strong> questions correctly.</p>
+            </div>
+        `;
+        
+        resultsArea.innerHTML = resultsHTML;
+        resultsArea.innerHTML += generateConfidenceAnalysis();
+        resultsArea.innerHTML += generateStudyFocus();
+        resultsArea.innerHTML += generateDetailedReview();
+
+        setTimeout(() => {
+            const scoreCircle = document.querySelector('.score-animation-circle');
+            if (scoreCircle) {
+                scoreCircle.style.background = `conic-gradient(var(--success-green) ${score}%, var(--border-light) ${score}% 100%)`;
+            }
+        }, 100);
+
+        if (score >= 80) {
+            triggerConfetti();
+        }
+    }
+
+    function generateDetailedReview() {
+        let detailsHTML = '<div id="results-details"><h2>Question Review</h2>';
+        finalQuizData.forEach((qData, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = checkAnswerCorrectness(qData, userAnswer);
+            
+            let resultBodyHTML = '<ul>';
+            for (const [key, text] of Object.entries(qData.options)) {
+                let li_class = '';
+                const isCorrectOpt = qData.type === 'sata' ? qData.correctAnswer.includes(key) : key === qData.correctAnswer;
+                const isUserSelect = Array.isArray(userAnswer) ? userAnswer.includes(key) : key === userAnswer;
+                if (isCorrectOpt) li_class = 'correct-answer-label';
+                if (isUserSelect && !isCorrectOpt) li_class = 'incorrect-answer-label';
+                if (!isUserSelect && isCorrectOpt && !isCorrect) li_class = 'missed-correct-answer-label';
+                resultBodyHTML += `<li class="${li_class}">${text}</li>`;
+            }
+            resultBodyHTML += '</ul>';
+
+            detailsHTML += `
+                <div class="result-question">
+                    <p><strong>Question ${index + 1}: ${qData.questionText}</strong></p>
+                    ${resultBodyHTML}
+                    <div class="rationale"><strong>Rationale:</strong> ${qData.rationale || 'N/A'}</div>
+                </div>`;
+        });
+        detailsHTML += '</div>';
+        return detailsHTML;
+    }
+    
+    function generateConfidenceAnalysis() {
+        let correctAndConfident = 0, correctButUnsure = 0, incorrectAndConfident = 0, incorrectButUnsure = 0;
+        finalQuizData.forEach((qData, index) => {
+            const isCorrect = checkAnswerCorrectness(qData, userAnswers[index]);
+            const confidence = confidenceRatings[index] || 3;
+            if (confidence >= 4) { if (isCorrect) correctAndConfident++; else incorrectAndConfident++; } 
+            else { if (isCorrect) correctButUnsure++; else incorrectButUnsure++; }
+        });
+        return `
+            <div id="confidence-analysis">
+                <h3>Confidence Analysis</h3>
+                <ul>
+                    <li>Correct & Confident: <strong>${correctAndConfident}</strong></li>
+                    <li>Correct but Unsure: <strong>${correctButUnsure}</strong></li>
+                    <li>Incorrect & Confident: <strong>${incorrectAndConfident}</strong></li>
+                    <li>Incorrect but Unsure: <strong>${incorrectButUnsure}</strong></li>
+                </ul>
+            </div>`;
+    }
+
+    function generateStudyFocus() {
+        const topicCounts = {};
+        finalQuizData.forEach((qData, index) => {
+            if (!checkAnswerCorrectness(qData, userAnswers[index])) {
+                const topic = qData.section || "General";
+                topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+            }
+        });
+        const sortedTopics = Object.entries(topicCounts).sort((a, b) => b[1] - a[1]);
+        let focusHTML = '<div id="study-focus"><h3>Personalized Study Focus</h3>';
+        if (sortedTopics.length > 0) {
+            focusHTML += '<p>Based on your performance, focus your review on these topics:</p><ul>';
+            sortedTopics.forEach(topic => { focusHTML += `<li><strong>${topic[0]}</strong> (${topic[1]} item${topic[1] > 1 ? 's' : ''} missed)</li>`; });
+            focusHTML += '</ul>';
+        } else {
+            focusHTML += '<p>Excellent work! No specific weak areas were identified.</p>';
+        }
+        focusHTML += '</div>';
+        return focusHTML;
+    }
+
+    function triggerConfetti() {
+        const numConfetti = 150;
+        for (let i = 0; i < numConfetti; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 90%, 60%)`;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 6000);
+        }
+    }
+
+    startBtn.addEventListener('click', prepareAndStartQuiz);
+    quizForm.addEventListener('submit', e => { 
+        e.preventDefault(); 
+        handleNavigation(); 
+    });
+</script>
+
+</body>
+</html>
