@@ -24,10 +24,8 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Modal Overlay -->
-    <!-- This overlay covers the entire page, applies a blur effect, and contains the modal. -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
-        <!-- Modal Dialog -->
+    <!-- Main Modal Overlay (TOS Agreement) -->
+    <div id="tos-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-lg mx-4 sm:mx-auto transition-all duration-300 transform scale-100">
             <div class="text-center">
                 <img src="https://placehold.co/100x100/cyan/white?text=RN" alt="AlliedRNPrep Logo" class="mx-auto mb-4 rounded-full shadow-lg">
@@ -87,6 +85,11 @@
                     </h2>
                     <!-- Class Materials content will be dynamically added here -->
                     <div class="space-y-4">
+                        <p class="text-gray-600">Click the button below to view all the materials for this class.</p>
+                        <!-- Updated button to a link for class content -->
+                        <a href="iansclassintronursingexampractice.html" target="_blank" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600">
+                            <i class="fas fa-file-alt mr-2"></i>Intro to Nursing practice test one
+                        </a>
                     </div>
                 </div>
             </main>
@@ -120,16 +123,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tosCheckbox = document.getElementById('tos-checkbox');
             const continueBtn = document.getElementById('continue-btn');
-            const modalOverlay = document.getElementById('modal-overlay');
+            const tosModalOverlay = document.getElementById('tos-modal-overlay');
 
             // Toggle the button's disabled state based on checkbox status
             tosCheckbox.addEventListener('change', () => {
                 continueBtn.disabled = !tosCheckbox.checked;
             });
 
-            // Hide the modal when the continue button is clicked
+            // Hide the TOS modal when the continue button is clicked
             continueBtn.addEventListener('click', () => {
-                modalOverlay.classList.add('hidden');
+                tosModalOverlay.classList.add('hidden');
             });
         });
     </script>
