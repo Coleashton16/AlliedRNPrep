@@ -47,7 +47,7 @@
         const mockAuth = {
             onAuthStateChanged: (callback) => {
                 setTimeout(() => callback({ uid: 'standalone-renal-user-v2' }), 100);
-                return () => {}; 
+                return () => {};
             },
             signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-renal-user-v2' } }),
         };
@@ -317,19 +317,41 @@
                             <li><strong>Prevention:</strong> Strict sterile technique during all exchanges is paramount.</li>
                         </ul>
                         <strong>Other Complications:</strong> Abdominal pain, hernias, and hyperglycemia from the dextrose in the dialysate. `},
-                    { id: 'kidney-transplant-care', title: 'Kidney Transplant', type: 'text', content: `Kidney transplantation is the treatment of choice for ESRD. It offers the best chance for a normal lifestyle.<br><br>
-                        <strong>Postoperative Care Priorities:</strong>
+                    { id: 'kidney-transplant-basics', title: 'Kidney Transplant: The Journey', type: 'text', content: `Kidney transplantation is the treatment of choice for end-stage renal disease. It significantly improves quality of life and life expectancy. The new kidney is typically placed in the lower abdomen and the old, diseased kidneys are left in place unless they are causing complications.
+                        <br><br>
+                        <strong>Donor Types:</strong>
                         <ul>
-                            <li><strong>Fluid & Electrolyte Balance:</strong> The new kidney can produce large volumes of urine immediately. Monitor urine output hourly and replace fluids as ordered to prevent dehydration.</li>
-                            <li><strong>Immunosuppression:</strong> The patient must take a lifelong regimen of immunosuppressant drugs (e.g., tacrolimus, corticosteroids) to prevent organ rejection. This increases the risk of infection and cancer.</li>
-                            <li><strong>Monitoring for Rejection:</strong>
+                            <li><strong>Living Donors:</strong> Offer the best long-term outcomes, as the kidney has a shorter cold ischemia time. They can be living related (e.g., family) or living unrelated (e.g., spouse, friend, altruistic donor).</li>
+                            <li><strong>Deceased Donors:</strong> Kidneys are retrieved from brain-dead donors. The organ's journey from procurement to implant is time-sensitive.</li>
+                        </ul>
+                        <strong>Pre-transplant Evaluation:</strong> A rigorous process to ensure the recipient is healthy enough for surgery and to minimize the risk of rejection. Includes tissue typing (HLA), cross-matching, and a full medical and psychosocial evaluation.
+                        
+
+[Image of a diagram of a kidney transplant]
+`},
+                    { id: 'immunosuppression', title: 'Immunosuppression: The Cornerstone of Care', type: 'text', content: `To prevent the recipient's immune system from attacking the new organ, patients must take a lifelong regimen of immunosuppressant drugs. This is a critical component of post-transplant nursing care, as it balances preventing rejection with the risk of infection and side effects.
+                        <br><br>
+                        <strong>Key Drug Classes:</strong>
+                        <ul>
+                            <li><strong>Calcineurin Inhibitors (e.g., Tacrolimus, Cyclosporine):</strong> The backbone of immunosuppression. They prevent T-cell activation. A major nursing implication is the need for therapeutic drug monitoring to ensure levels are within a narrow window. Side effects include nephrotoxicity, hypertension, and neurotoxicity.</li>
+                            <li><strong>Antimetabolites (e.g., Mycophenolate Mofetil, Azathioprine):</strong> Interfere with DNA synthesis, inhibiting lymphocyte proliferation. Side effects include leukopenia, thrombocytopenia, and GI disturbances.</li>
+                            <li><strong>Corticosteroids (e.g., Prednisone):</strong> Used to prevent acute rejection. Long-term use is associated with many side effects, including hyperglycemia, hypertension, osteoporosis, and increased risk of infection.</li>
+                        </ul>
+                        <strong>Nursing Management:</strong> Education is paramount. Patients must understand the importance of taking medication exactly as prescribed, reporting side effects, and protecting themselves from infection (e.g., hand hygiene, avoiding sick people).`},
+                    { id: 'organ-rejection', title: 'Understanding Organ Rejection', type: 'text', content: `You asked about "host vs. graft disease," which is the term for a complication of bone marrow transplant. For a solid organ transplant like a kidney, the correct term is <strong>organ rejection</strong>. Rejection occurs when the recipient's immune system recognizes the new organ as "foreign" and attacks it. This is why immunosuppressants are so vital.
+                        <br><br>
+                        <strong>Types of Organ Rejection:</strong>
+                        <ul>
+                            <li><strong>Hyperacute Rejection:</strong> Occurs within minutes to hours of transplantation. It is a Type II hypersensitivity reaction caused by pre-existing antibodies in the recipient's blood that immediately attack the donor kidney. This is a surgical emergency, and the kidney must be removed. It is very rare today due to meticulous cross-matching.</li>
+                            <li><strong>Acute Rejection:</strong> Occurs in the first 6 months but can happen at any time. It is primarily a cell-mediated response where T-lymphocytes activate and destroy the graft.
                                 <ul>
-                                    <li><strong>Hyperacute:</strong> Occurs within minutes to hours. Caused by pre-existing antibodies. The kidney must be removed.</li>
-                                    <li><strong>Acute:</strong> Occurs in the first 6 months. Signs include fever, graft site tenderness, decreased urine output, and a rising creatinine. Usually reversible with increased immunosuppression.</li>
-                                    <li><strong>Chronic:</strong> Occurs over months to years. Gradual decline in kidney function. Irreversible.</li>
+                                    <li><strong>Clinical Signs:</strong> Fever, graft site tenderness or pain, decreased urine output, and a rising serum creatinine.</li>
+                                    <li><strong>Nursing Implications:</strong> Promptly report signs of rejection. It is often reversible with a "pulse" of high-dose corticosteroids or other immunosuppressants.</li>
                                 </ul>
                             </li>
-                        </ul>`},
+                            <li><strong>Chronic Rejection:</strong> A slow, progressive rejection that occurs over months to years. The exact mechanism is not fully understood but involves both cellular and humoral immunity. It leads to fibrosis and scarring of the kidney vessels, resulting in a gradual decline in kidney function. It is irreversible and will eventually lead to graft failure.</li>
+                        </ul>
+                        <strong>Nursing Care for Rejection:</strong> Close monitoring of labs (BUN, creatinine, GFR), vital signs (especially BP and temperature), and physical signs (graft tenderness). Educating the patient on signs and symptoms is a primary responsibility. `},
                     { id: 'renal-therapies-quiz', title: 'Renal Therapies Quiz', type: 'quiz',
                         questions: [
                             { question: "When assessing a patient's AV fistula, the nurse cannot feel a thrill. What is the nurse's priority action?", options: ["Document the finding and re-assess in one hour.", "Notify the nephrologist or dialysis unit immediately.", "Instruct the patient to squeeze a rubber ball to strengthen the fistula.", "Take the blood pressure on the fistula arm to check for perfusion."], correctAnswer: "Notify the nephrologist or dialysis unit immediately." },
@@ -409,7 +431,7 @@
 
 
             const handleOptionSelect = (option) => {
-                if (feedback && !isPreAssessment) return; 
+                if (feedback && !isPreAssessment) return;
 
                 if (Array.isArray(currentQuestion.correctAnswer)) {
                     setSelectedOption(prevSelected => {
@@ -493,9 +515,9 @@
                     <div className="mt-4 text-center">
                         {!feedback || isPreAssessment ? (
                              <button
-                                onClick={handleSubmit}
-                                disabled={selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)}
-                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                 onClick={handleSubmit}
+                                 disabled={selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)}
+                                 className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 {isPreAssessment ? (currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment') : 'Submit Answer'}
                             </button>
@@ -511,7 +533,7 @@
                 </div>
             );
         };
-       
+        
         const PreAssessmentQuiz = ({ onComplete, onExit }) => {
             const [results, setResults] = useState(null);
 
@@ -633,7 +655,7 @@
                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
                                     Reset Progress
-                                   </button>
+                                    </button>
                            </div>
                             <div className="w-full bg-gray-200 rounded-full h-4">
                                 <div
@@ -642,11 +664,11 @@
                                 ></div>
                             </div>
                              <div className="flex justify-between items-center">
-                                <p className="text-left text-sm text-gray-600 mt-2">
-                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
-                                </p>
-                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
-                            </div>
+                                 <p className="text-left text-sm text-gray-600 mt-2">
+                                     {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+                                 </p>
+                                 <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
+                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -769,7 +791,7 @@
         const StaticContentStep = ({ step, onComplete }) => {
             useEffect(() => {
                 onComplete();
-            }, [onComplete]); 
+            }, [onComplete]);
 
             return (
                 <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50 rounded-lg shadow-inner space-y-4" dangerouslySetInnerHTML={{ __html: step.content }}>
@@ -1071,4 +1093,3 @@
     </script>
 </body>
 </html>
-
