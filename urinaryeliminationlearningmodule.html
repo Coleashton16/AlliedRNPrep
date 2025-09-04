@@ -29,6 +29,8 @@
             },
         };
     </script>
+    <!-- Add prose plugin for better typography on content pages -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -45,75 +47,84 @@
 
         // --- Mock Authentication Setup for Standalone Demo ---
         // This mock object simulates basic user authentication to allow progress tracking via localStorage.
-        // In a real application, this would be replaced with actual Firebase authentication.
         const mockAuth = {
             onAuthStateChanged: (callback) => {
-                // Simulate an asynchronous authentication check, providing a unique user ID.
-                setTimeout(() => callback({ uid: 'standalone-elimination-user' }), 100);
-                return () => {}; // Returns an empty function as a cleanup/unsubscribe placeholder.
+                setTimeout(() => callback({ uid: 'medsurg2-renal-student' }), 100);
+                return () => {}; 
             },
-            signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-elimination-user' } }), // Mock anonymous sign-in.
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'medsurg2-renal-student' } }),
         };
 
-        // --- Content & Data Structure for the Learning Modules ---
+        // --- Expanded Content & Data Structure for Med-Surg II Level ---
         const contentData = {
             'elimination-concepts': {
-                title: 'Elimination Concepts: The Foundation',
+                title: 'Advanced Renal Concepts & Assessment',
                 color: 'from-blue-500 to-indigo-600',
-                description: 'Understand the fundamental concepts of urinary elimination, from basic anatomy to patient assessment.',
+                description: 'Deepen your understanding of renal physiology, comprehensive assessment, and interpreting complex diagnostic results.',
                 steps: [
-                    { id: 'module-goals', title: 'Introduction & Module Goals', type: 'text', content: `As nurses, we know that elimination is a fundamental process for life. It's the body's way of ridding itself of waste products and excess fluid. Without proper elimination, these waste products build up, creating a toxic environment that can harm every organ system in the body. This module focuses on the <strong>urinary system</strong>, the body's primary filter. <br><br>Our learning objectives for this module are to:<br><ul><li><strong>Define</strong> and describe the concept of urinary elimination.</li><li><strong>Identify</strong> risk factors for elimination problems.</li><li><strong>Recognize</strong> clinical cues and symptoms of impaired elimination.</li><li><strong>Plan, implement, and evaluate</strong> appropriate nursing and collaborative interventions.</li></ul>` },
-                    { id: 'anatomy-physiology', title: 'Anatomy & Physiology of Elimination', type: 'text', content: `To understand problems, we must first understand the normal process. The urinary system is a beautifully designed filtration and elimination pathway.<br><br>
-                    <ul>
-                        <li><strong>Urinary Elimination</strong> is the process of passing urine out of the urinary tract through the urinary sphincter and urethra.</li>
-                        <li><strong>The Kidneys</strong> are the main organs of filtration. They filter wastes and excess fluids from the blood. The core functional unit of the kidney is the <strong>nephron</strong>, a microscopic structure responsible for this filtration. The <strong>glomerulus</strong> within the nephron is a network of capillaries where blood is initially filtered. 
-
-[Image of kidney anatomy and nephron]
-</li>
-                        <li><strong>The Bladder</strong> stores the urine produced by the kidneys.</li>
-                        <li><strong>The Urethra</strong> is the tube through which urine exits the body.</li>
-                        <li><strong>Sphincters</strong> (internal and external) are muscles that control the flow of urine.</li>
-                    </ul><br>
-                    <strong>Pathophysiology: When Things Go Wrong</strong><br>
-                    Urinary elimination problems can manifest in two primary ways:
-                    <ul>
-                        <li><strong>Urinary Incontinence:</strong> The involuntary release of urine.</li>
-                        <li><strong>Urinary Retention:</strong> The inability to fully empty the bladder, which can lead to overflow incontinence and kidney damage.</li>
-                    </ul>` },
-                    { id: 'risk-factors-assessment', title: 'Risk Factors & Nursing Assessment', type: 'text', content: `Noticing a problem is the first step in the nursing process. This requires a sharp eye for both subjective and objective cues.<br><br>
-                    <strong>Risk Factors:</strong><br>
-                    While all individuals are at risk, certain populations are more vulnerable.
-                    <ul>
-                        <li><strong>Children:</strong> Still developing bladder control.</li>
-                        <li><strong>Pregnant Women:</strong> Increased pressure on the bladder from the growing fetus.</li>
-                        <li><strong>Older Adults:</strong> Normal aging leads to decreased kidney function, reduced bladder capacity, and weakened sphincter muscles. Men are particularly at risk due to a common age-related condition called <strong>Benign Prostatic Hyperplasia (BPH)</strong>, which can obstruct urine flow.</li>
-                    </ul><br>
-                    <strong>Assessment: Subjective & Objective Cues:</strong><br>
-                    A comprehensive nursing assessment is key.<br>
-                    <strong>Subjective Assessment (What the patient tells you):</strong>
-                    <ul>
-                        <li><strong>Intake & Output (I&O):</strong> Ask about their fluid intake and how often they urinate.</li>
-                        <li><strong>Nutritional Habits:</strong> Diet impacts fluid balance and waste production.</li>
-                        <li><strong>Symptoms:</strong> Are they experiencing pain or burning with urination (dysuria)? Is there an urgency or frequency? Do they feel like they can't empty their bladder completely?</li>
-                        <li><strong>Knowledge & Coping:</strong> How does this problem affect their daily life and emotional well-being?</li>
-                    </ul>
-                    <strong>Objective Assessment (What you observe):</strong>
-                    <ul>
-                        <li><strong>Fluid Status:</strong> Assess for signs of fluid overload or dehydration, such as weight changes, skin turgor, edema, and vital signs.</li>
-                        <li><strong>Urinary Output:</strong> Measure and document hourly urine output. Normal urine output is generally 30 mL/hr or more.</li>
-                        <li><strong>Physical Exam:</strong> Check for flank pain, costovertebral angle tenderness (CVA tenderness), and bladder distention. </li>
-                    </ul>`},
-                    { id: 'diagnostic-tests', title: 'Diagnostic Tests and Their Meaning', type: 'text', content: `When a urinary or renal problem is suspected, a variety of diagnostic tools are used to pinpoint the cause.<br><br>
-                    <ul>
-                        <li><strong>Lab Tests:</strong> The most important lab values for kidney function are <strong>creatinine</strong> and <strong>blood urea nitrogen (BUN)</strong>. Both are waste products that build up when kidneys aren't filtering properly. <strong>Glomerular Filtration Rate (GFR)</strong> is a key measure of kidney function. A normal GFR is typically 60 or higher.  Other tests include urinalysis, urine culture, and a 24-hour urine collection.</li>
-                        <li><strong>Imaging:</strong> X-rays, CT scans, MRIs, and ultrasounds can visualize the urinary tract and kidneys. They are crucial for identifying blockages or structural abnormalities.</li>
-                        <li><strong>Direct Observation:</strong> Procedures like **cystoscopy** allow direct visualization of the bladder and urethra. </li>
-                    </ul>` },
-                    { id: 'elimination-concepts-quiz', title: 'Elimination Concepts Check-up', type: 'quiz',
+                    { id: 'module-goals', title: 'Introduction & Advanced Goals', type: 'text', content: `Welcome to the advanced module on renal function and urinary elimination. This content is tailored for the Med-Surg II level, focusing on the critical thinking required for complex patient scenarios. Our goal is to move beyond basic definitions and into deep application.<br><br><strong>Our learning objectives are to:</strong><ul><li><strong>Analyze</strong> the integrated functions of the renal system, including hormonal and metabolic roles (RAAS, Erythropoietin, Vitamin D).</li><li><strong>Synthesize</strong> assessment data to differentiate between various renal pathologies.</li><li><strong>Interpret</strong> complex lab values (e.g., BUN/creatinine ratio, urinalysis with micro) to guide nursing care.</li><li><strong>Prioritize</strong> nursing interventions for patients with acute and chronic renal disorders.</li></ul>` },
+                    { id: 'anatomy-physiology', title: 'Renal Anatomy & Physiology Revisited', type: 'text', content: `Beyond simple filtration, the kidneys are a powerhouse of regulation.<br><br>
+                        <strong>Key Structures:</strong><ul>
+                            <li><strong>Nephron:</strong> The functional unit. Includes the <strong>glomerulus</strong> (for filtration), Bowman's capsule, and a series of tubules for reabsorption and secretion.</li>
+                            <li><strong>Juxtaglomerular Apparatus (JGA):</strong> A key structure located near the glomerulus that is critical for blood pressure regulation.</li>
+                        </ul><br>
+                        <strong>Core Kidney Functions:</strong><br>
+                        <ul>
+                            <li><strong>Filtration:</strong> Removal of metabolic wastes (urea, creatinine, uric acid) and excess electrolytes from the blood to form urine. The <strong>Glomerular Filtration Rate (GFR)</strong> is the best measure of this function.</li>
+                            <li><strong>Hormonal Function:</strong>
+                                <ul>
+                                    <li><strong>Renin Production:</strong> The JGA secretes renin in response to low blood pressure, initiating the <strong>Renin-Angiotensin-Aldosterone System (RAAS)</strong> to increase BP. This is a primary target for many antihypertensive medications.</li>
+                                    <li><strong>Erythropoietin (EPO) Production:</strong> Stimulates the bone marrow to produce red blood cells. This is why patients with CKD suffer from chronic anemia.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Metabolic Function:</strong>
+                                <ul>
+                                    <li><strong>Vitamin D Activation:</strong> Converts inactive Vitamin D to its active form, which is essential for calcium absorption. Failure of this process leads to renal osteodystrophy in CKD.</li>
+                                    <li><strong>Acid-Base Balance:</strong> The kidneys are the primary long-term regulators of blood pH, reabsorbing bicarbonate and excreting hydrogen ions. In renal failure, this leads to <strong>metabolic acidosis</strong>.</li>
+                                </ul>
+                            </li>
+                        </ul>` },
+                    { id: 'risk-factors-assessment', title: 'Comprehensive Nursing Assessment', type: 'text', content: `A Med-Surg level assessment requires connecting patient history with subtle clinical cues.<br><br>
+                        <strong>Key Risk Factors:</strong><ul>
+                            <li><strong>Co-morbidities:</strong> Uncontrolled <strong>Diabetes Mellitus</strong> and <strong>Hypertension</strong> are the #1 and #2 causes of CKD.</li>
+                            <li><strong>Nephrotoxic Exposure:</strong> History of using drugs like NSAIDs, aminoglycosides (gentamicin), vancomycin, and exposure to IV contrast dye.</li>
+                            <li><strong>Autoimmune Diseases:</strong> Lupus (SLE) can cause glomerulonephritis.</li>
+                            <li><strong>Obstructions:</strong> BPH, kidney stones (urolithiasis), tumors.</li>
+                        </ul><br>
+                        <strong>Focused Subjective Assessment:</strong><ul>
+                            <li>Ask about changes in urine: color (hematuria), clarity (infection), odor, and pattern (nocturia).</li>
+                            <li>Inquire about fatigue, itching (pruritus), and muscle cramping, which are subtle signs of uremia and electrolyte imbalance.</li>
+                        </ul>
+                        <strong>Advanced Objective Assessment:</strong><ul>
+                            <li><strong>Fluid Status:</strong> Daily weights are the most sensitive indicator of fluid balance (1 kg weight gain = 1 L fluid retention). Auscultate for crackles in the lungs, assess for JVD, and check for peripheral or sacral edema.</li>
+                            <li><strong>Physical Exam:</strong> Assess for flank pain. Percuss the costovertebral angle (CVA) for tenderness, a classic sign of kidney inflammation (pyelonephritis).</li>
+                             <li><strong>Uremic Signs:</strong> In advanced disease, assess for confusion (uremic encephalopathy), metallic taste in mouth, and uremic frost (a rare, late sign of crystallized urea on the skin).</li>
+                        </ul>`},
+                    { id: 'diagnostic-tests', title: 'Interpreting Diagnostic Data', type: 'text', content: `Understanding labs is key to anticipating problems.<br><br>
+                        <strong>Key Serum Labs:</strong>
+                        <ul>
+                            <li><strong>Creatinine (Cr):</strong> (Normal: 0.6-1.2 mg/dL). Waste product of muscle metabolism. It is the most reliable indicator of kidney function because it is only excreted by the kidneys.</li>
+                            <li><strong>Blood Urea Nitrogen (BUN):</strong> (Normal: 10-20 mg/dL). Waste product of protein metabolism. Can be influenced by dehydration, high protein diet, or GI bleeding, making it less specific than creatinine.</li>
+                            <li><strong>BUN:Creatinine Ratio:</strong> (Normal: 10:1 to 20:1). A high ratio (>20:1) with normal creatinine suggests a non-renal cause, like dehydration (prerenal AKI). A normal ratio with high BUN and Cr suggests intrinsic kidney damage.</li>
+                             <li><strong>Glomerular Filtration Rate (GFR):</strong> Calculated from creatinine, age, sex, and race. <strong>Normal >90 mL/min. GFR < 60 mL/min indicates CKD. GFR < 15 mL/min is End-Stage Renal Disease (ESRD).</strong></li>
+                        </ul>
+                        <strong>Urinalysis (UA):</strong>
+                        <ul>
+                            <li><strong>Specific Gravity:</strong> (Normal: 1.010-1.030). Measures urine concentration. Fixed at 1.010 in severe kidney disease indicates inability to concentrate or dilute urine.</li>
+                            <li><strong>Protein:</strong> Abnormal finding; indicates glomerular damage.</li>
+                            <li><strong>Nitrites & Leukocyte Esterase:</strong> Signs of a Urinary Tract Infection (UTI).</li>
+                        </ul>
+                        <strong>Imaging & Procedures:</strong>
+                        <ul>
+                           <li><strong>Renal Ultrasound:</strong> Used to identify obstructions like stones or hydronephrosis (swelling of a kidney due to urine build-up).</li>
+                           <li><strong>CT Scan/MRI:</strong> Provide detailed images of kidneys and urinary tract. Use of contrast dye requires caution in patients with renal impairment.</li>
+                           <li><strong>Renal Biopsy:</strong> Invasive procedure to obtain a tissue sample to determine the specific cause of intrarenal disease. Post-procedure, the nurse's priority is to monitor for bleeding (vitals, flank pain, hematuria).</li>
+                        </ul>` },
+                    { id: 'elimination-concepts-quiz', title: 'Advanced Concepts Check-up', type: 'quiz',
                         questions: [
-                            { question: "Which of the following is the primary functional unit of the kidney responsible for filtration?", options: ["Bladder", "Glomerulus", "Ureter", "Urethra"], correctAnswer: "Glomerulus" },
-                            { question: "A GFR of 50 would indicate which of the following?", options: ["Normal kidney function", "Kidney failure", "Mild loss of kidney function", "Severe loss of kidney function"], correctAnswer: "Mild loss of kidney function" },
-                            { question: "Which of these populations is at the highest risk for elimination problems related to Benign Prostatic Hyperplasia (BPH)?", options: ["Children", "Pregnant women", "Older adults", "Athletes"], correctAnswer: "Older adults" },
+                            { question: "A patient's labs show a BUN of 45 mg/dL and a Creatinine of 1.1 mg/dL. The nurse interprets this BUN:Cr ratio as most likely indicating which condition?", options: ["Intrinsic kidney damage", "Postrenal obstruction", "Severe dehydration", "Chronic kidney disease"], correctAnswer: "Severe dehydration" },
+                            { question: "A patient with CKD is anemic. The nurse understands this is primarily caused by a deficiency of which hormone?", options: ["Renin", "Aldosterone", "Erythropoietin", "Calcitriol (Active Vitamin D)"], correctAnswer: "Erythropoietin" },
+                            { question: "Following a renal biopsy, which assessment finding is the highest priority for the nurse to report to the provider?", options: ["Pink-tinged urine", "Biopsy site tenderness rated 3/10", "Blood pressure drop from 140/80 to 95/50 mmHg", "Patient request for pain medication"], correctAnswer: "Blood pressure drop from 140/80 to 95/50 mmHg" },
                         ]
                     },
                 ]
@@ -121,44 +132,76 @@
             'acute-kidney-injury': {
                 title: 'Acute Kidney Injury (AKI)',
                 color: 'from-orange-500 to-red-400',
-                description: 'Learn about the sudden onset of kidney failure, its causes, phases, and key nursing priorities.',
+                description: 'Master the causes, phases, and high-priority nursing management of this sudden and life-threatening condition.',
                 steps: [
-                    { id: 'aki-etiology', title: 'AKI: Etiology & Pathophysiology', type: 'text', content: `Acute Kidney Injury (AKI) is a sudden episode of kidney failure or kidney damage that happens within a few hours or a few days. It causes a rapid buildup of waste products and fluid. It is a life-threatening emergency that can affect other organs.<br><br>
-                    AKI is categorized by where the problem originates. 
-                    <ol>
-                        <li><strong>Prerenal (Before the Kidneys):</strong> Caused by reduced blood flow to the kidneys (hypoperfusion). The kidney itself is not damaged. The most common causes are severe dehydration, shock, or a sudden drop in blood pressure.</li>
-                        <li><strong>Intrarenal (Within the Kidneys):</strong> Caused by direct damage to the kidney tissue. This can be due to **nephrotoxic** substances (e.g., certain antibiotics, contrast dye) or a condition like glomerulonephritis.</li>
-                        <li><strong>Postrenal (After the Kidneys):</strong> Caused by an obstruction of urine outflow from the kidneys. The most common causes are kidney stones, bladder cancer, or an enlarged prostate (BPH).</li>
-                    </ol>` },
-                    { id: 'phases-of-aki', title: 'Phases of Acute Kidney Injury', type: 'text', content: `AKI progresses through distinct phases that have different nursing priorities.<br><br>
-                    <ul>
-                        <li><strong>Initiation Phase:</strong> The period from the initial kidney injury until the first signs of renal impairment appear.</li>
-                        <li><strong>Oliguric Phase:</strong> Urine output drops significantly to less than 400 mL/day. Waste products like BUN and creatinine, and electrolytes like potassium, phosphorus, and magnesium, build up in the blood. This phase can last for weeks and may require dialysis.</li>
-                        <li><strong>Diuretic Phase:</strong> The kidneys start to recover, and urine output increases, sometimes to 3-5 L/day. The patient is at high risk for dehydration and electrolyte imbalances.</li>
-                        <li><strong>Recovery Phase:</strong> Kidney function gradually returns to normal over several weeks to months. Increasing urine output, decreasing BUN/Cr, Potassium, Phosphorus, and Magnesium, increased GFR.</li>
-                    </ul>` },
-                    { id: 'aki-nursing-care', title: 'AKI: Nursing Assessment & Management', type: 'text', content: `Nursing care for AKI is focused on early recognition and supportive measures.<br><br>
-                    <strong>Health Promotion:</strong>
-                    <ul>
-                        <li>Teach healthy adults to drink 2 to 3 L of water daily.</li>
-                        <li>Avoid exposure to nephrotoxic drugs when possible.</li>
-                    </ul><br>
-                    <strong>Assessment Cues (RECOGNIZE):</strong>
-                    <ul>
-                        <li><strong>History:</strong> Recent surgery, trauma, or a drug history that includes potentially nephrotoxic substances.</li>
-                        <li><strong>Physical Assessment:</strong> Monitor hourly urine output. Assess for signs of fluid volume deficit (hypoperfusion) or excess. Evaluate vital signs for hypotension or hypoxemia.</li>
-                        <li><strong>Lab Cues:</strong> Anticipate elevated creatinine, BUN, and abnormal electrolyte values.</li>
-                    </ul><br>
-                    <strong>Interventions (PLAN):</strong>
-                    <ul>
-                        <li><strong>Diuretics:</strong> May be used to increase urine output and manage fluid balance in the early stages, but they do not preserve kidney function.</li>
-                        <li><strong>Remove the Cause:</strong> For intrarenal injury caused by nephrotoxic agents, discontinuing the medication is the first step. For postrenal obstruction, surgical or procedural interventions are often necessary.</li>
-                    </ul>`},
-                     { id: 'aki-quiz', title: 'Acute Kidney Injury Quiz', type: 'quiz',
+                    { id: 'aki-etiology', title: 'AKI: Etiology & Pathophysiology', type: 'text', content: `Acute Kidney Injury (AKI) is a rapid decline in renal function, leading to a buildup of waste products and fluid/electrolyte imbalances. It is often reversible if diagnosed and treated early.<br><br>
+                        <strong>AKI Categories:</strong>
+                        <ol>
+                            <li><strong>Prerenal (Perfusion Reduction):</strong> The most common cause. Problem is *before* the kidneys. Caused by any condition that reduces blood flow to the kidneys. Examples:
+                                <ul>
+                                    <li><strong>Hypovolemia:</strong> Hemorrhage, dehydration, burns.</li>
+                                    <li><strong>Decreased Cardiac Output:</strong> Heart failure, cardiogenic shock.</li>
+                                    <li><strong>Systemic Vasodilation:</strong> Sepsis, anaphylaxis.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Intrarenal (Kidney Damage):</strong> Problem is *within* the kidneys. Caused by direct damage to the kidney tissue (glomeruli or tubules). Examples:
+                                <ul>
+                                    <li><strong>Acute Tubular Necrosis (ATN):</strong> Most common intrarenal cause. From prolonged ischemia (untreated prerenal issue) or exposure to <strong>nephrotoxins</strong> (IV contrast dye, aminoglycosides, NSAIDs).</li>
+                                    <li><strong>Glomerulonephritis:</strong> Inflammation of the glomeruli, often following a streptococcal infection.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Postrenal (Urine Outflow Obstruction):</strong> Least common cause. Problem is *after* the kidneys. Caused by a mechanical obstruction of urine outflow. Examples:
+                                <ul>
+                                    <li>Benign Prostatic Hyperplasia (BPH)</li>
+                                    <li>Kidney stones (Urolithiasis)</li>
+                                    <li>Tumors, strictures.</li>
+                                </ul>
+                            </li>
+                        </ol>` },
+                    { id: 'phases-of-aki', title: 'Phases of Acute Kidney Injury', type: 'text', content: `Understanding the phases of AKI helps the nurse anticipate patient needs.<br><br>
+                        <ul>
+                            <li><strong>1. Onset/Initiation Phase:</strong> Begins with the precipitating event and continues until signs and symptoms appear. Early intervention here can prevent progression.</li>
+                            <li><strong>2. Oliguric Phase:</strong> Characterized by <strong>urine output < 400 mL/day</strong>. Lasts 1-2 weeks.
+                                <ul>
+                                    <li><strong>Key Problems:</strong> Fluid volume excess (JVD, edema, HTN, pulmonary crackles), metabolic acidosis, <strong>hyperkalemia</strong>, hyponatremia, waste product accumulation (elevated BUN/Cr).</li>
+                                    <li><strong>Nursing Priority:</strong> Monitor for life-threatening hyperkalemia (cardiac monitoring), restrict fluids, prepare for potential dialysis.</li>
+                                </ul>
+                            </li>
+                            <li><strong>3. Diuretic Phase:</strong> Kidneys begin to recover, but cannot concentrate urine yet. Urine output increases dramatically (can be 3-5 L/day). Lasts 1-3 weeks.
+                                <ul>
+                                    <li><strong>Key Problems:</strong> Massive fluid and electrolyte loss, leading to <strong>hypovolemia, hypotension, and hypokalemia</strong>.</li>
+                                     <li><strong>Nursing Priority:</strong> Strict I&O, monitor for dehydration, administer IV fluids, and provide electrolyte supplements as ordered.</li>
+                                </ul>
+                            </li>
+                            <li><strong>4. Recovery Phase:</strong> GFR begins to increase, and BUN/Cr levels start to normalize. Can take up to a year. Some patients may progress to CKD.</li>
+                        </ul>` },
+                    { id: 'aki-nursing-care', title: 'AKI: Nursing Management & CRRT', type: 'text', content: `Nursing care is focused on treating the underlying cause and managing life-threatening complications.<br><br>
+                        <strong>Health Promotion & Prevention:</strong>
+                        <ul>
+                            <li>Ensure adequate hydration for at-risk patients, especially before and after procedures with contrast dye.</li>
+                            <li>Monitor peak/trough levels for nephrotoxic drugs like vancomycin and gentamicin.</li>
+                            <li>Identify and manage sepsis and hypotension promptly.</li>
+                        </ul><br>
+                        <strong>Priority Interventions:</strong>
+                        <ul>
+                             <li><strong>Fluid Management:</strong> For prerenal AKI, a fluid challenge may be given. For oliguric phase, fluid restriction is crucial (often calculated as previous 24h output + 600 mL for insensible loss).</li>
+                            <li><strong>Managing Hyperkalemia:</strong> This is an emergency!
+                                <ul>
+                                    <li><strong>IV Insulin & D50:</strong> Shifts K+ into cells (temporary).</li>
+                                    <li><strong>Sodium Polystyrene Sulfonate (Kayexalate):</strong> Binds K+ in the gut for excretion. Not for emergencies.</li>
+                                    <li><strong>IV Calcium Gluconate:</strong> Protects the heart from dysrhythmias but does not lower K+ levels.</li>
+                                    <li><strong>Dialysis:</strong> The most definitive treatment.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Nutritional Therapy:</strong> Provide adequate protein to prevent catabolism but may be restricted. Potassium and sodium are restricted.</li>
+                        </ul><br>
+                        <strong>Continuous Renal Replacement Therapy (CRRT):</strong>
+                        <p>CRRT is a form of dialysis used for hemodynamically unstable AKI patients, typically in the ICU. It removes fluid and solutes slowly and continuously over 24 hours, avoiding the rapid fluid shifts and hypotension associated with traditional hemodialysis.</p>`},
+                       { id: 'aki-quiz', title: 'Acute Kidney Injury Quiz', type: 'quiz',
                         questions: [
-                            { question: "A patient with severe dehydration and hypovolemic shock is at high risk for which type of AKI?", options: ["Prerenal", "Intrarenal", "Postrenal", "Intrinsic"], correctAnswer: "Prerenal" },
-                            { question: "The oliguric phase of AKI is characterized by a urine output of less than:", options: ["1000 mL/day", "400 mL/day", "2 L/day", "30 mL/hr"], correctAnswer: "400 mL/day" },
-                            { question: "Which is a priority nursing intervention for a patient with a postrenal AKI caused by a prostate obstruction?", options: ["Administering diuretics to increase urine output.", "Preparing for surgical intervention to remove the obstruction.", "Administering IV fluids to increase GFR.", "Restricting fluid intake to prevent overload."], correctAnswer: "Preparing for surgical intervention to remove the obstruction." },
+                            { question: "A patient develops AKI after receiving IV contrast for a CT scan. The nurse correctly identifies this as which type of AKI?", options: ["Prerenal", "Intrarenal", "Postrenal", "Functional"], correctAnswer: "Intrarenal" },
+                            { question: "During the diuretic phase of AKI, the nurse should prioritize assessment for which complications? (Select All That Apply)", options: ["Hyperkalemia", "Hypovolemia", "Hypertension", "Hypotension", "Fluid overload"], correctAnswer: ["Hypovolemia", "Hypotension"] },
+                            { question: "Which order should the nurse question for a patient in the oliguric phase of AKI with a potassium level of 6.5 mEq/L?", options: ["Administer IV Furosemide 40 mg", "Prepare patient for hemodialysis", "Administer Spironolactone 25 mg PO", "Place patient on continuous cardiac monitoring"], correctAnswer: "Administer Spironolactone 25 mg PO" },
                         ]
                     },
                 ]
@@ -166,176 +209,215 @@
             'chronic-kidney-disease': {
                 title: 'Chronic Kidney Disease (CKD)',
                 color: 'from-purple-600 to-pink-500',
-                description: 'Explore the progressive decline of kidney function, its causes, and effects on the body.',
+                description: 'Understand the progressive nature of CKD, its systemic effects, and long-term management strategies.',
                 steps: [
-                    { id: 'ckd-pathophysiology', title: 'CKD: Pathophysiology and Risk Factors', type: 'text', content: `Chronic kidney disease (CKD), also called chronic kidney failure, involves a gradual and irreversible loss of kidney function. Kidneys filter wastes and excess fluids from the blood, which are then removed in urine. Advanced CKD can cause dangerous levels of fluid, electrolytes, and wastes to build up in the body.<br><br>
-                    The two leading causes of CKD are <strong>diabetes</strong> and **hypertension**. Other risk factors include obesity, heart problems, family history, and tobacco use. `},
-                    { id: 'stages-of-ckd', title: 'Stages of CKD & Multisystem Effects', type: 'text', content: `CKD is categorized into five stages based on the patient's GFR. As kidney function declines, waste products build up, affecting every body system. 
-                    <br><br>
-                    <strong>Multisystem Effects of End-Stage Renal Disease (ESRD):</strong>
+                    { id: 'ckd-pathophysiology', title: 'CKD: Pathophysiology and Staging', type: 'text', content: `Chronic kidney disease (CKD) is a progressive, irreversible loss of kidney function. The two leading causes are <strong>diabetes</strong> and <strong>hypertension</strong>.<br><br>
+                    <strong>Staging of CKD (Based on GFR):</strong>
                     <ul>
-                        <li><strong>Cardiovascular:</strong> Hypertension, fluid overload, heart failure, and arrhythmias due to electrolyte imbalances.</li>
-                        <li><strong>Respiratory:</strong> Pleural effusions from fluid overload.</li>
-                        <li><strong>Neurologic:</strong> Confusion, lethargy, and seizures from toxic buildup (uremia).</li>
-                        <li><strong>Skeletal:</strong> Weak, brittle bones due to mineral and vitamin D imbalances.</li>
-                        <li><strong>Hematologic:</strong> Anemia, bleeding tendencies, and immunosuppression.</li>
-                        <li><strong>Dermatologic:</strong> Dry skin and severe itching (**pruritus**).</li>
+                        <li><strong>Stage 1:</strong> GFR >90. Kidney damage with normal or increased GFR. Asymptomatic. Focus on controlling underlying conditions (BP, glucose).</li>
+                        <li><strong>Stage 2:</strong> GFR 60-89. Mild decrease in GFR. Focus on risk reduction.</li>
+                        <li><strong>Stage 3a:</strong> GFR 45-59. Mild to moderate decrease in GFR. Complications like anemia and bone disease begin to appear.</li>
+                        <li><strong>Stage 3b:</strong> GFR 30-44. Moderate to severe decrease in GFR.</li>
+                        <li><strong>Stage 4:</strong> GFR 15-29. Severe decrease in GFR. Preparation for Renal Replacement Therapy (RRT) begins.</li>
+                        <li><strong>Stage 5:</strong> GFR <15. End-Stage Renal Disease (ESRD). RRT (dialysis or transplant) is required to sustain life.</li>
                     </ul>`},
+                    { id: 'stages-of-ckd', title: 'CKD: Multisystem Effects', type: 'text', content: `As kidney function declines, uremia develops, affecting nearly every body system.<br><br>
+                        <strong>Systemic Effects of Uremia:</strong>
+                        <ul>
+                            <li><strong>Cardiovascular:</strong> Hypertension (due to fluid overload and RAAS), heart failure, and lethal dysrhythmias (due to hyperkalemia) are the leading causes of death in CKD patients.</li>
+                            <li><strong>Hematologic:</strong> Anemia (due to decreased erythropoietin production), bleeding tendencies (impaired platelet function), and infection risk.</li>
+                            <li><strong>Respiratory:</strong> Pulmonary edema (fluid overload), Kussmaul respirations (deep, rapid breathing to compensate for metabolic acidosis), pleural effusion.</li>
+                            <li><strong>Neurologic:</strong> Lethargy, confusion, encephalopathy, peripheral neuropathy, seizures.</li>
+                            <li><strong>Skeletal (Renal Osteodystrophy):</strong> Kidneys fail to activate Vitamin D, leading to hypocalcemia. This triggers the parathyroid gland to release PTH, which pulls calcium from the bones, making them brittle. Hyperphosphatemia also contributes.</li>
+                            <li><strong>Integumentary:</strong> Pruritus (severe itching) from dry skin and calcium-phosphate deposits, uremic frost (late sign).</li>
+                            <li><strong>Metabolic:</strong> Waste product accumulation, metabolic acidosis, hyperkalemia, hyperphosphatemia, hypocalcemia.</li>
+                        </ul>`},
+                    { id: 'ckd-management', title: 'CKD: Pharmacologic & Nutritional Management', type: 'text', content: `Management focuses on preserving remaining kidney function, managing symptoms, and preventing complications.<br><br>
+                        <strong>Pharmacologic Therapy:</strong>
+                        <ul>
+                            <li><strong>Control Hyperkalemia:</strong> See AKI section. Dietary restriction is key.</li>
+                            <li><strong>Manage Hypertension:</strong> ACE Inhibitors (-pril) or ARBs (-sartan) are often used as they have a protective effect on the kidneys, but must be used with caution as they can increase potassium.</li>
+                            <li><strong>Treat Anemia:</strong> Erythropoiesis-stimulating agents (ESAs) like Epoetin alfa, and IV or oral iron supplements.</li>
+                            <li><strong>Manage Renal Osteodystrophy:</strong> 
+                                <ul>
+                                    <li><strong>Phosphate Binders:</strong> Sevelamer, Calcium Carbonate. <strong>Must be taken with meals</strong> to bind dietary phosphorus.</li>
+                                    <li><strong>Vitamin D Supplements:</strong> Calcitriol (active form).</li>
+                                </ul>
+                            </li>
+                        </ul><br>
+                        <strong>Nutritional Therapy:</strong>
+                        <ul>
+                            <li><strong>Protein:</strong> May be restricted in pre-ESRD stages to decrease waste products. Once on dialysis, protein intake is actually increased to compensate for losses during treatment.</li>
+                            <li><strong>Fluid:</strong> Usually restricted in later stages, especially for patients on hemodialysis.</li>
+                            <li><strong>Sodium & Potassium:</strong> Restricted to manage fluid balance and prevent hyperkalemia. Patients should avoid salt substitutes, which are high in potassium chloride.</li>
+                            <li><strong>Phosphorus:</strong> Restricted. Found in dairy, meat, and dark sodas.</li>
+                        </ul>`},
                     { id: 'ckd-quiz', title: 'Chronic Kidney Disease Quiz', type: 'quiz',
                         questions: [
-                            { question: "Which of the following is considered the two leading causes of chronic kidney disease?", options: ["Diabetes and obesity", "Hypertension and smoking", "Diabetes and hypertension", "High cholesterol and family history"], correctAnswer: "Diabetes and hypertension" },
-                            { question: "A patient with a GFR of 20 would be in which stage of Chronic Kidney Disease?", options: ["Stage 2", "Stage 3a", "Stage 4", "Stage 5"], correctAnswer: "Stage 4" },
-                            { question: "Multisystem effects of ESRD include which of the following?", options: ["Decreased blood pressure", "Bradycardia", "Polyuria", "Pruritus"], correctAnswer: "Pruritus" },
+                            { question: "A nurse is teaching a patient with Stage 4 CKD about their diet. Which statement by the patient indicates a need for further education?", options: ["I will use a salt substitute to lower my sodium intake.", "I need to limit my consumption of milk and cheese.", "I will avoid dark sodas like cola.", "I should monitor my fluid intake carefully."], correctAnswer: "I will use a salt substitute to lower my sodium intake." },
+                            { question: "A patient with ESRD is prescribed Sevelamer. The nurse instructs the patient to take this medication:", options: ["First thing in the morning on an empty stomach.", "With a large glass of water one hour before meals.", "With meals to bind phosphorus.", "At bedtime to prevent leg cramps."], correctAnswer: "With meals to bind phosphorus." },
+                            { question: "Which of the following are expected assessment findings in a patient with ESRD? (Select All That Apply)", options: ["Anemia", "Metabolic Alkalosis", "Hypotension", "Pruritus", "Hypercalcemia"], correctAnswer: ["Anemia", "Pruritus"] },
                         ]
                     },
                 ]
             },
             'renal-therapies': {
-                title: 'Renal Therapies & Dialysis',
+                title: 'Renal Replacement Therapies (RRT)',
                 color: 'from-teal-500 to-cyan-600',
-                description: 'Explore the different treatment options for end-stage renal disease, from dialysis to transplantation.',
+                description: 'Compare and contrast hemodialysis, peritoneal dialysis, and kidney transplantation, focusing on nursing priorities for each.',
                 steps: [
-                    { id: 'renal-replacement-intro', title: 'Renal Replacement Therapy (RRT)', type: 'text', content: `When kidney function is no longer adequate to sustain life, the patient requires Renal Replacement Therapy (RRT). The primary goal of RRT is to remove waste products and excess fluid from the blood.<br><br>
-                    There are three main types of RRT:<br>
-                    <ol>
-                        <li><strong>Hemodialysis (HD):</strong> Blood is filtered by a machine.</li>
-                        <li><strong>Peritoneal Dialysis (PD):</strong> The patient's own peritoneal membrane is used as a filter.</li>
-                        <li><strong>Kidney Transplant:</strong> A surgical procedure to replace the failed kidney with a healthy one.</li>
-                    </ol>`},
-                    { id: 'hemodialysis-basics', title: 'Hemodialysis (HD): The Machine Filter', type: 'text', content: `Hemodialysis is the most common form of dialysis. Blood is pumped into a machine called a **dialyzer** and filtered. The process relies on principles of osmosis, diffusion, and ultrafiltration.<br><br>
-                    **Access:** Hemodialysis requires a high-flow access point to the patient's bloodstream.<br>
-                    <ul>
-                        <li><strong>Arteriovenous (AV) Fistula:</strong> A surgically created connection between an artery and a vein, which takes several weeks to mature. It is the preferred long-term access. </li>
-                        <li><strong>AV Graft:</strong> A synthetic tube used to connect an artery and a vein.</li>
-                        <li><strong>HD Catheter:</strong> A temporary catheter placed in a large vein for short-term use. </li>
-                    </ul><br>
-                    **Nursing Assessment for AV Fistula/Graft:**
-                    <p>As a nurse, it is critical to assess the access site. You must:</p>
-                    <ul>
-                        <li><strong>Feel the thrill:</strong> Palpate for a buzzing vibration, which indicates blood flow.</li>
-                        <li><strong>Hear the bruit:</strong> Auscultate for a swishing sound, which also indicates blood flow.</li>
-                        <li>**Critical Safety Alert:** Never take blood pressure or draw blood from the arm with a fistula or graft! This can damage the access and lead to its failure.</li>
-                    </ul>`},
-                    { id: 'peritoneal-dialysis-basics', title: 'Peritoneal Dialysis (PD): The Internal Filter', type: 'text', content: `Peritoneal dialysis uses the patient's own peritoneal membrane as the filter. A dialysate solution is instilled into the peritoneal cavity through an implanted catheter. <br><br>
-                    **Pros and Cons of PD:**
-                    <ul>
-                        <li><strong>Pros:</strong> Can be done at home, offers more patient mobility, less stressful on the cardiovascular system.</li>
-                        <li><strong>Cons:</strong> Requires meticulous sterile technique due to a high risk of **peritonitis**, a severe infection of the abdominal cavity. It is contraindicated in patients with recent abdominal surgery or clotting problems.</li>
-                    </ul>`},
-                    { id: 'kidney-transplant-care', title: 'Kidney Transplant: Perioperative Care', type: 'text', content: `Kidney transplantation is the treatment of choice for end-stage renal disease (ESRD).<br><br>
-                    **Preoperative Care:**
-                    <ul>
-                        <li>Reduce anxiety and provide psychological support.</li>
-                        <li>Initiate immunosuppression drugs before transplantation to prevent immediate graft rejection.</li>
-                        <li>Address patient education regarding the procedure and post-operative care.</li>
-                    </ul><br>
-                    **Postoperative Care:**
-                    <ul>
-                        <li><strong>Monitor for Perfusion:</strong> Closely monitor the new kidney's function by tracking urine output and lab values.</li>
-                        <li><strong>Prevent Infection:</strong> Use strict asepsis due to the immunosuppressant regimen.</li>
-                        <li><strong>Identify Rejection:</strong> Be alert for signs of acute rejection, such as a rising serum creatinine, oliguria, and pain at the graft site.</li>
-                        <li><strong>Patient Education:</strong> Instruct the patient on signs of rejection, strict medication adherence, and daily vital sign and weight monitoring.</li>
-                    </ul>`},
+                    { id: 'hemodialysis-basics', title: 'Hemodialysis (HD)', type: 'text', content: `Hemodialysis uses a machine to filter wastes, electrolytes, and water from the blood. Treatments are typically 3-4 hours, 3 times per week.<br><br>
+                        <strong>Vascular Access:</strong>
+                        <ul>
+                            <li><strong>Arteriovenous (AV) Fistula:</strong> The gold standard. A surgical connection between an artery and a vein. Takes months to "mature" before it can be used. Has the lowest risk of infection and clotting.</li>
+                            <li><strong>AV Graft:</strong> A synthetic tube connecting an artery and vein. Used if the patient's vessels are not suitable for a fistula. Higher risk of clotting and infection.</li>
+                            <li><strong>Central Venous Catheter:</strong> For temporary, immediate access. High risk of infection and should not be used for anything other than dialysis.</li>
+                        </ul><br>
+                        <strong>Nursing Care for Fistula/Graft:</strong>
+                        <ul>
+                            <li><strong>Assessment:</strong> In every shift, <strong>palpate for a thrill</strong> (a buzzing sensation) and <strong>auscultate for a bruit</strong> (a whooshing sound). Absence of these indicates a clot and is an emergency.</li>
+                            <li><strong>Safety:</strong> <strong>NO</strong> blood pressures, IV insertions, or venipuncture in the access arm. Protect the arm from constriction.</li>
+                        </ul>
+                        <strong>Complications of HD:</strong>
+                        <ul>
+                            <li><strong>Hypotension:</strong> Most common complication, due to rapid fluid removal.</li>
+                            <li><strong>Muscle Cramps:</strong> Related to rapid shifts in fluid and electrolytes.</li>
+                            <li><strong>Disequilibrium Syndrome:</strong> Rare but serious. Caused by rapid removal of solutes from the blood, leading to cerebral edema. Signs include nausea, vomiting, confusion, seizures. Most common in new dialysis patients.</li>
+                        </ul>`},
+                    { id: 'peritoneal-dialysis-basics', title: 'Peritoneal Dialysis (PD)', type: 'text', content: `PD uses the patient's peritoneal membrane as the filter. A dialysate solution is instilled into the abdomen via a Tenckhoff catheter, dwells for a period, and is then drained.<br><br>
+                        <strong>PD Cycles (Exchanges):</strong>
+                        <ol>
+                            <li><strong>Inflow (Fill):</strong> Solution is infused.</li>
+                            <li><strong>Dwell:</strong> Solution sits in the peritoneal cavity, where diffusion and osmosis occur.</li>
+                            <li><strong>Drain:</strong> Solution is drained out by gravity.</li>
+                        </ol><br>
+                        <strong>Pros and Cons:</strong>
+                        <ul>
+                            <li><strong>Pros:</strong> Can be done at home, allows for more flexible diet and fluid intake, gentler on the body.</li>
+                            <li><strong>Cons:</strong> Major risk of <strong>peritonitis</strong>. Requires a high degree of patient motivation and sterile technique.</li>
+                        </ul>
+                        <strong>Nursing Priorities:</strong>
+                        <ul>
+                            <li><strong>Preventing Peritonitis:</strong> The hallmark signs are <strong>cloudy dialysate outflow</strong>, abdominal pain, and fever. This is the #1 priority. Meticulous sterile technique during exchanges is critical.</li>
+                            <li><strong>Managing Outflow:</strong> If outflow is poor, check the tubing for kinks and reposition the patient.</li>
+                        </ul>`},
+                    { id: 'kidney-transplant-care', title: 'Kidney Transplantation', type: 'text', content: `Transplantation is the treatment of choice for ESRD but is limited by donor availability. It requires lifelong immunosuppression to prevent organ rejection.<br><br>
+                        <strong>Postoperative Care Priorities:</strong>
+                        <ul>
+                            <li><strong>Fluid & Electrolyte Balance:</strong> The new kidney may produce large volumes of urine initially. Monitor urine output hourly and replace fluids as ordered.</li>
+                            <li><strong>Preventing Infection:</strong> The patient is immunocompromised. Use strict aseptic technique, monitor for signs of infection (which may be blunted, like a low-grade fever).</li>
+                            <li><strong>Monitoring for Rejection:</strong>
+                                <ul>
+                                    <li><strong>Hyperacute:</strong> Occurs within minutes to hours. Caused by pre-existing antibodies. The kidney must be removed.</li>
+                                    <li><strong>Acute:</strong> Occurs in the first 6 months. Usually reversible with increased immunosuppression. Signs include fever, graft site tenderness, and a rise in serum creatinine.</li>
+                                    <li><strong>Chronic:</strong> Occurs over months to years. Irreversible. The patient will eventually need to return to dialysis.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <strong>Patient Education is KEY:</strong>
+                        <p>Teach the patient about the importance of lifelong adherence to their immunosuppressant medication regimen, signs of rejection to report immediately, and infection prevention strategies.</p>`},
                     { id: 'renal-therapies-quiz', title: 'Renal Therapies Quiz', type: 'quiz',
                         questions: [
-                            { question: "What is the primary safety measure a nurse must remember when caring for a patient with an AV fistula for hemodialysis?", options: ["Administering heparin before dialysis.", "Palpating for a thrill and auscultating for a bruit.", "Checking blood pressure and drawing blood from the access arm.", "Restricting all fluid intake to prevent overload."], correctAnswer: "Palpating for a thrill and auscultating for a bruit." },
-                            { question: "A patient on peritoneal dialysis reports cloudy dialysate return. The nurse's first action should be to suspect:", options: ["Excess fluid removal.", "Peritonitis.", "Hypotension.", "Dialysis machine malfunction."], correctAnswer: "Peritonitis." },
-                            { question: "A nurse is teaching a patient about a new kidney transplant. The nurse should emphasize that the patient must take immunosuppressant drugs to prevent:", options: ["Kidney trauma.", "Hyperkalemia.", "Organ rejection.", "Urinary tract infections."], correctAnswer: "Organ rejection." },
-                            { question: "Which type of renal replacement therapy would be most appropriate for a patient who cannot tolerate the rapid fluid shifts of standard hemodialysis due to low blood pressure?", options: ["Peritoneal dialysis (PD)", "Continuous Renal Replacement Therapy (CRRT)", "Kidney transplant", "AV fistula creation"], correctAnswer: "Continuous Renal Replacement Therapy (CRRT)" }
+                            { question: "A nurse assesses a patient's AV fistula prior to hemodialysis and cannot palpate a thrill or auscultate a bruit. What is the nurse's priority action?", options: ["Administer a dose of heparin.", "Notify the nephrologist and dialysis unit immediately.", "Attempt to flush the fistula with saline.", "Re-assess in one hour."], correctAnswer: "Notify the nephrologist and dialysis unit immediately." },
+                            { question: "A patient on peritoneal dialysis reports that their outflow fluid is cloudy. What is the nurse's primary concern?", options: ["Dehydration", "Peritonitis", "Hyperglycemia", "Catheter migration"], correctAnswer: "Peritonitis" },
+                            { question: "Which statement by a kidney transplant recipient indicates a need for further teaching about immunosuppressive therapy?", options: ["I will need to take these medications for the rest of my life.", "I should report a low-grade fever to my doctor.", "I can stop taking the medication once my creatinine level is normal.", "I should wash my hands frequently to prevent infections."], correctAnswer: "I can stop taking the medication once my creatinine level is normal." }
+                        ]
+                    },
+                ]
+            },
+            'other-renal-disorders': {
+                title: 'Common Renal & Urinary Disorders',
+                color: 'from-green-500 to-emerald-400',
+                description: 'Covering key aspects of UTIs, pyelonephritis, kidney stones, BPH, and glomerular disorders.',
+                steps: [
+                    { id: 'uti-pyelonephritis', title: 'UTIs & Pyelonephritis', type: 'text', content: `<strong>Urinary Tract Infections (UTIs)</strong> are most commonly caused by E. coli.
+                        <ul>
+                            <li><strong>Cystitis (Bladder Infection):</strong> Symptoms include frequency, urgency, dysuria (painful urination), and suprapubic pain. In older adults, the primary symptom may be confusion.</li>
+                            <li><strong>Pyelonephritis (Kidney Infection):</strong> A more serious, ascending infection. Symptoms include fever, chills, nausea/vomiting, and classic CVA tenderness. Can lead to urosepsis.</li>
+                            <li><strong>Management:</strong> Antibiotics, increased fluid intake. Phenazopyridine (Pyridium) may be used for symptom relief and will turn urine orange.</li>
+                            <li><strong>CAUTI Prevention:</strong> Catheter-Associated UTIs are a major focus. Key nursing actions include using sterile technique for insertion, maintaining a closed drainage system, and advocating for prompt removal of unnecessary catheters.</li>
+                        </ul>`},
+                    { id: 'urolithiasis', title: 'Urolithiasis (Kidney Stones)', type: 'text', content: `Urolithiasis refers to stones in the urinary tract. The primary symptom is severe, colicky flank pain (renal colic) that may radiate to the groin.<br><br>
+                        <strong>Nursing Management:</strong>
+                        <ul>
+                            <li><strong>Pain Control:</strong> The #1 priority is managing the severe pain, often with opioids and NSAIDs.</li>
+                            <li><strong>Fluids:</strong> Encourage high fluid intake (2-3 L/day) to help pass the stone.</li>
+                            <li><strong>Strain Urine:</strong> All urine must be strained to catch the stone for analysis, which determines the type and guides prevention strategies.</li>
+                            <li><strong>Procedures:</strong> For large stones, procedures like lithotripsy (using shock waves to break up the stone) or ureteroscopy may be needed.</li>
+                        </ul>`},
+                    { id: 'bph', title: 'Benign Prostatic Hyperplasia (BPH)', type: 'text', content: `BPH is an age-related enlargement of the prostate gland that can compress the urethra and cause outflow obstruction (a postrenal issue).<br><br>
+                        <strong>Symptoms (LUTS - Lower Urinary Tract Symptoms):</strong> Difficulty starting a stream, decreased flow, urinary retention, frequency, urgency, nocturia.<br><br>
+                        <strong>Management:</strong>
+                        <ul>
+                            <li><strong>Medications:</strong> Alpha-blockers (-osin, e.g., Tamsulosin) relax bladder neck muscles. 5-alpha reductase inhibitors (-eride, e.g., Finasteride) shrink the prostate.</li>
+                            <li><strong>Surgery (TURP):</strong> A Transurethral Resection of the Prostate is a common procedure. Post-op, patients will have a 3-way catheter for continuous bladder irrigation (CBI) to prevent clots. The nurse's job is to maintain patency and titrate the flow to keep the urine pink.</li>
+                        </ul>`},
+                    { id: 'other-disorders-quiz', title: 'Disorders Quiz', type: 'quiz',
+                        questions: [
+                            { question: "An older adult client is admitted with sudden confusion and incontinence. The nurse should suspect which condition as a likely cause?", options: ["Acute Kidney Injury", "Urinary Tract Infection", "Benign Prostatic Hyperplasia", "Dehydration"], correctAnswer: "Urinary Tract Infection" },
+                            { question: "What is the priority nursing intervention for a patient admitted with acute renal colic from urolithiasis?", options: ["Administering IV pain medication", "Encouraging ambulation", "Straining all urine", "Obtaining a urine culture"], correctAnswer: "Administering IV pain medication" },
+                             { question: "A patient is post-op day 1 from a TURP and has a continuous bladder irrigation (CBI). The drainage is bright red with clots. What is the nurse's best action?", options: ["Stop the irrigation immediately", "Document the finding as normal", "Increase the irrigation rate and notify the surgeon", "Administer a PRN dose of an opioid"], correctAnswer: "Increase the irrigation rate and notify the surgeon" }
                         ]
                     },
                 ]
             },
             'electrolytes-trauma': {
-                title: 'Electrolytes & Kidney Trauma',
-                color: 'from-green-500 to-emerald-400',
-                description: 'Review key electrolytes and manage the nursing care for patients with a traumatic kidney injury.',
+                title: 'Electrolytes & Final Case Study',
+                color: 'from-rose-400 to-red-500',
+                description: 'Integrate your knowledge of critical electrolyte imbalances and apply it to a complex clinical case study.',
                 steps: [
-                    { id: 'electrolyte-imbalances', title: 'Electrolyte Imbalances with Kidney Failure', type: 'text', content: `When kidneys fail, the body's ability to regulate key electrolytes is severely compromised. This requires meticulous nursing care.<br><br>
-                    <strong>Potassium (K+):</strong> The most dangerous imbalance. **Hyperkalemia** (high potassium) can cause life-threatening cardiac arrhythmias.
-                    <ul>
-                        <li><strong>Nursing Interventions for Hyperkalemia:</strong> Administer insulin and glucose (D50) IV to shift potassium into cells, use potassium-binding resins (e.g., Kayexalate), and prepare for dialysis.</li>
-                    </ul>
-                    <strong>Phosphorus (PO4):</strong> Kidneys normally excrete excess phosphorus. In kidney failure, **hyperphosphatemia** (high phosphorus) develops, leading to bone and mineral disease.
-                    <ul>
-                        <li><strong>Nursing Interventions for Hyperphosphatemia:</strong> Administer phosphate-binding agents (e.g., Sevelamer) with meals to prevent absorption.</li>
-                    </ul>
-                    <strong>Calcium (Ca2+):</strong> Due to the reciprocal relationship with phosphorus, hyperphosphatemia often leads to **hypocalcemia** (low calcium), which can cause muscle cramps and tetany.
-                    <ul>
-                        <li><strong>Nursing Interventions for Hypocalcemia:</strong> Administer calcium supplements (e.g., Calcium Carbonate) and Vitamin D to increase absorption.</li>
-                    </ul>`},
-                    { id: 'kidney-trauma', title: 'Kidney Trauma', type: 'text', content: `Kidney trauma can be caused by blunt force (e.g., a fall, car accident) or penetrating injuries. As a nurse, you must recognize the signs and act quickly. <br><br>
-                    **Signs of Trauma:**
-                    <ul>
-                        <li><strong>Hematuria:</strong> Blood in the urine.</li>
-                        <li><strong>Flank or abdominal pain.</strong></li>
-                        <li><strong>Tenderness, swelling, or ecchymosis</strong> (bruising) over the flank area (**Turner's sign**).</li>
-                        <li>**Oliguria or Anuria:** Decreased or no urine output.</li>
-                        <li>Signs of **shock** due to internal bleeding.</li>
-                    </ul><br>
-                    **Nursing Care:**
-                    <ul>
-                        <li>Monitor hemodynamic status (blood pressure, heart rate) and a CBC to check for a drop in H&H (hemoglobin and hematocrit).</li>
-                        <li>Anticipate imaging such as an ultrasound or CT scan to assess the extent of the injury.</li>
-                        <li>**Priority:** Control bleeding and prevent shock.</li>
-                        <li>Provide postoperative care if a partial or total nephrectomy is required.</li>
-                    </ul>`},
-                     { id: 'case-study-final', title: 'Clinical Case Study: AKI and Electrolytes', type: 'case_study', case: {
-                        scenario: `You are the nurse in the emergency department. A 68-year-old male is brought in by his family with confusion, lethargy, and general weakness. His family reports he has a history of heart failure and recently started a new diuretic. His vital signs are: BP 88/50 mmHg, HR 112 bpm, RR 24, O2 Sat 92% on room air. Lab results show a serum creatinine of 4.2 mg/dL (up from a baseline of 1.2 mg/dL) and a serum potassium of 6.8 mEq/L.`,
-                        question: `Based on the patient's presentation, which of the following is the most immediate priority nursing intervention?`,
-                        options: [
-                            "Option A: Administer a diuretic to decrease fluid overload.",
-                            "Option B: Administer a PRN dose of IV magnesium sulfate.",
-                            "Option C: Administer IV insulin and D50 to treat hyperkalemia.",
-                            "Option D: Encourage the patient to increase oral fluid intake.",
-                        ],
-                        correctAnswer: "Option C: Administer IV insulin and D50 to treat hyperkalemia.",
-                        explanation: `<strong>Rationale:</strong>
-                        The patient is presenting with signs of **prerenal Acute Kidney Injury (AKI)**, likely due to hypovolemia from the new diuretic and pre-existing heart failure (BP 88/50 mmHg, HR 112 bpm). The elevated creatinine (4.2 mg/dL) confirms this acute injury.
-                        
-                        However, the most immediate and life-threatening finding is the severe **hyperkalemia** (potassium 6.8 mEq/L). High potassium levels can cause fatal cardiac arrhythmias (a patient safety and ABC priority). Administering IV insulin and D50 is a rapid intervention to shift potassium from the extracellular space back into the cells, temporarily lowering serum levels.
-                        
+                    { id: 'electrolyte-imbalances', title: 'Critical Electrolyte Imbalances', type: 'text', content: `Kidney failure causes predictable and dangerous electrolyte shifts.<br><br>
                         <ul>
-                            <li><strong>Option A (Administering a diuretic):</strong> This would worsen the patient's hypotension and dehydration, exacerbating the prerenal AKI.</li>
-                            <li><strong>Option B (IV magnesium sulfate):</strong> This is the treatment for Torsades de Pointes, a specific arrhythmia often associated with hypomagnesemia, not the hyperkalemia seen here.</li>
-                            <li><strong>Option C (Correct):</strong> This directly addresses the life-threatening hyperkalemia, which is the immediate priority based on the patient's presentation and lab values.</li>
-                            <li><strong>Option D (Increase oral fluids):</strong> While the patient is dehydrated, his altered mental status makes oral intake a choking risk, and this is not a fast enough intervention to address the critically high potassium.</li>
-                        </ul>
-                        <strong>Key takeaway:</strong> Always prioritize the most life-threatening condition first. In this case, that is the severe hyperkalemia and its potential for cardiac arrest.`
+                            <li><strong>Hyperkalemia (K+ > 5.0):</strong> The most life-threatening. Caused by impaired excretion. Leads to peaked T waves on EKG and can cause cardiac arrest.</li>
+                            <li><strong>Hyperphosphatemia (PO4 > 4.5) & Hypocalcemia (Ca < 9.0):</strong> Have an inverse relationship. High phosphate binds with calcium, lowering serum calcium. Leads to muscle cramps, tetany, and positive Chvostek's/Trousseau's signs.</li>
+                            <li><strong>Hypermagnesemia (Mg > 2.5):</strong> Kidneys can't excrete magnesium. Leads to decreased deep tendon reflexes, lethargy, and respiratory depression. Patients should avoid magnesium-containing antacids and laxatives.</li>
+                             <li><strong>Metabolic Acidosis:</strong> Kidneys cannot excrete hydrogen ions or reabsorb bicarbonate. The lungs compensate with deep, rapid Kussmaul respirations. Serum bicarb (HCO3) will be low (<22).</li>
+                        </ul>`},
+                     { id: 'case-study-final', title: 'Clinical Case Study: Putting It All Together', type: 'case_study', case: {
+                        scenario: `A 72-year-old male with a history of Type 2 Diabetes and Stage 3b CKD is admitted from a nursing home for lethargy and confusion. His vital signs are: BP 178/98, HR 110, RR 28 and deep, Temp 99.1°F. He has 2+ pitting edema in his lower extremities and faint crackles in his lung bases. His morning labs show: K+ 6.2 mEq/L, Creatinine 3.8 mg/dL, BUN 88 mg/dL, HCO3 16 mEq/L.`,
+                        question: `Based on this data, which orders should the nurse anticipate and prioritize? (Select All That Apply)`,
+                        options: [
+                            "Option A: IV Furosemide",
+                            "Option B: IV Insulin and D50",
+                            "Option C: Sevelamer with breakfast",
+                            "Option D: Strict I&O and daily weights",
+                            "Option E: IV fluid bolus of 1L Normal Saline",
+                            "Option F: Place on a cardiac monitor",
+                        ],
+                        correctAnswer: ["Option A: IV Furosemide", "Option B: IV Insulin and D50", "Option D: Strict I&O and daily weights", "Option F: Place on a cardiac monitor"],
+                        explanation: `<strong>Rationale:</strong>
+                        The patient is presenting with an acute-on-chronic kidney injury, evidenced by the high Cr/BUN, fluid overload (edema, crackles, HTN), life-threatening hyperkalemia, and metabolic acidosis (low HCO3, deep/rapid respirations).
+                        <ul>
+                            <li><strong>(A) IV Furosemide:</strong> Correct. This is needed to address the severe fluid overload (hypertension, edema, crackles).</li>
+                            <li><strong>(B) IV Insulin and D50:</strong> Correct. This is an immediate priority to treat the life-threatening hyperkalemia (K+ 6.2).</li>
+                             <li><strong>(C) Sevelamer:</strong> While appropriate for a CKD patient, it is not an immediate priority for this acute presentation.</li>
+                            <li><strong>(D) Strict I&O and daily weights:</strong> Correct. This is a fundamental intervention for monitoring fluid status in any renal patient, especially one in fluid overload.</li>
+                            <li><strong>(E) IV fluid bolus:</strong> Incorrect. This patient is in severe fluid overload; a fluid bolus would be dangerous and could cause acute pulmonary edema.</li>
+                            <li><strong>(F) Cardiac Monitor:</strong> Correct. This is an immediate safety priority due to the severe hyperkalemia and its risk for causing fatal dysrhythmias.</li>
+                        </ul>`
                     }},
-                    { id: 'final-quiz', title: 'Final NCLEX Review', type: 'quiz',
-                        questions: [
-                            { question: "A nurse is caring for a patient with AKI who is in the diuretic phase. What is the priority nursing intervention?", options: ["Restricting fluid intake.", "Administering a vasopressor to increase blood pressure.", "Monitoring for signs of dehydration and electrolyte imbalances.", "Preparing the patient for hemodialysis."], correctAnswer: "Monitoring for signs of dehydration and electrolyte imbalances." },
-                            { question: "A patient with CKD is prescribed Sevelamer. The nurse should provide which of the following instructions?", options: ["Take this medication on an empty stomach.", "Take this medication with meals.", "This medication will increase your potassium levels.", "This medication is used to control your blood pressure."], correctAnswer: "Take this medication with meals." },
-                            { question: "Which sign is a key indicator of a functioning AV fistula for hemodialysis?", options: ["A palpable thrill.", "Absence of a bruit.", "Pain and redness at the site.", "A firm, non-vibrating mass."], correctAnswer: "A palpable thrill." },
-                            { question: "What is a primary sign of kidney trauma a nurse should assess for?", options: ["Chest pain.", "Turner's sign (flank ecchymosis).", "Abnormal heart rhythms.", "Increased urine output."], correctAnswer: "Turner's sign (flank ecchymosis)." },
-                        ]
-                    },
                 ]
             },
         };
 
         const preAssessmentQuizData = [
-            { moduleId: 'elimination-concepts', question: "What is the key functional unit of the kidney responsible for filtering waste from the blood?", options: ["Bladder", "Nephron", "Ureter", "Glomerulus"], correctAnswer: "Glomerulus" },
-            { moduleId: 'elimination-concepts', question: "A patient's GFR is reported as 45. This indicates which stage of Chronic Kidney Disease?", options: ["Stage 1", "Stage 2", "Stage 3a", "Stage 3b"], correctAnswer: "Stage 3a" },
-            { moduleId: 'acute-kidney-injury', question: "What is the most common cause of prerenal acute kidney injury (AKI)?", options: ["Kidney stones", "Severe dehydration", "Infection within the kidney", "Glomerulonephritis"], correctAnswer: "Severe dehydration" },
-            { moduleId: 'acute-kidney-injury', question: "During which phase of AKI is the patient at the greatest risk for fluid overload and hyperkalemia?", options: ["Initiation phase", "Oliguric phase", "Diuretic phase", "Recovery phase"], correctAnswer: "Oliguric phase" },
-            { moduleId: 'chronic-kidney-disease', question: "The multisystem effects of chronic kidney disease can include neurological symptoms such as confusion and lethargy due to:", options: ["Fluid overload", "Anemia", "Uremia", "Hypertension"], correctAnswer: "Uremia" },
-            { moduleId: 'renal-therapies', question: "What is a major complication risk for a patient undergoing peritoneal dialysis?", options: ["Hypotension", "Peritonitis", "Thrill and bruit loss", "Hypokalemia"], correctAnswer: "Peritonitis" },
-            { moduleId: 'renal-therapies', question: "A nurse is teaching a patient about their new AV fistula. The nurse knows teaching was effective if the patient states they will check for a 'thrill' which is:", options: ["A visual sign of swelling.", "A painful sensation at the site.", "A buzzing vibration felt at the site.", "A swishing sound heard at the site."], correctAnswer: "A buzzing vibration felt at the site." },
-            { moduleId: 'electrolytes-trauma', question: "A patient in acute renal failure develops a high serum potassium level. The nurse should anticipate administering which medication to rapidly shift potassium into the cells?", options: ["Oral phosphate binders", "Calcium carbonate", "IV insulin and glucose", "Furosemide"], correctAnswer: "IV insulin and glucose" },
+            { moduleId: 'elimination-concepts', question: "The RAAS system is primarily initiated in response to what physiological trigger?", options: ["Hyperkalemia", "Low blood pressure", "Metabolic acidosis", "Anemia"], correctAnswer: "Low blood pressure" },
+            { moduleId: 'acute-kidney-injury', question: "A patient with heart failure and a low ejection fraction is at highest risk for which type of AKI?", options: ["Prerenal", "Intrarenal", "Postrenal", "Intrinsic"], correctAnswer: "Prerenal" },
+            { moduleId: 'chronic-kidney-disease', question: "Which instruction is critical for a patient taking phosphate binders like Sevelamer?", options: ["Take it 1 hour before meals", "Take it with meals", "Take it at bedtime", "Take it with a sip of orange juice"], correctAnswer: "Take it with meals" },
+            { moduleId: 'renal-therapies', question: "A nurse is assessing a patient's AV fistula. The absence of a bruit would suggest what complication?", options: ["Infection", "Aneurysm", "Stenosis or clotting", "Normal maturation"], correctAnswer: "Stenosis or clotting" },
+            { moduleId: 'other-renal-disorders', question: "What is the priority nursing intervention for a patient with a TURP and a continuous bladder irrigation (CBI) that has stopped draining?", options: ["Increase the irrigation rate", "Check the tubing for kinks", "Call the surgeon immediately", "Administer a diuretic"], correctAnswer: "Check the tubing for kinks" },
+            { moduleId: 'electrolytes-trauma', question: "A patient with ESRD has a potassium level of 6.8 mEq/L and peaked T-waves on their EKG. What is the priority intervention to protect the heart?", options: ["Administer Kayexalate", "Administer IV insulin and D50", "Administer IV Calcium Gluconate", "Prepare for emergency dialysis"], correctAnswer: "Administer IV Calcium Gluconate" },
         ];
 
+
         // --- Helper Functions ---
-        // Utility for conditionally joining Tailwind CSS classes.
         const cn = (...classes) => classes.filter(Boolean).join(' ');
 
 
         // --- Child Components ---
-
+        
         /**
-         * Quiz component for interactive multiple-choice questions.
-         * Users answer questions and receive immediate feedback.
+         * Quiz component for interactive multiple-choice questions. Handles both single and multi-select (SATA) questions.
          */
         const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
             const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -344,70 +426,70 @@
             const [answers, setAnswers] = useState([]);
 
             const currentQuestion = questions[currentQuestionIndex];
+            
+            // Initialize selectedOption based on question type (array for multi-select)
+            useEffect(() => {
+                if (Array.isArray(currentQuestion.correctAnswer)) {
+                    setSelectedOption([]);
+                } else {
+                    setSelectedOption(null);
+                }
+            }, [currentQuestionIndex, currentQuestion.correctAnswer]);
 
-            // Handle option selection for both single and multiple choice
             const handleOptionSelect = (option) => {
-                if (feedback && !isPreAssessment) return; // Prevent changing answer after feedback in regular quiz
+                if (feedback && !isPreAssessment) return;
 
                 if (Array.isArray(currentQuestion.correctAnswer)) {
-                    // Multi-select (SATA)
-                    setSelectedOption(prevSelected => {
-                        if (prevSelected.includes(option)) {
-                            return prevSelected.filter(item => item !== option);
-                        } else {
-                            return [...prevSelected, option];
-                        }
-                    });
+                    setSelectedOption(prevSelected => 
+                        prevSelected.includes(option)
+                            ? prevSelected.filter(item => item !== option)
+                            : [...prevSelected, option]
+                    );
                 } else {
-                    // Single select
                     setSelectedOption(option);
                 }
             };
 
-            const handlePreAssessmentNext = () => {
-                if (selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)) return;
-                
-                // Logic for checking correctness for both single and multi-select
-                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
-                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
-                    : selectedOption === currentQuestion.correctAnswer;
-                
-                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
-                setAnswers(updatedAnswers);
-
-                if (currentQuestionIndex < questions.length - 1) {
-                    setCurrentQuestionIndex(currentQuestionIndex + 1);
-                    setSelectedOption(null); // Reset for next question
-                    setFeedback(null);
+            const checkAnswer = () => {
+                 if (Array.isArray(currentQuestion.correctAnswer)) {
+                    // For SATA, correct if selected options exactly match correct answers
+                    return selectedOption.length === currentQuestion.correctAnswer.length && selectedOption.every(opt => currentQuestion.correctAnswer.includes(opt));
                 } else {
-                    onComplete(updatedAnswers);
+                    return selectedOption === currentQuestion.correctAnswer;
                 }
             };
-            
-            const handleRegularQuizSubmit = () => {
-                if (selectedOption === null) return;
+
+            const handleSubmit = () => {
+                const isValidSelection = Array.isArray(selectedOption) ? selectedOption.length > 0 : selectedOption !== null;
+                if (!isValidSelection) return;
+
+                const isCorrect = checkAnswer();
                 
-                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
-                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
-                    : selectedOption === currentQuestion.correctAnswer;
-                
-                setFeedback(isCorrect ? 'correct' : 'incorrect');
+                if(isPreAssessment) {
+                    const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                    setAnswers(updatedAnswers);
+                    
+                    if (currentQuestionIndex < questions.length - 1) {
+                        setCurrentQuestionIndex(currentQuestionIndex + 1);
+                        setFeedback(null);
+                    } else {
+                        onComplete(updatedAnswers);
+                    }
+                } else {
+                     setFeedback(isCorrect ? 'correct' : 'incorrect');
+                }
             };
 
-            const handleRegularQuizNext = () => {
-                // Ensure the current answer is recorded before moving to the next question
-                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
-                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
-                    : selectedOption === currentQuestion.correctAnswer;
+            const handleNextQuestion = () => {
+                const isCorrect = checkAnswer();
                 const finalAnswers = [...answers, { question: currentQuestion, isCorrect }];
-                
+
                 if (currentQuestionIndex < questions.length - 1) {
                     setAnswers(finalAnswers);
                     setCurrentQuestionIndex(currentQuestionIndex + 1);
-                    setSelectedOption(null); // Reset for next question
                     setFeedback(null);
                 } else {
-                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0) + (isCorrect ? 1 : 0) - answers.length;
                     onComplete({ score: finalScore, total: questions.length });
                 }
             };
@@ -418,75 +500,47 @@
                     <p className="font-semibold text-gray-700 mb-3">{currentQuestion.question}</p>
                     <div className="space-y-2">
                         {currentQuestion.options.map((option, index) => {
-                            const isSelected = Array.isArray(selectedOption) ? selectedOption.includes(option) : selectedOption === option;
-                            const isCorrectOption = Array.isArray(currentQuestion.correctAnswer)
-                                ? currentQuestion.correctAnswer.includes(option)
-                                : option === currentQuestion.correctAnswer;
-                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
+                             const isSelected = Array.isArray(selectedOption) ? selectedOption.includes(option) : selectedOption === option;
+                             const isCorrectOption = Array.isArray(currentQuestion.correctAnswer) ? currentQuestion.correctAnswer.includes(option) : option === currentQuestion.correctAnswer;
+                             let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
 
-                            if (feedback && !isPreAssessment) {
-                                if (isCorrectOption) {
-                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
-                                } else if (isSelected && !isCorrectOption) {
-                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
-                                }
-                            } else if (isSelected) {
-                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
-                            }
+                             if (feedback && !isPreAssessment) {
+                                 if (isCorrectOption) {
+                                     optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                 } else if (isSelected && !isCorrectOption) {
+                                     optionClass = 'bg-red-100 border-red-500 text-red-800';
+                                 }
+                             } else if (isSelected) {
+                                 optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                             }
 
                             return (
-                                <div
-                                    key={index}
-                                    onClick={() => handleOptionSelect(option)}
-                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
-                                >
+                                <div key={index} onClick={() => handleOptionSelect(option)} className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}>
                                     <div className="flex items-center">
-                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
-                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : <span className="text-red-600 mr-2">✗</span>
-                                        )}
-                                        <span className="flex-1">{option}</span>
+                                         {feedback && !isPreAssessment && (isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>))}
+                                         <span className="flex-1">{option.replace(/^Option [A-Z]:\s*/, '')}</span>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
                     <div className="mt-4 text-center">
-                        {isPreAssessment ? (
-                             <button
-                                onClick={handlePreAssessmentNext}
-                                disabled={selectedOption === null}
-                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                         { !feedback || isPreAssessment ? (
+                            <button onClick={handleSubmit}  className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                {isPreAssessment ? (currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment') : 'Submit Answer'}
                             </button>
-                        ) : (
-                            <>
-                            {!feedback ? (
-                                <button
-                                    onClick={handleRegularQuizSubmit}
-                                    disabled={selectedOption === null}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                >
-                                    Submit Answer
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleRegularQuizNext}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-                                >
-                                    Next Question
-                                </button>
-                            )}
-                            </>
-                        )}
+                         ) : (
+                            <button onClick={handleNextQuestion} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                                 {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                            </button>
+                         )}
                     </div>
                 </div>
             );
         };
         
         /**
-         * PreAssessmentQuiz component to handle the initial diagnostic quiz.
-         * Displays quiz questions and then results, allowing users to "test out" of modules.
+         * PreAssessmentQuiz component handles the initial diagnostic quiz and displays results.
          */
         const PreAssessmentQuiz = ({ onComplete, onExit }) => {
             const [results, setResults] = useState(null);
@@ -498,19 +552,11 @@
                     if (!moduleResults[moduleId]) {
                         moduleResults[moduleId] = { correct: 0, total: 0 };
                     }
-                    if (answer.isCorrect) {
-                        moduleResults[moduleId].correct++;
-                    }
+                    if (answer.isCorrect) moduleResults[moduleId].correct++;
                     moduleResults[moduleId].total++;
                 });
 
-                const completedModules = [];
-                for (const moduleId in moduleResults) {
-                    // For pre-assessment, a module is "completed" if all its questions in the pre-assessment quiz were answered correctly.
-                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
-                        completedModules.push(moduleId);
-                    }
-                }
+                const completedModules = Object.keys(moduleResults).filter(moduleId => moduleResults[moduleId].correct === moduleResults[moduleId].total);
                 setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
                 onComplete(completedModules);
             };
@@ -520,9 +566,7 @@
                     <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
                         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
                             <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
-                            <p className="text-lg text-gray-600 mb-6">
-                                You correctly answered {results.correct} out of {results.total} questions.
-                            </p>
+                            <p className="text-lg text-gray-600 mb-6">You correctly answered {results.correct} out of {results.total} questions.</p>
                             {results.completedModules.length > 0 ? (
                                 <>
                                     <p className="text-green-600 font-semibold mb-4">You've tested out of the following modules:</p>
@@ -531,14 +575,9 @@
                                     </ul>
                                 </>
                             ) : (
-                                <p className="text-yellow-600 font-semibold mb-6">You haven't tested out of any modules. You can proceed to the main modules for learning.</p>
+                                <p className="text-yellow-600 font-semibold mb-6">Let's review the modules to solidify your knowledge!</p>
                             )}
-                            <button
-                                onClick={onExit}
-                                className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-                            >
-                                Return to Dashboard
-                            </button>
+                            <button onClick={onExit} className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">Return to Dashboard</button>
                         </div>
                     </div>
                 );
@@ -553,167 +592,75 @@
                 </div>
             );
         };
-
-
+        
         /**
-         * Dashboard component to display the available learning modules.
-         * It allows users to select a module to start learning.
-         * Shows progress for each module using a circular progress bar and status.
+         * Dashboard component to display the available learning modules and overall progress.
          */
         const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
-            let totalCompletedSteps = 0;
-            let totalPossibleSteps = 0;
-            let totalQuizCorrect = 0;
-            let totalQuizQuestions = 0;
-
-            // Calculate overall progress and gather quiz scores
-            Object.entries(contentData).forEach(([moduleId, module]) => {
-                totalPossibleSteps += module.steps.length;
-                const moduleProgress = progress[moduleId] || {};
-                
-                Object.values(moduleProgress).forEach(stepProgress => {
-                    if (stepProgress.completed) {
-                        totalCompletedSteps++;
-                    }
-                    if (stepProgress.score !== undefined) {
-                        totalQuizCorrect += stepProgress.score;
-                    }
-                });
-
-                module.steps.forEach(step => {
-                    if (step.type === 'quiz') {
-                        totalQuizQuestions += step.questions.length;
-                    }
-                });
-            });
-
-
-            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+            const { totalCompletedSteps, totalPossibleSteps, overallPercentage } = useMemo(() => {
+                 let totalCompleted = 0;
+                 let totalPossible = 0;
+                 Object.values(contentData).forEach(module => {
+                     totalPossible += module.steps.length;
+                 });
+                 Object.values(progress).forEach(moduleProgress => {
+                     totalCompleted += Object.values(moduleProgress).filter(p => p.completed).length;
+                 });
+                 const percentage = totalPossible > 0 ? (totalCompleted / totalPossible) * 100 : 0;
+                 return { totalCompletedSteps: totalCompleted, totalPossibleSteps: totalPossible, overallPercentage: percentage };
+            }, [progress]);
 
             return (
                 <div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
-                    <div className="w-full">
+                    <div className="w-full max-w-7xl mx-auto">
                         <header className="mb-8 text-center">
-                            <div className="flex items-center justify-center gap-3 mb-2">
-                                {/* Text placeholder for the main application identifier */}
-                                <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">EKG</span>
-                                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Urinary Elimination and Renal Function Module</h1>
-                                <span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
-                            </div>
-                            <p className="text-lg text-gray-500 max-w-2xl mx-auto">A comprehensive learning module to master renal concepts for NCLEX and clinical practice.</p>
+                            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Renal & Urinary Elimination: Med-Surg II</h1>
+                            <p className="text-lg text-gray-500 max-w-3xl mx-auto mt-2">An advanced module designed to build clinical judgment for complex renal patients, aligned with the Florida nursing curriculum.</p>
                         </header>
 
-                        {/* Skip Ahead Button */}
                         <div className="mb-8 text-center">
-                            <button
-                                onClick={onStartPreAssessment}
-                                className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
-                            >
-                                <div className="text-xl">Skip Ahead: Take Diagnostic Quiz</div>
-                                <div className="text-sm font-normal">Test your knowledge and potentially skip modules.</div>
+                            <button onClick={onStartPreAssessment} className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105">
+                                <div className="text-xl">Test Out: Take Diagnostic Quiz</div>
+                                <div className="text-sm font-normal">Assess your current knowledge and potentially bypass mastered topics.</div>
                             </button>
                         </div>
 
-                        {/* Overall Progress Bar & Reset Button */}
                         <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 w-full">
                            <div className="flex justify-between items-center mb-3">
-                             <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
-                             <button 
-                                onClick={onResetProgress}
-                                className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2"
-                               >
-                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                     <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" />
-                                 </svg>
-                                 Reset Progress
+                               <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+                               <button onClick={onResetProgress} className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
+                                   Reset Progress
                                </button>
                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-4">
-                                <div
-                                    className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
-                                    style={{ width: `${overallPercentage}%` }}
-                                ></div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <p className="text-left text-sm text-gray-600 mt-2">
-                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
-                                </p>
-                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
-                            </div>
+                           <div className="w-full bg-gray-200 rounded-full h-4"><div className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out" style={{ width: `${overallPercentage}%` }}></div></div>
+                           <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
-                            {/* Iterate over all modules defined in contentData */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                             {Object.entries(contentData).map(([id, module]) => {
                                 const moduleProgress = progress[id] || {};
-                                // Calculate completion count for steps within the module.
                                 const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
                                 const totalSteps = module.steps.length;
                                 const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
-
-                                let statusText = "Not Started";
-                                let statusColor = "text-gray-500";
-                                if (completedCount === totalSteps) {
-                                    statusText = "Completed";
-                                    statusColor = "text-green-600";
-                                } else if (completedCount > 0) {
-                                    statusText = "In Progress";
-                                    statusColor = "text-yellow-600";
-                                }
-
-                                // Get quiz score for this module if available
-                                const quizStep = module.steps.find(step => step.type === 'quiz');
-                                const quizProgress = quizStep ? moduleProgress[quizStep.id] : null;
-
+                                let statusText = completedCount === totalSteps ? "Completed" : (completedCount > 0 ? "In Progress" : "Not Started");
+                                let statusColor = completedCount === totalSteps ? "text-green-600" : (completedCount > 0 ? "text-yellow-600" : "text-gray-500");
+                                
                                 return (
-                                    <div
-                                        key={id}
-                                        onClick={() => onSelectModule(id)}
-                                        // Styling for module cards, including hover effects.
-                                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col"
-                                    >
+                                    <div key={id} onClick={() => onSelectModule(id)} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col">
                                         <div className="flex justify-between items-start mb-4">
-                                            {/* Placeholder for module icon: Displays the first letter of the module title. */}
                                             <div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-10 h-10 flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0")}>
-                                                {module.title.split(' ').map(word => word.charAt(0)).join('')}
+                                                {id.split('-')[0].charAt(0).toUpperCase()}
                                             </div>
-                                            {/* Progress Circle */}
                                             <div className="relative w-12 h-12 flex-shrink-0">
-                                                <svg className="w-full h-full" viewBox="0 0 36 36">
-                                                    {/* Background circle for the progress bar. */}
-                                                    <path
-                                                        className="text-gray-200"
-                                                        d="M18 2.0845
-                                                            a 15.9155 15.9155 0 0 1 0 31.831
-                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="3"
-                                                    />
-                                                    {/* Foreground arc representing the completion percentage. */}
-                                                    <path
-                                                        className="text-indigo-500"
-                                                        d="M18 2.0845
-                                                            a 15.9155 15.9155 0 0 1 0 31.831
-                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="3"
-                                                        strokeDasharray={`${percentage}, 100`}
-                                                        strokeLinecap="round"
-                                                        transform="rotate(-90 18 18)"
-                                                    />
-                                                </svg>
-                                                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
+                                                 <svg className="w-full h-full" viewBox="0 0 36 36"><path className="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" /><path className="text-indigo-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${percentage}, 100`} strokeLinecap="round" transform="rotate(-90 18 18)" /></svg>
+                                                 <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
                                             </div>
                                         </div>
-                                        <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
-                                        <p className="text-gray-500 text-sm mb-2 h-10">{module.description}</p>
+                                        <h3 className="text-lg font-bold text-gray-800 mb-2">{module.title}</h3>
+                                        <p className="text-gray-500 text-sm mb-2 flex-grow">{module.description}</p>
                                         <div className="mt-auto">
                                             <p className={cn("text-sm font-semibold", statusColor)}>{statusText}</p>
-                                            {quizProgress && quizProgress.score !== undefined && (
-                                                <p className="text-sm text-gray-600 mt-1">Quiz Score: {quizProgress.score} / {quizStep.questions.length}</p>
-                                            )}
                                             <div className="flex items-center justify-end text-sm font-medium text-indigo-600 group-hover:text-indigo-700 mt-2">
                                                 Start Learning <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
                                             </div>
@@ -728,74 +675,65 @@
         };
         
         /**
-         * CaseStudy component for a multiple-choice case study challenge.
-         * Presents a scenario and a question with multiple options.
+         * CaseStudy component for a multiple-choice case study challenge. Handles SATA.
          */
         const CaseStudy = ({ caseData, onComplete }) => {
-            // State to store the user's selected answer.
-            const [selectedAnswer, setSelectedAnswer] = useState(null);
-
-            // Handles the selection of an answer option.
+            const [selectedAnswers, setSelectedAnswers] = useState([]);
+            const [isSubmitted, setIsSubmitted] = useState(false);
+        
             const handleSelect = (option) => {
-                if (selectedAnswer) return; // Prevents changing the answer once selected.
-                setSelectedAnswer(option);
-                // Case-insensitive comparison needs to check if the 'option' matches any of the correct answers.
-                // For the case study, the correct answers are an array in the data.
-                const isCorrect = Array.isArray(caseData.correctAnswer)
-                    ? caseData.correctAnswer.includes(option)
-                    : option === caseData.correctAnswer;
-                
-                if (isCorrect) {
-                    onComplete(); // Marks the step as complete if the correct answer is chosen.
-                }
+                if (isSubmitted) return;
+                setSelectedAnswers(prev => 
+                    prev.includes(option) ? prev.filter(item => item !== option) : [...prev, option]
+                );
             };
 
+            const handleSubmit = () => {
+                setIsSubmitted(true);
+                const isCorrect = selectedAnswers.length === caseData.correctAnswer.length && selectedAnswers.every(ans => caseData.correctAnswer.includes(ans));
+                if(isCorrect) {
+                    onComplete();
+                }
+            };
+        
             return (
                 <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
-                    <h4 className="font-bold text-lg text-gray-800 mb-2">Case Study Challenge</h4>
-                    {/* Scenario description, using dangerouslySetInnerHTML to render HTML bold tags */}
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Clinical Case Study</h4>
                     <p className="bg-blue-100 text-blue-800 p-3 rounded-md mb-4 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
                     <p className="font-semibold text-gray-700 mb-3">{caseData.question}</p>
                     <div className="space-y-2">
                         {caseData.options.map(option => {
-                            const isSelected = selectedAnswer === option;
-                            // Case-insensitive comparison for correct answer highlight
-                            const isCorrectOption = Array.isArray(caseData.correctAnswer)
-                                ? caseData.correctAnswer.includes(option)
-                                : option === caseData.correctAnswer;
-                            const showFeedback = selectedAnswer !== null; // Show feedback once any answer is selected 
-
-                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200'; // Default styling for options.
-                            if (showFeedback) {
-                                if (isCorrectOption) {
-                                    optionClass = 'bg-green-100 border-green-500 text-green-800'; // Correct answer always green when feedback is shown 
-                                } else if (isSelected && !isCorrectOption) {
-                                    optionClass = 'bg-red-100 border-red-500 text-red-800'; // Incorrect selected answer is red 
-                                }
+                            const isSelected = selectedAnswers.includes(option);
+                            const isCorrectOption = caseData.correctAnswer.includes(option);
+                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
+                            
+                            if (isSubmitted) {
+                                if (isCorrectOption) optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                else if (isSelected && !isCorrectOption) optionClass = 'bg-red-100 border-red-500 text-red-800';
                             } else if (isSelected) {
-                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800'; // Highlight selected before submission 
-                            } 
-
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                            }
+        
                             return (
-                                <div
-                                    key={option}
-                                    onClick={() => handleSelect(option)}
-                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
-                                >
+                                <div key={option} onClick={() => handleSelect(option)} className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}>
                                     <div className="flex items-center">
-                                        {showFeedback && ( // Display a checkmark or cross icon if feedback is active 
-                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>)
-                                        )}
-                                        <span className="flex-1">{option}</span>
+                                        {isSubmitted && (isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>))}
+                                        <span className="flex-1">{option.replace(/^Option [A-Z]:\s*/, '')}</span>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
-                    {selectedAnswer && ( // Display the explanation after an answer has been selected.
+                    {!isSubmitted ? (
+                        <div className="mt-4 text-center">
+                            <button onClick={handleSubmit} disabled={selectedAnswers.length === 0} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                Submit Answer
+                            </button>
+                        </div>
+                    ) : (
                         <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
                             <h5 className="font-bold text-indigo-800">Explanation</h5>
-                            <p className="text-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                            <div className="prose prose-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></div>
                         </div>
                     )}
                 </div>
@@ -804,48 +742,27 @@
         
         /**
          * StaticContentStep component for displaying basic text content.
-         * Marks itself as complete immediately on render.
          */
         const StaticContentStep = ({ step, onComplete }) => {
-            // For 'text' type steps, mark them as complete immediately upon rendering.
-            // The effect should only run once when the component mounts to prevent an infinite loop.
             useEffect(() => {
                 onComplete();
-            }, []); // Empty dependency array ensures this runs only once.
-
-            // Using dangerouslySetInnerHTML to render HTML content (e.g., <strong> tags).
-            return (
-                <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50 rounded-lg shadow-inner space-y-4" dangerouslySetInnerHTML={{ __html: step.content }}>
-                </div>
-            );
+            }, []); // Empty dependency array ensures this runs only once on mount.
+            return <div className="prose max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: step.content }}></div>;
         };
 
         /**
-         * CompletionModal component displayed when a module is completed.
+         * CompletionModal component displayed when a module is finished.
          */
         const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
             if (!isOpen) return null;
-
             return (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
                         <h3 className="text-2xl font-bold text-indigo-700 mb-4">Module Completed! 🎉</h3>
-                        <p className="text-gray-700 mb-6">You've successfully completed all steps in this module. Great job!</p>
+                        <p className="text-gray-700 mb-6">Excellent work! You have mastered the key concepts in this module.</p>
                         <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-                            <button
-                                onClick={onClose}
-                                className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
-                            >
-                                Back to Dashboard
-                            </button>
-                            {hasNextModule && (
-                                <button
-                                    onClick={onNextModule}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-                                >
-                                    Continue to Next Module
-                                </button>
-                            )}
+                            <button onClick={onClose} className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm">Back to Dashboard</button>
+                            {hasNextModule && <button onClick={onNextModule} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors">Continue to Next Module</button>}
                         </div>
                     </div>
                 </div>
@@ -853,29 +770,21 @@
         };
 
         /**
-         * LearningModule component to manage steps within the selected module.
-         * Provides navigation between steps and renders the appropriate content for each.
+         * LearningModule component manages steps within the selected module.
          */
         const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
-            const [activeStep, setActiveStep] = useState(0); // Manages the index of the currently active step.
-            const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Controls the visibility of the sidebar on mobile.
-            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false); // State for completion modal 
+            const [activeStep, setActiveStep] = useState(0);
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
 
-            // Callback function to update the completion status of a specific step.
             const handleStepComplete = useCallback((stepId, data = {}) => {
                 onProgressUpdate(module.id, stepId, { completed: true, ...data });
             }, [onProgressUpdate, module.id]);
 
             const moduleProgress = progress[module.id] || {};
-            
-            // Check if all steps in the current module are completed
-            const allStepsCompletedInModule = module.steps.every(step =>
-                moduleProgress[step.id] && moduleProgress[step.id].completed
-            );
+            const allStepsCompletedInModule = module.steps.every(step => moduleProgress[step.id]?.completed);
 
-            // Navigates to the next step, if available.
             const handleNextStep = () => {
-                // If it's the last step and all steps in the module are completed, open the modal 
                 if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
                     setIsCompletionModalOpen(true);
                 } else if (activeStep < module.steps.length - 1) {
@@ -883,291 +792,159 @@
                 }
             };
 
-            // Navigates to the previous step, if available.
-            const handlePrevStep = () => {
-                if (activeStep > 0) {
-                    setActiveStep(activeStep - 1);
-                }
-            };
-            
-            // Ensure module and its steps are defined before accessing properties 
-            if (!module || !module.steps) {
-                console.error("LearningModule received invalid module prop:", module);
-                return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Loading module...</div>;
-            }
-
-            const currentStep = module.steps[activeStep];
-            
-            // Renders the appropriate content component based on the current step's type.
-            // This function acts as a router for different interactive and static content types.
             const renderStepContent = (step) => {
-                if (!step) return <p>Please select a step.</p>;
-
                 const onCompleteForStep = (data) => handleStepComplete(step.id, data);
-
                 switch (step.type) {
-                    case 'text':
-                        return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
-                    case 'case_study':
-                        return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
-                    case 'quiz':
-                        return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
-                    default:
-                        // Fallback for unrecognized step types, ensuring robust error handling.
-                        return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+                    case 'text': return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study': return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz': return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    default: return <p>Error: Content type not available.</p>;
                 }
             };
-
-            const handleModalClose = () => {
-                setIsCompletionModalOpen(false);
-                onBack(); // Go back to dashboard when modal is closed 
-            };
-
-            const handleModalNextModule = () => {
-                setIsCompletionModalOpen(false);
-                onNextModule(); // Proceed to next module 
-            };
-
+            
+            const currentStep = module.steps[activeStep];
 
             return (
                 <div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
-                    {/* Header for the learning module, including back button and module title. */}
                     <header className="bg-white shadow-md p-4 flex items-center justify-between z-30 flex-shrink-0">
                         <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                            <span className="hidden sm:inline">Dashboard</span>
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                             <span className="hidden sm:inline">Dashboard</span>
                         </button>
-                        <div className="flex items-center gap-3">
-                            <h2 className="text-xl font-bold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
-                        </div>
-                        {/* Mobile sidebar toggle button using text/emoji placeholders. */}
+                        <h2 className="text-lg font-bold text-gray-800 text-center truncate px-2">{module.title}</h2>
                         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                         </button>
                     </header>
-                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
                     <div className="flex flex-1 overflow-hidden">
-                        {/* Sidebar for navigation steps within the module. */}
-                        <aside className={cn(
-                            "bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
-                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                        )}>
+                         <aside className={cn("bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20", isSidebarOpen ? 'translate-x-0' : '-translate-x-full')}>
                             <h3 className="text-lg font-semibold mb-4 text-gray-700 px-3">Module Steps</h3>
                             <nav className="space-y-1 overflow-y-auto flex-1 pr-1">
                                 {module.steps.map((step, index) => (
-                                    <button
-                                        key={step.id}
-                                        onClick={() => {
-                                            setActiveStep(index);
-                                            setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
-                                        }}
-                                        className={cn(
-                                            'w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors',
-                                            activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700'
-                                        )}
-                                    >
-                                        {/* Step completion indicator */}
+                                    <button key={step.id} onClick={() => { setActiveStep(index); setIsSidebarOpen(false); }} className={cn('w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors', activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700')}>
                                         <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                                            {moduleProgress[step.id]?.completed ? (
-                                                <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                                            ) : (
-                                                <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
-                                            )}
+                                            {moduleProgress[step.id]?.completed ? <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg> : <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>}
                                         </div>
                                         <span className="flex-1 text-sm">{step.title}</span>
                                     </button>
                                 ))}
                             </nav>
-                        </aside>
-
-                        {/* Main content area for the current step. */}
-                        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
-                            <div className="max-w-5xl mx-auto">
+                         </aside>
+                         <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                            <div className="max-w-4xl mx-auto">
                                 <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentStep.title}</h3>
                                 {renderStepContent(currentStep)}
-
-                                {/* Navigation buttons for moving between steps. */}
                                 <div className="flex justify-between mt-8">
-                                    <button
-                                        onClick={handlePrevStep}
-                                        disabled={activeStep === 0}
-                                        className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
-                                    >
-                                        Previous
-                                    </button>
-
-                                    <button
-                                        onClick={handleNextStep}
-                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
-                                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
-                                    >
+                                    <button onClick={() => setActiveStep(activeStep - 1)} disabled={activeStep === 0} className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm">Previous</button>
+                                    <button onClick={handleNextStep} disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule} className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md">
                                         {activeStep === module.steps.length - 1 ? 'Finish Module' : 'Next'}
                                     </button>
                                 </div>
                             </div>
-                        </main>
+                         </main>
                     </div>
-                    <CompletionModal
-                        isOpen={isCompletionModalOpen}
-                        onClose={handleModalClose}
-                        onNextModule={handleModalNextModule}
-                        hasNextModule={hasNextModule}
-                    />
+                    <CompletionModal isOpen={isCompletionModalOpen} onClose={() => { setIsCompletionModalOpen(false); onBack(); }} onNextModule={() => { setIsCompletionModalOpen(false); onNextModule(); }} hasNextModule={hasNextModule} />
                 </div>
             );
         };
         
-        // --- Main App Component ---
         /**
-         * The root component of the Cardiac Rhythm Interpretation learning module application.
-         * Manages overall application state, including module selection, user ID, and progress.
+         * The root App component. Manages state, routing, and progress persistence.
          */
         function App() {
-            // State for the currently selected learning module's ID. Null means Dashboard is active.
             const [currentModuleId, setCurrentModuleId] = useState(null);
             const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
-            // State for the authenticated user's ID, used for local storage progress tracking.
             const [userId, setUserId] = useState(null);
-            // State for storing the user's progress across all modules and steps.
             const [progress, setProgress] = useState({});
-            // State to indicate if authentication is complete and user ID is available.
             const [isAuthReady, setIsAuthReady] = useState(false);
 
-            // Effect hook for handling initial authentication and setting the user ID.
             useEffect(() => {
                 const unsubscribe = mockAuth.onAuthStateChanged((user) => {
                     if (user) setUserId(user.uid);
-                    setIsAuthReady(true); // Mark authentication as ready once user is determined.
+                    setIsAuthReady(true);
                 });
-                return () => unsubscribe(); // Cleanup the auth state listener on component unmount.
-            }, []); // Empty dependency array ensures this runs only once on mount.
+                return () => unsubscribe();
+            }, []);
 
-            // Effect hook for loading user progress from localStorage after authentication is ready.
             useEffect(() => {
-                if (!isAuthReady || !userId) return; // Only proceed if auth is ready and userId is available.
-                const storedProgress = localStorage.getItem(`elimination-module-progress-${userId}`);
-                if (storedProgress) {
-                    try {
-                        setProgress(JSON.parse(storedProgress)); // Attempt to parse and set stored progress.
-                    } catch (e) {
-                        console.error("Failed to parse stored progress, resetting.", e);
-                        setProgress({}); // Reset progress if parsing fails (e.g., corrupted data).
-                    }
-                }
-            }, [isAuthReady, userId]); // Reruns when auth status or userId changes.
+                if (!isAuthReady || !userId) return;
+                const storedProgress = localStorage.getItem(`renal-module-progress-${userId}`);
+                if (storedProgress) setProgress(JSON.parse(storedProgress));
+            }, [isAuthReady, userId]);
 
-            // Callback function to update and persist the user's progress for a specific step.
             const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
                 if (!isAuthReady || !userId) return;
-
                 setProgress(currentProgress => {
-                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
-                    const newStepProgress = { ...currentStepProgress, ...data };
-
-                    // If the old and new step data are identical, do not update state.
-                    // This prevents the infinite re-render loop.
-                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+                    // Prevent state update if step is already complete, breaking the loop.
+                    if (currentProgress[moduleId]?.[stepId]?.completed) {
                         return currentProgress;
                     }
-
-                    // Otherwise, proceed with the update.
                     const newProgress = {
                         ...currentProgress,
-                        [moduleId]: {
-                            ...(currentProgress[moduleId] || {}),
-                            [stepId]: newStepProgress
-                        }
+                        [moduleId]: { ...(currentProgress[moduleId] || {}), [stepId]: { ...(currentProgress[moduleId]?.[stepId] || {}), ...data } }
                     };
-
-                    localStorage.setItem(`elimination-module-progress-${userId}`, JSON.stringify(newProgress));
+                    localStorage.setItem(`renal-module-progress-${userId}`, JSON.stringify(newProgress));
                     return newProgress;
                 });
             }, [isAuthReady, userId]);
-
-            const handlePreAssessmentComplete = (completedModuleIds) => {
-                const newProgress = { ...progress };
-                completedModuleIds.forEach(moduleId => {
-                    const module = contentData[moduleId];
-                    if (module) {
-                        newProgress[moduleId] = {};
-                        module.steps.forEach(step => {
-                            newProgress[moduleId][step.id] = { completed: true };
-                        });
-                    }
-                });
-                setProgress(newProgress);
-                localStorage.setItem(`elimination-module-progress-${userId}`, JSON.stringify(newProgress));
-                // The results screen is now part of the PreAssessmentQuiz component.
-                // We just need to handle exiting it.
-            };
             
-            // Callback to reset all progress
+            const handlePreAssessmentComplete = useCallback((completedModuleIds) => {
+                setProgress(currentProgress => {
+                    const newProgress = { ...currentProgress };
+                    completedModuleIds.forEach(moduleId => {
+                        const module = contentData[moduleId];
+                        if (module) {
+                            newProgress[moduleId] = {};
+                            module.steps.forEach(step => {
+                                newProgress[moduleId][step.id] = { completed: true };
+                            });
+                        }
+                    });
+                    localStorage.setItem(`renal-module-progress-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [userId]);
+
             const handleResetProgress = useCallback(() => {
                 if (!isAuthReady || !userId) return;
-                // Clear from state
                 setProgress({});
-                // Clear from localStorage
-                localStorage.removeItem(`elimination-module-progress-${userId}`);
+                localStorage.removeItem(`renal-module-progress-${userId}`);
             }, [isAuthReady, userId]);
-
-            // Function to navigate to the next module in the sequence
+            
             const handleNextModule = useCallback(() => {
                 const moduleIds = Object.keys(contentData);
                 const currentIndex = moduleIds.indexOf(currentModuleId);
                 if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
                     setCurrentModuleId(moduleIds[currentIndex + 1]);
                 } else {
-                    // If it's the last module, go back to the dashboard.
                     setCurrentModuleId(null);
                 }
             }, [currentModuleId]);
 
-            // Determine which module is currently selected based on `currentModuleId`.
-            const selectedModule = currentModuleId && contentData[currentModuleId]
-                                                     ? { ...contentData[currentModuleId], id: currentModuleId }
-                                                     : null;
-
+            const selectedModule = currentModuleId && contentData[currentModuleId] ? { ...contentData[currentModuleId], id: currentModuleId } : null;
             const moduleIds = Object.keys(contentData);
             const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
             const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
 
-
             return (
                 <div className="bg-gray-100 min-h-screen font-sans text-gray-900">
                     {isPreAssessmentActive ? (
-                        <PreAssessmentQuiz 
-                            onComplete={handlePreAssessmentComplete} 
-                            onExit={() => setIsPreAssessmentActive(false)}
-                        />
+                        <PreAssessmentQuiz onComplete={handlePreAssessmentComplete} onExit={() => setIsPreAssessmentActive(false)} />
                     ) : selectedModule ? (
-                        <LearningModule
-                            key={selectedModule.id}
-                            module={selectedModule}
-                            onBack={() => setCurrentModuleId(null)}
-                            progress={progress}
-                            onProgressUpdate={handleProgressUpdate}
-                            onNextModule={handleNextModule}
-                            hasNextModule={hasNextModule}
-                        />
+                        <LearningModule key={selectedModule.id} module={selectedModule} onBack={() => setCurrentModuleId(null)} progress={progress} onProgressUpdate={handleProgressUpdate} onNextModule={handleNextModule} hasNextModule={hasNextModule}/>
                     ) : (
-                        <Dashboard 
-                            onSelectModule={setCurrentModuleId} 
-                            progress={progress} 
-                            onResetProgress={handleResetProgress}
-                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
-                        />
+                        <Dashboard onSelectModule={setCurrentModuleId} progress={progress} onResetProgress={handleResetProgress} onStartPreAssessment={() => setIsPreAssessmentActive(true)} />
                     )}
                 </div>
             );
         }
 
         // --- Render the App into the DOM ---
-        // Get the DOM element where the React application will be mounted.
         const container = document.getElementById('root');
-        // Create a React root, which is the entry point for React 18+ applications.
         const root = ReactDOM.createRoot(container);
-        // Render the main App component into the root.
         root.render(<App />);
     </script>
 </body>
 </html>
+
+
