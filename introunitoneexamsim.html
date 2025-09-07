@@ -1,0 +1,2892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Intro to Nursing unit 1 Exam Simulation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2253af;
+            --highlight: #2e8efd;
+            --danger: #ea2e49;
+            --success: #18b47b;
+            --border: #e3e7ec;
+            --nav-bg: #14263a;
+            --nav-text: #fff;
+            --bg: #f7f8fa;
+            --option-bg: #f4f7fa;
+            --option-active: #eaf3ff;
+            --option-correct: #e8fbe8;
+            --option-wrong: #fff0f3;
+            --modal-bg: #202534cc;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+            --shadow-strong: rgba(0, 0, 0, 0.2);
+            --gradient-blue: linear-gradient(135deg, #e0f2f7, #c5e4ed);
+            --gradient-dark-blue: linear-gradient(45deg, var(--primary), #1d428a);
+            --gradient-green: linear-gradient(45deg, var(--success), #149a62);
+            --gradient-red: linear-gradient(45deg, var(--danger), #b8253a);
+        }
+        html, body {
+            height: 100%; width: 100vw;
+            margin: 0; padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            color: #1a2336;
+            overflow: hidden; /* Prevent scrollbars during transitions */
+        }
+        body {
+            min-height: 100vh; min-width: 100vw;
+            height: 100vh; width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .topbar {
+            width: 100vw;
+            background: var(--nav-bg);
+            color: var(--nav-text);
+            height: 54px; min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0; left: 0; z-index: 10;
+            font-size: 1.09rem;
+            font-weight: 600;
+            letter-spacing: -.5px;
+        }
+        .timer-box {
+            position: absolute;
+            right: 32px; top: 0;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #f8cb4a;
+            background: transparent;
+            letter-spacing: 0.03em;
+            user-select: none;
+            z-index: 30;
+            padding-left: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+        .timer-box.urgent { color: #f32d32;}
+        .main-exam {
+            display: flex;
+            flex: 1 1 auto;
+            height: calc(100vh - 54px - 64px);
+            min-height: 0; min-width: 0;
+            margin-top: 54px;
+            margin-bottom: 64px;
+            width: 100vw;
+            background: var(--bg);
+            overflow: hidden;
+        }
+        .qnav {
+            background: #fff;
+            border-right: 1.5px solid var(--border);
+            width: 80px; min-width: 60px; max-width: 100px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 18px 0 0 0;
+            gap: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .q-btn {
+            width: 38px; height: 38px;
+            border: 2px solid var(--border);
+            background: #fff;
+            color: #344665;
+            border-radius: 50%;
+            display: flex;
+            align-items: center; justify-content: center;
+            font-weight: 600;
+            font-size: 1.10rem;
+            margin-bottom: 6px;
+            transition: border .15s, background .14s, color .16s;
+            box-sizing: border-box;
+            pointer-events: none;
+            user-select: none;
+        }
+        .q-btn.current {
+            border: 2.3px solid var(--highlight);
+            background: var(--highlight);
+            color: #fff;
+        }
+        .q-btn.answered:not(.current) {
+            border: 2px solid var(--success);
+            color: var(--success);
+            background: var(--option-correct);
+        }
+        .q-btn.unanswered:not(.current) {
+            border: 2px solid #e7e8ee;
+            color: #a6b2c9;
+            background: #fff;
+        }
+        .center-area {
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            height: 100%;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            background: var(--bg);
+            overflow: hidden;
+        }
+        .question-card, .review-card {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            box-shadow: 0 2px 24px #1b347213;
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: 38px 5vw 28px 5vw;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .question-text {
+            font-size: 1.18rem;
+            font-weight: 600;
+            margin-bottom: 23px;
+            color: #25394a;
+            line-height: 1.47;
+        }
+        .options {
+            margin-bottom: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .option-label {
+            background: var(--option-bg);
+            border-radius: 7px;
+            border: 2px solid transparent;
+            padding: 16px 18px;
+            cursor: pointer;
+            display: flex; align-items: center;
+            font-size: 1.09rem;
+            transition: background .18s, border .18s, color .17s;
+            user-select: none;
+            gap: 12px;
+            min-height: 46px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .option-label.selected {
+            border: 2px solid var(--highlight);
+            background: var(--option-active);
+            color: #1d428a;
+        }
+        .option-label.user-answer {
+            border: 2px solid var(--danger);
+            background: var(--option-wrong);
+            color: #c91a36;
+            font-weight: 600;
+        }
+        .option-label.correct-answer {
+            border: 2px solid var(--success);
+            background: var(--option-correct);
+            color: #168b56;
+            font-weight: 600;
+        }
+        .footer-bar {
+            position: fixed; left: 0; bottom: 0; width: 100vw;
+            background: #fff;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 16px #2357b015;
+            height: 64px;
+            min-height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 20;
+        }
+        .footer-inner {
+            width: 100vw; max-width: 900px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px;
+        }
+        .progress-display {
+            font-size: 1.11rem;
+            color: #4667a1;
+            font-weight: 500;
+        }
+        .footer-btns {
+            display: flex; gap: 15px;
+        }
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px 36px;
+            font-size: 1.13rem;
+            font-weight: 600;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.13s;
+            box-shadow: 0 2px 7px #2c539c14;
+            outline: none;
+            letter-spacing: 0.01em;
+            min-width: 150px;
+        }
+        .btn:active { background: #20438c; }
+        .btn[disabled] { background: #c5d9f3; color: #7a8aa2; cursor: not-allowed;}
+        .score-ctn {
+            text-align: center;
+            margin-top: 39px;
+            margin-bottom: 45px;
+        }
+        .score-title {
+            font-size: 1.21rem;
+            color: #2374e0;
+            margin-bottom: 13px;
+            font-weight: 600;
+        }
+        .score-value {
+            font-size: 2.21rem;
+            color: #18b47b;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+        .score-msg {
+            font-size: 1.15rem;
+            color: #757b86;
+            margin: 17px 0 13px 0;
+        }
+        .restart-btn {
+            background: #24b334;
+            margin-top: 21px;
+            color: #fff;
+            border-radius: 7px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            padding: 12px 38px;
+            border: none;
+            cursor: pointer;
+        }
+        .review-card {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 0;
+            box-shadow: 0 2px 24px #18457d11;
+            width: 100%;
+            margin: 32px auto;
+            padding: 28px 2vw 16px 2vw;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+        .review-q {
+            color: #264169;
+            font-size: 1.08rem;
+            font-weight: 600;
+            margin-bottom: 11px;
+        }
+        .review-options {
+            margin-bottom: 13px;
+            margin-top: 9px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .rationale {
+            background: #f6f8fd;
+            border-left: 4px solid var(--highlight);
+            border-radius: 8px;
+            padding: 15px 22px 13px 17px;
+            font-size: 1.07rem;
+            color: #2d436e;
+            min-height: 30px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        /* Modal Styles */
+        .modal-bg {
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: var(--modal-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .modal-window {
+            background: #fff;
+            border-radius: 13px;
+            box-shadow: 0 6px 36px #1d2e6318;
+            padding: 35px 28px 26px 28px;
+            max-width: 98vw; min-width: 320px;
+            width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .modal-title {
+            font-size: 1.16rem;
+            font-weight: 600;
+            color: #24436d;
+            margin-bottom: 14px;
+        }
+        .modal-msg {
+            font-size: 1.06rem;
+            color: #3d4860;
+            margin-bottom: 22px;
+        }
+        .modal-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .modal-btn {
+            min-width: 100px;
+            font-size: 1.08rem;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: var(--primary);
+            color: #fff;
+            transition: background .13s;
+        }
+        .modal-btn.cancel {
+            background: #f1f1f7;
+            color: #24436d;
+            border: 1px solid #d7d8df;
+        }
+        @media (max-width: 700px) {
+            .qnav { display: none; }
+            .footer-inner { padding: 0 3vw;}
+            .question-card, .review-card { padding: 11px 2vw 8px 2vw;}
+            .center-area { padding-left: 0;}
+            .timer-box { right: 6vw;}
+        }
+        @media (max-width: 420px) {
+            .question-card, .review-card { padding: 7px 1vw 2px 1vw;}
+            .footer-inner { padding: 0 1vw;}
+            .topbar { font-size: .97rem;}
+            .modal-window { min-width: unset; width: 98vw;}
+        }
+
+        /* New Screen Styles */
+        .screen {
+            position: absolute; /* Use absolute positioning for transitions */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: var(--bg);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out; /* Smooth fade transition */
+            z-index: 1; /* Default z-index */
+        }
+        .screen.active {
+            display: flex;
+            opacity: 1;
+            z-index: 2; /* Bring active screen to front */
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            background: var(--gradient-blue);
+            color: #005662;
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: subtlePulse 10s infinite alternate ease-in-out;
+        }
+        @keyframes subtlePulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+        .welcome-content {
+            z-index: 10;
+            background: rgba(255,255,255,0.8);
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-strong);
+            max-width: 90%;
+            transform: translateY(0);
+            transition: transform 0.5s ease-out;
+        }
+        .welcome-screen.active .welcome-content {
+            animation: slideInUp 0.8s ease-out forwards;
+        }
+        @keyframes slideInUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .welcome-screen h1 {
+            font-size: 3.2rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-weight: 800;
+            text-shadow: 2px 2px 5px var(--shadow-light);
+            letter-spacing: -0.03em;
+        }
+        /* Specific button styling for #selectTestBtn */
+        #selectTestBtn {
+            padding: 20px 60px;
+            font-size: 1.6rem;
+            background: var(--gradient-green);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            /* Added specific hover and active effects for this button */
+        }
+        #selectTestBtn:hover {
+            background: linear-gradient(45deg, #149a62, var(--success));
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px var(--shadow-strong);
+        }
+        #selectTestBtn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        #selectTestBtn:active::after {
+            width: 200%;
+            height: 200%;
+            opacity: 1;
+            transition: 0s;
+        }
+
+        /* Download Screen */
+        .download-screen {
+            background: linear-gradient(135deg, #f0f8ff, #e6f7ff);
+            color: #005662;
+        }
+        .download-content {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            max-width: 90%;
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .download-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .download-screen .exam-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .file-icon-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 30px;
+        }
+        .file-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: var(--primary);
+            animation: bounceIn 0.8s ease-out;
+        }
+        .download-arrow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            font-size: 2rem;
+            color: var(--success);
+            animation: downloadArrow 1.5s infinite ease-out;
+            opacity: 0;
+        }
+        @keyframes downloadArrow {
+            0% { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            20% { opacity: 1; }
+            80% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 0; }
+        }
+        .download-progress-bar {
+            width: 90%;
+            height: 35px;
+            background-color: #e0f0f5;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .download-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--highlight), #4a90e2);
+            border-radius: 18px;
+            transition: width 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .download-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            animation: progressStripe 2s linear infinite;
+        }
+        @keyframes progressStripe {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 0; }
+        }
+        .download-text {
+            margin-top: 25px;
+            font-size: 1.3rem;
+            color: #555;
+            font-weight: 500;
+            min-height: 1.5em; /* Reserve space for message */
+        }
+
+        /* Settings Screen */
+        .settings-screen {
+            background: linear-gradient(135deg, #fdfdfd, #f0f0f0);
+            color: #333;
+        }
+        .settings-content {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            max-width: 90%;
+            width: 650px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .settings-screen h2 {
+            font-size: 2.6rem;
+            margin-bottom: 40px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 18px 25px;
+            background: #f0f4f8;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #4a4a4a;
+            box-shadow: 0 3px 12px var(--shadow-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .setting-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+        .setting-item svg {
+            margin-right: 20px;
+            color: var(--highlight);
+            font-size: 2em;
+            flex-shrink: 0;
+        }
+        .password-section {
+            width: 100%;
+            padding: 30px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.05);
+        }
+        .password-section h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .password-section p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        .password-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .password-input-group input {
+            padding: 18px 25px;
+            font-size: 1.3rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .password-input-group input:focus {
+            border-color: var(--highlight);
+            box-shadow: 0 0 0 4px rgba(46, 142, 253, 0.4);
+        }
+        .password-input-group button {
+            padding: 15px 45px;
+            font-size: 1.3rem;
+            background: var(--gradient-dark-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px var(--shadow-medium);
+            font-weight: 600;
+        }
+        .password-input-group button:hover {
+            background: linear-gradient(45deg, #1d428a, var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 9px 25px var(--shadow-strong);
+        }
+        .password-error {
+            color: var(--danger);
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-15px); }
+            40%, 80% { transform: translateX(15px); }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            background: linear-gradient(135deg, #f8fbfd, #eef3f7);
+            color: #333;
+        }
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-strong);
+            max-width: 90%;
+            width: 500px;
+        }
+        .loading-spinner {
+            border: 10px solid #e0e0e0;
+            border-top: 10px solid var(--primary);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .loading-spinner::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #c0c0c0;
+            border-top: 5px solid var(--highlight);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: spinReverse 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinReverse {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+        .loading-screen h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .loading-message {
+            font-size: 1.2rem;
+            color: #777;
+            min-height: 1.8em; /* Reserve space */
+            font-weight: 500;
+        }
+
+        /* Antivirus Disclaimer */
+        .antivirus-disclaimer {
+            background: linear-gradient(135deg, #fff0f3, #ffe6eb);
+            color: #333;
+        }
+        .antivirus-content {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            max-width: 90%;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .antivirus-disclaimer h2 {
+            font-size: 2.6rem;
+            margin-bottom: 25px;
+            color: var(--danger);
+            font-weight: 800;
+        }
+        .antivirus-disclaimer p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            max-width: 600px;
+            font-weight: 500;
+        }
+        /* Specific button styling for #disableAntivirusBtn */
+        #disableAntivirusBtn {
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            background: var(--gradient-red);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px var(--shadow-medium);
+            font-weight: 600;
+            /* Added specific hover effect for this button */
+        }
+        #disableAntivirusBtn:hover {
+            background: linear-gradient(45deg, #b8253a, var(--danger));
+            transform: translateY(-3px);
+            box-shadow: 0 9px 25px var(--shadow-strong);
+        }
+        .firewall-animation {
+            width: 100%;
+            max-width: 500px;
+            height: 220px;
+            background: #e0e0e0;
+            border: 3px solid #ccc;
+            border-radius: 20px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.25);
+            transition: background 0.5s ease-out;
+        }
+        .firewall-animation.deactivated {
+            background: linear-gradient(135deg, #e8fbe8, #d0f0d0); /* Greenish tint when deactivated */
+        }
+        .firewall-line {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: var(--danger);
+            animation: deactivateLine 2.5s forwards ease-in-out;
+            opacity: 1;
+            transform: translateX(0);
+            box-shadow: 0 0 12px rgba(234, 46, 73, 0.6);
+        }
+        .firewall-line:nth-child(2) { top: 20%; animation-delay: 0.2s; }
+        .firewall-line:nth-child(3) { top: 40%; animation-delay: 0.4s; }
+        .firewall-line:nth-child(4) { top: 60%; animation-delay: 0.6s; }
+        .firewall-line:nth-child(5) { top: 80%; animation-delay: 0.8s; }
+
+        @keyframes deactivateLine {
+            0% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(120%); opacity: 0; }
+            100% { transform: translateX(120%); opacity: 0; }
+        }
+        .firewall-text {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #333;
+            z-index: 1;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.7);
+        }
+        .firewall-shield {
+            font-size: 5rem;
+            color: var(--danger);
+            margin-bottom: 25px;
+            animation: shieldPulse 1.5s infinite alternate;
+            z-index: 1;
+        }
+        .firewall-animation.deactivated .firewall-shield {
+            color: var(--success); /* Change color when deactivated */
+            animation: none; /* Stop pulsing */
+        }
+        @keyframes shieldPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0.9; }
+        }
+        .firewall-status-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 15px;
+            font-weight: 500;
+            min-height: 1.5em; /* Reserve space */
+        }
+
+        /* Proctor Wait Screen */
+        .proctor-wait-screen {
+            background: linear-gradient(135deg, #f0f4f8, #e6edf2);
+            color: #333;
+        }
+        .proctor-content {
+            background: #fff;
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-strong);
+            max-width: 90%;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .proctor-wait-screen .stop-sign {
+            width: 220px;
+            height: 220px;
+            background: var(--gradient-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 0 0 0 18px rgba(234, 46, 73, 0.25), 0 0 0 36px rgba(234, 46, 73, 0.15);
+            animation: pulseStop 2s infinite alternate;
+        }
+        .proctor-wait-screen .stop-sign::before {
+            content: "STOP";
+            color: #fff;
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-shadow: 2px 2px 6px var(--shadow-strong);
+        }
+        @keyframes pulseStop {
+            0% { transform: scale(1); box-shadow: 0 0 0 18px rgba(234, 46, 73, 0.25), 0 0 0 36px rgba(234, 46, 73, 0.15); }
+            100% { transform: scale(1.03); box-shadow: 0 0 0 22px rgba(234, 46, 73, 0.35), 0 0 0 40px rgba(234, 46, 73, 0.2); }
+        }
+        .proctor-wait-screen p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 50px;
+            text-shadow: 1px 1px 3px var(--shadow-light);
+            line-height: 1.4;
+        }
+        /* Specific button styling for #startTestBtn */
+        #startTestBtn {
+            padding: 20px 60px;
+            font-size: 1.6rem;
+            background: var(--gradient-dark-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--shadow-medium);
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            /* Added specific hover effect for this button */
+        }
+        #startTestBtn:hover {
+            background: linear-gradient(45deg, #1d428a, var(--primary));
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px var(--shadow-strong);
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="screen active">
+        <div class="welcome-content">
+            <h1>Welcome to the Intro to Nursing Unit 1 Exam Simulation</h1>
+            <button id="selectTestBtn">Select Test</button>
+        </div>
+    </div>
+
+    <!-- Download Screen -->
+    <div id="downloadScreen" class="screen">
+        <div class="download-content">
+            <h2>Downloading Exam...</h2>
+            <p class="exam-title">Intro to Nursing Unit 1 Exam Simulation</p>
+            <div class="file-icon-container">
+                <!-- SVG for a document icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text file-icon">
+                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                    <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+                    <path d="M10 9H8"/>
+                    <path d="M16 13H8"/>
+                    <path d="M16 17H8"/>
+                </svg>
+                <div class="download-arrow">⬇️</div>
+            </div>
+            <div class="download-progress-bar">
+                <div class="download-progress" id="downloadProgress">0%</div>
+            </div>
+            <p class="download-text" id="downloadStatus">Initializing download...</p>
+        </div>
+    </div>
+
+    <!-- Testing Settings Screen -->
+    <div id="settingsScreen" class="screen">
+        <div class="settings-content">
+            <h2>Testing Settings</h2>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi-off"><line x1="12" x2="12.01" y1="18" y2="18"/><path d="M5 12.5S2 10 2 7c0-1.5 1.5-3 3-3"/><path d="M19 12.5S22 10 22 7c0-1.5-1.5-3-3-3"/><path d="M2 17l20 5"/><path d="M17 17s-2.5-2.5-5-2.5-5 2.5-5 2.5"/><path d="M8.5 8.5C9 7.5 10 7 12 7c1.5 0 2.5.5 3.5 1.5"/></svg>
+                    Wi-Fi is deactivated
+                </div>
+                <div class="setting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shuffle"><path d="M22 16H2"/><path d="M10 2L2 16"/><path d="M15 22l7-16"/></svg>
+                    Test questions are randomized
+                </div>
+                <div class="setting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Test environment is protected and secured
+                </div>
+            </div>
+            <div class="password-section">
+                <h3>Exam Access Password</h3>
+                <p>Please enter the provided password to unlock the exam environment.(code = UnitOneExamSim)</p>
+                <div class="password-input-group">
+                    <input type="password" id="passwordInput" placeholder="Enter password" />
+                    <button id="passwordSubmitBtn">Unlock Exam</button>
+                    <p id="passwordError" class="password-error" style="display:none;">Incorrect password. Please try again.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <h3>Preparing your exam environment...</h3>
+            <p id="loadingMessage" class="loading-message">Verifying system integrity...</p>
+        </div>
+    </div>
+
+    <!-- Antivirus Disclaimer Screen -->
+    <div id="antivirusDisclaimer" class="screen">
+        <div class="antivirus-content">
+            <h2>Important System Check</h2>
+            <p>To ensure the integrity and smooth operation of your exam, please temporarily disable any active antivirus or firewall software.</p>
+            <button id="disableAntivirusBtn">Proceed to Deactivate Firewall</button>
+            <div id="firewallAnimation" class="firewall-animation" style="display:none;">
+                <div class="firewall-shield">🛡️</div>
+                <div class="firewall-text">Deactivating Firewall...</div>
+                <div class="firewall-status-text" id="firewallStatus">Scanning for active protections...</div>
+                <div class="firewall-line"></div>
+                <div class="firewall-line"></div>
+                <div class="firewall-line"></div>
+                <div class="firewall-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proctor Wait Screen -->
+    <div id="proctorWaitScreen" class="screen">
+        <div class="proctor-content">
+            <div class="stop-sign"></div>
+            <p>Please wait for the proctor's instruction to begin the test.</p>
+            <button id="startTestBtn">Start Test</button>
+        </div>
+    </div>
+
+    <!-- Main Exam Content (Original User Code) -->
+    <div class="topbar" style="display:none;">
+        Intro to Nursing unit 1 Exam Simulation
+        <span class="timer-box" id="timerBox"></span>
+    </div>
+    <div class="main-exam" style="display:none;">
+        <div class="qnav" id="qPalette"></div>
+        <div class="center-area">
+            <div class="question-card" id="qArea"></div>
+            <div id="reviewArea" style="display:none;width:100%;height:100%;overflow-y:auto;"></div>
+        </div>
+    </div>
+    <div class="footer-bar" style="display:none;">
+        <div class="footer-inner">
+            <div class="progress-display" id="progressBar"></div>
+            <div class="footer-btns">
+                <button class="btn" id="nextBtn" disabled>Next</button>
+            </div>
+        </div>
+    </div>
+    <div id="modal" style="display:none"></div>
+
+    <script>
+        // Helper function to show a screen and hide others with fade effect
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                if (screen.id === screenId) {
+                    screen.style.display = 'flex'; // Show the screen
+                    setTimeout(() => screen.classList.add('active'), 10); // Add active class after a tiny delay for transition
+                } else {
+                    screen.classList.remove('active');
+                    // Hide after transition completes
+                    setTimeout(() => {
+                        if (!screen.classList.contains('active')) { // Only hide if not the active screen
+                            screen.style.display = 'none';
+                        }
+                    }, 500); // Match CSS transition duration
+                }
+            });
+
+            // Hide main exam elements by default
+            document.querySelector('.topbar').style.display = 'none';
+            document.querySelector('.main-exam').style.display = 'none';
+            document.querySelector('.footer-bar').style.display = 'none';
+        }
+
+        // Initial screen: Welcome
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen('welcomeScreen');
+        });
+
+        // 1. Welcome Screen Logic
+        document.getElementById('selectTestBtn').addEventListener('click', () => {
+            showScreen('downloadScreen');
+            simulateDownload();
+        });
+
+        // 2. Download Screen Logic
+        function simulateDownload() {
+            const progressBar = document.getElementById('downloadProgress');
+            const downloadStatus = document.getElementById('downloadStatus');
+            const downloadArrow = document.querySelector('.download-arrow');
+            let progress = 0;
+            const downloadMessages = [
+                "Initializing download...",
+                "Connecting to secure server...",
+                "Downloading exam package (1/3)...",
+                "Downloading exam package (2/3)...",
+                "Downloading exam package (3/3)...",
+                "Verifying file integrity...",
+                "Decompressing exam assets...",
+                "Setting up local environment...",
+                "Preparing for launch...",
+                "Download complete. Finalizing setup..."
+            ];
+            let messageIndex = 0;
+
+            // Start arrow animation
+            downloadArrow.style.animation = 'downloadArrow 1.5s infinite ease-out';
+
+            const interval = setInterval(() => {
+                progress += 10;
+                if (progress <= 100) {
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${progress}%`;
+                    if (messageIndex < downloadMessages.length - 1 && progress >= (messageIndex + 1) * 10) {
+                        messageIndex++;
+                    }
+                    downloadStatus.textContent = downloadMessages[messageIndex];
+                } else {
+                    clearInterval(interval);
+                    downloadArrow.style.animation = 'none'; // Stop arrow animation
+                    downloadStatus.textContent = `Download Complete!`;
+                    setTimeout(() => {
+                        showScreen('settingsScreen');
+                    }, 800); // Short delay before moving to settings
+                }
+            }, 300); // Adjust speed of download animation
+        }
+
+        // 3. Testing Settings Screen Logic
+        const correctPassword = "UnitOneExamSim";
+        document.getElementById('passwordSubmitBtn').addEventListener('click', () => {
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordError = document.getElementById('passwordError');
+            if (passwordInput.value === correctPassword) {
+                passwordError.style.display = 'none';
+                showScreen('loadingScreen');
+                simulateLoading();
+            } else {
+                passwordError.style.display = 'block';
+                passwordInput.value = ''; // Clear password on error
+            }
+        });
+
+        // 4. Animated Loading Screen Logic
+        function simulateLoading() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const messages = [
+                "Verifying system integrity...",
+                "Loading core modules...",
+                "Establishing secure connection...",
+                "Calibrating display settings...",
+                "Finalizing exam environment...",
+                "Almost ready..."
+            ];
+            let msgIndex = 0;
+
+            const messageInterval = setInterval(() => {
+                msgIndex = (msgIndex + 1) % messages.length;
+                loadingMessage.textContent = messages[msgIndex];
+            }, 1000); // Change message every second
+
+            setTimeout(() => {
+                clearInterval(messageInterval);
+                showScreen('antivirusDisclaimer');
+            }, 6000); // Simulate loading for 6 seconds
+        }
+
+        // 5 & 6. Antivirus Disclaimer and Firewall Deactivation Logic
+        document.getElementById('disableAntivirusBtn').addEventListener('click', () => {
+            const antivirusDisclaimer = document.getElementById('antivirusDisclaimer');
+            const firewallAnimation = document.getElementById('firewallAnimation');
+            const disableAntivirusBtn = document.getElementById('disableAntivirusBtn');
+            const firewallStatus = document.getElementById('firewallStatus');
+            const firewallShield = document.querySelector('.firewall-shield');
+
+            disableAntivirusBtn.style.display = 'none'; // Hide the button
+            firewallAnimation.style.display = 'flex'; // Show the animation
+
+            // Reset animation for re-run if needed
+            firewallAnimation.querySelectorAll('.firewall-line').forEach(line => {
+                line.style.animation = 'none';
+                void line.offsetWidth; // Trigger reflow
+                line.style.animation = `deactivateLine 2.5s forwards ease-in-out`;
+                line.style.opacity = '1';
+                line.style.transform = 'translateX(0)';
+            });
+
+            firewallStatus.textContent = "Scanning for active protections...";
+            firewallAnimation.classList.remove('deactivated'); // Ensure it's not deactivated initially
+            firewallShield.style.animation = 'shieldPulse 1.5s infinite alternate'; // Restart shield pulse
+
+            setTimeout(() => {
+                firewallStatus.textContent = "Deactivating security protocols...";
+            }, 1000);
+            setTimeout(() => {
+                firewallStatus.textContent = "Firewall deactivated. System ready.";
+                firewallAnimation.classList.add('deactivated'); // Add class for visual change
+                firewallShield.style.animation = 'none'; // Stop shield pulse
+            }, 2500);
+
+
+            setTimeout(() => {
+                // After firewall animation completes
+                showScreen('proctorWaitScreen');
+            }, 3000); // Allow time for firewall animation (2.5s + buffer)
+        });
+
+        // 7. Proctor Wait Screen Logic
+        document.getElementById('startTestBtn').addEventListener('click', () => {
+            // Hide all introductory screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+                screen.style.display = 'none'; // Ensure they are hidden
+            });
+
+            // Show main exam elements
+            document.querySelector('.topbar').style.display = 'flex';
+            document.querySelector('.main-exam').style.display = 'flex';
+            document.querySelector('.footer-bar').style.display = 'flex';
+
+            // Initialize the exam
+            initExam();
+        });
+
+
+        // PASTE YOUR ENTIRE TEST BANK HERE:
+        // Using only 3 questions for testing purposes as requested
+        const allQuestions = [
+  {
+    "questionText": "A nurse is using Orem’s Self-Care Deficit Theory when planning care for a patient with a new colostomy. Which nursing intervention demonstrates application of this theory?",
+    "type": "mc",
+    "section": "Nursing Theory",
+    "options": {
+      "a": "Administering pain medication as prescribed",
+      "b": "Teaching the patient how to empty and change the colostomy pouch",
+      "c": "Providing wound care to the stoma site",
+      "d": "Reporting changes in output to the provider"
+    },
+    "correctAnswer": "b",
+    "rationale": "Orem’s theory emphasizes patient self-care and independence. Teaching a patient to manage their colostomy exemplifies promoting self-care."
+  },
+  {
+    "questionText": "A nurse finds out her close friend was admitted to the oncology unit where she works. Which action by the nurse best demonstrates professional boundaries?",
+    "type": "mc",
+    "section": "Professional Practice & Values",
+    "options": {
+      "a": "Accessing the friend’s chart to see her diagnosis",
+      "b": "Asking the charge nurse to assign her to her friend",
+      "c": "Maintaining patient confidentiality and requesting NOT to be assigned",
+      "d": "Informing her other coworkers that her friend is admitted"
+    },
+    "correctAnswer": "c",
+    "rationale": "Nurses must maintain confidentiality and boundaries. Accessing records without need-to-know is a HIPAA violation."
+  },
+  {
+    "questionText": "A patient says, “I feel like I can’t go on anymore.” Which therapeutic communication is most appropriate?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "You have so much to live for.",
+      "b": "Tell me more about what you are feeling.",
+      "c": "Don’t say that; everything will be fine.",
+      "d": "Do you want me to call your family now?"
+    },
+    "correctAnswer": "b",
+    "rationale": "Open-ended, nonjudgmental statements encourage the patient to share feelings and show active listening."
+  },
+  {
+    "questionText": "The nurse is caring for a client receiving IV vancomycin. The client suddenly develops wheezing, hypotension, and facial swelling. What is the first nursing action?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Call the rapid response team",
+      "b": "Stop the infusion immediately",
+      "c": "Administer oxygen",
+      "d": "Prepare epinephrine for administration"
+    },
+    "correctAnswer": "b",
+    "rationale": "Clinical judgment requires immediate safety intervention. Stopping the causative infusion is the priority before other interventions."
+  },
+  {
+    "questionText": "During assessment, a nurse documents a patient’s wound with purulent drainage, foul odor, and erythema. Which finding is the nursing priority based on the assessment data?",
+    "type": "mc",
+    "section": "Nursing Process – Assessment",
+    "options": {
+      "a": "Risk for impaired mobility",
+      "b": "Ineffective tissue perfusion",
+      "c": "Risk for infection",
+      "d": "Ineffective wound healing"
+    },
+    "correctAnswer": "c",
+    "rationale": "Purulent drainage with odor and redness indicates active infection, making infection control the highest priority."
+  },
+  {
+    "questionText": "The nurse develops the diagnosis: “Impaired skin integrity related to immobility as evidenced by Stage 2 pressure injury.” Which part of this diagnosis represents the etiology?",
+    "type": "mc",
+    "section": "Nursing Diagnosis",
+    "options": {
+      "a": "Impaired skin integrity",
+      "b": "As evidenced by Stage 2 pressure injury",
+      "c": "Related to immobility",
+      "d": "Pressure injury"
+    },
+    "correctAnswer": "c",
+    "rationale": "In nursing diagnoses, the related to portion identifies the etiology or contributing factor."
+  },
+  {
+    "questionText": "For a patient with new-onset diabetes, which outcome statement is measurable and correctly written?",
+    "type": "mc",
+    "section": "Planning, Implementation, Evaluation",
+    "options": {
+      "a": "Patient will learn about diet.",
+      "b": "Patient will understand insulin therapy.",
+      "c": "Patient will demonstrate correct insulin injection within 48 hours.",
+      "d": "Patient will not have complications in the future."
+    },
+    "correctAnswer": "c",
+    "rationale": "Outcomes must be specific, measurable, achievable, and time-bound (SMART goals)."
+  },
+  {
+    "questionText": "A nurse is preparing to care for a patient with MRSA in wound drainage. Which PPE is required?",
+    "type": "mc",
+    "section": "Infection Control & PPE",
+    "options": {
+      "a": "Surgical mask only",
+      "b": "Gown and gloves",
+      "c": "N95 mask and face shield",
+      "d": "Gloves only"
+    },
+    "correctAnswer": "b",
+    "rationale": "MRSA wound infections require contact precautions—gloves and gown upon entry to the room."
+  },
+  {
+    "questionText": "A patient with tuberculosis requires transport to radiology. What is the nurse’s priority action?",
+    "type": "mc",
+    "section": "Infection Control & PPE",
+    "options": {
+      "a": "Place a surgical mask on the patient",
+      "b": "Wear an N95 respirator",
+      "c": "Notify security to escort the patient",
+      "d": "Instruct radiology staff to use droplet precautions"
+    },
+    "correctAnswer": "a",
+    "rationale": "TB is airborne; while staff wear N95 in the room, the patient must wear a surgical mask during transport."
+  },
+  {
+    "questionText": "Which patient requires placement in a negative-pressure room?",
+    "type": "mc",
+    "section": "Isolation Rooms",
+    "options": {
+      "a": "Patient with influenza",
+      "b": "Patient with disseminated shingles",
+      "c": "Patient with MRSA in urine",
+      "d": "Patient with C. difficile"
+    },
+    "correctAnswer": "b",
+    "rationale": "Disseminated (systemic) shingles is airborne; airborne precautions require negative-pressure room."
+  },
+  {
+    "questionText": "A confused older adult refuses a morning bath. Which is the best nursing response?",
+    "type": "mc",
+    "section": "Hygiene & Skin Integrity",
+    "options": {
+      "a": "You must take your bath now.",
+      "b": "Can we bathe you later in the day instead?",
+      "c": "I’ll call your family to convince you.",
+      "d": "It’s not important if you don’t want to."
+    },
+    "correctAnswer": "b",
+    "rationale": "Respecting patient autonomy while offering flexibility demonstrates patient-centered care."
+  },
+  {
+    "questionText": "A nurse assesses a wound with exposed bone and slough present. Which stage of pressure injury is this?",
+    "type": "mc",
+    "section": "Wound Staging",
+    "options": {
+      "a": "Stage 2",
+      "b": "Stage 3",
+      "c": "Stage 4",
+      "d": "Unstageable"
+    },
+    "correctAnswer": "c",
+    "rationale": "Stage 4 pressure injuries involve full-thickness skin loss with exposed bone, tendon, or muscle."
+  },
+  {
+    "questionText": "A patient reports pain rating 8/10 one hour after receiving IV morphine. Which action is best?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Document pain score and reassess in 2 hours",
+      "b": "Notify the provider of inadequate pain relief",
+      "c": "Explain tolerance is expected with opioids",
+      "d": "Administer an NSAID instead of opioids"
+    },
+    "correctAnswer": "b",
+    "rationale": "If pain remains uncontrolled after treatment, the nurse advocates for alternative or additional provider orders."
+  },
+  {
+    "questionText": "During sterile Foley catheter insertion, the nurse accidentally brushes the sterile catheter tip against the patient’s thigh. What is the correct action?",
+    "type": "mc",
+    "section": "Asepsis",
+    "options": {
+      "a": "Continue procedure; thigh is clean",
+      "b": "Soak the catheter tip in antiseptic",
+      "c": "Discard and replace the catheter with a new sterile one",
+      "d": "Notify the provider"
+    },
+    "correctAnswer": "c",
+    "rationale": "Asepsis requires strict sterility; once contaminated, equipment must be replaced."
+  },
+  {
+    "questionText": "A nurse enters the room of a patient diagnosed with meningococcal meningitis. Which PPE should be worn?",
+    "type": "mc",
+    "section": "Droplet Precautions",
+    "options": {
+      "a": "Gown and gloves only",
+      "b": "N95 mask and gown",
+      "c": "Surgical mask, gown, and gloves",
+      "d": "Goggles only"
+    },
+    "correctAnswer": "c",
+    "rationale": "Droplet precautions (e.g., meningitis) require a surgical mask plus gown and gloves if contact is likely."
+  },
+ {
+    "questionText": "According to Maslow’s Hierarchy of Needs, which nursing action addresses a client’s highest priority?",
+    "type": "mc",
+    "section": "Nursing Theory",
+    "options": {
+      "a": "Providing pain medication for a postoperative patient",
+      "b": "Educating a diabetic patient on meal planning",
+      "c": "Encouraging a newly admitted patient to call family",
+      "d": "Assisting with arranging a ride home upon discharge"
+    },
+    "correctAnswer": "a",
+    "rationale": "Physiological needs, such as pain relief, are the highest priority in Maslow’s hierarchy."
+  },
+  {
+    "questionText": "Which action by a nurse best shows accountability?",
+    "type": "mc",
+    "section": "Professional Practice",
+    "options": {
+      "a": "Delegating a medication task to an unlicensed staff member",
+      "b": "Documenting a medication error and informing the healthcare provider",
+      "c": "Discussing a patient’s care with another patient’s family",
+      "d": "Sharing unit gossip during handoff report"
+    },
+    "correctAnswer": "b",
+    "rationale": "Disclosing a medication error and initiating the correct follow-up is an essential demonstration of accountability."
+  },
+  {
+    "questionText": "A nurse caring for a hearing-impaired client implements which most effective communication strategy?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Speaking loudly close to the patient’s ear",
+      "b": "Maintaining eye contact, using written and visual aids",
+      "c": "Using medical terms at normal volume",
+      "d": "Asking family to interpret"
+    },
+    "correctAnswer": "b",
+    "rationale": "Eye contact and visual aids ensure mutual understanding for hearing-impaired clients."
+  },
+  {
+    "questionText": "At 0800, a client with sepsis has a temperature of 101.8°F, HR 115, BP 88/60, and is shivering. What is the nurse’s priority?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Give antipyretics",
+      "b": "Notify the healthcare provider",
+      "c": "Increase IV fluids per protocol",
+      "d": "Bundle up with more blankets"
+    },
+    "correctAnswer": "c",
+    "rationale": "Rapid IV fluid administration is prioritized for unstable vital signs—part of sepsis protocol."
+  },
+  {
+    "questionText": "Which assessment data best demonstrates a focused approach?",
+    "type": "mc",
+    "section": "Nursing Process – Assessment",
+    "options": {
+      "a": "Vital signs only",
+      "b": "A post-op abdominal wound inspection",
+      "c": "Full physical exam for all systems",
+      "d": "Checking pain level only"
+    },
+    "correctAnswer": "b",
+    "rationale": "Focused assessments target specific problems, such as a surgical wound."
+  },
+  {
+    "questionText": "For a patient with Stage 1 pressure injury on the sacrum, which diagnostic statement is best?",
+    "type": "mc",
+    "section": "Nursing Diagnosis",
+    "options": {
+      "a": "Impaired skin integrity related to immobility as evidenced by non-blanchable redness",
+      "b": "Risk for infection",
+      "c": "Acute pain related to surgery",
+      "d": "Impaired physical mobility"
+    },
+    "correctAnswer": "a",
+    "rationale": "The diagnosis clearly identifies cause, effect, and evidence specific to the wound."
+  },
+  {
+    "questionText": "Which statement is the best example of evaluation?",
+    "type": "mc",
+    "section": "Planning, Implementation, Evaluation",
+    "options": {
+      "a": "Patient’s pain reduced to 2/10 after medication.",
+      "b": "Administered pain medication.",
+      "c": "Planned to ambulate patient.",
+      "d": "Reinforced wound dressing."
+    },
+    "correctAnswer": "a",
+    "rationale": "Evaluation measures the patient's response to intervention, closing the nursing process loop."
+  },
+  {
+    "questionText": "When opening a sterile pack on a bedside table, what should the nurse do first?",
+    "type": "mc",
+    "section": "Asepsis",
+    "options": {
+      "a": "Don sterile gloves immediately",
+      "b": "Open the outermost flap away from the body",
+      "c": "Move the table into the hallway",
+      "d": "Pour solution onto the sterile drape"
+    },
+    "correctAnswer": "b",
+    "rationale": "Opening the outermost flap first maintains the sterile field."
+  },
+  {
+    "questionText": "What action has the greatest impact on decreasing healthcare-associated infections?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Wearing a mask",
+      "b": "Practicing consistent hand hygiene",
+      "c": "Using alcohol-based wipes for the environment",
+      "d": "Placing patients on isolation"
+    },
+    "correctAnswer": "b",
+    "rationale": "Hand hygiene is proven to be the most effective barrier to infection transmission."
+  },
+  {
+    "questionText": "Which is essential when caring for a client with C. difficile?",
+    "type": "mc",
+    "section": "Infection Control",
+    "options": {
+      "a": "Wearing an N95 respirator",
+      "b": "Using soap and water for hand hygiene",
+      "c": "Disinfecting with alcohol gel",
+      "d": "Double gloving"
+    },
+    "correctAnswer": "b",
+    "rationale": "C. difficile spores require mechanical removal by soap and water for effective hand hygiene."
+  },
+  {
+    "questionText": "Which patient would require droplet precautions?",
+    "type": "mc",
+    "section": "Contact, Isolation, Droplet Precautions",
+    "options": {
+      "a": "Herpes zoster, localized",
+      "b": "Influenza",
+      "c": "C. difficile",
+      "d": "Tuberculosis"
+    },
+    "correctAnswer": "b",
+    "rationale": "Influenza spreads via droplets—mask and private room are necessary."
+  },
+  {
+    "questionText": "Who is most appropriately placed in a positive pressure room?",
+    "type": "mc",
+    "section": "Negative/Positive Pressure Rooms",
+    "options": {
+      "a": "Client with neutropenia",
+      "b": "Client with COVID-19",
+      "c": "Client with pulmonary tuberculosis",
+      "d": "Client with measles"
+    },
+    "correctAnswer": "a",
+    "rationale": "Positive pressure protects immunocompromised clients (e.g., neutropenia) from outside contaminants."
+  },
+  {
+    "questionText": "When assisting an incontinent client with perineal care, which action reduces risk for skin breakdown?",
+    "type": "mc",
+    "section": "Hygiene & Personal Care",
+    "options": {
+      "a": "Applying powder after drying",
+      "b": "Using barrier cream",
+      "c": "Wiping from back to front",
+      "d": "Cleaning once per shift"
+    },
+    "correctAnswer": "b",
+    "rationale": "Barrier creams offer ongoing skin protection between diapers or cleanings."
+  },
+  {
+    "questionText": "A client is at risk for skin breakdown due to immobility. Which measure is most preventive?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Applying heat packs",
+      "b": "Repositioning every 2 hours",
+      "c": "Using plastic sheets",
+      "d": "Restricting fluids"
+    },
+    "correctAnswer": "b",
+    "rationale": "Turning reduces pressure, improving circulation and preventing ulcers."
+  },
+  {
+    "questionText": "A nurse notes new erythema, warmth, and swelling around a surgical site. What is the initial intervention?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Document and continue routine care",
+      "b": "Obtain wound culture as prescribed",
+      "c": "Start antibiotics immediately",
+      "d": "Apply heat pack"
+    },
+    "correctAnswer": "b",
+    "rationale": "Signs suggest possible infection; cultures confirm causative organism for targeted treatment."
+  },
+  {
+    "questionText": "A wound with slough obscuring the base is best classified as:",
+    "type": "mc",
+    "section": "Pressure Wounds & Staging",
+    "options": {
+      "a": "Stage 2",
+      "b": "Stage 4",
+      "c": "Stage 3",
+      "d": "Unstageable"
+    },
+    "correctAnswer": "d",
+    "rationale": "Slough or eschar preventing visualization of the extent is \"unstageable\" until debrided."
+  },
+  {
+    "questionText": "For a patient with chronic osteoarthritis pain, which non-pharmacologic intervention should be prioritized?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "TENS therapy",
+      "b": "Deep breathing exercises",
+      "c": "Distraction with music",
+      "d": "Aromatherapy"
+    },
+    "correctAnswer": "a",
+    "rationale": "TENS (transcutaneous electrical nerve stimulation) is evidence-based for musculoskeletal pain relief."
+  },
+  {
+    "questionText": "Which findings indicate effective pain management post-op?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Vital signs returning to baseline, low pain score",
+      "b": "Persistent grimacing and high BP",
+      "c": "Guarding surgical site, RR increased",
+      "d": "Complaints of 8/10 pain"
+    },
+    "correctAnswer": "a",
+    "rationale": "Decreased pain behavior and normal vitals suggest successful pain interventions."
+  },
+  {
+    "questionText": "Which finding indicates a venous ulcer rather than an arterial ulcer?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Well-defined wound edges, pale base",
+      "b": "Irregular wound borders, moderate exudate, lower leg edema",
+      "c": "Dry, necrotic base, minimal drainage",
+      "d": "Located on the foot with shiny, hairless skin"
+    },
+    "correctAnswer": "b",
+    "rationale": "Venous ulcers commonly have irregular borders, moderate drainage, and are accompanied by lower leg swelling."
+  },
+  {
+    "questionText": "Which type of wound dressing is best for a full-thickness leg ulcer with minimal exudate?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Hydrocolloid",
+      "b": "Alginate",
+      "c": "Hydrogel",
+      "d": "Transparent film"
+    },
+    "correctAnswer": "c",
+    "rationale": "Hydrogel provides extra moisture for full-thickness wounds with minimal exudate to promote healing."
+  },
+  {
+    "questionText": "Negative pressure wound therapy (NPWT) is prescribed for a client with a stage 3 pressure injury. Which finding is an expected outcome of NPWT?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Increased wound size",
+      "b": "Increased exudate",
+      "c": "Reduction in wound size and exudate",
+      "d": "Skin maceration"
+    },
+    "correctAnswer": "c",
+    "rationale": "NPWT decreases wound size and exudate while promoting healing."
+  },
+  {
+    "questionText": "A client’s wound is healing with new, pale red tissue that bleeds easily. What does this indicate?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Wound infection",
+      "b": "Granulation tissue forming",
+      "c": "Eschar development",
+      "d": "Inflammatory phase"
+    },
+    "correctAnswer": "b",
+    "rationale": "Granulation tissue is a sign of healthy wound healing and new tissue growth."
+  },
+  {
+    "questionText": "After debridement, a wound base shows beefy red tissue and some serous drainage. The nurse should:",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Apply dry gauze",
+      "b": "Moisten the wound with normal saline and protect with a non-adhesive dressing",
+      "c": "Scrub the wound daily",
+      "d": "Pack tightly with wet-dry dressings"
+    },
+    "correctAnswer": "b",
+    "rationale": "Maintaining a moist, protected environment supports granulation and prevents trauma."
+  },
+  {
+    "questionText": "In the diagnosis step, which statement best links assessment to client priority?",
+    "type": "mc",
+    "section": "Nursing Process & Clinical Judgment",
+    "options": {
+      "a": "Patient is at risk for falls.",
+      "b": "Impaired skin integrity related to immobility as evidenced by redness over sacrum",
+      "c": "Needs regular repositioning",
+      "d": "Knowledge deficit about wound care"
+    },
+    "correctAnswer": "b",
+    "rationale": "This diagnosis includes the cause, effect, and evidence—connecting assessment to nursing judgment."
+  },
+  {
+    "questionText": "Which demonstrates “Evaluate Outcomes” in clinical judgment?",
+    "type": "mc",
+    "section": "Nursing Process & Clinical Judgment",
+    "options": {
+      "a": "Teaching the client to wash hands",
+      "b": "Assessing wound for decreased drainage and size",
+      "c": "Documenting initial wound measurement",
+      "d": "Planning dressing changes every 6 hours"
+    },
+    "correctAnswer": "b",
+    "rationale": "Evaluation is measuring patient response versus expected healing outcomes."
+  },
+  {
+    "questionText": "A nurse recognizes cues of increased HR, pain, and swelling in a post-op wound. What action is next according to the judgment model?",
+    "type": "mc",
+    "section": "Nursing Process & Clinical Judgment",
+    "options": {
+      "a": "Ignore, as this is common",
+      "b": "Generate hypothesis: wound infection likely",
+      "c": "Plan to change the dressing on schedule",
+      "d": "Discharge the client"
+    },
+    "correctAnswer": "b",
+    "rationale": "After recognizing cues, the next step is to analyze and prioritize likely problems."
+  },
+  {
+    "questionText": "A nurse teaching wound care tells the client how to note signs of infection. This demonstrates which nursing process phase?",
+    "type": "mc",
+    "section": "Nursing Process & Clinical Judgment",
+    "options": {
+      "a": "Implementation",
+      "b": "Assessment",
+      "c": "Diagnosis",
+      "d": "Evaluation"
+    },
+    "correctAnswer": "a",
+    "rationale": "Implementation involves delivering education and interventions."
+  },
+  {
+    "questionText": "Which pathogens require BOTH contact and airborne precautions?",
+    "type": "mc",
+    "section": "Infection Control, Isolation & PPE",
+    "options": {
+      "a": "MRSA",
+      "b": "Varicella (chickenpox)",
+      "c": "C. difficile",
+      "d": "E. coli"
+    },
+    "correctAnswer": "b",
+    "rationale": "Chickenpox transmits via airborne droplets and direct contact, so both are needed."
+  },
+  {
+    "questionText": "When doffing PPE after caring for a CDiff-positive patient, which step comes first?",
+    "type": "mc",
+    "section": "Infection Control, Isolation & PPE",
+    "options": {
+      "a": "Remove gown",
+      "b": "Remove gloves",
+      "c": "Remove goggles",
+      "d": "Remove mask"
+    },
+    "correctAnswer": "b",
+    "rationale": "Gloves are most contaminated and are removed first in the sequence."
+  },
+  {
+    "questionText": "What is the best room placement for a client with pulmonary TB?",
+    "type": "mc",
+    "section": "Infection Control, Isolation & PPE",
+    "options": {
+      "a": "Positive pressure private room",
+      "b": "Standard semi-private room",
+      "c": "Negative pressure isolation room",
+      "d": "Double-bed room with curtain divider"
+    },
+    "correctAnswer": "c",
+    "rationale": "TB is airborne; a negative pressure room is required to contain pathogens."
+  },
+  {
+    "questionText": "Which client is most at risk for pressure injuries in acute care?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Ambulates with assistance",
+      "b": "Paraplegic, incontinent",
+      "c": "Eats all meals",
+      "d": "Alert, oriented, walks unassisted"
+    },
+    "correctAnswer": "b",
+    "rationale": "Immobility and incontinence are high risk factors for pressure injury development."
+  },
+  {
+    "questionText": "Which finding shows development of opioid tolerance?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Needing increasingly higher doses to control pain",
+      "b": "Drowsiness after first dose",
+      "c": "Nausea and vomiting",
+      "d": "New onset constipation"
+    },
+    "correctAnswer": "a",
+    "rationale": "Tolerance results in lessened effect, requiring dose escalations."
+  },
+  {
+    "questionText": "What is a best practice for Patient-Controlled Analgesia (PCA)?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Instruct family to push button if patient is asleep",
+      "b": "Loading dose may be given before self-administration begins",
+      "c": "PCA is never used after surgery",
+      "d": "Nurses must push button for confused patients"
+    },
+    "correctAnswer": "b",
+    "rationale": "A loading dose helps reach therapeutic relief before self-administration begins."
+  },
+  {
+    "questionText": "Which is the most reliable indicator for assessing acute pain in a non-verbal client?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Heart rate",
+      "b": "Facial grimacing and withdrawal from touch",
+      "c": "Respiratory rate",
+      "d": "Blood pressure"
+    },
+    "correctAnswer": "b",
+    "rationale": "Behavioral cues such as grimacing and withdrawal reliably indicate pain in nonverbal populations."
+  },
+  {
+    "questionText": "The nurse is assisting a client with dementia who refuses a daily bath. Which approach supports dignity?",
+    "type": "mc",
+    "section": "Hygiene & Skin Integrity",
+    "options": {
+      "a": "Insist the client bathe now",
+      "b": "Offer the bath later or use partial cleansing methods",
+      "c": "Skip hygiene altogether",
+      "d": "Call the physician to persuade the client"
+    },
+    "correctAnswer": "b",
+    "rationale": "Offering alternatives respects dignity and accommodates preferences."
+  },
+  {
+    "questionText": "Which example best illustrates Watson’s Theory of Human Caring?",
+    "type": "mc",
+    "section": "Nursing Theory",
+    "options": {
+      "a": "A nurse focuses solely on performing tasks quickly",
+      "b": "A nurse sits at the bedside and actively listens to the patient’s concerns before a procedure",
+      "c": "A nurse delegates hygiene care to unlicensed staff",
+      "d": "A nurse completes charting at the nurses’ station before assessing new admissions"
+    },
+    "correctAnswer": "b",
+    "rationale": "Watson’s theory emphasizes caring relationships, presence, and holistic attention to patients."
+  },
+  {
+    "questionText": "Which nurse behavior upholds the principle of veracity?",
+    "type": "mc",
+    "section": "Professional Practice",
+    "options": {
+      "a": "Omitting a medication error from the report",
+      "b": "Explaining all possible risks of a planned procedure to a patient",
+      "c": "Telling the patient a side effect is “not a big deal”",
+      "d": "Documenting incomplete information"
+    },
+    "correctAnswer": "b",
+    "rationale": "Veracity is the ethical duty to tell the truth and fully inform patients."
+  },
+  {
+    "questionText": "A patient refuses a blood transfusion due to religious beliefs. Which action by the nurse is best?",
+    "type": "mc",
+    "section": "Values, Beliefs, Caring",
+    "options": {
+      "a": "Persuade the patient to accept blood products",
+      "b": "Notify the care team and advocate for alternative treatments",
+      "c": "Administer the blood without consent",
+      "d": "Discharge the patient"
+    },
+    "correctAnswer": "b",
+    "rationale": "Nurses must respect patient autonomy, advocate for their beliefs, and alert the team for care planning."
+  },
+  {
+    "questionText": "When using SBAR to report a patient’s change in status, which component comes first?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Assessment",
+      "b": "Situation",
+      "c": "Background",
+      "d": "Recommendation"
+    },
+    "correctAnswer": "b",
+    "rationale": "SBAR begins with a concise statement of the current situation for clarity."
+  },
+  {
+    "questionText": "Which phrase best demonstrates active listening with a patient expressing fear?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "You don’t need to worry.",
+      "b": "Why are you scared?",
+      "c": "It sounds like you are feeling very anxious right now.",
+      "d": "Let’s move on to your medications."
+    },
+    "correctAnswer": "c",
+    "rationale": "Reflecting feelings demonstrates empathy and understanding."
+  },
+  {
+    "questionText": "After reviewing a frail elderly patient’s chart, the nurse identifies diuretics, poor appetite, and decreased mobility. What should be prioritized in the care plan?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Offer snacks between meals",
+      "b": "Monitor for falls and implement safety interventions",
+      "c": "Encourage daily medications",
+      "d": "Assign bedrest"
+    },
+    "correctAnswer": "b",
+    "rationale": "Diuretics, nutritional deficits, and immobility increase fall risk, requiring safety as a priority."
+  },
+  {
+    "questionText": "Which cluster of assessment findings would support a nursing diagnosis of “Risk for Impaired Skin Integrity”?",
+    "type": "mc",
+    "section": "Nursing Process – Assessment & Diagnosis",
+    "options": {
+      "a": "Moist, healthy skin, ambulates without help",
+      "b": "Incontinence, reduced sensation, thin frail skin, immobility",
+      "c": "Normal dietary intake and strong pulses",
+      "d": "Alert and oriented, skin warm to touch"
+    },
+    "correctAnswer": "b",
+    "rationale": "Incontinence, poor sensation, and limited mobility are skin breakdown risk factors."
+  },
+  {
+    "questionText": "The nurse notes a wound is pink, moist, and shallow with partial thickness loss. How should it be staged?",
+    "type": "mc",
+    "section": "Nursing Process – Assessment & Diagnosis",
+    "options": {
+      "a": "Stage 1",
+      "b": "Stage 2",
+      "c": "Stage 3",
+      "d": "Stage 4"
+    },
+    "correctAnswer": "b",
+    "rationale": "Stage 2 pressure ulcers show partial-thickness loss and exposed dermis."
+  },
+  {
+    "questionText": "Which nursing action reflects the “implementation” phase regarding infection prevention for a patient with an indwelling catheter?",
+    "type": "mc",
+    "section": "Planning, Implementation, Evaluation",
+    "options": {
+      "a": "Document “no signs of infection”",
+      "b": "Assess insertion site for redness",
+      "c": "Perform hand hygiene before and after care",
+      "d": "Plan to educate about catheter care"
+    },
+    "correctAnswer": "c",
+    "rationale": "Implementation includes direct interventions to reduce infection risk."
+  },
+  {
+    "questionText": "Which outcome is written correctly for measuring the success of a turning schedule in a bedridden client?",
+    "type": "mc",
+    "section": "Planning, Implementation, Evaluation",
+    "options": {
+      "a": "Patient will not report pain",
+      "b": "Skin will remain intact, no redness, during hospitalization",
+      "c": "Wound will drain slightly",
+      "d": "Nurse will turn patient every 6 hours"
+    },
+    "correctAnswer": "b",
+    "rationale": "Outcomes should be client-focused and measurable (e.g., intact skin, no redness)."
+  },
+  {
+    "questionText": "Which teaching is most important for nursing students to maintain surgical asepsis during procedures?",
+    "type": "mc",
+    "section": "Asepsis & Infection Control",
+    "options": {
+      "a": "Ask questions if unsure",
+      "b": "Keep hands above waist after scrubbing and gloving",
+      "c": "Keep mask over chin only",
+      "d": "Turn back to sterile field when retrieving supplies"
+    },
+    "correctAnswer": "b",
+    "rationale": "Maintaining hands above waist prevents contamination of the sterile field."
+  },
+  {
+    "questionText": "A nurse is preparing to administer a subcutaneous injection in a patient on contact precautions. Which PPE is required?",
+    "type": "mc",
+    "section": "Asepsis & Infection Control",
+    "options": {
+      "a": "Mask only",
+      "b": "Gown and gloves",
+      "c": "N95 and gown",
+      "d": "Face shield and gloves"
+    },
+    "correctAnswer": "b",
+    "rationale": "Contact precautions require gloves and gowns for protection."
+  },
+  {
+    "questionText": "A patient with measles is admitted. What is the required isolation setting?",
+    "type": "mc",
+    "section": "Precautions: Isolation, Droplet, Pressure Rooms",
+    "options": {
+      "a": "Droplet precautions",
+      "b": "Private negative pressure room, airborne precautions",
+      "c": "Standard precautions alone",
+      "d": "Positive pressure room"
+    },
+    "correctAnswer": "b",
+    "rationale": "Measles is airborne and requires a negative pressure room."
+  },
+  {
+    "questionText": "For which patient should the nurse recommend a positive pressure room?",
+    "type": "mc",
+    "section": "Precautions: Isolation, Droplet, Pressure Rooms",
+    "options": {
+      "a": "Patient with cystic fibrosis admitted for stem cell transplant",
+      "b": "Patient with newly diagnosed varicella",
+      "c": "Patient with septic arthritis",
+      "d": "Patient with hepatitis B"
+    },
+    "correctAnswer": "a",
+    "rationale": "Positive pressure is used for immunosuppressed or transplant patients to reduce infection risk."
+  },
+  {
+    "questionText": "Which instruction is most important for a patient self-administering wound care at home?",
+    "type": "mc",
+    "section": "Hygiene, Skin Integrity, Wound Care",
+    "options": {
+      "a": "It’s OK to skip dressing changes if busy.",
+      "b": "Report any redness, swelling, or purulent drainage immediately.",
+      "c": "Antibiotics are unnecessary after surgery.",
+      "d": "Use only alcohol wipes for cleaning."
+    },
+    "correctAnswer": "b",
+    "rationale": "Early recognition and reporting of infection are critical for safety."
+  },
+  {
+    "questionText": "When turning a patient, the nurse notes a red, non-blanchable area on the sacrum. What is the priority action?",
+    "type": "mc",
+    "section": "Hygiene, Skin Integrity, Wound Care",
+    "options": {
+      "a": "Massage the area",
+      "b": "Place the patient on a pressure-redistribution surface and avoid further pressure on the area",
+      "c": "Cover area with hydrocolloid",
+      "d": "No action is needed"
+    },
+    "correctAnswer": "b",
+    "rationale": "Non-blanchable redness is stage 1; prevent further breakdown by offloading pressure."
+  },
+  {
+    "questionText": "Which finding should prompt the nurse to question an order for opioids?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Patient is lethargic with a respiratory rate of 8/min",
+      "b": "Reports pain 7/10",
+      "c": "Patient is anxious and restless",
+      "d": "States prior opioid use"
+    },
+    "correctAnswer": "a",
+    "rationale": "Respiratory depression (RR <10/min) is a serious risk; opioid orders should be clarified."
+  },
+  {
+    "questionText": "A nurse on a busy surgical floor must delegate wound care for three patients.\n\nP1: Recent hip arthroplasty, stable, small serous drainage\n\nP2: Immunosuppressed oncology patient with a new foul-smelling, undermined wound\n\nP3: Young adult post-appendectomy with minor skin irritation at incision\nWhich patient, if any, is most appropriate to delegate routine wound care to a competent UAP (unlicensed assistive personnel)?",
+    "type": "mc",
+    "section": "Delegation",
+    "options": {
+      "a": "P2 only",
+      "b": "P3 only",
+      "c": "P1 only",
+      "d": "None"
+    },
+    "correctAnswer": "b",
+    "rationale": "UAPs can clean minor skin irritation post-appendectomy, but immunosuppression and abnormal wound features require RN assessment. Hip arthroplasty patients often need sterile technique, which is beyond UAP scope."
+  },
+  {
+    "questionText": "Which scenario best demonstrates “value-belief conflict” requiring advanced therapeutic communication?",
+    "type": "mc",
+    "section": "Values & Beliefs",
+    "options": {
+      "a": "Patient expresses anger about discharge",
+      "b": "Patient declines pain medication due to cultural view of suffering",
+      "c": "Patient is frustrated about lengthy test wait times",
+      "d": "Patient requests a second opinion"
+    },
+    "correctAnswer": "b",
+    "rationale": "A value-belief conflict exists when a patient’s personal or cultural values influence clinical choices that may not align with standard care."
+  },
+  {
+    "questionText": "While preparing a sterile field for a central line dressing change, the nurse notices the tray was opened 45 minutes prior by the night nurse. What should the nurse do?",
+    "type": "mc",
+    "section": "Asepsis",
+    "options": {
+      "a": "Use the existing field if it appears undisturbed",
+      "b": "Replace only visibly contaminated supplies",
+      "c": "Discard the sterile setup and recreate a new one",
+      "d": "Ask the patient if they want to proceed"
+    },
+    "correctAnswer": "c",
+    "rationale": "A pre-prepared sterile field not maintained continuously is considered contaminated; create a new sterile field."
+  },
+  {
+    "questionText": "Which pressure injury assessment finding requires the most urgent provider contact?",
+    "type": "mc",
+    "section": "Assessment & Pathophysiology",
+    "options": {
+      "a": "Non-blanchable erythema on coccyx",
+      "b": "Bleeding granulation tissue on greater trochanter",
+      "c": "New dusky skin over sacrum with bogginess, without open ulcer",
+      "d": "Serosanguinous drainage from elbow wound"
+    },
+    "correctAnswer": "c",
+    "rationale": "Deep tissue injury (dusky/boggy skin) may rapidly progress to unstageable injury; immediate escalation prevents irreversible damage."
+  },
+  {
+    "questionText": "Which client is at highest risk for HAIs (healthcare associated infections)?",
+    "type": "mc",
+    "section": "Assessment & Pathophysiology",
+    "options": {
+      "a": "Middle-aged postop with dressing change every 8 hrs",
+      "b": "Elderly, uncontrolled diabetes, urinary catheter, total parenteral nutrition",
+      "c": "Young healthy trauma patient without invasive devices",
+      "d": "Immunocompetent patient recovering from elective laparoscopic surgery"
+    },
+    "correctAnswer": "b",
+    "rationale": "Multiple invasive devices, diabetes, and age potentiate infection risk."
+  },
+  {
+    "questionText": "A nurse assigned to a COVID-19 isolation room enters wearing gloves, N95, face shield, and a gown, but exits the room to grab additional dressings, leaving her PPE on. Which principle is being violated?",
+    "type": "mc",
+    "section": "Isolation & Infection Control",
+    "options": {
+      "a": "Aseptic technique",
+      "b": "Standard precautions",
+      "c": "Doffing sequence",
+      "d": "Isolation “clean-to-dirty” rule"
+    },
+    "correctAnswer": "d",
+    "rationale": "Re-entering clean areas while wearing used isolation PPE risks cross-contamination; PPE must be doffed prior to leaving isolation."
+  },
+  {
+    "questionText": "Which wound care technique risks impeding healing?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Packing a deep wound loosely with saline-soaked gauze",
+      "b": "Using povidone-iodine to clean healthy granulation tissue daily",
+      "c": "Protecting peri-wound skin with barrier ointment",
+      "d": "Covering a surgical wound with a sterile occlusive film"
+    },
+    "correctAnswer": "b",
+    "rationale": "Povidone-iodine is cytotoxic to healthy cells and delays healing; it should not be used on granulation tissue."
+  },
+  {
+    "questionText": "Which task is least appropriate to delegate to an experienced LPN/LVN?",
+    "type": "mc",
+    "section": "Delegation & Supervision",
+    "options": {
+      "a": "Administering oral pain meds",
+      "b": "Reinforcing teaching for wound care",
+      "c": "Initial wound assessment and plan of care",
+      "d": "Monitoring healing progress of a stage 2 pressure ulcer"
+    },
+    "correctAnswer": "c",
+    "rationale": "Initial assessments and plan development require RN-level judgment."
+  },
+  {
+    "questionText": "A UAP reports a new foul odor from a pressure ulcer during morning care. What is the nurse’s priority response?",
+    "type": "mc",
+    "section": "Delegation & Supervision",
+    "options": {
+      "a": "Ask UAP to clean and re-dress the wound",
+      "b": "Assess the wound immediately",
+      "c": "Ask provider to increase antibiotics",
+      "d": "Document findings at end of shift"
+    },
+    "correctAnswer": "b",
+    "rationale": "Foul odor may indicate infection; RNs must assess promptly before further interventions."
+  },
+  {
+    "questionText": "Which lab finding should the nurse prioritize for a patient receiving a new broad-spectrum antibiotic for wound infection?",
+    "type": "mc",
+    "section": "Clinical Reasoning",
+    "options": {
+      "a": "Platelet count: 180,000/mm³",
+      "b": "WBC: 7,400/mm³",
+      "c": "Creatinine: 2.3 mg/dL",
+      "d": "Potassium: 4.4 mEq/L"
+    },
+    "correctAnswer": "c",
+    "rationale": "Elevated creatinine signals kidney impairment; many antibiotics can further harm renal function, so this needs urgent attention."
+  },
+  {
+    "questionText": "The nurse is performing wound care on an HIV+ patient who is also positive for Hepatitis C. What PPE is indicated for routine dressing changes (no splash anticipated)?",
+    "type": "mc",
+    "section": "Infection Control & PPE",
+    "options": {
+      "a": "Gloves only",
+      "b": "Gown and gloves",
+      "c": "Gloves and N95 mask",
+      "d": "No PPE"
+    },
+    "correctAnswer": "a",
+    "rationale": "Standard precautions (gloves) suffice unless visible soiling or splash are anticipated."
+  },
+  {
+    "questionText": "Which scenario best indicates a need for specialty wound consult?",
+    "type": "mc",
+    "section": "Wound Care",
+    "options": {
+      "a": "Stage 1 pressure injury persisting 24 hours",
+      "b": "Stage 2 ulcer with exudate, unresponsive to dressings after 10 days",
+      "c": "Stage 4 ulcer in steady healing for two weeks",
+      "d": "Superficial skin tear with minimal drainage"
+    },
+    "correctAnswer": "b",
+    "rationale": "Non-healing after appropriate initial interventions warrants expert consultation."
+  },
+  {
+    "questionText": "Which pain management regimen would be contraindicated for a client with a history of severe respiratory compromise postoperatively?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "PCA morphine with standard dosing",
+      "b": "Low-dose acetaminophen every 4 hours",
+      "c": "Scheduled ibuprofen",
+      "d": "Non-pharmacologic TENS therapy"
+    },
+    "correctAnswer": "a",
+    "rationale": "Morphine PCA may further compromise respiratory drive in at-risk patients."
+  },
+  {
+    "questionText": "A postoperative patient complains of incisional pain unrelieved despite maximum allowed opioid doses, anxiety, and hypotension. What should the nurse suspect?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Drug-seeking",
+      "b": "Wound dehiscence",
+      "c": "Internal bleeding",
+      "d": "Drug tolerance"
+    },
+    "correctAnswer": "c",
+    "rationale": "Ongoing pain plus hypotension and anxiety points toward hemorrhage, not drug tolerance."
+  },
+  {
+    "questionText": "A negative pressure room is occupied, and another TB-positive client arrives. Which action is correct?",
+    "type": "mc",
+    "section": "Isolation Rooms",
+    "options": {
+      "a": "Place the new client in the same negative pressure room if space permits",
+      "b": "Place the new client in a positive pressure room and keep the door closed",
+      "c": "Admit to standard private room with surgical mask",
+      "d": "Delay admission until the negative pressure room is available"
+    },
+    "correctAnswer": "a",
+    "rationale": "Cohorting patients with the same airborne illness and no other infection is allowed if negative pressure ventilation is maintained."
+  },
+  {
+    "questionText": "A nurse dons PPE for contact plus airborne precautions in the following order: gloves, gown, mask, face shield. What is incorrect?",
+    "type": "mc",
+    "section": "PPE & Precautions",
+    "options": {
+      "a": "Mask should be first",
+      "b": "Gloves should be first",
+      "c": "Gown should be first",
+      "d": "Face shield should be first"
+    },
+    "correctAnswer": "c",
+    "rationale": "The gown should be donned before gloves for proper barrier protection."
+  },
+  {
+    "questionText": "A deep sacral wound is filled with yellow-green slough and cannot be probed to base; adjacent tissue is boggy, with moderate serosanguinous drainage. What is the proper wound stage?",
+    "type": "mc",
+    "section": "Wound Staging",
+    "options": {
+      "a": "Stage 3",
+      "b": "Stage 4",
+      "c": "Unstageable",
+      "d": "Deep tissue injury"
+    },
+    "correctAnswer": "c",
+    "rationale": "If the base cannot be visualized due to slough, the wound is unstageable until debrided."
+  },
+  {
+    "questionText": "A nurse uses Peplau’s Interpersonal Relations Theory when caring for a newly admitted psychiatric patient by:",
+    "type": "mc",
+    "section": "Nursing Theory",
+    "options": {
+      "a": "Focusing on medication administration only",
+      "b": "Establishing trust and therapeutic rapport through active listening",
+      "c": "Ignoring the patient’s fears to maintain objectivity",
+      "d": "Delegating assessments to another nurse"
+    },
+    "correctAnswer": "b",
+    "rationale": "Peplau emphasizes building therapeutic nurse-patient relationships to improve care outcomes."
+  },
+  {
+    "questionText": "Which nursing action best reflects cultural competence?",
+    "type": "mc",
+    "section": "Values, Beliefs, Caring",
+    "options": {
+      "a": "Convincing the client to participate in routine care despite objections",
+      "b": "Incorporating the patient’s cultural practices into the care plan when safe",
+      "c": "Avoiding discussions about culture to prevent conflict",
+      "d": "Providing only evidence-based care, regardless of cultural preferences"
+    },
+    "correctAnswer": "b",
+    "rationale": "Cultural competence involves respecting and integrating patients’ values into care."
+  },
+  {
+    "questionText": "Which statement best demonstrates the use of the teach-back method?",
+    "type": "mc",
+    "section": "Communication",
+    "options": {
+      "a": "Do you understand?",
+      "b": "Can you explain how you will take your medications at home?",
+      "c": "Please listen carefully.",
+      "d": "I think you know your treatment plan."
+    },
+    "correctAnswer": "b",
+    "rationale": "Teach-back checks patient understanding by requesting them to explain instructions."
+  },
+  {
+    "questionText": "A client’s oxygen saturation decreases from 95% to 88%. What is the nurse’s best initial action?",
+    "type": "mc",
+    "section": "Clinical Judgment",
+    "options": {
+      "a": "Notify the healthcare provider",
+      "b": "Assess the patient and airway",
+      "c": "Administer oxygen per protocol immediately",
+      "d": "Document the decrease"
+    },
+    "correctAnswer": "b",
+    "rationale": "Clinical judgment requires assessing before interventions to identify causes."
+  },
+  {
+    "questionText": "Which finding indicates orthostatic hypotension?",
+    "type": "mc",
+    "section": "Nursing Process – Assessment",
+    "options": {
+      "a": "Pulse 72 bpm supine, 72 bpm sitting",
+      "b": "SBP 120 mmHg supine, 94 mmHg standing with dizziness",
+      "c": "BP 140/90 mmHg supine, 140/90 standing",
+      "d": "HR 88 bpm sitting, 60 bpm standing"
+    },
+    "correctAnswer": "b",
+    "rationale": "Significant BP drop with positional change + symptoms indicates orthostatic hypotension."
+  },
+  {
+    "questionText": "A patient is diagnosed with “Impaired physical mobility related to weakness and pain.” Which outcome statement is most measurable?",
+    "type": "mc",
+    "section": "Nursing Diagnosis",
+    "options": {
+      "a": "Patient will ambulate safely with assistive device three times daily within 48 hours.",
+      "b": "Patient will feel less pain.",
+      "c": "Patient will be more active.",
+      "d": "Patient will improve mobility."
+    },
+    "correctAnswer": "a",
+    "rationale": "Clearly defined, measurable, and time-oriented outcome."
+  },
+  {
+    "questionText": "Which is an appropriate nursing intervention for a patient on droplet precautions?",
+    "type": "mc",
+    "section": "Planning, Implementation, Evaluation",
+    "options": {
+      "a": "Mask only during patient transport",
+      "b": "Gown and gloves for any contact",
+      "c": "Surgical mask when within three feet of patient",
+      "d": "N95 respirator at all times"
+    },
+    "correctAnswer": "c",
+    "rationale": "Droplet precautions require surgical masks when close to the patient."
+  },
+  {
+    "questionText": "Which action compromises sterile technique during a catheter insertion?",
+    "type": "mc",
+    "section": "Asepsis",
+    "options": {
+      "a": "Keeping sterile gloves above waist level",
+      "b": "Opening sterile packages away from patient",
+      "c": "Touching the sterile catheter tip to unsterile surface",
+      "d": "Maintaining a dry sterile field"
+    },
+    "correctAnswer": "c",
+    "rationale": "Contact with non-sterile surfaces contaminates sterile equipment."
+  },
+  {
+    "questionText": "Which action is required after removing gloves contaminated with C. difficile spores?",
+    "type": "mc",
+    "section": "Infection Control—Contact Precautions",
+    "options": {
+      "a": "Use alcohol-based hand rub",
+      "b": "Wash hands with soap and water",
+      "c": "Don new gloves immediately",
+      "d": "Use antiseptic wipes"
+    },
+    "correctAnswer": "b",
+    "rationale": "Soap and water physically remove spores; alcohol-based rubs are ineffective."
+  },
+  {
+    "questionText": "Which is the correct PPE removal order?",
+    "type": "mc",
+    "section": "PPE",
+    "options": {
+      "a": "Gown, gloves, face shield, mask",
+      "b": "Gloves, gown, face shield, mask",
+      "c": "Mask, gown, gloves, face shield",
+      "d": "Gloves, face shield, gown, mask"
+    },
+    "correctAnswer": "b",
+    "rationale": "Correct doffing minimizes contamination risk."
+  },
+  {
+    "questionText": "Which patient symptom requires droplet precautions?",
+    "type": "mc",
+    "section": "Droplet Precautions",
+    "options": {
+      "a": "Neisseria meningitidis infection",
+      "b": "Varicella zoster localized rash",
+      "c": "Clostridium difficile diarrhea",
+      "d": "Hepatitis B"
+    },
+    "correctAnswer": "a",
+    "rationale": "Meningitis is transmitted by droplets."
+  },
+  {
+    "questionText": "What is the key difference between negative and positive pressure rooms?",
+    "type": "mc",
+    "section": "Isolation",
+    "options": {
+      "a": "Negative pressure prevents airflow into the room; positive prevents airflow out",
+      "b": "Negative pressure is for immunosuppressed; positive is for airborne infections",
+      "c": "Negative pressure rooms have filters; positive do not",
+      "d": "Negative pressures rooms use surgical masks; positives use N95s"
+    },
+    "correctAnswer": "a",
+    "rationale": "Negative pressure isolates airborne pathogens; positive protects immunocompromised patients."
+  },
+  {
+    "questionText": "Which intervention reduces risk of skin breakdown in incontinent patients?",
+    "type": "mc",
+    "section": "Hygiene & Personal Care",
+    "options": {
+      "a": "Frequent perineal care with moisturizing soap",
+      "b": "Using soap and water to clean perineum after each episode",
+      "c": "Use of skin barrier creams after cleaning and drying",
+      "d": "Applying talcum powder after care"
+    },
+    "correctAnswer": "c",
+    "rationale": "Barrier creams protect skin from moisture damage."
+  },
+  {
+    "questionText": "What is a priority teaching point for a patient with a shallow venous ulcer?",
+    "type": "mc",
+    "section": "Skin Integrity",
+    "options": {
+      "a": "Elevate legs to reduce edema",
+      "b": "Decrease fluid intake",
+      "c": "Avoid compression stockings",
+      "d": "Avoid walking"
+    },
+    "correctAnswer": "a",
+    "rationale": "Leg elevation decreases venous pressure and edema aiding healing."
+  },
+  {
+    "questionText": "A patient has a pressure ulcer with full-thickness skin loss exposing fascia but no muscle or bone. What is the correct stage?",
+    "type": "mc",
+    "section": "Wound Care & Staging",
+    "options": {
+      "a": "Stage 2",
+      "b": "Stage 3",
+      "c": "Stage 4",
+      "d": "Unstageable"
+    },
+    "correctAnswer": "b",
+    "rationale": "Stage 3 involves full-thickness skin loss exposing fascia (not muscle/bone)."
+  },
+  {
+    "questionText": "Which intervention best prevents pressure ulcers in immobile patients?",
+    "type": "mc",
+    "section": "Pressure Ulcers",
+    "options": {
+      "a": "Reposition patient every 4 hours",
+      "b": "Use donut-shaped cushions",
+      "c": "Encourage high protein diet and adequate hydration",
+      "d": "Massage reddened areas"
+    },
+    "correctAnswer": "c",
+    "rationale": "Proper nutrition supports skin integrity; pressure relief should be every 2 hours, and massage can cause tissue damage."
+  },
+  {
+    "questionText": "Which analgesic plan is best for treating neuropathic pain?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Opioids only",
+      "b": "NSAIDs only",
+      "c": "Antidepressants or anticonvulsants",
+      "d": "Acetaminophen only"
+    },
+    "correctAnswer": "c",
+    "rationale": "Neuropathic pain responds better to agents affecting nerve signaling like antidepressants or anticonvulsants."
+  },
+  {
+    "questionText": "A patient with a history of opioid use disorder is experiencing severe postoperative pain. What is the nurse’s best approach?",
+    "type": "mc",
+    "section": "Pain Management",
+    "options": {
+      "a": "Avoid opioid analgesics to prevent relapse",
+      "b": "Provide multimodal pain management, including opioids if needed",
+      "c": "Use non-pharmacologic methods only",
+      "d": "Call behavioral health only"
+    },
+    "correctAnswer": "b",
+    "rationale": "Effective pain management with multimodal approaches including opioids when appropriate is essential for recovery and relapse prevention."
+  }
+  ];
+
+        // SELECT 85 RANDOM QUESTIONS, SHUFFLE
+        function sampleQuestions(arr, n) {
+            // For this simulation, we'll just use the provided 3 questions
+            // In a real scenario, this function would select and shuffle
+            if (arr.length < n) {
+                console.warn(`Warning: Not enough questions (${arr.length}) to sample ${n}. Using all available questions.`);
+                return [...arr]; // Return all available questions if less than n
+            }
+            const out = [];
+            const idxs = Array.from({length: arr.length}, (_, i) => i);
+            for (let i = idxs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+            }
+            for (let i = 0; i < Math.min(n, idxs.length); i++) out.push(arr[idxs[i]]);
+            return out;
+        }
+
+        // Set questions
+        let questions = []; // Will be set in initExam
+
+        // TIMER STATE
+        const DURATION_SEC = 3 * 60 * 60; // 3 hours
+        let timer = {
+            timeLeft: DURATION_SEC,
+            running: true,
+            interval: null
+        };
+
+        // STATE
+        let state = {
+            idx: 0,
+            answers: [], // Will be initialized in initExam
+            submitted: [], // Will be initialized in initExam
+            completed: false,
+            auto: false // set true if auto-submitted by timer
+        };
+
+        // RENDERING
+        function renderPalette() {
+            const palette = document.getElementById('qPalette');
+            if (!palette) return;
+            palette.innerHTML = '';
+            questions.forEach((q, i) => {
+                const btn = document.createElement('button');
+                btn.textContent = i + 1;
+                btn.className = 'q-btn';
+                if (state.idx === i) btn.classList.add('current');
+                if (state.submitted[i]) btn.classList.add('answered');
+                else btn.classList.add('unanswered');
+                palette.appendChild(btn);
+            });
+        }
+
+        function renderQuestion() {
+            const idx = state.idx;
+            const q = questions[idx];
+            const isMC = q.type === 'mc';
+            const selected = state.answers[idx];
+            let html = `<div class="question-text">${q.questionText || ''}</div>
+                        <form class="options" id="optionsForm">`;
+            if(q.options) {
+                Object.entries(q.options).forEach(([key, text]) => {
+                    let checked = isMC ? (selected === key) : (Array.isArray(selected) && selected.includes(key));
+                    let cls = checked ? "selected" : "";
+                    html += `<label class="option-label ${cls}">
+                        <input type="${isMC ? "radio" : "checkbox"}" name="opt" value="${key}" ${checked ? "checked" : ""} ${state.submitted[idx] ? "disabled" : ""}>
+                        <span><b>${key}.</b> ${text}</span>
+                    </label>`;
+                });
+            }
+            html += `</form>`;
+            document.getElementById('qArea').innerHTML = html;
+            document.getElementById('qArea').style.display = "flex";
+            document.getElementById('reviewArea').style.display = "none";
+        }
+
+        function renderFooter() {
+            const idx = state.idx;
+            document.getElementById('progressBar').textContent = `Question ${idx + 1} of ${questions.length}`;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = !canProceed();
+            nextBtn.textContent = (idx === questions.length - 1) ? "Finish Exam" : "Next";
+        }
+
+        function renderAll() {
+            renderPalette();
+            renderQuestion();
+            renderFooter();
+            // Only setup select logic if not completed or submitted
+            if (!state.completed && !state.submitted[state.idx]) {
+                const idx = state.idx;
+                const q = questions[idx];
+                const isMC = q.type === 'mc';
+                const form = document.getElementById('optionsForm');
+                if (form) {
+                    form.addEventListener('change', e => {
+                        let val = e.target.value;
+                        if (isMC) {
+                            state.answers[idx] = val;
+                        } else {
+                            let arr = Array.isArray(state.answers[idx]) ? [...state.answers[idx]] : [];
+                            if (e.target.checked) arr.push(val);
+                            else arr = arr.filter(x => x !== val);
+                            state.answers[idx] = arr;
+                        }
+                        // Update visual
+                        document.querySelectorAll('.option-label').forEach(label => {
+                            let input = label.querySelector('input');
+                            label.classList.toggle('selected', input.checked);
+                        });
+                        renderFooter();
+                    });
+                }
+            }
+            document.getElementById('qArea').style.height = "100%";
+            document.getElementById('qArea').style.overflowY = "auto";
+        }
+
+        function canProceed() {
+            const idx = state.idx;
+            if (state.submitted[idx]) return true;
+            const q = questions[idx];
+            if (q && q.type === 'mc') return !!state.answers[idx];
+            return Array.isArray(state.answers[idx]) && state.answers[idx].length > 0;
+        }
+
+        // BUTTON LOGIC
+        document.getElementById('nextBtn').onclick = () => {
+            const idx = state.idx;
+            state.submitted[idx] = true;
+            if (idx < questions.length - 1) {
+                state.idx++;
+                renderAll();
+            } else {
+                showModal();
+            }
+        };
+
+        // MODAL LOGIC
+        function showModal() {
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-bg">
+                    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                        <div class="modal-title" id="modal-title">Submit Exam?</div>
+                        <div class="modal-msg">You are about to submit your answers. Are you sure you want to finish and see your results?</div>
+                        <div class="modal-btns">
+                            <button class="modal-btn cancel" id="cancelModalBtn">Cancel</button>
+                            <button class="modal-btn" id="confirmModalBtn">Submit Exam</button>
+                        </div>
+                    </div>
+                </div>`;
+            modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+            document.getElementById('cancelModalBtn').onclick = () => {
+                modal.style.display = "none";
+                document.body.style.overflow = "";
+            };
+            document.getElementById('confirmModalBtn').onclick = () => {
+                modal.style.display = "none";
+                document.body.style.overflow = "";
+                timer.running = false;
+                state.completed = true;
+                renderReview();
+            };
+        }
+
+        // TIMER LOGIC
+        function renderTimer() {
+            const box = document.getElementById('timerBox');
+            if (!box) return;
+            if (state.completed) {
+                box.style.display = "none";
+                if (timer.interval) clearInterval(timer.interval);
+                return;
+            }
+            box.style.display = "inline-flex";
+            let t = timer.timeLeft;
+            let h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+            box.textContent = `Time Left: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            box.className = "timer-box" + (t <= 300 ? " urgent" : "");
+        }
+
+        function startTimer() {
+            renderTimer();
+            timer.running = true;
+            if (timer.interval) clearInterval(timer.interval);
+            timer.interval = setInterval(() => {
+                if (!timer.running) return;
+                timer.timeLeft--;
+                renderTimer();
+                if (timer.timeLeft <= 0) {
+                    timer.running = false;
+                    state.auto = true;
+                    state.completed = true;
+                    if (timer.interval) clearInterval(timer.interval);
+                    autoSubmitExam();
+                }
+            }, 1000);
+        }
+
+        function autoSubmitExam() {
+            // Mark all remaining as submitted
+            for (let i = 0; i < questions.length; ++i) state.submitted[i] = true;
+            renderReview(true);
+        }
+
+        // REVIEW SECTION AT THE END
+        function renderReview(auto=false) {
+            let corrects = [];
+            let wrongs = [];
+            questions.forEach((q, idx) => {
+                let user = state.answers[idx];
+                let right = false;
+                if (q.type === "mc") right = user === q.correctAnswer;
+                else {
+                    let u = Array.isArray(user) ? [...user].sort() : [];
+                    let c = [...q.correctAnswer].sort();
+                    right = u.length === c.length && u.every((v, i) => v === c[i]);
+                }
+                if (right) corrects.push(idx);
+                else wrongs.push(idx);
+            });
+
+            // Show score and review wrongs
+            let percent = Math.round(corrects.length / questions.length * 100);
+            let msg = percent === 100
+                ? "🏆 Perfect! You're ready."
+                : percent >= 80
+                    ? "Great work! Review missed questions below."
+                    : percent >= 60
+                        ? "Keep practicing. Review the rationales."
+                        : "Don't give up. Review, study, and try again!";
+            let html = `
+                <div class="score-ctn">
+                    <div class="score-title">Exam Complete</div>
+                    <div class="score-value">${corrects.length} / ${questions.length} <span style="font-size:1.08rem;color:#4a83f2;">(${percent}%)</span></div>
+                    <div class="score-msg">${msg}</div>
+                    ${auto ? `<div style="color:#f32d32;margin-top:10px;font-size:1.12rem;"><b>Time expired – exam auto-submitted</b></div>` : ""}
+                    <button class="restart-btn" onclick="location.reload()">Retake Exam</button>
+                </div>
+            `;
+            if (wrongs.length > 0) {
+                html += `<div style="text-align:center;margin-bottom:8px;font-size:1.05rem;font-weight:500;color:#b92525;">Incorrect Responses & Rationales</div>`;
+                wrongs.forEach(idx => {
+                    const q = questions[idx];
+                    const user = state.answers[idx];
+                    const isMC = q.type === "mc";
+                    html += `<div class="review-card">
+                        <div class="review-q">${q.questionText || ''}</div>
+                        <div class="review-options">`;
+                    if(q.options) {
+                        Object.entries(q.options).forEach(([key, text]) => {
+                            let uwrong = isMC ? (user === key) : (Array.isArray(user) && user.includes(key));
+                            let ucorrect = isMC ? (key === q.correctAnswer) : (Array.isArray(q.correctAnswer) && q.correctAnswer.includes(key));
+                            let classStr = uwrong ? "user-answer" : (ucorrect ? "correct-answer" : "");
+                            html += `<div class="option-label ${classStr}"><b>${key}.</b> ${text}</div>`;
+                        });
+                    }
+                    html += `</div>
+                        <div class="rationale"><b>Rationale:</b> ${q.rationale || ''}</div>
+                    </div>`;
+                });
+            }
+            document.getElementById('qArea').style.display = "none";
+            let reviewArea = document.getElementById('reviewArea');
+            reviewArea.style.display = "block";
+            reviewArea.innerHTML = html;
+            reviewArea.style.height = "100%";
+            reviewArea.style.overflowY = "auto";
+            document.querySelector('.footer-inner').innerHTML = "";
+            renderTimer();
+        }
+
+        // INIT function to be called when the exam starts
+        function initExam() {
+            // Set questions (using all 3 for testing as requested)
+            questions = sampleQuestions(allQuestions, 85);
+
+            // Set up state arrays based on question count
+            state.answers = Array(questions.length).fill(null);
+            state.submitted = Array(questions.length).fill(false);
+            state.idx = 0; // Reset to first question
+
+            renderAll();
+            startTimer();
+        }
+    </script>
+</body>
+</html>
