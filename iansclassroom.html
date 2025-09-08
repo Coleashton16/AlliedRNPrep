@@ -6,26 +6,24 @@
     <title>Ian's Class - Virtual Classroom</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-
-        /* Custom backdrop filter for the blur effect */
         .backdrop-blur-sm {
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <div id="tos-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-lg mx-4 sm:mx-auto transition-all duration-300 transform scale-100">
+    <div role="dialog" aria-modal="true" aria-labelledby="modal-title" id="tos-modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-lg mx-4 sm:mx-auto transition-all duration-300 transform scale-100" role="document">
             <div class="text-center">
                 <img src="https://placehold.co/100x100/cyan/white?text=RN" alt="AlliedRNPrep Logo" class="mx-auto mb-4 rounded-full shadow-lg">
-                <h2 class="text-3xl font-bold text-cyan-700 mb-2">Important Announcement</h2>
+                <h2 id="modal-title" class="text-3xl font-bold text-cyan-700 mb-2">Important Announcement</h2>
                 <p class="text-gray-600 mb-6">
                     Ian's classroom is now being hosted by <strong>AlliedRNPrep</strong>. We are excited to provide you with an enhanced learning experience!
                 </p>
@@ -61,34 +59,56 @@
     <div class="container mx-auto max-w-7xl p-6 md:p-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <main class="md:col-span-2 space-y-8">
-                <div class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                    <h2 class="text-2xl font-semibold text-cyan-700 mb-4 pb-2 border-b-2 border-yellow-400 flex items-center gap-3">
-                        <i class="fas fa-bullhorn text-yellow-500"></i> Announcements
+                <section class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1" aria-labelledby="announcements-heading">
+                    <h2 id="announcements-heading" class="text-2xl font-semibold text-cyan-700 mb-4 pb-2 border-b-2 border-yellow-400 flex items-center gap-3">
+                        <i class="fas fa-bullhorn text-yellow-500" aria-hidden="true"></i> Announcements
                     </h2>
                     <div class="space-y-4">
+                        <p class="text-gray-600">No new announcements at this time. Check back soon!</p>
                     </div>
-                </div>
+                </section>
                 
-                <div class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                    <h2 class="text-2xl font-semibold text-cyan-700 mb-4 pb-2 border-b-2 border-yellow-400 flex items-center gap-3">
-                        <i class="fas fa-book-open text-yellow-500"></i> Class Materials
+                <section class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1" aria-labelledby="materials-heading">
+                    <h2 id="materials-heading" class="text-2xl font-semibold text-cyan-700 mb-4 pb-2 border-b-2 border-yellow-400 flex items-center gap-3">
+                        <i class="fas fa-book-open text-yellow-500" aria-hidden="true"></i> Class Materials
                     </h2>
                     <div class="space-y-4">
-                        <p class="text-gray-600">Click the button below to view all the materials for this class.</p>
-                        <a href="iansclassintronursingexampractice.html" target="_blank" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600">
-                            <i class="fas fa-file-alt mr-2"></i>Intro to Nursing practice test one
-                        </a>
-                        <a href="introunitoneexamsim.html" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600 mt-4">
-                            <i class="fas fa-laptop-code mr-2"></i>Unit One Exam Simulation
-                        </a>
+                        <p class="text-gray-600">Click the buttons below to view all the materials for this class.</p>
+                        <ul class="space-y-4">
+                            <li>
+                                <a href="iansclassintronursingexampractice.html" target="_blank" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600" aria-label="Intro to Nursing practice test one">
+                                    <i class="fas fa-file-alt mr-2" aria-hidden="true"></i>Intro to Nursing practice test one
+                                </a>
+                            </li>
+                            <li>
+                                <a href="introunitoneexamsim.html" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600" aria-label="Unit One Exam Simulation">
+                                    <i class="fas fa-laptop-code mr-2" aria-hidden="true"></i>Unit One Exam Simulation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="intronursingtutorpresentation.html" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600" aria-label="Intro Nursing Tutor Presentation">
+                                    <i class="fas fa-chalkboard-teacher mr-2" aria-hidden="true"></i>Intro Nursing Tutor Presentation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="introtutorsde.html" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600" aria-label="Tutor SDE (All Material)">
+                                    <i class="fas fa-book-reader mr-2" aria-hidden="true"></i>Tutor SDE (All Material)
+                                </a>
+                            </li>
+                            <li>
+                                <a href="intronursingcasestudiestutor.html" class="w-full text-center inline-block bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-all duration-200 hover:bg-cyan-600" aria-label="Miniature Case Studies (All Topics)">
+                                    <i class="fas fa-clipboard-list mr-2" aria-hidden="true"></i>Miniature Case Studies (All Topics)
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </div>
+                </section>
             </main>
 
-            <aside class="space-y-8">
-                <div class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                    <h2 class="text-2xl font-semibold text-cyan-700 mb-4 pb-2 border-b-2 border-yellow-400 flex items-center gap-3">
-                        <i class="fas fa-clipboard-list text-yellow-500"></i> Upcoming Assignments
+            <aside class="space-y-8" aria-labelledby="assignments-heading">
+                <section class="bg-white p-6 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <h2 id="assignments-heading" class="text-2xl font-semibold text-cyan-700 mb-4 pb-2 border-b-2 border-yellow-400 flex items-center gap-3">
+                        <i class="fas fa-clipboard-list text-yellow-500" aria-hidden="true"></i> Upcoming Assignments
                     </h2>
                     <div class="divide-y divide-dashed divide-gray-200">
                         <div class="py-4">
@@ -96,12 +116,12 @@
                             <p class="text-sm text-red-500 mt-1"><span class="font-bold">Due: in 14 days</span></p>
                         </div>
                     </div>
-                </div>
+                </section>
             </aside>
         </div>
     </div>
 
-    <footer class="bg-gray-200 text-gray-600 py-6 text-center mt-10">
+    <footer class="bg-gray-200 text-gray-600 py-6 text-center mt-10" role="contentinfo">
         <div class="container mx-auto max-w-7xl">
             <p class="text-sm">&copy; 2025 AlliedRNPrep.org. All Rights Reserved.</p>
         </div>
