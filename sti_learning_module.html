@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>STI Learning Module | AlliedRNPrep</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- React, ReactDOM via CDN for consistency with your setup -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body class="bg-slate-100 font-inter text-slate-800">
+
+<div id="root"></div>
+
+<script type="text/javascript">
+const contentData = [
+  {
+    title: "Overview",
+    color: "teal",
+    steps: [
+      {
+        type: "text",
+        html: `<h2 class="text-xl font-bold mb-2 text-teal-700">Overview of Sexually Transmitted Infections (STIs)</h2>
+        <ul class="list-disc ml-6 space-y-1">
+          <li>STIs are infections primarily transmitted by sexual contact (vaginal, oral, or anal); can be bacterial or viral.</li>
+          <li>Affects people of all sexual orientations and ages, but highest prevalence in adolescents & young adults.</li>
+          <li>Nursing role: early recognition, education, prevention, and management – critical for reducing complications and transmission.</li>
+        </ul>`
+      },
+    ]
+  },
+  {
+    title: "Bacterial STIs",
+    color: "rose",
+    steps: [
+      {
+        type: "table",
+        html: `
+        <table class="min-w-full table-auto border border-collapse border-slate-300 text-sm">
+          <thead>
+            <tr class="bg-rose-100">
+              <th class="border px-2 py-1">Infection</th>
+              <th class="border px-2 py-1">Key Facts</th>
+              <th class="border px-2 py-1">Symptoms</th>
+              <th class="border px-2 py-1">Complications</th>
+              <th class="border px-2 py-1">Nursing/NCLEX Priorities</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border px-2 py-1">Chlamydia</td>
+              <td class="border px-2 py-1">Most common; often asymptomatic</td>
+              <td class="border px-2 py-1">Dysuria, abnormal discharge, pain</td>
+              <td class="border px-2 py-1">PID, infertility, neonatal pneumonia</td>
+              <td class="border px-2 py-1">Screen all sexually active pts; treat all partners; educate compliance</td>
+            </tr>
+            <tr>
+              <td class="border px-2 py-1">Gonorrhea</td>
+              <td class="border px-2 py-1">2nd most common; also co-treat chlamydia</td>
+              <td class="border px-2 py-1">Purulent discharge, dysuria</td>
+              <td class="border px-2 py-1">PID, infertility, neonatal blindness</td>
+              <td class="border px-2 py-1">Reportable infection; emphasize partner treatment</td>
+            </tr>
+            <tr>
+              <td class="border px-2 py-1">Syphilis</td>
+              <td class="border px-2 py-1">Painless chancre (primary), rash (secondary)</td>
+              <td class="border px-2 py-1">Varies by stage</td>
+              <td class="border px-2 py-1">Neuro, cardiac, death, congenital</td>
+              <td class="border px-2 py-1">Mandatory reporting, early antibiotics, assess pregnancy risk</td>
+            </tr>
+          </tbody>
+        </table>`
+      }
+    ]
+  },
+  {
+    title: "Viral STIs",
+    color: "indigo",
+    steps: [
+      {
+        type: "table",
+        html: `
+        <table class="min-w-full table-auto border border-collapse border-slate-300 text-sm">
+          <thead>
+            <tr class="bg-indigo-100">
+              <th class="border px-2 py-1">Infection</th>
+              <th class="border px-2 py-1">Key Facts</th>
+              <th class="border px-2 py-1">Symptoms</th>
+              <th class="border px-2 py-1">Complications</th>
+              <th class="border px-2 py-1">NCLEX/Priority Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border px-2 py-1">HPV</td>
+              <td class="border px-2 py-1">Most common viral STI; >90% adults exposed</td>
+              <td class="border px-2 py-1">Warts, abnormal Pap</td>
+              <td class="border px-2 py-1">Cervical/anogenital cancer</td>
+              <td class="border px-2 py-1">Vaccine recommended, annual Pap, educate on wart risk</td>
+            </tr>
+            <tr>
+              <td class="border px-2 py-1">Herpes Simplex Virus</td>
+              <td class="border px-2 py-1">Recurrent, incurable but manageable</td>
+              <td class="border px-2 py-1">Painful vesicles, prodrome symptoms</td>
+              <td class="border px-2 py-1">Neonatal infection, increased HIV risk</td>
+              <td class="border px-2 py-1">Antivirals (acyclovir), safe sex, nurse support for stigma</td>
+            </tr>
+            <tr>
+              <td class="border px-2 py-1">HIV</td>
+              <td class="border px-2 py-1">Can progress to AIDS; many years asymptomatic</td>
+              <td class="border px-2 py-1">Flu-like symptoms, opportunistic infections (late)</td>
+              <td class="border px-2 py-1">AIDS, cancers, multi-organ complications</td>
+              <td class="border px-2 py-1">Universal precautions, screen all with other STIs, confidentiality</td>
+            </tr>
+          </tbody>
+        </table>`
+      }
+    ]
+  },
+  {
+    title: "Nursing Care & Assessment",
+    color: "yellow",
+    steps: [
+      {
+        type: "text",
+        html: `
+        <h3 class="text-lg font-semibold mb-2 text-yellow-700">Nursing Assessment: The '5 P's'</h3>
+        <ul class="list-decimal ml-6 mb-3 space-y-1">
+          <li><strong>Partners</strong> (number, gender, recent changes)</li>
+          <li><strong>Prevention of Pregnancy</strong> (contraceptive use, but highlight only condoms prevent STIs)</li>
+          <li><strong>Protection from STIs</strong> (methods, condom usage)</li>
+          <li><strong>Practices</strong> (type of intercourse, risk level)</li>
+          <li><strong>Past History</strong> (prior STI diagnoses, treatment results)</li>
+        </ul>
+        <h4 class="font-semibold text-yellow-700">Patient Education:</h4>
+        <ul class="list-disc ml-6 space-y-1">
+          <li>Complete all prescribed treatment—finish ALL antibiotics/antivirals.</li>
+          <li>Abstain from sex until cleared by provider/test-of-cure (and, in some states, report all partners).</li>
+          <li>Routine screening is critical; educate on asymptomatic presentations (especially for women).</li>
+          <li>Confidentiality is assured, but some diagnoses must be reported to health authorities.</li>
+        </ul>
+        `
+      },
+    ]
+  },
+  {
+    title: "NCLEX/Exam Tips",
+    color: "green",
+    steps: [
+      {
+        type: "text",
+        html: `
+        <h3 class="text-lg font-semibold mb-2 text-green-700">NCLEX/NGN Focused Quick Tips</h3>
+        <ul class="list-disc ml-6 space-y-1">
+          <li>Bacterial STIs are curable, viral STIs are managed (not cured).</li>
+          <li>Women may have less obvious symptoms, focus on complications (PID, infertility).</li>
+          <li>Patient teaching/education and reporting are common correct answers for safety/EQ/LGBTQ+ scenarios.</li>
+          <li>Chlamydia/Gonorrhea often co-exist and are co-treated.</li>
+          <li>Look for 'select all that apply' safety/education/priority questions—read carefully!</li>
+          <li>Always screen pts with one STI for others, especially HIV.</li>
+        </ul>
+        `
+      }
+    ]
+  },
+  {
+    title: "Quiz",
+    color: "sky",
+    steps: [
+      {
+        type: "quiz",
+        questions: [
+          {
+            prompt: "A 22-year-old female presents with burning urination and abnormal vaginal discharge. Which STI is most likely, and what should the nurse prioritize?",
+            choices: [
+              "A. Chlamydia; Advise abstinence until treatment complete, screen partners.",
+              "B. Syphilis; Perform VDRL and report to CDC.",
+              "C. HPV; Schedule Pap test only.",
+              "D. Herpes; Start lifelong acyclovir immediately."
+            ],
+            answer: 0,
+            rationale: "Chlamydia is common, often asymptomatic, but can cause cervical d/c and dysuria. Abstinence and partner screening are priority."
+          },
+          {
+            prompt: "Which nursing statement requires follow-up?",
+            choices: [
+              'A. “You should finish all your antibiotics, even if you feel better.”',
+              'B. “You need to notify any sexual partners so they can be treated.”',
+              'C. “If you use oral contraceptives, you’re protected from most STIs.”',
+              'D. “Condoms are the only birth control that also helps prevent STIs.”'
+            ],
+            answer: 2,
+            rationale: "Oral contraceptives do not protect against STIs; always confirm the patient understands this."
+          },
+          {
+            prompt: "A patient with HSV asks if it can be cured. What is the correct nursing response?",
+            choices: [
+              "A. 'Antibiotics will cure it if you start them soon.'",
+              "B. 'Herpes is managed with medications but not cured.'",
+              "C. 'Once symptoms stop, it will not return.'",
+              "D. 'There is a vaccine available for HSV.'"
+            ],
+            answer: 1,
+            rationale: "HSV is lifelong and managed, not cured. Antivirals decrease symptoms and outbreaks."
+          }
+        ]
+      }
+    ]
+  }
+];
+
+// Simple React module (adapted from your system structure)
+function App() {
+  const [unitIdx, setUnitIdx] = React.useState(0);
+
+  return (
+    <div className="flex flex-col md:flex-row max-w-5xl mx-auto mt-8 shadow-lg bg-white rounded-lg overflow-hidden">
+      <nav className="md:w-56 bg-slate-50 border-r border-slate-200 p-4 space-y-2">
+        {contentData.map((u,i) => (
+          <button key={u.title}
+            onClick={() => setUnitIdx(i)}
+            className={`block w-full text-left px-4 py-2 rounded transition
+              ${i===unitIdx ? "bg-"+u.color+"-100 text-"+u.color+"-800 font-semibold" : "text-slate-700 hover:bg-"+u.color+"-50"}
+            `}>
+            {u.title}
+          </button>
+        ))}
+      </nav>
+      <main className="flex-1 p-8">
+        {contentData[unitIdx].steps.map((step,si) => {
+          if(step.type==="text") return <div key={si} dangerouslySetInnerHTML={{__html: step.html}} className="mb-6"/>;
+          if(step.type==="table") return <div key={si} dangerouslySetInnerHTML={{__html: step.html}} className="mb-6 overflow-x-auto"/>;
+          if(step.type==="quiz") return <Quiz key={si} data={step.questions}/>;
+        })}
+      </main>
+    </div>
+  );
+}
+
+// Quiz component
+function Quiz({data}) {
+  const [answers, setAnswers] = React.useState(Array(data.length).fill(null));
+  const [submitted, setSubmitted] = React.useState(false);
+  return (
+    <div>
+      <h3 className="text-lg font-bold mb-2 text-sky-700">Quiz: Test Your Knowledge</h3>
+      {data.map((q,qIdx) => (
+        <div key={qIdx} className="mb-4">
+          <p className="font-semibold">{qIdx+1}. {q.prompt}</p>
+          <div className="ml-6 space-y-1">
+            {q.choices.map((c,cIdx) => (
+              <label key={cIdx} className="flex items-center cursor-pointer">
+                <input type="radio" name={`q${qIdx}`} disabled={submitted}
+                  className="mr-2"
+                  checked={answers[qIdx]===cIdx}
+                  onChange={()=> {
+                    let na = answers.slice();
+                    na[qIdx]=cIdx;
+                    setAnswers(na);
+                  }}
+                />
+                {c}
+              </label>
+            ))}
+          </div>
+          {submitted && (
+            <div className={`mt-2 pl-3 text-sm ${answers[qIdx]===q.answer?"text-green-600":"text-red-600"}`}>
+              {answers[qIdx]===q.answer ? "Correct! " : "Not quite. "} {q.rationale}
+            </div>
+          )}
+        </div>
+      ))}
+      <button onClick={()=>setSubmitted(true)}
+              className="mt-4 px-4 py-2 rounded bg-sky-600 text-white font-semibold hover:bg-sky-700"
+              disabled={submitted}>
+        Check Answers
+      </button>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>
+
+</body>
+</html>
