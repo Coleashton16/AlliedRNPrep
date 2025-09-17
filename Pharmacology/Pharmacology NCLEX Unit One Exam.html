@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCLEX Challenge Exam - Full Randomized & Modern</title>
+    <!-- Existing Font for the Page Content -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <!-- New Fonts for the Navigation Bar (from Med Surg / Pharma pages) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* --- Existing NCLEX Page Variables --- */
+        :root {
+            --primary-color: #007bff; /* Blue */
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d; /* Gray */
+            --background-color: #f8f9fa; /* Light gray */
+            --surface-color: #ffffff; /* White */
+            --text-color: #343a40; /* Dark gray */
+            --light-text-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --success-color: #28a745; /* Green */
+            --danger-color: #dc3545; /* Red */
+            --font-family: 'Lato', sans-serif; /* Kept for main page content */
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- NEW Global Variables & Refined Color Palette (from Med Surg / Pharma pages) --- */
+        :root {
+            /* Core Neutrals & Blues (Modern & Professional) */
+            --color-primary-dark: #2F4858;    /* Deep Slate Blue - for headings, navigation */
+            --color-primary-medium: #4B6B80; /* Muted Steel Blue - for secondary headings, accents */
+            /* Note: text-main, text-light, background, card-background, border are already effectively defined by the NCLEX page's --text-color, --background-color, --surface-color, --border-color. Using the existing ones to avoid direct conflict for core page elements. */
+            --color-text-main-new: #333333;      /* Dark Gray - for main body text */
+            --color-text-light-new: #607D8B;     /* Light Slate Gray - for subtle text, icons */
+            --color-background-new: #F4F7F6;    /* Very Light Blue-Gray - overall page background */
+            --color-card-background-new: #FFFFFF; /* Crisp White - for main content cards */
+            --color-border-new: #E0E6EC;         /* Soft Border Gray */
+            --color-white: #FFFFFF; /* Explicit white for button text on hover */
+
+            /* Accent Color (Warm & Inviting) */
+            --color-accent: #DAA520;         /* Goldenrod - for hover states, underlines, active elements */
+            --color-accent-light: #FFE082;   /* Lighter Goldenrod - for very subtle accents */
+
+            /* Shadows (Soft & Modern) */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+            /* Spacing & Radii (Using values from Med Surg / Pharma for consistency where applied) */
+            --spacing-unit: 1rem;
+            --padding-section: 2.5rem; /* Consistent padding for sections */
+            --padding-inner: 1.5rem; /* Padding inside elements like topic groups */
+            --radius-default: 6px;   /* Slightly less rounded for modern look */
+            --radius-large: 12px;    /* Larger radius for main cards */
+
+            /* Global padding for full width elements like nav */
+            --page-horizontal-padding: max(20px, 5vw);
+        }
+
+        /* --- Base Body Styles (Adjusted for new background, but keeping existing font-family) --- */
+        body {
+            font-family: var(--font-family); /* Retain Lato for existing page content */
+            line-height: 1.7;
+            margin: 0;
+            padding: 0; /* Removed fixed padding as nav will be full width and main container will handle padding */
+            background-color: var(--color-background-new); /* Use the new subtle background */
+            color: var(--color-text-main-new); /* Use the new main text color for general body text */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center the main .container */
+        }
+
+        /* --- Top Navigation Menu (Copied from Med Surg / Pharma pages) --- */
+        .top-nav {
+            background-color: var(--color-primary-dark);
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            width: 100%; /* Ensure it spans full width */
+        }
+
+        .top-nav-container {
+            width: 100%;
+            padding: 0 var(--page-horizontal-padding);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .top-nav-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .top-nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 2.5rem;
+            white-space: nowrap;
+        }
+
+        .top-nav-item a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif; /* Use Roboto for nav links */
+            font-weight: 500;
+            font-size: 1.0rem;
+            padding: 0.6rem 0;
+            transition: all 0.3s ease;
+            position: relative;
+            display: block;
+            letter-spacing: 0.02em;
+        }
+
+        .top-nav-item a::after {
+            content: '';
+            position: absolute;
+            bottom: -0.25rem;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--color-accent);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+
+        .top-nav-item a:hover {
+            color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+        .top-nav-item a:hover::after {
+            transform: scaleX(1);
+        }
+        
+        /* --- NCLEX Page Specific Styles (Adjusted for new palette & Nav) --- */
+        .container {
+            background-color: var(--color-card-background-new); /* Use new card background */
+            padding: 25px 30px;
+            border-radius: var(--radius-large); /* Use new border-radius for consistency */
+            box-shadow: var(--shadow-md); /* Use new shadow */
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 30px;
+            border: 1px solid var(--color-border-new); /* Use new border color */
+        }
+
+        #timerDisplay {
+            font-size: 1.6em;
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 12px 15px;
+            background-color: var(--color-topic-group-bg); /* Use a subtle new background */
+            border-radius: var(--radius-default); /* Consistent radius */
+            font-weight: 700;
+            color: var(--color-primary-medium); /* Use new primary medium color */
+            border: 1px solid var(--color-border-new); /* Consistent border */
+        }
+
+        .question-block { /* Applies to questions in form and in review */
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--color-border-new); /* Consistent border */
+        }
+        #examFormContainer .question-block:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        #answerReview .question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: var(--color-background-new); /* Consistent with new background */
+            border: 1px solid var(--color-border-new);
+            border-radius: var(--radius-default);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--color-primary-dark); /* Use new primary dark for main title */
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Roboto', sans-serif; /* Make h1 use Roboto */
+        }
+        h2 { /* For results section title */
+            color: var(--color-primary-medium); /* Use new primary medium for h2 */
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-primary-medium); /* Consistent border color */
+            padding-bottom: 10px;
+            font-family: 'Roboto', sans-serif; /* Make h2 use Roboto */
+        }
+        h3 { /* Question title in form and review */
+            margin-bottom: 18px;
+            font-size: 1.25em;
+            font-weight: 700;
+            color: var(--color-text-main-new); /* Use new main text color */
+            line-height: 1.4;
+            font-family: 'Open Sans', sans-serif; /* Keep original body font, or use Open Sans for clarity */
+        }
+        #examFormContainer label { /* Answer choice label in the form */
+            display: block;
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: var(--radius-default);
+            background-color: var(--color-background-new); /* Consistent with new background */
+            border: 1px solid var(--color-border-new);
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+        #examFormContainer label:hover {
+            background-color: var(--color-topic-group-bg); /* Use topic group background for hover */
+            border-color: var(--color-accent-light); /* Subtle accent border on hover */
+            transform: translateX(2px);
+        }
+        #examFormContainer input[type="radio"], 
+        #examFormContainer input[type="checkbox"] {
+            margin-right: 12px;
+            vertical-align: middle;
+            transform: scale(1.15);
+        }
+        #examFormContainer input[type="text"] {
+            padding: 10px 12px;
+            margin-top: 8px;
+            border: 1px solid var(--color-border-new); /* Consistent border */
+            border-radius: var(--radius-default);
+            width: 150px;
+            font-size: 1em;
+            box-sizing: border-box;
+            color: var(--color-text-main-new);
+            background-color: var(--color-card-background-new);
+        }
+        button#submitBtn {
+            display: block;
+            width: 240px;
+            padding: 14px 22px;
+            background-color: var(--color-primary-dark); /* Use new primary dark color */
+            color: var(--color-white); /* Ensure text is white */
+            border: none;
+            border-radius: var(--radius-default);
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 700;
+            margin: 45px auto 20px auto;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-sm); /* Use new shadow */
+        }
+        button#submitBtn:hover {
+            background-color: var(--color-primary-medium); /* Darker on hover */
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        button#submitBtn:disabled {
+            background-color: var(--color-text-light-new); /* Use a muted gray */
+            cursor: not-allowed;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: var(--color-card-background-new); /* Consistent with cards */
+            border-radius: var(--radius-large);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border-new);
+        }
+        .results #score {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--color-accent); /* Use accent color for score */
+            margin-bottom: 10px;
+        }
+        .results #feedback {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: var(--color-text-main-new);
+        }
+        .results h3 { /* "Review Your Answers" title in results */
+            color: var(--color-primary-medium); /* Consistent with new h2 */
+            border-bottom: 1px solid var(--color-border-new);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .rationale-display { /* For rationales in results */
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e6f7ff; /* A light blue for rationales */
+            border: 1px solid #a6e3ff;
+            border-left: 5px solid var(--color-primary-medium); /* Use new blue border */
+            border-radius: var(--radius-default);
+            font-size: 0.95em;
+            color: var(--color-text-main-new);
+        }
+        .rationale-display strong { /* Bolding within rationale content */
+            font-weight: 700;
+        }
+        .rationale-display p:first-of-type strong { 
+            color: var(--color-primary-medium); /* Consistent with new blue */
+        }
+        .correct-answer-text-indicator { /* Span for "Correct" / "Incorrect" text in review */
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .correct-answer-text-indicator.correct {
+            color: var(--module-button-base); /* Use the module green */
+        }
+        .correct-answer-text-indicator.incorrect {
+            color: var(--exam-button-base); /* Use the exam orange */
+        }
+        .user-answer-display {
+            font-style: italic;
+            color: var(--color-text-light-new); /* Use new light text color */
+            margin-bottom: 8px;
+            padding-left: 10px;
+        }
+        .instructions {
+            margin-bottom: 30px;
+            padding: 18px;
+            background-color: var(--color-accent-light); /* Use light accent for instructions */
+            border: 1px solid var(--color-accent);
+            border-left: 5px solid var(--color-accent);
+            border-radius: var(--radius-default);
+            font-size: 1.05em;
+            color: var(--color-text-main-new);
+        }
+        .instructions strong {
+            color: var(--color-primary-dark); /* Strong text in instructions */
+        }
+        .rationale-text-hidden { /* Class for initially hidden rationale divs in HTML */
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0; /* Remove fixed padding, let --page-horizontal-padding handle it for container */
+            }
+            .top-nav-container {
+                justify-content: center; /* Center nav items on smaller screens */
+            }
+            .container {
+                padding: 20px var(--page-horizontal-padding); /* Apply padding to container */
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h3 { /* Question titles */
+                font-size: 1.15em;
+            }
+            #examFormContainer label {
+                padding: 10px 12px;
+                font-size: 0.95em;
+            }
+            button#submitBtn {
+                width: 100%;
+                font-size: 1.05em;
+                padding: 12px 18px;
+            }
+            #timerDisplay {
+                font-size: 1.3em;
+            }
+        }
+        @media (max-width: 480px) {
+            .top-nav-list {
+                flex-direction: column; /* Stack nav items vertically on very small screens */
+                align-items: center; /* Center them when stacked */
+                gap: 10px;
+            }
+            .top-nav-item a {
+                font-size: 0.9rem;
+                padding: 8px 15px;
+                width: fit-content;
+            }
+            .top-nav-container {
+                padding: 0 15px;
+            }
+            h1 {
+                font-size: 1.6em;
+            }
+            h3 { 
+                font-size: 1.1em;
+            }
+            #examFormContainer label {
+                font-size: 0.9em;
+            }
+            #examFormContainer input[type="text"] {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="top-nav-container">
+            <ul class="top-nav-list">
+                <li class="top-nav-item"><a href="index.html">Home</a></li>
+                <li class="top-nav-item"><a href="Academic Support Resources consent.html">Learning Support</a></li>
+                <li class="top-nav-item"><a href="Calendar.html">Calendar</a></li>
+                <li class="top-nav-item"><a href="https://www.vsrep.org/complaints" target="_blank" rel="noopener noreferrer">Complaints</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>NCLEX Challenge Exam</h1>
+        <div id="timerDisplay">Time Remaining: 02:00:00</div>
+        <div class="instructions">
+            <p><strong>Instructions:</strong> This is a very challenging exam. Each question is worth <strong>3 points</strong>. Read each question carefully. You have <strong>2 hours</strong> to complete the exam. The exam will automatically submit when the timer runs out. Click the "Submit Exam" button at the end to see your score and rationales.</p>
+        </div>
+        
+        <form id="examFormContainer">
+            </form>
+    </div>
+
+    <div class="container results" id="resultsDisplay" style="display:none;">
+        <h2>Your Results</h2>
+        <p id="score"></p>
+        <p id="feedback"></p>
+        <h3>Review Your Answers:</h3>
+        <div id="answerReview"></div>
+    </div>
+
+    <div class="rationale-text-hidden" id="r_q1">
+        <p><strong>Rationale:</strong> Antidiarrheals like diphenoxylate/atropine (Lomotil) are contraindicated in suspected or confirmed Clostridium difficile infection because they can worsen the condition by retaining toxins and potentially precipitating toxic megacolon. Options B, C, and D are appropriate interventions for suspected C. difficile.</p>
+        <p><strong>Correct Answer Text:</strong> Administer diphenoxylate/atropine.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q2">
+        <p><strong>Rationale:</strong> Promethazine is a vesicant and can cause severe chemical irritation and tissue damage if it extravasates. The symptoms described indicate potential extravasation or severe phlebitis. The infusion must be stopped immediately to prevent further harm. While other actions might be taken later, stopping the infusion is the priority.</p>
+        <p><strong>Correct Answer Text:</strong> Stop the infusion immediately.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q3">
+        <p><strong>Rationale:</strong> Bulk-forming laxatives absorb water to increase bulk and promote peristalsis. Insufficient fluid intake can lead to esophageal or intestinal obstruction. Option B is incorrect; onset is typically 12-72 hours. Option C is general advice but not the most critical for this specific class. Mild cramping (D) can occur; severe cramping or obstruction symptoms would warrant discontinuation.</p>
+        <p><strong>Correct Answer Text:</strong> "Take this medication with at least 8 ounces of fluid."</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q4">
+        <p><strong>Rationale:</strong> The primary goal of lactulose in hepatic encephalopathy is to reduce ammonia levels, thereby improving mental status. While 2-3 soft stools are a means to excrete ammonia and a desired outcome for managing bowel movements, the ultimate therapeutic effect is neurological improvement. A decrease in ammonia is positive, but clinical improvement is the most direct indicator of therapeutic success. Decreased distension can occur but is not the primary indicator for encephalopathy treatment.</p>
+        <p><strong>Correct Answer Text:</strong> Improved level of consciousness and orientation.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q5">
+        <p><strong>Rationale:</strong> Aluminum-containing antacids are known to cause constipation. Magnesium-containing antacids tend to cause diarrhea. Hypermagnesemia is a risk with magnesium antacids, especially in renal impairment. Metabolic alkalosis can occur with excessive use of any antacid, but constipation is specific to aluminum-based ones.</p>
+        <p><strong>Correct Answer Text:</strong> Constipation</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q6">
+        <p><strong>Rationale:</strong> Long-term use of Proton Pump Inhibitors (PPIs) like omeprazole is associated with several potential complications: Increased risk of Clostridium difficile infection due to alteration of gut flora. Hypomagnesemia due to reduced intestinal absorption of magnesium. Vitamin B12 deficiency due to impaired absorption. Increased risk of osteoporosis and fractures due to potential effects on calcium absorption. Acute interstitial nephritis, though less common, is a serious renal adverse effect. All these are recognized long-term risks.</p>
+        <p><strong>Correct Answer Texts:</strong> Increased risk of Clostridium difficile infection, Hypomagnesemia, Vitamin B12 deficiency, Increased risk of osteoporosis and fractures, Acute interstitial nephritis</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q7">
+        <p><strong>Rationale:</strong> Sucralfate can bind to other medications in the GI tract and decrease their absorption. To prevent this interaction, sucralfate should be administered at least 2 hours apart from other medications like phenytoin. Taking them together would reduce phenytoin absorption. 30 minutes is often not enough separation. Crushing sucralfate is appropriate for administration if allowed, but mixing directly with phenytoin doesn't solve the absorption issue and the timing separation is key.</p>
+        <p><strong>Correct Answer Text:</strong> Administer sucralfate at least 2 hours apart from phenytoin.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q8">
+        <p><strong>Rationale:</strong> First-generation H1 antihistamines (e.g., diphenhydramine) are known for their sedative effects. This poses a significant safety risk, especially when performing tasks that require alertness. While dry mouth and appetite changes can occur, and administration with food can decrease GI upset, the risk of sedation and impaired motor skills is the priority safety concern.</p>
+        <p><strong>Correct Answer Text:</strong> "Avoid operating heavy machinery or driving until you know how this drug affects you."</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q9">
+        <p><strong>Rationale:</strong> Anticholinergic drugs can cause mydriasis (pupil dilation), which can precipitate an acute angle-closure glaucoma attack in susceptible individuals. Therefore, narrow-angle glaucoma is a significant contraindication. Hypothyroidism, peptic ulcer disease, and hypertension are generally not contraindications for anticholinergic use, though side effects might need monitoring in some contexts.</p>
+        <p><strong>Correct Answer Text:</strong> Narrow-angle glaucoma</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q10">
+        <p><strong>Rationale:</strong> St. John's Wort is a potent inducer of CYP450 enzymes, particularly CYP3A4 and CYP2C9, which metabolize warfarin. This leads to increased warfarin metabolism and a decreased INR (reduced anticoagulant effect), increasing the risk of clotting. Therefore, the INR needs close monitoring, and the warfarin dose may need to be increased. Decreasing warfarin would be inappropriate. Spacing doses doesn't mitigate this metabolic interaction.</p>
+        <p><strong>Correct Answer Text:</strong> Monitor the INR more frequently and anticipate a potential need to increase the warfarin dose.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q11">
+        <p><strong>Rationale:</strong> The Z-track method is specifically designed to seal medication deep within the muscle tissue and prevent it from leaking back into the subcutaneous tissue or along the needle track. This minimizes irritation, pain, and potential staining for certain medications (e.g., iron dextran, promethazine IM). A 25-gauge, 5/8-inch needle is typically for subcutaneous or intradermal injections. A 45-degree angle is for subcutaneous injections. Vigorous massage is generally contraindicated after Z-track or for irritating medications as it can promote leakage and irritation.</p>
+        <p><strong>Correct Answer Text:</strong> Employing the Z-track injection method.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q12">
+        <p><strong>Rationale:</strong> Chronic alcohol abuse leads to thiamine deficiency, which can cause Wernicke's encephalopathy (confusion, ataxia, nystagmus) and progress to Korsakoff syndrome (amnesia, confabulation). Parenteral thiamine is crucial for prevention and treatment. Vitamin B12 deficiency is associated with pernicious anemia and neurological symptoms, but thiamine is specific for Wernicke-Korsakoff. Vitamin K is for clotting factor synthesis. Vitamin D is for calcium absorption.</p>
+        <p><strong>Correct Answer Text:</strong> Vitamin B1 (Thiamine)</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q13">
+        <p><strong>Rationale:</strong> Sympathomimetic nasal decongestants like pseudoephedrine can cause vasoconstriction, leading to increased blood pressure (a concern for hypertensive patients), and can also worsen urinary retention in clients with BPH. Antihistamines can also contribute to urinary retention due to their anticholinergic effects, but sympathomimetic decongestants pose a dual threat in this client. Dextromethorphan is generally safe unless combined with MAOIs or SSRIs in high doses.</p>
+        <p><strong>Correct Answer Text:</strong> The nasal decongestant (e.g., pseudoephedrine), due to risk of increased blood pressure and urinary retention.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q14">
+        <p><strong>Rationale:</strong> The first trimester is a critical period of organogenesis, making it the most vulnerable time for teratogenic effects. Any medication use requires careful risk-benefit analysis. Many antiemetics are not Category A; for example, ondansetron has had some concerns. Scopolamine is Category C and not first-line. OTC status does not guarantee safety in pregnancy (e.g., NSAIDs in the third trimester).</p>
+        <p><strong>Correct Answer Text:</strong> The benefits of treating severe nausea must outweigh the potential risks to the fetus, especially in the first trimester.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q15">
+        <p><strong>Rationale:</strong> Gentamicin is nephrotoxic and ototoxic. The elevated BUN and creatinine indicate acute kidney injury (AKI). Hyperkalemia (K+ 5.8 mEq/L) is also a sign of renal dysfunction. Continuing gentamicin would worsen renal damage. Notifying the HCP is crucial for re-evaluation of therapy. While hyperkalemia needs addressing, stopping the offending agent is primary. Increased fluids may be helpful but not the priority over stopping the nephrotoxic drug. A potassium-sparing diuretic is contraindicated with hyperkalemia.</p>
+        <p><strong>Correct Answer Text:</strong> Hold the next dose of gentamicin and notify the healthcare provider.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q16">
+        <p><strong>Rationale:</strong> IV administration delivers the drug directly into the systemic circulation, bypassing absorption and the first-pass metabolism in the liver that oral medications undergo. This results in immediate and complete (100%) bioavailability. IV meds often have a higher risk of rapid-onset systemic side effects. PO is generally more convenient for long-term use. Drug interactions can occur regardless of route, though the nature might differ.</p>
+        <p><strong>Correct Answer Text:</strong> Avoidance of the first-pass effect, leading to 100% bioavailability.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q17">
+        <p><strong>Rationale:</strong> Many elixirs and suspensions, especially those containing sorbitol, are hyperosmolar and can cause osmotic diarrhea when administered via PEG tube. Diluting these medications (if compatible and recommended by pharmacy/drug literature) can reduce their osmolarity and alleviate diarrhea. Requesting an antidiarrheal addresses the symptom but not the cause. Switching all meds to crushed tablets may not be feasible (e.g., enteric-coated, sustained-release) and doesn't directly address the osmolarity of remaining liquids. Stopping tube feeding is a significant step and might not be necessary if the cause is medication formulation.</p>
+        <p><strong>Correct Answer Text:</strong> Dilute the hyperosmolar liquid medications with sterile water before administration, if appropriate.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q18">
+        <p><strong>Rationale:</strong> For rapid volume expansion in hypovolemic shock, an isotonic crystalloid is preferred. Lactated Ringer's and 0.9% Sodium Chloride (Normal Saline) are both isotonic. LR is often favored as its electrolyte composition is closer to plasma and it helps buffer acidosis that can occur in shock. 0.45% NaCl is hypotonic and would not effectively expand intravascular volume. D5W is isotonic in the bag but becomes hypotonic once dextrose is metabolized. 3% NaCl is hypertonic and used for specific situations like severe hyponatremia or cerebral edema, not typically for initial hypovolemic shock resuscitation.</p>
+        <p><strong>Correct Answer Text:</strong> Lactated Ringer's (LR) solution</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q19">
+        <p><strong>Rationale:</strong> Scopolamine is an anticholinergic drug. Blurred vision, dry mouth, and drowsiness are common and expected anticholinergic side effects. While these can be bothersome, they are not typically signs of an allergic reaction unless accompanied by rash, hives, or anaphylaxis. They don't necessarily indicate an overdose requiring immediate removal unless severe or accompanied by more serious symptoms like confusion, hallucinations, or urinary retention. Incorrect application usually leads to lack of effect rather than these specific systemic side effects.</p>
+        <p><strong>Correct Answer Text:</strong> Expected anticholinergic side effects.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q20">
+        <p><strong>Rationale:</strong> Ondansetron is a serotonin (5-HT3) receptor antagonist. Common side effects include headache, constipation, and diarrhea. A more serious potential adverse effect is QT interval prolongation, which can increase the risk of torsades de pointes. EPS and tardive dyskinesia are associated with dopamine antagonist antiemetics (e.g., metoclopramide, prochlorperazine). Significant sedation and respiratory depression are more characteristic of phenothiazines (e.g., promethazine) or opioids.</p>
+        <p><strong>Correct Answer Text:</strong> Headache and QT interval prolongation</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q21">
+        <p><strong>Rationale:</strong> Misoprostol is a prostaglandin analog that can cause uterine contractions and is an abortifacient (Pregnancy Category X). It is absolutely contraindicated in pregnancy unless used for cervical ripening/labor induction under medical supervision. Therefore, effective contraception is essential. While other instructions are relevant (GI upset, diarrhea is a common side effect, it protects the stomach lining and can decrease acid), the teratogenic risk is paramount.</p>
+        <p><strong>Correct Answer Text:</strong> "You must use effective contraception during and for one month after misoprostol therapy."</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q22">
+        <p><strong>Rationale:</strong> PRBCs are indicated to increase oxygen-carrying capacity in anemic clients. They provide red blood cells with a much smaller volume of plasma compared to whole blood, which is crucial for clients at risk of fluid overload or who do not need the extra plasma volume. Whole blood contains all components and a larger volume, typically reserved for massive hemorrhage. FFP is used to replace clotting factors. Platelets are for thrombocytopenia or platelet dysfunction. Given the active bleeding and severe anemia, PRBCs are the priority to improve oxygenation.</p>
+        <p><strong>Correct Answer Text:</strong> Packed red blood cells (PRBCs)</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q23">
+        <p><strong>Rationale:</strong> Promethazine can cause severe tissue injury (including gangrene) if extravasation occurs. After stopping the infusion (which is the first crucial step), the HCP must be notified immediately for further orders, which may include specific treatments to limit tissue damage (e.g., phentolamine, hyaluronidase, or specific compresses per policy – often cold for vesicants initially, though policies vary). Oral analgesics address pain but not tissue injury. Warm compresses may be contraindicated with some vesicants as they can increase drug spread; cold is often preferred initially, but specific orders are needed. Documentation is vital but not the priority over immediate medical consultation for intervention.</p>
+        <p><strong>Correct Answer Text:</strong> Notify the healthcare provider and prepare for potential administration of an antidote or further treatment for extravasation.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q24">
+        <p><strong>Rationale:</strong> Magnesium is excreted by the kidneys. In clients with chronic renal failure, magnesium-containing laxatives (like magnesium hydroxide or magnesium citrate) can lead to hypermagnesemia, which can cause serious adverse effects including hypotension, respiratory depression, and cardiac arrest. Psyllium requires adequate fluid intake, which might be an issue with fluid restriction, but doesn't pose the same systemic electrolyte risk. Docusate is generally safe. Bisacodyl acts locally and is less likely to cause systemic electrolyte issues related to renal failure, though dependency can be a concern with long-term use.</p>
+        <p><strong>Correct Answer Text:</strong> Magnesium hydroxide (osmotic - saline)</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q25">
+        <p><strong>Rationale:</strong> The goal of lactulose in hepatic encephalopathy is to promote the excretion of ammonia through the stool. Typically, 2-3 soft stools per day indicate effective therapy. Asterixis (liver flap) is a key sign of hepatic encephalopathy, and its reduction, along with improved mental status, signals efficacy. Frequent watery diarrhea might indicate overdosage and can lead to dehydration/electrolyte imbalance. Lactulose can cause hypokalemia, not hyperkalemia. BUN is more related to renal function and hydration status, not a direct measure of lactulose efficacy for encephalopathy.</p>
+        <p><strong>Correct Answer Text:</strong> The client has 2-3 soft, formed stools per day and reduced asterixis.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q26">
+        <p><strong>Rationale:</strong> Aluminum-based antacids cause constipation. They also bind phosphate in the GI tract, which can lead to hypophosphatemia with prolonged high-dose use. Furosemide is a loop diuretic that causes potassium loss, not typically directly related to the antacid's phosphate binding or constipation effect. Diarrhea is associated with magnesium antacids. Metabolic alkalosis (not acidosis) can occur with excessive systemic absorption of some antacids, but constipation and hypophosphatemia are specific concerns with high-dose aluminum antacids.</p>
+        <p><strong>Correct Answer Text:</strong> Worsening constipation and potential hypophosphatemia.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q27">
+        <p><strong>Rationale:</strong> Long-term PPI use is a known risk factor for hypomagnesemia. Symptoms of hypomagnesemia include neuromuscular excitability (tetany, muscle weakness, tremors, seizures) and cardiac manifestations such as ECG changes (prolonged QT interval, T-wave flattening or inversion) and arrhythmias like Torsades de Pointes. Hyperkalemia typically causes peaked T waves and widened QRS. Hyponatremia symptoms are primarily neurological. Hypercalcemia can cause muscle weakness but different ECG changes (shortened QT).</p>
+        <p><strong>Correct Answer Text:</strong> Hypomagnesemia</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q28">
+        <p><strong>Rationale:</strong> Sucralfate can significantly decrease the absorption of fluoroquinolones like ciprofloxacin by binding to them in the GI tract. To minimize this interaction, ciprofloxacin should be given at least 2 hours before or 4-6 hours after sucralfate. Taking them together or mixing would impair ciprofloxacin efficacy. While sucralfate is typically taken on an empty stomach (1 hour before meals and at bedtime) for ulcer treatment, the critical instruction here is the separation from ciprofloxacin. Ciprofloxacin can be taken with or without food, but food (especially dairy or calcium-fortified) can also reduce its absorption, though the sucralfate interaction is more pronounced.</p>
+        <p><strong>Correct Answer Text:</strong> Administer ciprofloxacin at least 2 hours before or 6 hours after sucralfate.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q29">
+        <p><strong>Rationale:</strong> While H1 receptors are primarily responsible for acute allergic symptoms like itching and hives, H2 receptors are also found on endothelial cells and contribute to vasodilation and increased vascular permeability in systemic allergic reactions, including anaphylaxis. Combining H1 and H2 blockers can provide more complete blockade of histamine effects, particularly in managing severe urticaria and as adjunctive therapy in anaphylaxis (after epinephrine). Sedation is a side effect, not the goal. While H2 blockers reduce acid, this isn't the primary reason for combination in acute allergy. H2 blockers don't reduce H1 blocker anticholinergic effects.</p>
+        <p><strong>Correct Answer Text:</strong> To target both H1 and H2 receptors involved in systemic allergic responses, especially urticaria and anaphylaxis.</p>
+    </div>
+    <div class="rationale-text-hidden" id="r_q30">
+        <p><strong>Rationale:</strong> Myasthenia gravis is characterized by a deficiency of acetylcholine at the neuromuscular junction. Anticholinergic drugs block the action of acetylcholine. In a client with myasthenia gravis, who already has impaired neuromuscular transmission, further blocking acetylcholine can worsen muscle weakness and potentially trigger a myasthenic crisis (severe muscle weakness leading to respiratory failure). Pyridostigmine is an acetylcholinesterase inhibitor used to treat myasthenia gravis by increasing acetylcholine; anticholinergics would counteract this effect. Therefore, anticholinergic medications are generally contraindicated or used with extreme caution in clients with myasthenia gravis, as they can exacerbate symptoms.</p>
+        <p><strong>Correct Answer Text:</strong> Myasthenia gravis</p>
+    </div>
+
+    <script>
+        // QUESTION DATA (truncated for brevity, actual content should go here)
+        const questions = [
+            {
+                id: "q1",
+                type: "multiple-choice",
+                question: "The nurse is preparing to administer several medications. Which medication order should the nurse question or clarify with the healthcare provider?",
+                options: [
+                    "Administer metoclopramide to a client with gastroparesis.",
+                    "Administer ondansetron to a client experiencing chemotherapy-induced nausea.",
+                    "Administer polyethylene glycol (Miralax) to a client with chronic constipation.",
+                    "Administer diphenoxylate/atropine to a client with suspected Clostridium difficile infection."
+                ],
+                correctAnswer: "Administer diphenoxylate/atropine to a client with suspected Clostridium difficile infection.",
+                rationaleId: "r_q1"
+            },
+            {
+                id: "q2",
+                type: "multiple-choice",
+                question: "A client receiving an intravenous (IV) infusion of promethazine complains of severe burning and pain at the insertion site, and the nurse observes redness and swelling. What is the nurse's priority action?",
+                options: [
+                    "Slow down the infusion rate.",
+                    "Apply a warm compress to the site.",
+                    "Stop the infusion immediately.",
+                    "Elevate the affected extremity."
+                ],
+                correctAnswer: "Stop the infusion immediately.",
+                rationaleId: "r_q2"
+            },
+            {
+                id: "q3",
+                type: "multiple-choice",
+                question: "The nurse is providing discharge teaching to a client prescribed a bulk-forming laxative (e.g., psyllium). Which instruction is most critical to prevent adverse effects?",
+                options: [
+                    "\"You may experience mild abdominal cramping with this medication.\"",
+                    "\"The medication will typically produce a bowel movement within 1 hour.\"",
+                    "\"Avoid taking this medication with dairy products.\"",
+                    "\"Take this medication with at least 8 ounces of fluid.\""
+                ],
+                correctAnswer: "\"Take this medication with at least 8 ounces of fluid.\"",
+                rationaleId: "r_q3"
+            },
+            {
+                id: "q4",
+                type: "multiple-choice",
+                question: "A client with hepatic encephalopathy is prescribed lactulose. The nurse determines the medication is having its therapeutic effect when which of the following is observed?",
+                options: [
+                    "The client reports 2-3 watery stools per day.",
+                    "The client's serum ammonia level decreases significantly.",
+                    "Improved level of consciousness and orientation.",
+                    "The client's abdominal distension decreases."
+                ],
+                correctAnswer: "Improved level of consciousness and orientation.",
+                rationaleId: "r_q4"
+            },
+            {
+                id: "q5",
+                type: "multiple-choice",
+                question: "Which common adverse effect should the nurse instruct a client to expect when taking an aluminum hydroxide-containing antacid for indigestion?",
+                options: [
+                    "Diarrhea",
+                    "Constipation",
+                    "Hypermagnesemia",
+                    "Metabolic acidosis"
+                ],
+                correctAnswer: "Constipation",
+                rationaleId: "r_q5"
+            },
+            {
+                id: "q6",
+                type: "multiple-choice-multiple",
+                question: "The nurse is providing education to a client prescribed long-term omeprazole therapy. Which potential long-term adverse effects should the nurse include in the teaching? (Select all that apply.)",
+                options: [
+                    "Increased risk of Clostridium difficile infection",
+                    "Hypokalemia",
+                    "Hypomagnesemia",
+                    "Vitamin B12 deficiency",
+                    "Increased risk of osteoporosis and fractures",
+                    "Acute interstitial nephritis"
+                ],
+                correctAnswer: [
+                    "Increased risk of Clostridium difficile infection",
+                    "Hypomagnesemia",
+                    "Vitamin B12 deficiency",
+                    "Increased risk of osteoporosis and fractures",
+                    "Acute interstitial nephritis"
+                ],
+                rationaleId: "r_q6"
+            },
+            {
+                id: "q7",
+                type: "multiple-choice",
+                question: "A client with a gastric ulcer is prescribed sucralfate and also takes phenytoin for a seizure disorder. Which instruction is most important for the nurse to provide regarding these medications?",
+                options: [
+                    "\"You can crush the sucralfate and mix it with your phenytoin.\"",
+                    "\"Take sucralfate 30 minutes after your phenytoin dose.\"",
+                    "\"Administer sucralfate at least 2 hours apart from phenytoin.\"",
+                    "\"Take sucralfate with food to minimize stomach upset.\""
+                ],
+                correctAnswer: "Administer sucralfate at least 2 hours apart from phenytoin.",
+                rationaleId: "r_q7"
+            },
+            {
+                id: "q8",
+                type: "multiple-choice",
+                question: "The nurse is teaching a client about a newly prescribed first-generation antihistamine, diphenhydramine. Which instruction is most important for client safety?",
+                options: [
+                    "\"This medication can cause dry mouth, so chew gum or suck on hard candy.\"",
+                    "\"It's best to take this medication with food if you experience stomach upset.\"",
+                    "\"You may notice a slight increase in your appetite while taking this drug.\"",
+                    "\"Avoid operating heavy machinery or driving until you know how this drug affects you.\""
+                ],
+                correctAnswer: "\"Avoid operating heavy machinery or driving until you know how this drug affects you.\"",
+                rationaleId: "r_q8"
+            },
+            {
+                id: "q9",
+                type: "multiple-choice",
+                question: "A client is prescribed an anticholinergic medication. The nurse should question this order if the client's medical history includes which condition?",
+                options: [
+                    "Hypothyroidism",
+                    "Peptic ulcer disease",
+                    "Hypertension",
+                    "Narrow-angle glaucoma"
+                ],
+                correctAnswer: "Narrow-angle glaucoma",
+                rationaleId: "r_q9"
+            },
+            {
+                id: "q10",
+                type: "multiple-choice",
+                question: "A client taking warfarin for atrial fibrillation informs the nurse that they have started taking an herbal supplement, St. John's Wort, for depression. What is the nurse's most appropriate action?",
+                options: [
+                    "Instruct the client to stop the St. John's Wort immediately.",
+                    "Monitor the INR more frequently and anticipate a potential need to increase the warfarin dose.",
+                    "Advise the client to take the St. John's Wort at a different time of day than the warfarin.",
+                    "Instruct the client that a decrease in the warfarin dose may be necessary."
+                ],
+                correctAnswer: "Monitor the INR more frequently and anticipate a potential need to increase the warfarin dose.",
+                rationaleId: "r_q10"
+            },
+            {
+                id: "q11",
+                type: "multiple-choice",
+                question: "The nurse is preparing to administer an intramuscular (IM) injection of an irritating medication. Which technique is most appropriate to prevent leakage of the medication into subcutaneous tissue?",
+                options: [
+                    "Using a 25-gauge, 5/8-inch needle.",
+                    "Administering the injection at a 45-degree angle.",
+                    "Vigorously massaging the injection site after administration.",
+                    "Employing the Z-track injection method."
+                ],
+                correctAnswer: "Employing the Z-track injection method.",
+                rationaleId: "r_q11"
+            },
+            {
+                id: "q12",
+                type: "multiple-choice",
+                question: "A client with chronic alcoholism is admitted with confusion, ataxia, and nystagmus. The nurse anticipates an order for which vitamin supplement to prevent Wernicke-Korsakoff syndrome?",
+                options: [
+                    "Vitamin C (Ascorbic acid)",
+                    "Vitamin B1 (Thiamine)",
+                    "Vitamin K (Phytonadione)",
+                    "Vitamin D (Cholecalciferol)"
+                ],
+                correctAnswer: "Vitamin B1 (Thiamine)",
+                rationaleId: "r_q12"
+            },
+            {
+                id: "q13",
+                type: "multiple-choice",
+                question: "A male client with benign prostatic hyperplasia (BPH) and hypertension has a cold and asks the nurse what over-the-counter (OTC) medication they can take. Which ingredient should the nurse advise the client to avoid?",
+                options: [
+                    "Guaifenesin (expectorant)",
+                    "Dextromethorphan (cough suppressant)",
+                    "The nasal decongestant (e.g., pseudoephedrine), due to risk of increased blood pressure and urinary retention.",
+                    "Ibuprofen (NSAID)"
+                ],
+                correctAnswer: "The nasal decongestant (e.g., pseudoephedrine), due to risk of increased blood pressure and urinary retention.",
+                rationaleId: "r_q13"
+            },
+            {
+                id: "q14",
+                type: "multiple-choice",
+                question: "The nurse is educating a pregnant client about antiemetic medications for severe morning sickness. Which statement by the nurse best reflects the principle of medication use in pregnancy?",
+                options: [
+                    "\"All over-the-counter antiemetics are safe to take during any trimester.\"",
+                    "\"If an antiemetic is Pregnancy Category A, it can be taken without any concerns.\"",
+                    "\"Scopolamine patches are often recommended as a first-line treatment for morning sickness.\"",
+                    "\"The benefits of treating severe nausea must outweigh the potential risks to the fetus, especially in the first trimester.\""
+                ],
+                correctAnswer: "The benefits of treating severe nausea must outweigh the potential risks to the fetus, especially in the first trimester.",
+                rationaleId: "r_q14"
+            },
+            {
+                id: "q15",
+                type: "multiple-choice",
+                question: "A client receiving IV gentamicin has a BUN of 35 mg/dL (normal 8-20 mg/dL) and creatinine of 2.0 mg/dL (normal 0.6-1.2 mg/dL). Their potassium level is 5.8 mEq/L (normal 3.5-5.0 mEq/L). What is the nurse's priority action?",
+                options: [
+                    "Administer a potassium-sparing diuretic.",
+                    "Increase the client's fluid intake.",
+                    "Hold the next dose of gentamicin and notify the healthcare provider.",
+                    "Administer an oral analgesic for potential flank pain."
+                ],
+                correctAnswer: "Hold the next dose of gentamicin and notify the healthcare provider.",
+                rationaleId: "r_q15"
+            },
+            {
+                id: "q16",
+                type: "multiple-choice",
+                question: "Which advantage is specifically associated with intravenous (IV) medication administration compared to oral (PO) administration?",
+                options: [
+                    "Increased convenience for long-term therapy.",
+                    "Reduced risk of drug-drug interactions.",
+                    "Avoidance of the first-pass effect, leading to 100% bioavailability.",
+                    "Slower onset of action, allowing for better monitoring."
+                ],
+                correctAnswer: "Avoidance of the first-pass effect, leading to 100% bioavailability.",
+                rationaleId: "r_q16"
+            },
+            {
+                id: "q17",
+                type: "multiple-choice",
+                question: "A client receiving medications via a percutaneous endoscopic gastrostomy (PEG) tube develops persistent diarrhea. The nurse notes that several of the client's liquid medications are hyperosmolar elixirs. What intervention should the nurse consider first?",
+                options: [
+                    "Request an order for an antidiarrheal medication.",
+                    "Dilute the hyperosmolar liquid medications with sterile water before administration, if appropriate.",
+                    "Stop the tube feeding for 12 hours.",
+                    "Request to switch all liquid medications to crushed tablets."
+                ],
+                correctAnswer: "Dilute the hyperosmolar liquid medications with sterile water before administration, if appropriate.",
+                rationaleId: "r_q17"
+            },
+            {
+                id: "q18",
+                type: "multiple-choice",
+                question: "A client presents to the emergency department with severe hypovolemic shock due to active bleeding. The nurse anticipates a rapid IV infusion of which fluid type?",
+                options: [
+                    "0.45% Sodium Chloride (Half-normal saline)",
+                    "Dextrose 5% in Water (D5W)",
+                    "Lactated Ringer's (LR) solution",
+                    "3% Sodium Chloride (Hypertonic saline)"
+                ],
+                correctAnswer: "Lactated Ringer's (LR) solution",
+                rationaleId: "r_q18"
+            },
+            {
+                id: "q19",
+                type: "multiple-choice",
+                question: "A client wearing a scopolamine patch for motion sickness reports blurred vision, dry mouth, and drowsiness. What is the nurse's best interpretation of these findings?",
+                options: [
+                    "Signs of an allergic reaction requiring patch removal.",
+                    "Symptoms of an overdose requiring immediate patch removal.",
+                    "Expected anticholinergic side effects.",
+                    "Indication of incorrect patch application."
+                ],
+                correctAnswer: "Expected anticholinergic side effects.",
+                rationaleId: "r_q19"
+            },
+            {
+                id: "q20",
+                type: "multiple-choice-multiple",
+                question: "The nurse is providing discharge teaching to a client prescribed ondansetron. Which common and potential serious adverse effects should the nurse include in the teaching? (Select all that apply.)",
+                options: [
+                    "Headache",
+                    "Extrapyramidal symptoms (EPS)",
+                    "QT interval prolongation",
+                    "Significant sedation",
+                    "Constipation",
+                    "Respiratory depression"
+                ],
+                correctAnswer: [
+                    "Headache",
+                    "QT interval prolongation",
+                    "Constipation"
+                ],
+                rationaleId: "r_q20"
+            },
+            {
+                id: "q21",
+                type: "multiple-choice",
+                question: "A female client of childbearing age is prescribed misoprostol for gastric ulcer prophylaxis. Which instruction is most critical for the nurse to provide?",
+                options: [
+                    "\"You may experience some diarrhea as a common side effect.\"",
+                    "\"This medication should be taken with food to decrease stomach upset.\"",
+                    "\"Misoprostol protects your stomach lining by reducing acid production.\"",
+                    "\"You must use effective contraception during and for one month after misoprostol therapy.\""
+                ],
+                correctAnswer: "\"You must use effective contraception during and for one month after misoprostol therapy.\"",
+                rationaleId: "r_q21"
+            },
+            {
+                id: "q22",
+                type: "multiple-choice",
+                question: "A client with acute gastrointestinal bleeding has a hemoglobin of 6.5 g/dL (normal 12-18 g/dL) and is hypotensive. The nurse anticipates an order for which blood product to rapidly improve oxygen-carrying capacity?",
+                options: [
+                    "Fresh frozen plasma (FFP)",
+                    "Platelets",
+                    "Packed red blood cells (PRBCs)",
+                    "Whole blood"
+                ],
+                correctAnswer: "Packed red blood cells (PRBCs)",
+                rationaleId: "r_q22"
+            },
+            {
+                id: "q23",
+                type: "multiple-choice",
+                question: "After stopping an intravenous (IV) infusion of promethazine due to extravasation, what is the nurse's next priority action?",
+                options: [
+                    "Apply a warm compress to the affected site.",
+                    "Administer oral analgesics to the client.",
+                    "Notify the healthcare provider and prepare for potential administration of an antidote or further treatment for extravasation.",
+                    "Document the event in the client's electronic health record."
+                ],
+                correctAnswer: "Notify the healthcare provider and prepare for potential administration of an antidote or further treatment for extravasation.",
+                rationaleId: "r_q23"
+            },
+            {
+                id: "q24",
+                type: "multiple-choice",
+                question: "A nurse is teaching a client with chronic renal failure about laxative use. Which type of laxative should the nurse advise the client to avoid due to the risk of hypermagnesemia?",
+                options: [
+                    "Bulk-forming laxative (e.g., psyllium)",
+                    "Stool softener (e.g., docusate sodium)",
+                    "Stimulant laxative (e.g., bisacodyl)",
+                    "Magnesium hydroxide (osmotic - saline)"
+                ],
+                correctAnswer: "Magnesium hydroxide (osmotic - saline)",
+                rationaleId: "r_q24"
+            },
+            {
+                id: "q25",
+                type: "multiple-choice",
+                question: "A client with hepatic encephalopathy is receiving lactulose. The nurse knows that the medication is effective when which assessment finding is observed?",
+                options: [
+                    "The client has 2-3 soft, formed stools per day and reduced asterixis.",
+                    "The client's serum potassium level is 3.0 mEq/L.",
+                    "The client reports frequent, watery diarrhea.",
+                    "The client's blood urea nitrogen (BUN) decreases."
+                ],
+                correctAnswer: "The client has 2-3 soft, formed stools per day and reduced asterixis.",
+                rationaleId: "r_q25"
+            },
+            {
+                id: "q26",
+                type: "multiple-choice",
+                question: "A client has been taking a high dose of an aluminum-containing antacid for several months. The nurse should monitor the client for which potential adverse effects?",
+                options: [
+                    "Diarrhea and hyperkalemia.",
+                    "Metabolic acidosis and hypocalcemia.",
+                    "Worsening constipation and potential hypophosphatemia.",
+                    "Fluid retention and hypertension."
+                ],
+                correctAnswer: "Worsening constipation and potential hypophosphatemia.",
+                rationaleId: "r_q26"
+            },
+            {
+                id: "q27",
+                type: "multiple-choice",
+                question: "A client on long-term proton pump inhibitor (PPI) therapy (e.g., pantoprazole) is admitted with muscle tremors and tetany. The nurse would suspect which electrolyte imbalance?",
+                options: [
+                    "Hyperkalemia",
+                    "Hypomagnesemia",
+                    "Hyponatremia",
+                    "Hypercalcemia"
+                ],
+                correctAnswer: "Hypomagnesemia",
+                rationaleId: "r_q27"
+            },
+            {
+                id: "q28",
+                type: "multiple-choice",
+                question: "The nurse is teaching a client who is prescribed both sucralfate and ciprofloxacin. Which instruction is most important to ensure effective absorption of ciprofloxacin?",
+                options: [
+                    "\"Take both medications at the same time for best effect.\"",
+                    "\"Mix the sucralfate with the ciprofloxacin liquid before administration.\"",
+                    "\"Take ciprofloxacin at least 2 hours before or 6 hours after sucralfate.\"",
+                    "\"Take ciprofloxacin with food to enhance absorption.\""
+                ],
+                correctAnswer: "Take ciprofloxacin at least 2 hours before or 6 hours after sucralfate.",
+                rationaleId: "r_q28"
+            },
+            {
+                id: "q29",
+                type: "multiple-choice",
+                question: "A client with severe allergic reactions is prescribed both a first-generation H1 antihistamine (e.g., diphenhydramine) and an H2 receptor antagonist (e.g., famotidine). The nurse understands the rationale for this combination therapy is to:",
+                options: [
+                    "Minimize the sedative effects of the H1 antihistamine.",
+                    "Reduce gastric acid production to prevent nausea.",
+                    "Provide a more complete blockade of histamine effects in systemic allergic responses.",
+                    "Reduce anticholinergic side effects of the H1 antihistamine."
+                ],
+                correctAnswer: "To target both H1 and H2 receptors involved in systemic allergic responses, especially urticaria and anaphylaxis.",
+                rationaleId: "r_q29"
+            },
+            {
+                id: "q30",
+                type: "multiple-choice",
+                question: "The nurse should question an order for an anticholinergic medication for a client with which medical condition?",
+                options: [
+                    "Irritable bowel syndrome (IBS)",
+                    "Motion sickness",
+                    "Parkinson's disease",
+                    "Myasthenia gravis"
+                ],
+                correctAnswer: "Myasthenia gravis",
+                rationaleId: "r_q30"
+            }
+        ];
+
+        // Global variables for timer and exam state
+        let timerInterval;
+        const examDuration = 120 * 60; // 2 hours in seconds
+        let timeLeft = examDuration;
+        let examSubmitted = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const examFormContainer = document.getElementById('examFormContainer');
+            const resultsDisplay = document.getElementById('resultsDisplay');
+            const scoreDisplay = document.getElementById('score');
+            const feedbackDisplay = document.getElementById('feedback');
+            const answerReview = document.getElementById('answerReview');
+            const submitBtn = document.createElement('button'); // Create the submit button dynamically
+            submitBtn.type = 'submit';
+            submitBtn.id = 'submitBtn';
+            submitBtn.textContent = 'Submit Exam';
+
+            // Shuffle questions for randomization
+            const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+
+            // Render questions
+            shuffledQuestions.forEach((q, index) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.classList.add('question-block');
+                
+                const questionHtml = document.createElement('h3');
+                questionHtml.textContent = `${index + 1}. ${q.question}`;
+                questionBlock.appendChild(questionHtml);
+
+                if (q.type === 'multiple-choice') {
+                    q.options.forEach(option => {
+                        const label = document.createElement('label');
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = `q${q.id}`;
+                        input.value = option;
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(option));
+                        questionBlock.appendChild(label);
+                    });
+                } else if (q.type === 'multiple-choice-multiple') {
+                    q.options.forEach(option => {
+                        const label = document.createElement('label');
+                        const input = document.createElement('input');
+                        input.type = 'checkbox';
+                        input.name = `q${q.id}`;
+                        input.value = option;
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(option));
+                        questionBlock.appendChild(label);
+                    });
+                } else if (q.type === 'fill-in-the-blank') {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.name = `q${q.id}`;
+                    input.placeholder = 'Your Answer';
+                    questionBlock.appendChild(input);
+                }
+                examFormContainer.appendChild(questionBlock);
+            });
+
+            examFormContainer.appendChild(submitBtn); // Add submit button to the form
+
+            // Timer functionality
+            const timerDisplay = document.getElementById('timerDisplay');
+            function updateTimer() {
+                const hours = Math.floor(timeLeft / 3600);
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const seconds = timeLeft % 60;
+
+                timerDisplay.textContent = `Time Remaining: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "Time's Up!";
+                    if (!examSubmitted) {
+                        submitExam();
+                    }
+                } else {
+                    timeLeft--;
+                }
+            }
+
+            // Start timer immediately
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Form submission logic
+            examFormContainer.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                if (!examSubmitted) {
+                    submitExam();
+                }
+            });
+
+            function submitExam() {
+                examSubmitted = true;
+                clearInterval(timerInterval);
+                submitBtn.disabled = true; // Disable button after submission
+
+                let correctCount = 0;
+                let totalQuestions = shuffledQuestions.length;
+
+                answerReview.innerHTML = ''; // Clear previous review content
+
+                shuffledQuestions.forEach((q, index) => {
+                    let userAnswer;
+                    let isCorrect = false;
+                    const reviewBlock = document.createElement('div');
+                    reviewBlock.classList.add('question-block');
+
+                    const questionTitle = document.createElement('h3');
+                    questionTitle.innerHTML = `${index + 1}. ${q.question}`;
+                    reviewBlock.appendChild(questionTitle);
+
+                    const userAnswerDisplay = document.createElement('p');
+                    userAnswerDisplay.classList.add('user-answer-display');
+
+                    if (q.type === 'multiple-choice') {
+                        const selectedOption = document.querySelector(`input[name="q${q.id}"]:checked`);
+                        userAnswer = selectedOption ? selectedOption.value : "No answer";
+                        isCorrect = (userAnswer === q.correctAnswer);
+                        userAnswerDisplay.innerHTML = `Your Answer: ${userAnswer}`;
+                    } else if (q.type === 'multiple-choice-multiple') {
+                        const selectedOptions = Array.from(document.querySelectorAll(`input[name="q${q.id}"]:checked`)).map(input => input.value);
+                        userAnswer = selectedOptions.length > 0 ? selectedOptions.join(', ') : "No answer";
+                        
+                        // Sort both arrays before comparing for multiple correct answers
+                        const sortedUserAnswers = [...selectedOptions].sort();
+                        const sortedCorrectAnswers = [...q.correctAnswer].sort();
+
+                        isCorrect = (sortedUserAnswers.length === sortedCorrectAnswers.length &&
+                                     sortedUserAnswers.every((val, i) => val === sortedCorrectAnswers[i]));
+                        
+                        userAnswerDisplay.innerHTML = `Your Answers: ${userAnswer}`;
+                    } else if (q.type === 'fill-in-the-blank') {
+                        const inputField = document.querySelector(`input[name="q${q.id}"]`);
+                        userAnswer = inputField ? inputField.value.trim() : "";
+                        isCorrect = (userAnswer.toLowerCase() === q.correctAnswer.toLowerCase());
+                        userAnswerDisplay.innerHTML = `Your Answer: ${userAnswer}`;
+                    }
+                    
+                    if (isCorrect) {
+                        correctCount++;
+                        questionTitle.innerHTML += ` <span class="correct-answer-text-indicator correct">(Correct)</span>`;
+                    } else {
+                        questionTitle.innerHTML += ` <span class="correct-answer-text-indicator incorrect">(Incorrect)</span>`;
+                    }
+
+                    reviewBlock.appendChild(userAnswerDisplay);
+
+                    // Display correct answer (if applicable and different from user answer)
+                    const correctAnswerText = document.createElement('p');
+                    correctAnswerText.style.fontWeight = 'bold';
+                    if (q.type === 'multiple-choice-multiple') {
+                        correctAnswerText.textContent = `Correct Answer(s): ${Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : q.correctAnswer}`;
+                    } else {
+                        correctAnswerText.textContent = `Correct Answer: ${q.correctAnswer}`;
+                    }
+                    correctAnswerText.style.color = isCorrect ? 'var(--success-color)' : 'var(--danger-color)'; // Green if user got it right, red if wrong
+                    if (!isCorrect || q.type === 'multiple-choice-multiple') { // Always show correct answers for MCM, or if incorrect
+                        reviewBlock.appendChild(correctAnswerText);
+                    }
+
+                    // Display rationale
+                    const rationaleContent = document.getElementById(q.rationaleId).innerHTML;
+                    const rationaleDisplay = document.createElement('div');
+                    rationaleDisplay.classList.add('rationale-display');
+                    rationaleDisplay.innerHTML = rationaleContent;
+                    reviewBlock.appendChild(rationaleDisplay);
+
+                    answerReview.appendChild(reviewBlock);
+                });
+
+                const totalPoints = totalQuestions * 3;
+                const earnedPoints = correctCount * 3;
+
+                scoreDisplay.textContent = `You scored ${earnedPoints} out of ${totalPoints} points (${((earnedPoints / totalPoints) * 100).toFixed(2)}%).`;
+
+                if (earnedPoints / totalPoints >= 0.8) {
+                    feedbackDisplay.textContent = "Excellent work! You have a strong understanding of the material.";
+                    feedbackDisplay.style.color = 'var(--success-color)';
+                } else if (earnedPoints / totalPoints >= 0.6) {
+                    feedbackDisplay.textContent = "Good effort! You're on your way, review the rationales to improve.";
+                    feedbackDisplay.style.color = 'var(--color-primary-medium)';
+                } else {
+                    feedbackDisplay.textContent = "Keep practicing! Focus on the rationales to strengthen your knowledge.";
+                    feedbackDisplay.style.color = 'var(--danger-color)';
+                }
+
+                examFormContainer.style.display = 'none';
+                resultsDisplay.style.display = 'block';
+
+                window.scrollTo(0, 0); // Scroll to top to see results
+            }
+        });
+    </script>
+</body>
+</html>
