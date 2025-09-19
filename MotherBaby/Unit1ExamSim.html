@@ -1,0 +1,3619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>MedSurg I Final Exam Simulation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2253af;
+            --highlight: #2e8efd;
+            --danger: #ea2e49;
+            --success: #18b47b;
+            --border: #e3e7ec;
+            --nav-bg: #14263a;
+            --nav-text: #fff;
+            --bg: #f7f8fa;
+            --option-bg: #f4f7fa;
+            --option-active: #eaf3ff;
+            --option-correct: #e8fbe8;
+            --option-wrong: #fff0f3;
+            --modal-bg: #202534cc;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+            --shadow-strong: rgba(0, 0, 0, 0.2);
+            --gradient-blue: linear-gradient(135deg, #e0f2f7, #c5e4ed);
+            --gradient-dark-blue: linear-gradient(45deg, var(--primary), #1d428a);
+            --gradient-green: linear-gradient(45deg, var(--success), #149a62);
+            --gradient-red: linear-gradient(45deg, var(--danger), #b8253a);
+        }
+        html, body {
+            height: 100%; width: 100vw;
+            margin: 0; padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            color: #1a2336;
+            overflow: hidden; /* Prevent scrollbars during transitions */
+        }
+        body {
+            min-height: 100vh; min-width: 100vw;
+            height: 100vh; width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .topbar {
+            width: 100vw;
+            background: var(--nav-bg);
+            color: var(--nav-text);
+            height: 54px; min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0; left: 0; z-index: 10;
+            font-size: 1.09rem;
+            font-weight: 600;
+            letter-spacing: -.5px;
+        }
+        .timer-box {
+            position: absolute;
+            right: 32px; top: 0;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #f8cb4a;
+            background: transparent;
+            letter-spacing: 0.03em;
+            user-select: none;
+            z-index: 30;
+            padding-left: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+        .timer-box.urgent { color: #f32d32;}
+        .main-exam {
+            display: flex;
+            flex: 1 1 auto;
+            height: calc(100vh - 54px - 64px);
+            min-height: 0; min-width: 0;
+            margin-top: 54px;
+            margin-bottom: 64px;
+            width: 100vw;
+            background: var(--bg);
+            overflow: hidden;
+        }
+        .qnav {
+            background: #fff;
+            border-right: 1.5px solid var(--border);
+            width: 80px; min-width: 60px; max-width: 100px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 18px 0 0 0;
+            gap: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .q-btn {
+            width: 38px; height: 38px;
+            border: 2px solid var(--border);
+            background: #fff;
+            color: #344665;
+            border-radius: 50%;
+            display: flex;
+            align-items: center; justify-content: center;
+            font-weight: 600;
+            font-size: 1.10rem;
+            margin-bottom: 6px;
+            transition: border .15s, background .14s, color .16s;
+            box-sizing: border-box;
+            pointer-events: none;
+            user-select: none;
+        }
+        .q-btn.current {
+            border: 2.3px solid var(--highlight);
+            background: var(--highlight);
+            color: #fff;
+        }
+        .q-btn.answered:not(.current) {
+            border: 2px solid var(--success);
+            color: var(--success);
+            background: var(--option-correct);
+        }
+        .q-btn.unanswered:not(.current) {
+            border: 2px solid #e7e8ee;
+            color: #a6b2c9;
+            background: #fff;
+        }
+        .center-area {
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            height: 100%;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            background: var(--bg);
+            overflow: hidden;
+        }
+        .question-card, .review-card {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            box-shadow: 0 2px 24px #1b347213;
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: 38px 5vw 28px 5vw;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .question-text {
+            font-size: 1.18rem;
+            font-weight: 600;
+            margin-bottom: 23px;
+            color: #25394a;
+            line-height: 1.47;
+        }
+        .options {
+            margin-bottom: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .option-label {
+            background: var(--option-bg);
+            border-radius: 7px;
+            border: 2px solid transparent;
+            padding: 16px 18px;
+            cursor: pointer;
+            display: flex; align-items: center;
+            font-size: 1.09rem;
+            transition: background .18s, border .18s, color .17s;
+            user-select: none;
+            gap: 12px;
+            min-height: 46px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .option-label.selected {
+            border: 2px solid var(--highlight);
+            background: var(--option-active);
+            color: #1d428a;
+        }
+        .option-label.user-answer {
+            border: 2px solid var(--danger);
+            background: var(--option-wrong);
+            color: #c91a36;
+            font-weight: 600;
+        }
+        .option-label.correct-answer {
+            border: 2px solid var(--success);
+            background: var(--option-correct);
+            color: #168b56;
+            font-weight: 600;
+        }
+        .footer-bar {
+            position: fixed; left: 0; bottom: 0; width: 100vw;
+            background: #fff;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -2px 16px #2357b015;
+            height: 64px;
+            min-height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 20;
+        }
+        .footer-inner {
+            width: 100vw; max-width: 900px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px;
+        }
+        .progress-display {
+            font-size: 1.11rem;
+            color: #4667a1;
+            font-weight: 500;
+        }
+        .footer-btns {
+            display: flex; gap: 15px;
+        }
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px 36px;
+            font-size: 1.13rem;
+            font-weight: 600;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.13s;
+            box-shadow: 0 2px 7px #2c539c14;
+            outline: none;
+            letter-spacing: 0.01em;
+            min-width: 150px;
+        }
+        .btn:active { background: #20438c; }
+        .btn[disabled] { background: #c5d9f3; color: #7a8aa2; cursor: not-allowed;}
+        .score-ctn {
+            text-align: center;
+            margin-top: 39px;
+            margin-bottom: 45px;
+        }
+        .score-title {
+            font-size: 1.21rem;
+            color: #2374e0;
+            margin-bottom: 13px;
+            font-weight: 600;
+        }
+        .score-value {
+            font-size: 2.21rem;
+            color: #18b47b;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+        .score-msg {
+            font-size: 1.15rem;
+            color: #757b86;
+            margin: 17px 0 13px 0;
+        }
+        .restart-btn {
+            background: #24b334;
+            margin-top: 21px;
+            color: #fff;
+            border-radius: 7px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            padding: 12px 38px;
+            border: none;
+            cursor: pointer;
+        }
+        .review-card {
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: 0;
+            box-shadow: 0 2px 24px #18457d11;
+            width: 100%;
+            margin: 32px auto;
+            padding: 28px 2vw 16px 2vw;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+        .review-q {
+            color: #264169;
+            font-size: 1.08rem;
+            font-weight: 600;
+            margin-bottom: 11px;
+        }
+        .review-options {
+            margin-bottom: 13px;
+            margin-top: 9px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .rationale {
+            background: #f6f8fd;
+            border-left: 4px solid var(--highlight);
+            border-radius: 8px;
+            padding: 15px 22px 13px 17px;
+            font-size: 1.07rem;
+            color: #2d436e;
+            min-height: 30px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        /* Modal Styles */
+        .modal-bg {
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: var(--modal-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .modal-window {
+            background: #fff;
+            border-radius: 13px;
+            box-shadow: 0 6px 36px #1d2e6318;
+            padding: 35px 28px 26px 28px;
+            max-width: 98vw; min-width: 320px;
+            width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .modal-title {
+            font-size: 1.16rem;
+            font-weight: 600;
+            color: #24436d;
+            margin-bottom: 14px;
+        }
+        .modal-msg {
+            font-size: 1.06rem;
+            color: #3d4860;
+            margin-bottom: 22px;
+        }
+        .modal-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .modal-btn {
+            min-width: 100px;
+            font-size: 1.08rem;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: var(--primary);
+            color: #fff;
+            transition: background .13s;
+        }
+        .modal-btn.cancel {
+            background: #f1f1f7;
+            color: #24436d;
+            border: 1px solid #d7d8df;
+        }
+        @media (max-width: 700px) {
+            .qnav { display: none; }
+            .footer-inner { padding: 0 3vw;}
+            .question-card, .review-card { padding: 11px 2vw 8px 2vw;}
+            .center-area { padding-left: 0;}
+            .timer-box { right: 6vw;}
+        }
+        @media (max-width: 420px) {
+            .question-card, .review-card { padding: 7px 1vw 2px 1vw;}
+            .footer-inner { padding: 0 1vw;}
+            .topbar { font-size: .97rem;}
+            .modal-window { min-width: unset; width: 98vw;}
+        }
+
+        /* New Screen Styles */
+        .screen {
+            position: absolute; /* Use absolute positioning for transitions */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: var(--bg);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out; /* Smooth fade transition */
+            z-index: 1; /* Default z-index */
+        }
+        .screen.active {
+            display: flex;
+            opacity: 1;
+            z-index: 2; /* Bring active screen to front */
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            background: var(--gradient-blue);
+            color: #005662;
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: subtlePulse 10s infinite alternate ease-in-out;
+        }
+        @keyframes subtlePulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+        .welcome-content {
+            z-index: 10;
+            background: rgba(255,255,255,0.8);
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-strong);
+            max-width: 90%;
+            transform: translateY(0);
+            transition: transform 0.5s ease-out;
+        }
+        .welcome-screen.active .welcome-content {
+            animation: slideInUp 0.8s ease-out forwards;
+        }
+        @keyframes slideInUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .welcome-screen h1 {
+            font-size: 3.2rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-weight: 800;
+            text-shadow: 2px 2px 5px var(--shadow-light);
+            letter-spacing: -0.03em;
+        }
+        /* Specific button styling for #selectTestBtn */
+        #selectTestBtn {
+            padding: 20px 60px;
+            font-size: 1.6rem;
+            background: var(--gradient-green);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            /* Added specific hover and active effects for this button */
+        }
+        #selectTestBtn:hover {
+            background: linear-gradient(45deg, #149a62, var(--success));
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px var(--shadow-strong);
+        }
+        #selectTestBtn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        #selectTestBtn:active::after {
+            width: 200%;
+            height: 200%;
+            opacity: 1;
+            transition: 0s;
+        }
+
+        /* Download Screen */
+        .download-screen {
+            background: linear-gradient(135deg, #f0f8ff, #e6f7ff);
+            color: #005662;
+        }
+        .download-content {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            max-width: 90%;
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .download-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .download-screen .exam-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .file-icon-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 30px;
+        }
+        .file-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: var(--primary);
+            animation: bounceIn 0.8s ease-out;
+        }
+        .download-arrow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            font-size: 2rem;
+            color: var(--success);
+            animation: downloadArrow 1.5s infinite ease-out;
+            opacity: 0;
+        }
+        @keyframes downloadArrow {
+            0% { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            20% { opacity: 1; }
+            80% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 0; }
+        }
+        .download-progress-bar {
+            width: 90%;
+            height: 35px;
+            background-color: #e0f0f5;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .download-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--highlight), #4a90e2);
+            border-radius: 18px;
+            transition: width 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .download-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            animation: progressStripe 2s linear infinite;
+        }
+        @keyframes progressStripe {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 0; }
+        }
+        .download-text {
+            margin-top: 25px;
+            font-size: 1.3rem;
+            color: #555;
+            font-weight: 500;
+            min-height: 1.5em; /* Reserve space for message */
+        }
+
+        /* Settings Screen */
+        .settings-screen {
+            background: linear-gradient(135deg, #fdfdfd, #f0f0f0);
+            color: #333;
+        }
+        .settings-content {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            max-width: 90%;
+            width: 650px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .settings-screen h2 {
+            font-size: 2.6rem;
+            margin-bottom: 40px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 18px 25px;
+            background: #f0f4f8;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #4a4a4a;
+            box-shadow: 0 3px 12px var(--shadow-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .setting-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+        .setting-item svg {
+            margin-right: 20px;
+            color: var(--highlight);
+            font-size: 2em;
+            flex-shrink: 0;
+        }
+        .password-section {
+            width: 100%;
+            padding: 30px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.05);
+        }
+        .password-section h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .password-section p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        .password-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .password-input-group input {
+            padding: 18px 25px;
+            font-size: 1.3rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .password-input-group input:focus {
+            border-color: var(--highlight);
+            box-shadow: 0 0 0 4px rgba(46, 142, 253, 0.4);
+        }
+        .password-input-group button {
+            padding: 15px 45px;
+            font-size: 1.3rem;
+            background: var(--gradient-dark-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px var(--shadow-medium);
+            font-weight: 600;
+        }
+        .password-input-group button:hover {
+            background: linear-gradient(45deg, #1d428a, var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 9px 25px var(--shadow-strong);
+        }
+        .password-error {
+            color: var(--danger);
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-15px); }
+            40%, 80% { transform: translateX(15px); }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            background: linear-gradient(135deg, #f8fbfd, #eef3f7);
+            color: #333;
+        }
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-strong);
+            max-width: 90%;
+            width: 500px;
+        }
+        .loading-spinner {
+            border: 10px solid #e0e0e0;
+            border-top: 10px solid var(--primary);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .loading-spinner::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #c0c0c0;
+            border-top: 5px solid var(--highlight);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: spinReverse 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinReverse {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+        .loading-screen h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .loading-message {
+            font-size: 1.2rem;
+            color: #777;
+            min-height: 1.8em; /* Reserve space */
+            font-weight: 500;
+        }
+
+        /* Antivirus Disclaimer */
+        .antivirus-disclaimer {
+            background: linear-gradient(135deg, #fff0f3, #ffe6eb);
+            color: #333;
+        }
+        .antivirus-content {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+            max-width: 90%;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .antivirus-disclaimer h2 {
+            font-size: 2.6rem;
+            margin-bottom: 25px;
+            color: var(--danger);
+            font-weight: 800;
+        }
+        .antivirus-disclaimer p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            max-width: 600px;
+            font-weight: 500;
+        }
+        /* Specific button styling for #disableAntivirusBtn */
+        #disableAntivirusBtn {
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            background: var(--gradient-red);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px var(--shadow-medium);
+            font-weight: 600;
+            /* Added specific hover effect for this button */
+        }
+        #disableAntivirusBtn:hover {
+            background: linear-gradient(45deg, #b8253a, var(--danger));
+            transform: translateY(-3px);
+            box-shadow: 0 9px 25px var(--shadow-strong);
+        }
+        .firewall-animation {
+            width: 100%;
+            max-width: 500px;
+            height: 220px;
+            background: #e0e0e0;
+            border: 3px solid #ccc;
+            border-radius: 20px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.25);
+            transition: background 0.5s ease-out;
+        }
+        .firewall-animation.deactivated {
+            background: linear-gradient(135deg, #e8fbe8, #d0f0d0); /* Greenish tint when deactivated */
+        }
+        .firewall-line {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: var(--danger);
+            animation: deactivateLine 2.5s forwards ease-in-out;
+            opacity: 1;
+            transform: translateX(0);
+            box-shadow: 0 0 12px rgba(234, 46, 73, 0.6);
+        }
+        .firewall-line:nth-child(2) { top: 20%; animation-delay: 0.2s; }
+        .firewall-line:nth-child(3) { top: 40%; animation-delay: 0.4s; }
+        .firewall-line:nth-child(4) { top: 60%; animation-delay: 0.6s; }
+        .firewall-line:nth-child(5) { top: 80%; animation-delay: 0.8s; }
+
+        @keyframes deactivateLine {
+            0% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(120%); opacity: 0; }
+            100% { transform: translateX(120%); opacity: 0; }
+        }
+        .firewall-text {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #333;
+            z-index: 1;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.7);
+        }
+        .firewall-shield {
+            font-size: 5rem;
+            color: var(--danger);
+            margin-bottom: 25px;
+            animation: shieldPulse 1.5s infinite alternate;
+            z-index: 1;
+        }
+        .firewall-animation.deactivated .firewall-shield {
+            color: var(--success); /* Change color when deactivated */
+            animation: none; /* Stop pulsing */
+        }
+        @keyframes shieldPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0.9; }
+        }
+        .firewall-status-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 15px;
+            font-weight: 500;
+            min-height: 1.5em; /* Reserve space */
+        }
+
+        /* Proctor Wait Screen */
+        .proctor-wait-screen {
+            background: linear-gradient(135deg, #f0f4f8, #e6edf2);
+            color: #333;
+        }
+        .proctor-content {
+            background: #fff;
+            padding: 50px 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px var(--shadow-strong);
+            max-width: 90%;
+            width: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .proctor-wait-screen .stop-sign {
+            width: 220px;
+            height: 220px;
+            background: var(--gradient-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 0 0 0 18px rgba(234, 46, 73, 0.25), 0 0 0 36px rgba(234, 46, 73, 0.15);
+            animation: pulseStop 2s infinite alternate;
+        }
+        .proctor-wait-screen .stop-sign::before {
+            content: "STOP";
+            color: #fff;
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-shadow: 2px 2px 6px var(--shadow-strong);
+        }
+        @keyframes pulseStop {
+            0% { transform: scale(1); box-shadow: 0 0 0 18px rgba(234, 46, 73, 0.25), 0 0 0 36px rgba(234, 46, 73, 0.15); }
+            100% { transform: scale(1.03); box-shadow: 0 0 0 22px rgba(234, 46, 73, 0.35), 0 0 0 40px rgba(234, 46, 73, 0.2); }
+        }
+        .proctor-wait-screen p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 50px;
+            text-shadow: 1px 1px 3px var(--shadow-light);
+            line-height: 1.4;
+        }
+        /* Specific button styling for #startTestBtn */
+        #startTestBtn {
+            padding: 20px 60px;
+            font-size: 1.6rem;
+            background: var(--gradient-dark-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--shadow-medium);
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            /* Added specific hover effect for this button */
+        }
+        #startTestBtn:hover {
+            background: linear-gradient(45deg, #1d428a, var(--primary));
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px var(--shadow-strong);
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="screen active">
+        <div class="welcome-content">
+            <h1>Welcome to the Medical Surgical I Final Exam Simulation</h1>
+            <button id="selectTestBtn">Select Test</button>
+        </div>
+    </div>
+
+    <!-- Download Screen -->
+    <div id="downloadScreen" class="screen">
+        <div class="download-content">
+            <h2>Downloading Exam...</h2>
+            <p class="exam-title">Medical Surgical Nursing I Final Exam</p>
+            <div class="file-icon-container">
+                <!-- SVG for a document icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text file-icon">
+                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                    <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+                    <path d="M10 9H8"/>
+                    <path d="M16 13H8"/>
+                    <path d="M16 17H8"/>
+                </svg>
+                <div class="download-arrow">⬇️</div>
+            </div>
+            <div class="download-progress-bar">
+                <div class="download-progress" id="downloadProgress">0%</div>
+            </div>
+            <p class="download-text" id="downloadStatus">Initializing download...</p>
+        </div>
+    </div>
+
+    <!-- Testing Settings Screen -->
+    <div id="settingsScreen" class="screen">
+        <div class="settings-content">
+            <h2>Testing Settings</h2>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi-off"><line x1="12" x2="12.01" y1="18" y2="18"/><path d="M5 12.5S2 10 2 7c0-1.5 1.5-3 3-3"/><path d="M19 12.5S22 10 22 7c0-1.5-1.5-3-3-3"/><path d="M2 17l20 5"/><path d="M17 17s-2.5-2.5-5-2.5-5 2.5-5 2.5"/><path d="M8.5 8.5C9 7.5 10 7 12 7c1.5 0 2.5.5 3.5 1.5"/></svg>
+                    Wi-Fi is deactivated
+                </div>
+                <div class="setting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shuffle"><path d="M22 16H2"/><path d="M10 2L2 16"/><path d="M15 22l7-16"/></svg>
+                    Test questions are randomized
+                </div>
+                <div class="setting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Test environment is protected and secured
+                </div>
+            </div>
+            <div class="password-section">
+                <h3>Exam Access Password</h3>
+                <p>Please enter the provided password to unlock the exam environment.(code = FinalExamSim2025)</p>
+                <div class="password-input-group">
+                    <input type="password" id="passwordInput" placeholder="Enter password" />
+                    <button id="passwordSubmitBtn">Unlock Exam</button>
+                    <p id="passwordError" class="password-error" style="display:none;">Incorrect password. Please try again.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <h3>Preparing your exam environment...</h3>
+            <p id="loadingMessage" class="loading-message">Verifying system integrity...</p>
+        </div>
+    </div>
+
+    <!-- Antivirus Disclaimer Screen -->
+    <div id="antivirusDisclaimer" class="screen">
+        <div class="antivirus-content">
+            <h2>Important System Check</h2>
+            <p>To ensure the integrity and smooth operation of your exam, please temporarily disable any active antivirus or firewall software.</p>
+            <button id="disableAntivirusBtn">Proceed to Deactivate Firewall</button>
+            <div id="firewallAnimation" class="firewall-animation" style="display:none;">
+                <div class="firewall-shield">🛡️</div>
+                <div class="firewall-text">Deactivating Firewall...</div>
+                <div class="firewall-status-text" id="firewallStatus">Scanning for active protections...</div>
+                <div class="firewall-line"></div>
+                <div class="firewall-line"></div>
+                <div class="firewall-line"></div>
+                <div class="firewall-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proctor Wait Screen -->
+    <div id="proctorWaitScreen" class="screen">
+        <div class="proctor-content">
+            <div class="stop-sign"></div>
+            <p>Please wait for the proctor's instruction to begin the test.</p>
+            <button id="startTestBtn">Start Test</button>
+        </div>
+    </div>
+
+    <!-- Main Exam Content (Original User Code) -->
+    <div class="topbar" style="display:none;">
+        Medical Surgical I Final Exam Simulation
+        <span class="timer-box" id="timerBox"></span>
+    </div>
+    <div class="main-exam" style="display:none;">
+        <div class="qnav" id="qPalette"></div>
+        <div class="center-area">
+            <div class="question-card" id="qArea"></div>
+            <div id="reviewArea" style="display:none;width:100%;height:100%;overflow-y:auto;"></div>
+        </div>
+    </div>
+    <div class="footer-bar" style="display:none;">
+        <div class="footer-inner">
+            <div class="progress-display" id="progressBar"></div>
+            <div class="footer-btns">
+                <button class="btn" id="nextBtn" disabled>Next</button>
+            </div>
+        </div>
+    </div>
+    <div id="modal" style="display:none"></div>
+
+    <script>
+        // Helper function to show a screen and hide others with fade effect
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                if (screen.id === screenId) {
+                    screen.style.display = 'flex'; // Show the screen
+                    setTimeout(() => screen.classList.add('active'), 10); // Add active class after a tiny delay for transition
+                } else {
+                    screen.classList.remove('active');
+                    // Hide after transition completes
+                    setTimeout(() => {
+                        if (!screen.classList.contains('active')) { // Only hide if not the active screen
+                            screen.style.display = 'none';
+                        }
+                    }, 500); // Match CSS transition duration
+                }
+            });
+
+            // Hide main exam elements by default
+            document.querySelector('.topbar').style.display = 'none';
+            document.querySelector('.main-exam').style.display = 'none';
+            document.querySelector('.footer-bar').style.display = 'none';
+        }
+
+        // Initial screen: Welcome
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen('welcomeScreen');
+        });
+
+        // 1. Welcome Screen Logic
+        document.getElementById('selectTestBtn').addEventListener('click', () => {
+            showScreen('downloadScreen');
+            simulateDownload();
+        });
+
+        // 2. Download Screen Logic
+        function simulateDownload() {
+            const progressBar = document.getElementById('downloadProgress');
+            const downloadStatus = document.getElementById('downloadStatus');
+            const downloadArrow = document.querySelector('.download-arrow');
+            let progress = 0;
+            const downloadMessages = [
+                "Initializing download...",
+                "Connecting to secure server...",
+                "Downloading exam package (1/3)...",
+                "Downloading exam package (2/3)...",
+                "Downloading exam package (3/3)...",
+                "Verifying file integrity...",
+                "Decompressing exam assets...",
+                "Setting up local environment...",
+                "Preparing for launch...",
+                "Download complete. Finalizing setup..."
+            ];
+            let messageIndex = 0;
+
+            // Start arrow animation
+            downloadArrow.style.animation = 'downloadArrow 1.5s infinite ease-out';
+
+            const interval = setInterval(() => {
+                progress += 10;
+                if (progress <= 100) {
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${progress}%`;
+                    if (messageIndex < downloadMessages.length - 1 && progress >= (messageIndex + 1) * 10) {
+                        messageIndex++;
+                    }
+                    downloadStatus.textContent = downloadMessages[messageIndex];
+                } else {
+                    clearInterval(interval);
+                    downloadArrow.style.animation = 'none'; // Stop arrow animation
+                    downloadStatus.textContent = `Download Complete!`;
+                    setTimeout(() => {
+                        showScreen('settingsScreen');
+                    }, 800); // Short delay before moving to settings
+                }
+            }, 300); // Adjust speed of download animation
+        }
+
+        // 3. Testing Settings Screen Logic
+        const correctPassword = "FinalExamSim2025";
+        document.getElementById('passwordSubmitBtn').addEventListener('click', () => {
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordError = document.getElementById('passwordError');
+            if (passwordInput.value === correctPassword) {
+                passwordError.style.display = 'none';
+                showScreen('loadingScreen');
+                simulateLoading();
+            } else {
+                passwordError.style.display = 'block';
+                passwordInput.value = ''; // Clear password on error
+            }
+        });
+
+        // 4. Animated Loading Screen Logic
+        function simulateLoading() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const messages = [
+                "Verifying system integrity...",
+                "Loading core modules...",
+                "Establishing secure connection...",
+                "Calibrating display settings...",
+                "Finalizing exam environment...",
+                "Almost ready..."
+            ];
+            let msgIndex = 0;
+
+            const messageInterval = setInterval(() => {
+                msgIndex = (msgIndex + 1) % messages.length;
+                loadingMessage.textContent = messages[msgIndex];
+            }, 1000); // Change message every second
+
+            setTimeout(() => {
+                clearInterval(messageInterval);
+                showScreen('antivirusDisclaimer');
+            }, 6000); // Simulate loading for 6 seconds
+        }
+
+        // 5 & 6. Antivirus Disclaimer and Firewall Deactivation Logic
+        document.getElementById('disableAntivirusBtn').addEventListener('click', () => {
+            const antivirusDisclaimer = document.getElementById('antivirusDisclaimer');
+            const firewallAnimation = document.getElementById('firewallAnimation');
+            const disableAntivirusBtn = document.getElementById('disableAntivirusBtn');
+            const firewallStatus = document.getElementById('firewallStatus');
+            const firewallShield = document.querySelector('.firewall-shield');
+
+            disableAntivirusBtn.style.display = 'none'; // Hide the button
+            firewallAnimation.style.display = 'flex'; // Show the animation
+
+            // Reset animation for re-run if needed
+            firewallAnimation.querySelectorAll('.firewall-line').forEach(line => {
+                line.style.animation = 'none';
+                void line.offsetWidth; // Trigger reflow
+                line.style.animation = `deactivateLine 2.5s forwards ease-in-out`;
+                line.style.opacity = '1';
+                line.style.transform = 'translateX(0)';
+            });
+
+            firewallStatus.textContent = "Scanning for active protections...";
+            firewallAnimation.classList.remove('deactivated'); // Ensure it's not deactivated initially
+            firewallShield.style.animation = 'shieldPulse 1.5s infinite alternate'; // Restart shield pulse
+
+            setTimeout(() => {
+                firewallStatus.textContent = "Deactivating security protocols...";
+            }, 1000);
+            setTimeout(() => {
+                firewallStatus.textContent = "Firewall deactivated. System ready.";
+                firewallAnimation.classList.add('deactivated'); // Add class for visual change
+                firewallShield.style.animation = 'none'; // Stop shield pulse
+            }, 2500);
+
+
+            setTimeout(() => {
+                // After firewall animation completes
+                showScreen('proctorWaitScreen');
+            }, 3000); // Allow time for firewall animation (2.5s + buffer)
+        });
+
+        // 7. Proctor Wait Screen Logic
+        document.getElementById('startTestBtn').addEventListener('click', () => {
+            // Hide all introductory screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+                screen.style.display = 'none'; // Ensure they are hidden
+            });
+
+            // Show main exam elements
+            document.querySelector('.topbar').style.display = 'flex';
+            document.querySelector('.main-exam').style.display = 'flex';
+            document.querySelector('.footer-bar').style.display = 'flex';
+
+            // Initialize the exam
+            initExam();
+        });
+
+
+        // PASTE YOUR ENTIRE TEST BANK HERE:
+        // Using only 3 questions for testing purposes as requested
+        const allQuestions = [
+  {
+    "questionText": "A 19-year-old athlete presents with absence of menses for 8 months. She reports heavy exercise, a vegetarian diet, and recent weight loss. Which focused assessment should the nurse perform FIRST to identify a priority risk?",
+    "options": {
+      "A": "Assess calcium and bone density status",
+      "B": "Evaluate for thyroid dysfunction",
+      "C": "Screen for hirsutism or deepened voice",
+      "D": "Inquire about hot flashes and night sweats"
+    },
+    "correctAnswer": "A",
+    "rationale": "Athletic amenorrhea increases risk for osteoporosis due to hypoestrogenism; bone health assessment is urgent.",
+    "section": "Amenorrhea",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is teaching an adolescent with primary dysmenorrhea about non-pharmacologic interventions. Which should the nurse emphasize as most evidence-based?",
+    "options": {
+      "A": "Warm compresses to lower abdomen",
+      "B": "Vitamin C supplementation",
+      "C": "Increased dairy intake",
+      "D": "Cold packs alternating with heat"
+    },
+    "correctAnswer": "A",
+    "rationale": "Heat therapy relaxes uterine muscles, reducing pain most effectively in primary dysmenorrhea.",
+    "section": "Primary Dysmenorrhea",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with endometriosis requires teaching regarding disease management. Select all nurse priorities.",
+    "options": {
+      "A": "Discuss options for hormonal suppression",
+      "B": "Educate on fertility preservation techniques",
+      "C": "Emphasize importance of regular Pap smears",
+      "D": "Screen for and explain pain management strategies",
+      "E": "Reassure that symptoms lessen after menopause"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Hormone suppression, pain management, and fertility counseling are all key. Pap smears are not specific to endometriosis care.",
+    "section": "Endometriosis",
+    "type": "sata"
+  },
+  {
+    "questionText": "A woman taking combined oral contraceptives experiences severe calf pain and swelling. What instruction is the nurse’s PRIORITY?",
+    "options": {
+      "A": "Continue OCPs and elevate leg",
+      "B": "Immediately stop OCPs and seek medical evaluation",
+      "C": "Apply warm compresses and rest",
+      "D": "Take aspirin and schedule follow-up next week"
+    },
+    "correctAnswer": "B",
+    "rationale": "Severe leg pain/swelling may indicate DVT, a life-threatening OCP complication. Stop medication and seek care immediately.",
+    "section": "Oral Contraceptives",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is counseling on oral contraceptive candidates. Which client is contraindicated?",
+    "options": {
+      "A": "Mother of two, BMI 32, controlled HTN",
+      "B": "Smoker, age 37, 1 pack/day",
+      "C": "Nulliparous, age 19, allergic to latex",
+      "D": "Married, age 24, family history breast cancer"
+    },
+    "correctAnswer": "B",
+    "rationale": "Women age ≥35 who smoke are at highest risk for thrombotic events; OCPs are contraindicated.",
+    "section": "Oral Contraceptives",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 49-year-old reports hot flashes, insomnia, and irregular periods. What is the nurse’s priority education regarding her increased cardiovascular risk?",
+    "options": {
+      "A": "Encourage high-protein snacks",
+      "B": "Recommend increased estrogen supplements",
+      "C": "Promote regular weight-bearing exercise",
+      "D": "Advocate for low-dose aspirin therapy"
+    },
+    "correctAnswer": "C",
+    "rationale": "Menopause reduces estrogen, increasing CVD risk. Exercise is a proven strategy to reduce this risk.",
+    "section": "Menopause and Cardiovascular Risk",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client presents with heavy, prolonged menstruation, pelvic fullness, and urinary frequency. Which priority complication should the nurse monitor for?",
+    "options": {
+      "A": "Anemia",
+      "B": "Endometrial cancer",
+      "C": "Urethral stricture",
+      "D": "Pelvic inflammatory disease"
+    },
+    "correctAnswer": "A",
+    "rationale": "Uterine fibroids can cause menorrhagia resulting in iron-deficiency anemia.",
+    "section": "Uterine Fibroids",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 33-year-old female with PCOS has irregular cycles, facial hair, and obesity. Which interventions should the nurse recommend? (Select all that apply)",
+    "options": {
+      "A": "Metformin as prescribed",
+      "B": "Weight loss and exercise plan",
+      "C": "Oral contraceptives for cycle regulation",
+      "D": "High-dose estrogen therapy",
+      "E": "Androgen blockers if prescribed"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "PCOS management includes metformin, hormonal regulation, weight loss, and possible antiandrogens. High-dose estrogen is not standard.",
+    "section": "PCOS & Treatment",
+    "type": "sata"
+  },
+  {
+    "questionText": "Which STIs require barrier methods for prevention of transmission? (Select all that apply)",
+    "options": {
+      "A": "HIV",
+      "B": "Gonorrhea",
+      "C": "Syphilis",
+      "D": "Chlamydia",
+      "E": "Genital Warts"
+    },
+    "correctAnswer": ["A", "B", "C", "D", "E"],
+    "rationale": "All listed STIs are transmitted through sexual contact and barrier protection is essential for prevention.",
+    "section": "STIs and Barrier Methods",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is educating a group of teenagers on behaviors increasing STI risk. Which should be included? (Select all that apply)",
+    "options": {
+      "A": "Multiple concurrent sexual partners",
+      "B": "Unprotected vaginal intercourse",
+      "C": "Consistent use of condoms",
+      "D": "Sex under the influence of alcohol"
+    },
+    "correctAnswer": ["A", "B", "D"],
+    "rationale": "Multiple partners, lack of protection, and compromised judgment increase STI risk.",
+    "section": "STI-Risky Behaviors",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client presents for an STI panel. Which statement by the patient requires immediate follow-up?",
+    "options": {
+      "A": "\"I had a painless sore that healed on its own.\"",
+      "B": "\"I consistently use latex condoms.\"",
+      "C": "\"I’ve never had a Pap smear.\"",
+      "D": "\"My partner and I are monogamous.\""
+    },
+    "correctAnswer": "A",
+    "rationale": "A painless sore (chancre) is a sign of syphilis, requiring prompt treatment to prevent serious complications.",
+    "section": "STI Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is explaining HPV screening to a 23-year-old client. What should the nurse include? (Select all that apply)",
+    "options": {
+      "A": "HPV can cause cervical cancer",
+      "B": "HPV vaccine recommended for young adults",
+      "C": "Pap smear screens for HPV-related changes",
+      "D": "Condoms eliminate all HPV transmission risk",
+      "E": "Genital warts may result from infection"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "HPV causes cervical cancer and warts. Vaccine and Pap smears are preventive; condoms reduce, but do not eliminate, risk.",
+    "section": "HPV, Warts, Testing",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with HIV is receiving preconception counseling. Which point is priority to reduce fetal risk?",
+    "options": {
+      "A": "Ensure strict adherence to antiretroviral therapy",
+      "B": "Increase protein intake",
+      "C": "Recommend vaccination for varicella",
+      "D": "Delay pregnancy until age 30"
+    },
+    "correctAnswer": "A",
+    "rationale": "Consistent ART is the most effective way to reduce perinatal HIV transmission.",
+    "section": "HIV and Pregnancy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with active genital herpes is 38 weeks pregnant and begins labor. What is the nurse’s immediate action?",
+    "options": {
+      "A": "Prepare for emergency cesarean delivery",
+      "B": "Obtain a specimen for HSV PCR testing",
+      "C": "Monitor temperature hourly",
+      "D": "Support vaginal delivery under isolation precautions"
+    },
+    "correctAnswer": "A",
+    "rationale": "Active herpes at delivery mandates C-section to prevent neonatal herpes infection.",
+    "section": "Genital Herpes",
+    "type": "mc"
+  },
+  {
+    "questionText": "During prenatal visit, a client is diagnosed with gonorrhea. What key risk should the nurse discuss regarding the infant?",
+    "options": {
+      "A": "Blindness due to ophthalmia neonatorum",
+      "B": "Congenital heart defects",
+      "C": "Albinism",
+      "D": "Neonatal diabetes"
+    },
+    "correctAnswer": "A",
+    "rationale": "Untreated gonorrhea in the mother may cause neonatal conjunctivitis and blindness.",
+    "section": "Gonorrhea Risks to Baby",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with severe PMS is frustrated by lack of relief. Which multimodal interventions should the nurse prioritize? (Select all that apply)",
+    "options": {
+      "A": "SSRIs if prescribed",
+      "B": "Aerobic exercise regimen",
+      "C": "Limiting caffeine and salt",
+      "D": "Increased sugary food intake",
+      "E": "Nonsteroidal anti-inflammatory drugs"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "SSRIs, exercise, dietary changes, and NSAIDs are evidence-based for severe PMS.",
+    "section": "PMS",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with heavy vaginal bleeding and a uterus palpable at the umbilicus is likely experiencing which condition?",
+    "options": {
+      "A": "Uterine fibroids",
+      "B": "Endometriosis",
+      "C": "Primary dysmenorrhea",
+      "D": "Pituitary adenoma"
+    },
+    "correctAnswer": "A",
+    "rationale": "Significant menorrhagia with enlarged uterus is classic for fibroids.",
+    "section": "Uterine Fibroids",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is teaching about risk reduction for women newly diagnosed with PCOS. Which topics should be included? (Select all that apply)",
+    "options": {
+      "A": "Diabetes risk and screening",
+      "B": "Importance of regular exercise",
+      "C": "Ovarian cancer surveillance necessity",
+      "D": "Weight management importance",
+      "E": "Infertility counseling"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "PCOS increases risk for diabetes and infertility, and weight/exercise are preventative. Routine ovarian cancer screening is not standard.",
+    "section": "PCOS",
+    "type": "sata"
+  },
+  {
+    "questionText": "A 34-year-old presents with cyclic pelvic pain and dyspareunia. Laparoscopy confirms endometriosis. The nurse anticipates which orders? (Select all that apply)",
+    "options": {
+      "A": "Combined oral contraceptives",
+      "B": "NSAIDs for pain management",
+      "C": "Transvaginal ultrasound annually",
+      "D": "Gonadotropin-releasing hormone agonists",
+      "E": "Referral to reproductive endocrinologist if desiring pregnancy"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "OCPs, NSAIDs, hormone agonists, and reproductive referral for fertility concerns are standard.",
+    "section": "Endometriosis Management",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client asks why condoms are advised with HSV infection despite being on suppression therapy. What is the nurse’s best response?",
+    "options": {
+      "A": "Suppressive therapy eliminates shedding risk",
+      "B": "Condoms prevent all forms of transmission",
+      "C": "Asymptomatic viral shedding may still occur",
+      "D": "Condoms are not needed when lesions are absent"
+    },
+    "correctAnswer": "C",
+    "rationale": "Herpes can be spread by viral shedding even without visible lesions.",
+    "section": "HSV and Barrier Use",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 16-year-old presents requesting oral contraceptives. Which assessment is the nurse’s PRIORITY before providing education?",
+    "options": {
+      "A": "Assess for thromboembolic history",
+      "B": "Screen for depression and mood changes",
+      "C": "Determine number of lifetime sexual partners",
+      "D": "Evaluate for irregular menstrual periods"
+    },
+    "correctAnswer": "A",
+    "rationale": "Thromboembolic history is a major contraindication to combined oral contraceptives.",
+    "section": "OCP Candidate Screening",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client on oral contraceptives reports taking rifampin for TB. The nurse advises:",
+    "options": {
+      "A": "Continue as usual—no interaction",
+      "B": "Use backup contraception during rifampin therapy",
+      "C": "Skip pills on rifampin days",
+      "D": "Discontinue oral contraceptive entirely"
+    },
+    "correctAnswer": "B",
+    "rationale": "Rifampin induces hepatic enzymes, reducing OCP efficacy; backup is needed.",
+    "section": "OCP Drug Interactions",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a woman who has stopped menstruating and experiences night sweats. Which labs best confirm menopausal transition?",
+    "options": {
+      "A": "Elevated FSH and low estradiol",
+      "B": "Low TSH and T4",
+      "C": "Elevated prolactin",
+      "D": "Low LH and low FSH"
+    },
+    "correctAnswer": "A",
+    "rationale": "FSH rises and estradiol falls during menopause.",
+    "section": "Menopause",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which clients should receive the HPV vaccine? (Select all that apply)",
+    "options": {
+      "A": "15-year-old with no sexual activity history",
+      "B": "23-year-old, new sexual partner",
+      "C": "19-year-old, history of HPV-positive Pap",
+      "D": "30-year-old pregnant with prior HPV vaccine",
+      "E": "32-year-old with cervical dysplasia"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "HPV vaccine is recommended for teens and young adults up to age 26; not for pregnancy or after dysplasia diagnosis.",
+    "section": "HPV Vaccine Candidates",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with multiple sexual partners is diagnosed with chlamydia. What is the nurse’s best advice regarding reinfection prevention?",
+    "options": {
+      "A": "Return for antibiotic test of cure in 6 weeks",
+      "B": "All partners must be treated before resuming intercourse",
+      "C": "Abstinence from oral sex is unnecessary",
+      "D": "Repeat chlamydia screening only if symptoms return"
+    },
+    "correctAnswer": "B",
+    "rationale": "All partners must be treated to prevent reinfection.",
+    "section": "Chlamydia Counseling",
+    "type": "mc"
+  },
+  {
+    "questionText": "A couple is newly diagnosed with HIV. Which steps should the nurse stress to decrease sexual transmission? (Select all that apply)",
+    "options": {
+      "A": "ART therapy adherence",
+      "B": "Regular viral load monitoring",
+      "C": "Condom use even with undetectable viral load",
+      "D": "Yearly Pap smears only if symptomatic",
+      "E": "Tenofovir PrEP for uninfected partner",
+      "F": "Monogamy"
+    },
+    "correctAnswer": ["A", "B", "C", "E", "F"],
+    "rationale": "ART, viral load, condoms, PrEP, and monogamy all prevent HIV spread. Pap smears recommended regardless of symptoms.",
+    "section": "HIV and STI Transmission",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client is using a hormonal IUD. For which symptoms should she seek immediate medical attention? (Select all that apply)",
+    "options": {
+      "A": "Sudden severe pelvic pain",
+      "B": "Heavy vaginal bleeding",
+      "C": "Intermittent spotting",
+      "D": "Foul-smelling discharge",
+      "E": "Fever and malaise"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Sudden pain could mean perforation, bleeding and discharge infection, and fever systemic involvement.",
+    "section": "Contraceptive IUD Complications",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client at 10 weeks gestation presents for first prenatal visit. Which finding should the nurse identify as a positive sign of pregnancy?",
+    "options": {
+      "A": "Amenorrhea",
+      "B": "Goodell's sign",
+      "C": "Visualization of gestational sac on ultrasound",
+      "D": "Nausea and vomiting"
+    },
+    "correctAnswer": "C",
+    "rationale": "Only objective findings like gestational sac visualization are positive confirmation; the others are presumptive/probable.",
+    "section": "Signs of Pregnancy",
+    "type": "mc"
+  },
+  {
+    "questionText": "During pregnancy teaching, a nurse reviews GTPAL. What is the GTPAL for a client currently pregnant, with twins born at 35 weeks (both alive), one prior miscarriage at 8 weeks, and one living child born at 39 weeks?",
+    "options": {
+      "A": "G4 T1 P1 A1 L4",
+      "B": "G3 T1 P1 A1 L3",
+      "C": "G4 T1 P1 A1 L3",
+      "D": "G4 T2 P0 A2 L4"
+    },
+    "correctAnswer": "A",
+    "rationale": "G4 (four pregnancies), T1 (one full term), P1 (preterm twins), A1 (abortion), L4 (total living children).",
+    "section": "GTPAL",
+    "type": "mc"
+  },
+  {
+    "questionText": "A teenager asks about recommended weight gain during pregnancy. As the nurse, which is the best individualized guideline?",
+    "options": {
+      "A": "Gain exactly 30 pounds regardless of BMI",
+      "B": "Weight gain is not necessary for most teens",
+      "C": "Gain 25-35 pounds if BMI in normal range",
+      "D": "Restrict gain to a maximum of 15 pounds"
+    },
+    "correctAnswer": "C",
+    "rationale": "The 25–35 pound range applies to women with normal pre-pregnancy BMI, including most teens.",
+    "section": "Weight Gain in Pregnancy",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse reviews prenatal teaching with a client. Which are essential cultural considerations for dietary guidance? (Select all that apply)",
+    "options": {
+      "A": "Assess traditional foods important to the client's culture",
+      "B": "Incorporate preferred protein sources where possible",
+      "C": "Discourage cultural foods not in USDA guidelines",
+      "D": "Respect and discuss religious-based fasting periods",
+      "E": "Collaborate with client on nutritional substitutes as needed"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Cultural/religious traditions impact diet. Assess and collaborate for safe nutrition while respecting beliefs.",
+    "section": "Culture and Pregnancy Diet",
+    "type": "sata"
+  },
+  {
+    "questionText": "A pregnant woman is 28 weeks gestation. Where should the nurse expect to palpate the fundal height?",
+    "options": {
+      "A": "At the level of the pubic symphysis",
+      "B": "Halfway between pubis and umbilicus",
+      "C": "At the umbilicus",
+      "D": "Approximately midway between the umbilicus and xiphoid process"
+    },
+    "correctAnswer": "D",
+    "rationale": "Fundal height at 28 weeks is midway between umbilicus and xiphoid.",
+    "section": "Fundal Height Measurement",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client at 32 weeks experiences supine hypotensive syndrome. What is the nurse’s first intervention?",
+    "options": {
+      "A": "Administer IV fluids rapidly",
+      "B": "Turn client to left lateral position",
+      "C": "Elevate head of bed",
+      "D": "Apply oxygen at 2L/min via nasal cannula"
+    },
+    "correctAnswer": "B",
+    "rationale": "Left lateral positioning relieves vena cava compression, the root cause of supine hypotension in pregnancy.",
+    "section": "Vena Cava Syndrome",
+    "type": "mc"
+  },
+  {
+    "questionText": "During a routine prenatal visit, a pregnant client is found to have proteinuria and a BP of 144/96 mmHg. Which actions take priority? (Select all that apply)",
+    "options": {
+      "A": "Initiate seizure precautions",
+      "B": "Prompt urinalysis for protein monitoring",
+      "C": "Assess for headache/epigastric pain/visual changes",
+      "D": "Advise ambulation and deep breathing",
+      "E": "Review laboratory liver enzymes and kidney function"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Pre-eclampsia: seizure precautions, symptom check, labs, and protein monitoring are all vital.",
+    "section": "Gestational Hypertension/Preeclampsia",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with gestational hypertension develops clonus, severe headache, and visual changes. What is the next priority action?",
+    "options": {
+      "A": "Administer magnesium sulfate per standing order",
+      "B": "Place ice packs over patient’s eyes",
+      "C": "Ambulate to prevent DVT",
+      "D": "Encourage oral fluids to lower blood pressure"
+    },
+    "correctAnswer": "A",
+    "rationale": "These are signs of impending eclampsia. Magnesium is the priority intervention to prevent seizure.",
+    "section": "Gestational Hypertension/Eclampsia",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 17-year-old pregnant client has persistent vomiting, tachycardia, and dry mucous membranes. Which laboratory should be monitored most closely?",
+    "options": {
+      "A": "Serum sodium",
+      "B": "Urine ketones",
+      "C": "Hemoglobin A1c",
+      "D": "White blood cell count"
+    },
+    "correctAnswer": "B",
+    "rationale": "Hyperemesis can lead to starvation ketosis, so urine ketones are critical for monitoring metabolic status.",
+    "section": "Vomiting in Pregnancy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client asks the nurse about fetal kick counts. Which guidance is correct?",
+    "options": {
+      "A": "Contact provider if <10 kicks are felt in 2 hours",
+      "B": "There is no minimum recommended daily kick count",
+      "C": "Do kick counts only when active",
+      "D": "Monitor for at least 1 kick per hour"
+    },
+    "correctAnswer": "A",
+    "rationale": "Less than 10 fetal movements in 2 hours is concerning and should prompt evaluation.",
+    "section": "Kick Counts",
+    "type": "mc"
+  },
+  {
+    "questionText": "During second trimester, what nutrition advice applies to adolescents? (Select all that apply)",
+    "options": {
+      "A": "Increase caloric intake by 300-400 kcal/day",
+      "B": "Include iron-rich foods or supplements",
+      "C": "Encourage folic acid sources",
+      "D": "Limit dairy and calcium",
+      "E": "Monitor for sufficient protein intake"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Adolescents require added calories, iron, folic acid, and protein for fetal growth; calcium should not be restricted.",
+    "section": "Adolescent Pregnancy Nutrition",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client at 36 weeks with painless, bright red vaginal bleeding denies pain or contractions. What is the nurse’s PRIORITY?",
+    "options": {
+      "A": "Obtain fetal heart tones and call provider",
+      "B": "Initiate vaginal exam for dilation",
+      "C": "Position client upright in bed",
+      "D": "Administer oxytocin for labor induction"
+    },
+    "correctAnswer": "A",
+    "rationale": "Placenta previa is likely (painless red bleed); no vaginal exam—assess fetal status/call provider immediately.",
+    "section": "Bleeding in Late Pregnancy",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which actions are appropriate when caring for a client with suspected placenta previa? (Select all that apply)",
+    "options": {
+      "A": "Monitor bleeding pads closely",
+      "B": "Maintain bed rest",
+      "C": "Start IV large bore access",
+      "D": "Perform vaginal exam to check for placental location",
+      "E": "Continuous fetal heart monitoring"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Monitor bleeding, bed rest, IV access, and continuous fetal monitoring; NO vaginal exams—they can increase hemorrhage.",
+    "section": "Placenta Previa Nursing Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse reviews laboratory results for a pregnant client with class A2 gestational diabetes. Which complications in the newborn are highest risk?",
+    "options": {
+      "A": "Hypoglycemia",
+      "B": "Polycythemia",
+      "C": "Hypocalcemia",
+      "D": "Macrosomia",
+      "E": "Respiratory distress syndrome"
+    },
+    "correctAnswer": ["A", "D", "E"],
+    "rationale": "Infants of diabetic mothers are at risk for hypoglycemia, macrosomia, and respiratory distress syndrome.",
+    "section": "Maternal Diabetes – Neonatal Effects",
+    "type": "sata"
+  },
+  {
+    "questionText": "During prenatal counseling, a client with a negative maternal blood type is at 28 weeks. What should the nurse do?",
+    "options": {
+      "A": "Administer Rhogam injection",
+      "B": "Schedule next Rhogam for 40 weeks gestation",
+      "C": "Check for Group B Strep colonization",
+      "D": "Order indirect Coombs test"
+    },
+    "correctAnswer": "A",
+    "rationale": "Rhogam is given at 28 weeks and after any procedures or trauma during pregnancy to Rh-negative moms.",
+    "section": "Rhogam",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with preterm labor at 32 weeks is being treated with magnesium sulfate. Which findings indicate toxicity? (Select all that apply)",
+    "options": {
+      "A": "Absent deep tendon reflexes",
+      "B": "Respiratory rate <12",
+      "C": "Urine output <30 mL/hr",
+      "D": "Elevated blood pressure",
+      "E": "Nausea and vomiting"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "Toxicity signs: loss of DTRs, respiratory depression, oliguria. Hypertension and nausea are not toxicity markers.",
+    "section": "Preterm Labor/Magnesium Sulfate",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client asks about non-invasive prenatal screening. Which tests are correctly described? (Select all that apply)",
+    "options": {
+      "A": "Quad screen assesses neural tube/Down’s risk",
+      "B": "Non-stress test evaluates fetal HR response",
+      "C": "Glucose challenge screens for gestational diabetes",
+      "D": "Chorionic villus sampling is non-invasive",
+      "E": "First trimester screen combines blood and ultrasound"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "CVS is invasive; all others are non-invasive prenatal screens.",
+    "section": "Prenatal Screening Tests",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse reviews expected newborn complications from preeclampsia. Which risks should the nurse monitor most closely for in the newborn? (Select all that apply)",
+    "options": {
+      "A": "Small for gestational age",
+      "B": "Hypoglycemia",
+      "C": "Low Apgar scores",
+      "D": "Polycythemia",
+      "E": "Bronchopulmonary dysplasia"
+    },
+    "correctAnswer": ["A", "C"],
+    "rationale": "Preeclampsia limits placental perfusion: SGA and low Apgars are risks.",
+    "section": "Preeclampsia—Neonatal Effects",
+    "type": "sata"
+  },
+  {
+    "questionText": "During a prenatal education class, which strategies can best reduce risk of vena cava syndrome? (Select all that apply)",
+    "options": {
+      "A": "Encourage left lateral side-lying position",
+      "B": "Raise lower extremities in supine position",
+      "C": "Provide frequent rest periods out of bed",
+      "D": "Use wedge pillow when reclining",
+      "E": "Instruct client not to lie flat on back"
+    },
+    "correctAnswer": ["A", "D", "E"],
+    "rationale": "Left side-lying, wedge, and avoiding supine posture reduce vena cava syndrome risk in pregnancy.",
+    "section": "Vena Cava Syndrome—Maternity",
+    "type": "sata"
+  },
+  {
+    "questionText": "A woman at 26 weeks gestation has dependent edema and proteinuria, but BP is 120/72. Which is the nurse’s interpretation?",
+    "options": {
+      "A": "Findings suggest normal physiologic changes",
+      "B": "Diagnosis of mild preeclampsia",
+      "C": "Diagnosis of severe preeclampsia",
+      "D": "Diagnosis of chronic hypertension"
+    },
+    "correctAnswer": "A",
+    "rationale": "Some edema and proteinuria without hypertension are generally normal.",
+    "section": "Pregnancy—Physiological Changes",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client at 38 weeks gestation develops sudden, severe abdominal pain, rigid uterus, and non-reassuring fetal heart pattern. Which is the highest nursing priority?",
+    "options": {
+      "A": "Notify surgical/emergency response team",
+      "B": "Insert large bore IV and draw bloods",
+      "C": "Place in high Fowler's position",
+      "D": "Perform immediate vaginal exam"
+    },
+    "correctAnswer": "A",
+    "rationale": "Signs of placental abruption require immediate team response—these are life-threatening signs!",
+    "section": "Placental Abruption",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse evaluates a mother’s knowledge regarding when to call the provider for pregnancy complications. Which situations require immediate action? (Select all that apply)",
+    "options": {
+      "A": "Vaginal bleeding",
+      "B": "Sudden swelling of face/hands",
+      "C": "Leaking amniotic fluid before 37 weeks",
+      "D": "Mild leg cramps",
+      "E": "Persistent headache or vision changes"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Bleeding, swelling (preeclampsia), leaking fluid (PPROM), headaches/vision changes all need rapid response.",
+    "section": "Pregnancy Complication—Recognition",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for a woman diagnosed with placenta previa. Which statement by the client requires further teaching?",
+    "options": {
+      "A": "\"I will avoid all intercourse.\"",
+      "B": "\"I can drive myself to the hospital if I bleed again.\"",
+      "C": "\"I need to monitor my vaginal bleeding.\"",
+      "D": "\"I should not have vaginal exams.\""
+    },
+    "correctAnswer": "B",
+    "rationale": "Active bleeding in placenta previa is an emergency—client should NOT drive self, should call 911.",
+    "section": "Placenta Previa—Client Education",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which actions are part of evidence-based management for preterm labor? (Select all that apply)",
+    "options": {
+      "A": "Administer corticosteroid for fetal lung maturity",
+      "B": "Begin tocolysis as prescribed",
+      "C": "Educate on restricted activity or modified bed rest",
+      "D": "Monitor for signs of chorioamnionitis",
+      "E": "Routinely rupture membranes to stimulate labor"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Steroids, tocolysis, limited activity, and infection monitoring are best practices. ROM is never indicated to induce preterm labor.",
+    "section": "Preterm Labor—Evidence-Based Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client in third trimester has severe anemia. Which fetal complications must the nurse monitor for most closely?",
+    "options": {
+      "A": "Intrauterine growth restriction",
+      "B": "Neural tube defects",
+      "C": "Polyhydramnios",
+      "D": "Fetomaternal hemorrhage"
+    },
+    "correctAnswer": "A",
+    "rationale": "Severe maternal anemia can restrict fetal development—monitor for IUGR.",
+    "section": "Maternal Anemia",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which assessment finding is a likely positive sign of pregnancy?",
+    "options": {
+      "A": "Fetal heart tones by Doppler",
+      "B": "Chadwick’s sign",
+      "C": "Breast tenderness",
+      "D": "Nausea and vomiting"
+    },
+    "correctAnswer": "A",
+    "rationale": "Fetal heart tones on Doppler are objective evidence—most reliable for confirming pregnancy.",
+    "section": "Positive Signs of Pregnancy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A mother’s labs show triple screen markers suggestive of neural tube defect. What is the nurse’s next priority?",
+    "options": {
+      "A": "Prepare for immediate cesarean birth",
+      "B": "Schedule diagnostic ultrasound",
+      "C": "Reassure family without further evaluation",
+      "D": "Initiate corticosteroids for fetal lung maturity"
+    },
+    "correctAnswer": "B",
+    "rationale": "Abnormal screening always requires diagnostic ultrasound follow-up; do not jump to interventions or assure without evidence.",
+    "section": "Prenatal Screening—Abnormal Finding F/U",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client at 28 weeks arrives with a new diagnosis of gestational hypertension. Which lab and clinical findings would most concern the nurse regarding progression to preeclampsia? (Select all that apply)",
+    "options": {
+      "A": "New-onset proteinuria",
+      "B": "Severe, sudden headache",
+      "C": "Blood pressure stabilized at 132/80",
+      "D": "Vision changes",
+      "E": "Brisk deep tendon reflexes"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Proteinuria, headache, neurologic changes, and increased DTRs are red flags for preeclampsia.",
+    "section": "Gestational Hypertension to Preeclampsia",
+    "type": "sata"
+  },
+  {
+    "questionText": "A newborn is small for gestational age to a mom with untreated severe preeclampsia. What is the likely explanation?",
+    "options": {
+      "A": "Placental insufficiency from vasospasm",
+      "B": "Gestational diabetes",
+      "C": "Excessive maternal weight gain",
+      "D": "Fetal macrosomia"
+    },
+    "correctAnswer": "A",
+    "rationale": "Preeclampsia → vasospasm → decreased placental perfusion → IUGR/SGA.",
+    "section": "Preeclampsia—Placental Effects",
+    "type": "mc"
+  },
+  {
+    "questionText": "After delivery of a baby to a diabetic mother, which findings require immediate intervention? (Select all that apply)",
+    "options": {
+      "A": "Jitteriness",
+      "B": "Blood glucose 37 mg/dL",
+      "C": "Lethargy",
+      "D": "Pink, acrocyanotic at 1 minute",
+      "E": "Apneic episode"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Hypoglycemia signs (jitters, low glucose, lethargy, apnea) in newborn require urgent glucose restoration.",
+    "section": "Maternal Diabetes—Neonatal Complications",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse provides teaching to a mother with twins by C-section at 33 weeks. Which newborn risks must be emphasized?",
+    "options": {
+      "A": "Neonatal hypothermia",
+      "B": "Respiratory distress syndrome",
+      "C": "Congenital rubella",
+      "D": "Hypoglycemia"
+    },
+    "correctAnswer": ["A", "B", "D"],
+    "rationale": "Premature babies are at risk for hypothermia, RDS, and hypoglycemia due to immature organ systems.",
+    "section": "Preterm Birth—Risks",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client at 32 weeks presents with sudden gush of clear fluid. Fetal HR baseline 150/min; no contractions. What is the nurse’s next step?",
+    "options": {
+      "A": "Assess for umbilical cord prolapse and infection",
+      "B": "Perform immediate vaginal exam",
+      "C": "Reassure and schedule for home monitoring",
+      "D": "Induce labor without further assessment"
+    },
+    "correctAnswer": "A",
+    "rationale": "PPROM requires assessment of fetal well-being, cord prolapse, and infection—avoid unnecessary exams.",
+    "section": "Premature Rupture of Membranes",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client asks why vitamin D and calcium are crucial during pregnancy. Best rationale?",
+    "options": {
+      "A": "They support infant tooth development",
+      "B": "They prevent maternal hypertension",
+      "C": "They promote fetal skeletal growth and prevent maternal bone loss",
+      "D": "They reduce nausea and vomiting"
+    },
+    "correctAnswer": "C",
+    "rationale": "Calcium and vitamin D are critical for fetal bones and maintaining maternal bone density.",
+    "section": "Pregnancy Nutrition—Calcium/Vit D",
+    "type": "mc"
+  },
+  {
+    "questionText": "A teenager in her first trimester insists on veganism. Key dietary risks the nurse should assess for include: (Select all that apply)",
+    "options": {
+      "A": "Iron deficiency",
+      "B": "Vitamin B12 deficiency",
+      "C": "Protein deficit",
+      "D": "Folic acid deficiency",
+      "E": "Hypercalcemia"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Vegan diets may lack B12, iron, protein, and folate if not carefully monitored.",
+    "section": "Pregnancy Nutrition—Vegans",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with a twin gestation is at 35 weeks complaining of mild SOB when supine. Fundal height measures 40 cm. What primary complication is likely?",
+    "options": {
+      "A": "Vena cava syndrome",
+      "B": "Gestational diabetes",
+      "C": "Oligohydramnios",
+      "D": "Urinary tract infection"
+    },
+    "correctAnswer": "A",
+    "rationale": "Large uterus (twins) can compress the vena cava causing hypotension and SOB in supine.",
+    "section": "Multiple Gestation Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse screens a new obstetric patient for intimate partner violence (IPV). Which responses should trigger follow-up action? (Select all that apply)",
+    "options": {
+      "A": "\"My partner controls our finances and schedules.\"",
+      "B": "\"He supports all my decisions.\"",
+      "C": "\"I need permission to visit my friends.\"",
+      "D": "\"My partner sometimes makes me afraid.\"",
+      "E": "\"We always decide together.\""
+    },
+    "correctAnswer": ["A", "C", "D"],
+    "rationale": "Controlling behavior, needing permission, and fear are all potential indicators of IPV.",
+    "section": "IPV Screening—Obstetrics",
+    "type": "sata"
+  },
+  {
+    "questionText": "A mom presents at 12 weeks for her first prenatal visit. What is the earliest most reliable way to confirm viability?",
+    "options": {
+      "A": "Transvaginal ultrasound detecting fetal heartbeat",
+      "B": "Fetal movement at 12 weeks",
+      "C": "Mother’s hCG urine test",
+      "D": "Presence of nausea/vomiting"
+    },
+    "correctAnswer": "A",
+    "rationale": "Ultrasound is the most reliable early confirmation of fetal viability.",
+    "section": "Early Pregnancy Confirmation",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse provides prenatal education to an overweight adolescent. Which teaching points are essential? (Select all that apply)",
+    "options": {
+      "A": "Monitor for gestational diabetes early",
+      "B": "Encourage gradual, not rapid, weight gain",
+      "C": "Discuss risk of hypertension and preeclampsia",
+      "D": "Increase caloric intake as much as desired",
+      "E": "Promote balanced nutrient-dense diet"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Overweight adolescents need early GD screening, slow gain, risk counseling, and balanced diet.",
+    "section": "Teen Pregnancy—Obesity",
+    "type": "sata"
+  },
+  {
+    "questionText": "A pregnant teen says she wants to eat only fruit for two weeks \"to feel light.\" The nurse’s most critical response is:",
+    "options": {
+      "A": "Encourage inclusion of protein and dairy for fetal development",
+      "B": "Support her desire as cravings are common",
+      "C": "Allow short-term fruit diets with close monitoring",
+      "D": "Warn that fruits will cause gestational diabetes"
+    },
+    "correctAnswer": "A",
+    "rationale": "Exclusively eating fruit deprives fetus of essential protein and calcium for growth.",
+    "section": "Pregnancy Nutrition—Disordered Eating",
+    "type": "mc"
+  },
+  {
+    "questionText": "During a routine prenatal visit, the nurse reviews lab values for an expectant mother. Which result would most concern the nurse?",
+    "options": {
+      "A": "Hemoglobin 8.4 g/dL",
+      "B": "Platelets 198,000/mm^3",
+      "C": "WBC 9,500/mm^3",
+      "D": "Glucose fasting 85 mg/dL"
+    },
+    "correctAnswer": "A",
+    "rationale": "Hemoglobin <11 g/dL in pregnancy signals anemia—needs timely intervention.",
+    "section": "Pregnancy—Anemia Risk",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client at 18 weeks has minor vaginal bleeding and a closed cervical os. Which is the nurse’s priority?",
+    "options": {
+      "A": "Monitor for progression; instruct to return with worsening",
+      "B": "Administer Rho(D) immune globulin if Rh-negative",
+      "C": "Prepare for emergency cerclage",
+      "D": "Restrict oral fluids"
+    },
+    "correctAnswer": "B",
+    "rationale": "All Rh-negative women with bleeding should receive Rhogam to prevent sensitization.",
+    "section": "Pregnancy—Hemorrhage/Rhogam",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is counseling a woman with a positive HIV test in first trimester. Which statement demonstrates understanding?",
+    "options": {
+      "A": "\"I need to take all antiretrovirals as prescribed.\"",
+      "B": "\"I should avoid all breastfeeding and vaginal delivery.\"",
+      "C": "\"There is no risk to my baby if I feel healthy.\"",
+      "D": "\"I must only be monitored if my viral load rises during pregnancy.\""
+    },
+    "correctAnswer": "A",
+    "rationale": "Strict ART adherence is the main way to prevent perinatal transmission of HIV.",
+    "section": "HIV in Pregnancy—Teaching",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nursing student is monitoring a woman in labor with preeclampsia. Which complication should the nurse anticipate?",
+    "options": {
+      "A": "Seizures",
+      "B": "Hyperglycemia",
+      "C": "Prolonged labor",
+      "D": "Polyhydramnios"
+    },
+    "correctAnswer": "A",
+    "rationale": "Primary threat is eclampsia (seizures) in preeclamptic laboring women.",
+    "section": "Eclampsia—Intrapartum Risk",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which interventions are standard for a pregnant patient with placenta previa? (Select all that apply)",
+    "options": {
+      "A": "No vaginal exams",
+      "B": "Type and crossmatch blood on admission",
+      "C": "Continuous fetal monitoring",
+      "D": "Right lateral positioning in bed",
+      "E": "Immediate delivery for all cases"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "No exams, type/crossmatch, and monitoring standard; not all cases require immediate delivery.",
+    "section": "Placenta Previa—Inpatient Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "A mother with gestational diabetes is following diet only but develops repeated high fasting blood sugars. What is the next step?",
+    "options": {
+      "A": "Begin insulin therapy as prescribed",
+      "B": "Increase exercise to double the prior plan",
+      "C": "Advise total carbohydrate restriction",
+      "D": "Monitor only if symptoms develop"
+    },
+    "correctAnswer": "A",
+    "rationale": "Insulin is initiated if dietary management fails to control glucose.",
+    "section": "GDM—Insulin Need",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman asks about exercise safety during pregnancy. Which guidelines are correct? (Select all that apply)",
+    "options": {
+      "A": "Avoid supine exercises after first trimester",
+      "B": "Continue moderate aerobic activity if previously active",
+      "C": "Limit water intake during exercise",
+      "D": "Stop exercise if dizzy, short of breath, or uterine pain",
+      "E": "Avoid contact or high-risk sports"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Supine position, overexertion, dehydration, and risky sports all need to be avoided.",
+    "section": "Pregnancy—Exercise",
+    "type": "sata"
+  },
+  {
+    "questionText": "A pregnant woman at 20 weeks refuses standard Down syndrome screening. What is the nurse's best response?",
+    "options": {
+      "A": "Respect her decision and document informed refusal",
+      "B": "Schedule test without client consent",
+      "C": "Instruct her she must have the test for her baby's health",
+      "D": "Counsel her that declining screening will discharge her from prenatal care"
+    },
+    "correctAnswer": "A",
+    "rationale": "Autonomy allows client refusal after informed counseling.",
+    "section": "Screening—Autonomy/Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman with a prior macrosomic baby asks about future risk. Nurse’s best teaching?",
+    "options": {
+      "A": "Monitor for GDM and fetal overgrowth in future pregnancies",
+      "B": "Risk of macrosomia eliminated if repeat pregnancy is at a different age",
+      "C": "There is no increased risk for recurrence",
+      "D": "Macrosomia prevents preterm labor"
+    },
+    "correctAnswer": "A",
+    "rationale": "Prior macrosomia increases GDM and growth risks in future pregnancies.",
+    "section": "Macrosomia—Risk Recurrence",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is teaching about fetal development. Which milestone should be achieved by 20 weeks gestation?",
+    "options": {
+      "A": "Fetal movement felt by mother (quickening)",
+      "B": "Lung maturity sufficient for extrauterine life",
+      "C": "Kidney function with urine production",
+      "D": "Eyebrows and scalp hair present"
+    },
+    "correctAnswer": "A",
+    "rationale": "Quickening typically occurs at 18–20 weeks, a major developmental milestone.",
+    "section": "Fetal Development—Milestones",
+    "type": "mc"
+  },
+  {
+    "questionText": "A pregnant client forgets her expected due date (EDD) and LMP. What action by the nurse is most helpful?",
+    "options": {
+      "A": "Request first trimester ultrasound for dating",
+      "B": "Use her current fundal height alone",
+      "C": "Use the average cycle length to estimate EDD",
+      "D": "Estimate based on first fetal movement"
+    },
+    "correctAnswer": "A",
+    "rationale": "When LMP is unknown, first trimester ultrasound is most accurate for dating.",
+    "section": "EDD Estimation—No LMP",
+    "type": "mc"
+  },
+  {
+    "questionText": "A multipara at 40 weeks with history of postpartum hemorrhage needs close monitoring. What is her greatest risk factor?",
+    "options": {
+      "A": "Grand multiparity",
+      "B": "Teenage status",
+      "C": "Iron-deficiency anemia",
+      "D": "Preeclampsia"
+    },
+    "correctAnswer": "A",
+    "rationale": "Grand multiparity (>5 births) is a major risk for PPH due to uterine atony.",
+    "section": "PPH—Risk Factors",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse assesses a woman at 36 weeks gestation with sudden severe abdominal pain, a tender, board-like uterus, and absent fetal heart tones. Which complication is most likely?",
+    "options": {
+      "A": "Placental abruption",
+      "B": "Placenta previa",
+      "C": "Acute appendicitis",
+      "D": "Uterine relaxation"
+    },
+    "correctAnswer": "A",
+    "rationale": "These classic signs indicate abruptio placentae, a life-threatening complication requiring emergency care.",
+    "section": "Pregnancy—Abruption",
+    "type": "mc"
+  },
+  {
+    "questionText": "A pregnant client is being evaluated for gestational diabetes mellitus (GDM). Which findings should the nurse report immediately? (Select all that apply)",
+    "options": {
+      "A": "Polyuria",
+      "B": "Fasting glucose >95 mg/dL",
+      "C": "Persistent glycosuria",
+      "D": "Blurred vision",
+      "E": "Blood pressure <110/60 mmHg"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Polyuria, high fasting glucose, glycosuria, and blurred vision are warning signs of GDM.",
+    "section": "Gestational Diabetes—Screen/Findings",
+    "type": "sata"
+  },
+  {
+    "questionText": "A laboring client with a prior cesarean section requests a trial of labor. Which finding requires immediate action?",
+    "options": {
+      "A": "Sudden onset of intense abdominal pain and signs of fetal distress",
+      "B": "Normal progression of labor with mild contractions",
+      "C": "Maternal fatigue",
+      "D": "Rupture of membranes at 6 cm dilation"
+    },
+    "correctAnswer": "A",
+    "rationale": "Sudden pain and fetal distress may indicate uterine rupture—a life-threatening emergency in post-cesarean labor.",
+    "section": "Pregnancy—Trial of Labor Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 7-year-old child is brought in for evaluation. The nurse notes bruises in different healing stages, withdrawn behavior, and poor eye contact with the parent. Which immediate action is required?",
+    "options": {
+      "A": "Report suspicion of abuse per mandatory reporting laws",
+      "B": "Document findings and re-evaluate in 2 weeks",
+      "C": "Ask parent to explain the bruises alone",
+      "D": "Ignore as children are often active"
+    },
+    "correctAnswer": "A",
+    "rationale": "Multiple signs are consistent with abuse—nurse is required to report immediately.",
+    "section": "Child Abuse—Reporting",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client at 24 weeks is diagnosed with preterm labor. Which orders should the nurse anticipate? (Select all that apply)",
+    "options": {
+      "A": "Administer betamethasone",
+      "B": "Start magnesium sulfate",
+      "C": "Assess for fetal fibronectin (fFN)",
+      "D": "Restrict oral fluids and withhold all food",
+      "E": "Strict bed rest until delivery"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "Steroids for lung maturity, mag sulfate for neuroprotection, and fFN assessment are best evidence; NPO and absolute bed rest are outdated.",
+    "section": "Preterm Labor—Management",
+    "type": "sata"
+  },
+  {
+    "questionText": "A woman in active labor exhibits tachysystole with Category II fetal strip. What is the nurse’s priority?",
+    "options": {
+      "A": "Stop/hold oxytocin infusion immediately",
+      "B": "Increase IV fluids",
+      "C": "Ambulate client",
+      "D": "Apply fetal scalp electrode"
+    },
+    "correctAnswer": "A",
+    "rationale": "Tachysystole with non-reassuring FHR requires IMMEDIATE cessation of oxytocin.",
+    "section": "Labor—Tachysystole",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client delivered a healthy newborn 30 minutes ago and suddenly reports severe perineal pain and feeling of pressure. Nurse priorities? (Select all that apply)",
+    "options": {
+      "A": "Check for perineal hematoma",
+      "B": "Assess vital signs for hemorrhagic shock",
+      "C": "Palpate uterine firmness",
+      "D": "Call provider for large, rapidly enlarging hematoma",
+      "E": "Begin fundal massage for atony"
+    },
+    "correctAnswer": ["A", "B", "D"],
+    "rationale": "Pain/pressure post-delivery suggests hematoma; assess, monitor shock, and notify provider if expanding. Fundal massage is critical for uterine atony, not hematoma.",
+    "section": "Postpartum Hematoma",
+    "type": "sata"
+  },
+  {
+    "questionText": "A woman who recently emigrated is tearful in postpartum period, reports insomnia and inability to care for her newborn. Which cultural and clinical considerations are priorities? (Select all that apply)",
+    "options": {
+      "A": "Screen for postpartum depression",
+      "B": "Assess for culture shock or lack of support",
+      "C": "Arrange interpreter services if needed",
+      "D": "Ignore as normal postpartum emotions",
+      "E": "Refer to social work or support group"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "PPD and social isolation risk are high in recent immigrants; screen, support, refer, and use interpreters.",
+    "section": "Postpartum—Mental Health/Culture",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse observes a tense exchange between a father and his wife in the clinic. The wife avoids eye contact and answers for the child. Which behavior most strongly suggests a cycle of violence?",
+    "options": {
+      "A": "Control of information, avoidance, and physical tension in communication",
+      "B": "Supportive parenting skills",
+      "C": "Father helps manage family schedule",
+      "D": "Child is visibly happy"
+    },
+    "correctAnswer": "A",
+    "rationale": "Control, fear, avoidance, and tension are classic warning signs of abuse.",
+    "section": "Family Dynamics—Cycle of Violence",
+    "type": "mc"
+  },
+  {
+    "questionText": "A preterm infant is born to a mother with prolonged rupture of membranes and maternal fever. Which complications must the nurse anticipate? (Select all that apply)",
+    "options": {
+      "A": "Neonatal sepsis",
+      "B": "Respiratory distress syndrome",
+      "C": "Jaundice",
+      "D": "Hypocalcemia",
+      "E": "Necrotizing enterocolitis"
+    },
+    "correctAnswer": ["A", "B", "E"],
+    "rationale": "Chorioamnionitis (maternal infection) raises risk for sepsis, RDS, and NEC; jaundice/hypocalcemia more general.",
+    "section": "Preterm Birth—Infection Risks",
+    "type": "sata"
+  },
+  {
+    "questionText": "A postpartum nurse is counseling a new mother on infant feeding. Which statement indicates need for further teaching?",
+    "options": {
+      "A": "I will prop the bottle during feeds when I am busy",
+      "B": "I will wake the baby every 2-3 hours to feed",
+      "C": "I know breastfed infants may feed more frequently",
+      "D": "I’ll use formula as prescribed if supplementation is needed"
+    },
+    "correctAnswer": "A",
+    "rationale": "Propping bottles increases aspiration and should never be done.",
+    "section": "Newborn Feeding—Safety",
+    "type": "mc"
+  },
+  {
+    "questionText": "An abused woman develops an escape plan. Which are crucial points for the nurse to review? (Select all that apply)",
+    "options": {
+      "A": "Pack essential documents and clothes in advance",
+      "B": "Identify trusted contacts out of the home",
+      "C": "Maintain secrecy about the exact plan",
+      "D": "Practice exit route when abuser is not present",
+      "E": "Notify law enforcement only if the abuser learns the plan"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Escape planning: pack, find support, keep plan private, practice safe exit; call law enforcement as needed, not just if discovered.",
+    "section": "Domestic Violence—Escape Plan",
+    "type": "sata"
+  },
+  {
+    "questionText": "A school nurse notes a child dressed inappropriately for cold weather, poor hygiene, and chronic fatigue. What is the best initial action?",
+    "options": {
+      "A": "Suspect neglect and make a report",
+      "B": "Discuss parenting skills with parents",
+      "C": "Ask classroom teacher to observe for two more weeks",
+      "D": "Provide child with clothing and send home"
+    },
+    "correctAnswer": "A",
+    "rationale": "Neglect is a form of child abuse—nurse is required to report suspicion immediately.",
+    "section": "Child Neglect—School Evaluation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a family with strict authoritarian parenting. Which outcomes would be expected in the child? (Select all that apply)",
+    "options": {
+      "A": "High academic achievement with low self-esteem",
+      "B": "Difficulty with independence",
+      "C": "Increased anxiety or fearfulness",
+      "D": "Trouble following all rules",
+      "E": "Better peer relationships"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "Authoritarian parenting often produces achievement with poor self-esteem, anxiety, and reduced independence.",
+    "section": "Family—Parenting Styles",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse teaches new parents about discipline. Which strategies are most effective for promoting healthy child development? (Select all that apply)",
+    "options": {
+      "A": "Consistent rules with age-appropriate consequences",
+      "B": "Positive reinforcement of good behavior",
+      "C": "Physical punishment for repeated mistakes",
+      "D": "Modeling respectful and calm responses",
+      "E": "Logical consequences for actions"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Healthy discipline is consistent, positive, and based on logical consequences and role modeling.",
+    "section": "Parenting—Discipline",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse evaluates for sexual abuse in a 9-year-old. Which findings are red flags for abuse? (Select all that apply)",
+    "options": {
+      "A": "Sexual acting out or knowledge beyond age",
+      "B": "Bruises on genitals/inner thighs",
+      "C": "Regression in toilet training",
+      "D": "Recurring nightmares and withdrawal",
+      "E": "Infectious vulvovaginitis"
+    },
+    "correctAnswer": ["A", "B", "C", "D", "E"],
+    "rationale": "All listed findings may be associated with sexual abuse in children.",
+    "section": "Child Abuse—Sexual",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is developing a care plan for a family with chronic illness and shifting roles. Which interventions support family adaptation? (Select all that apply)",
+    "options": {
+      "A": "Assessing family strengths and coping mechanisms",
+      "B": "Referring to social work or counseling",
+      "C": "Encouraging clear, honest family communication",
+      "D": "Isolating ill member from decision-making",
+      "E": "Facilitating access to community support resources"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Strength assessment, support services, honest communication, and resource access help families adapt.",
+    "section": "Family Structure/Function",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for a child who repeatedly returns to hospital with unexplained physical injuries and mother who appears anxious for pain meds for the child. What concept should guide next steps?",
+    "options": {
+      "A": "Suspicion of Munchausen syndrome by proxy—initiate investigation",
+      "B": "Assume accidental injuries as normal in active children",
+      "C": "Request ethics consult before reporting",
+      "D": "Defer assessment to attending physician only"
+    },
+    "correctAnswer": "A",
+    "rationale": "Multiple injuries with caregiver seeking treatment may signal medical child abuse (factitious disorder imposed on another/Munchausen).",
+    "section": "Child Abuse—Medical",
+    "type": "mc"
+  },
+  {
+    "questionText": "A teen is found sleeping in a car and admits running away due to physical abuse. Which nurse responses are priority? (Select all that apply)",
+    "options": {
+      "A": "Ensure immediate safety and basic needs",
+      "B": "Initiate child protection services intervention",
+      "C": "Contact school counselor for support",
+      "D": "Notify shelter or emergency housing",
+      "E": "Document history and actions taken"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Priority: safety, child protection, shelter, and documentation. School support is secondary.",
+    "section": "Child Abuse—Runaway",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse interviews a woman experiencing domestic violence. Which approaches help build trust and encourage disclosure? (Select all that apply)",
+    "options": {
+      "A": "Provide privacy and ensure confidentiality",
+      "B": "Use open-ended, nonjudgmental questions",
+      "C": "Avoid blaming/shaming language",
+      "D": "Assure her that disclosure is voluntary",
+      "E": "Require written statement for documentation"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Trust is built by privacy, open/nonjudgmental communication, voluntary disclosure—not forced statements.",
+    "section": "Domestic Violence—Interview",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for a 5-year-old who presents with burns in a stocking-glove pattern, a withdrawn demeanor, and inconsistent caregiver stories. Which is the most appropriate nursing action?",
+    "options": {
+      "A": "Report suspicion to child protective services immediately",
+      "B": "Ask caregiver for detailed explanation and document verbatim",
+      "C": "Reassure caregiver and suggest parenting classes",
+      "D": "Observe for a few more days before acting"
+    },
+    "correctAnswer": "A",
+    "rationale": "The presentation is highly suspicious of abuse—mandatory reporting is required immediately.",
+    "section": "Child Abuse—Burns",
+    "type": "mc"
+  },
+  {
+    "questionText": "A teen patient confides that she is being forced into sexual activity by her partner and is afraid to go home. Which nurse interventions are priority? (Select all that apply)",
+    "options": {
+      "A": "Ensure patient safety and privacy",
+      "B": "Report abuse according to facility and legal guidelines",
+      "C": "Refer to local crisis or counseling resources",
+      "D": "Call parent without patient’s consent",
+      "E": "Obtain forensic nursing support if available"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Immediate safety, mandated reporting, crisis intervention, and forensic assessment are priorities in sexual abuse.",
+    "section": "Sexual Abuse—Adolescent",
+    "type": "sata"
+  },
+  {
+    "questionText": "A family in crisis following job loss demonstrates increased conflict and verbal aggression between spouses. Which interventions are most appropriate for the nurse to suggest? (Select all that apply)",
+    "options": {
+      "A": "Referral to counseling or mental health support",
+      "B": "Screen for domestic violence",
+      "C": "Suggest temporary separation",
+      "D": "Offer information on community resources for financial hardship",
+      "E": "Encourage family meetings for open communication"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Counseling, DV screening, community resources, and family meetings are evidence-based interventions.",
+    "section": "Family Crisis—Support",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse evaluates a parenting style where parents rarely enforce rules and avoid punishment. Which effects could this have on the child? (Select all that apply)",
+    "options": {
+      "A": "Difficulty with impulse control",
+      "B": "Lower academic achievement",
+      "C": "Higher risk-taking behaviors",
+      "D": "Greater sense of independence",
+      "E": "Poor social boundaries"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Permissive parenting often results in poor boundaries, impulse control, risk-taking, and academic difficulty.",
+    "section": "Parenting Styles—Permissive",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse completes a family assessment for a child admitted for malnutrition. Which findings are most consistent with neglect? (Select all that apply)",
+    "options": {
+      "A": "Lack of basic hygiene and appropriate clothing",
+      "B": "Missed medical appointments",
+      "C": "Injury explained by rough play",
+      "D": "Frequent absence from school",
+      "E": "Developmental delays without medical cause"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Neglect: poor hygiene/clothing, missed care, truancy, and unexplained developmental delay.",
+    "section": "Neglect—Indicators",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse provides parenting education to a couple at well-child check. Which are characteristics of the authoritative style? (Select all that apply)",
+    "options": {
+      "A": "High expectations with warmth and responsiveness",
+      "B": "Firm rules with flexibility",
+      "C": "Open communication between parent and child",
+      "D": "Physical punishment for discipline",
+      "E": "Encouragement of independence"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Authoritative parents are strict but warm, communicate openly, and foster independence.",
+    "section": "Parenting—Authoritative Features",
+    "type": "sata"
+  },
+  {
+    "questionText": "A school nurse notes a young child arriving hungry, poorly dressed, and disheveled on multiple occasions. Which should be the nurse’s first action?",
+    "options": {
+      "A": "Contact child protective services with findings",
+      "B": "Arrange for free school lunches immediately",
+      "C": "Call a parent conference for further investigation",
+      "D": "Refer to school counselor and monitor",
+    },
+    "correctAnswer": "A",
+    "rationale": "Suspected neglect mandates immediate reporting by the nurse.",
+    "section": "School—Mandatory Reporting",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman in a volatile domestic partnership wishes to leave but fears being found. What safe planning tips should the nurse stress? (Select all that apply)",
+    "options": {
+      "A": "Clear internet and phone search history regularly",
+      "B": "Memorize phone numbers of shelters or trusted contacts",
+      "C": "Arrange safe words with trusted friends or family",
+      "D": "Use joint credit cards to reserve hotel rooms",
+      "E": "Pack an emergency bag and keep it hidden"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Digital hygiene, memorized numbers, communication codes, and a bag are all classic safe escape measures.",
+    "section": "Domestic Violence—Escape Safety",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for a child who discloses sexual abuse by a family member. Which actions are correct? (Select all that apply)",
+    "options": {
+      "A": "Remain nonjudgmental and supportive",
+      "B": "Report immediately per institutional policy/law",
+      "C": "Document disclosures using the child's own words",
+      "D": "Assess for immediate physical/psychological needs",
+      "E": "Promise total confidentiality and that you will not tell anyone"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Support, prompt reporting, precise documentation, and addressing urgent needs are essential. Never promise secrecy in abuse.",
+    "section": "Child Sexual Abuse—Best Practice",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse provides anticipatory guidance to a parent. Which statement demonstrates understanding of healthy family function?",
+    "options": {
+      "A": "\"We work together to solve family problems and support each other.\"",
+      "B": "\"I make all major decisions without input.\"",
+      "C": "\"Each child is disciplined differently with no pattern.\"",
+      "D": "\"Children should adapt to all parental expectations with no exceptions.\""
+    },
+    "correctAnswer": "A",
+    "rationale": "Healthy families work together, communicate, and are mutually supportive.",
+    "section": "Family Function—Healthy Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse interviews a child who appears frightened, with delayed speech and aggressive behavior. What possible contributing factors should be assessed? (Select all that apply)",
+    "options": {
+      "A": "Exposure to violence in the home",
+      "B": "Neglect or inconsistent care",
+      "C": "Nutrition status",
+      "D": "Recent school or family disruption",
+      "E": "High parental expectations for academics"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Behavior, speech, and aggression can signal violence, neglect, instability, or poor nutrition.",
+    "section": "Child Behavior—Assessment",
+    "type": "sata"
+  },
+  {
+    "questionText": "A multidisciplinary care conference addresses chronic family violence. Which nursing priorities are supported by evidence? (Select all that apply)",
+    "options": {
+      "A": "Routine screening for all family members",
+      "B": "Collaboration with law enforcement and social services",
+      "C": "Assessment of both victim and perpetrator’s needs",
+      "D": "Refusal to treat possible abuser in the hospital setting",
+      "E": "Ensure follow-up plans for safety post-discharge"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "DV evidence: universal screening, collaboration, assessing both parties, and discharge safety planning.",
+    "section": "Family Violence—Multi-team",
+    "type": "sata"
+  },
+  {
+    "questionText": "An adolescent in foster care admits to being physically and emotionally neglected. What nursing actions are most appropriate? (Select all that apply)",
+    "options": {
+      "A": "Provide emotional support and validation",
+      "B": "Ensure reporting to child welfare authorities",
+      "C": "Connect with trauma-focused mental health resources",
+      "D": "Continue observation without taking action",
+      "E": "Document all findings thoroughly"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Support, reporting, trauma care, and documentation are critical when neglect is disclosed.",
+    "section": "Child Neglect—Foster Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client in an abusive marriage makes a plan to leave. Which evidence-based discharge preparations are essential? (Select all that apply)",
+    "options": {
+      "A": "Schedule a follow-up contact post-discharge",
+      "B": "Provide referrals to safe shelter/services",
+      "C": "Require participation in counseling before discharge",
+      "D": "Supply written safety planning materials and crisis numbers",
+      "E": "Verify a safe method of transportation/home arrival"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Follow-up, resources, written materials, and verifying safe arrival are all best practice; counseling should not delay discharge.",
+    "section": "DV—Hospital Discharge",
+    "type": "sata"
+  },
+  {
+    "questionText": "When counseling a single-parent family, which unique strengths often exist in this structure? (Select all that apply)",
+    "options": {
+      "A": "Greater adaptability to change",
+      "B": "Opportunities for strong parent–child relationship",
+      "C": "Parental exhaustion from limited support",
+      "D": "Financial limitations with resourcefulness",
+      "E": "Frequent involvement with social/community support"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Single-parent families may adapt well, have close relationships, and are often resourceful and community-connected.",
+    "section": "Single-Parent Family—Strengths",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse discusses safe sleep practices with new parents. Which recommendations should be included? (Select all that apply)",
+    "options": {
+      "A": "Place baby on back for sleep",
+      "B": "Use soft bedding to keep infant comfortable",
+      "C": "Keep crib free of toys and blankets",
+      "D": "Share bed with infant to promote bonding",
+      "E": "Room-share without bed-sharing"
+    },
+    "correctAnswer": ["A", "C", "E"],
+    "rationale": "Safe sleep = back position, empty crib, and room-sharing but not bed-sharing.",
+    "section": "Infant Safety",
+    "type": "sata"
+  },
+  {
+    "questionText": "A family with two children moves to a shelter after losing their home. Which interventions should the nurse prioritize? (Select all that apply)",
+    "options": {
+      "A": "Assess for signs of malnutrition",
+      "B": "Help parents access community resources",
+      "C": "Monitor for infection risk only if symptoms arise",
+      "D": "Provide emotional support to parents and children",
+      "E": "Promote routine and structure where possible"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Malnutrition, resource navigation, emotional support, and structure are all important; infection screening should be proactive.",
+    "section": "Family Crisis",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse teaches a teen with chronic asthma about medication adherence. Which education points help reduce noncompliance risk? (Select all that apply)",
+    "options": {
+      "A": "Establish a daily routine for medication use",
+      "B": "Hide inhalers to prevent misuse",
+      "C": "Use reminders or alarms on phone",
+      "D": "Provide written instructions",
+      "E": "Involve patient in goal-setting"
+    },
+    "correctAnswer": ["A", "C", "D", "E"],
+    "rationale": "Routine, reminders, written plans, and shared goal-setting all improve adherence.",
+    "section": "Adolescent Health—Chronic Illness",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse reviews signs of physical child abuse. Which observations are most concerning? (Select all that apply)",
+    "options": {
+      "A": "Bruises in varying stages of healing",
+      "B": "Bilateral knee scrapes from playground falls",
+      "C": "Patterned burns on buttocks",
+      "D": "Child fearful of parent touch",
+      "E": "Well-demarcated handprint on upper arm"
+    },
+    "correctAnswer": ["A", "C", "D", "E"],
+    "rationale": "Suspicious findings include bruises of varying age, patterned burns, unexplained fear, and intentional marks.",
+    "section": "Child Abuse—Physical",
+    "type": "sata"
+  },
+  {
+    "questionText": "A woman discloses escalating partner threats. What nursing interventions reduce risk for lethal violence? (Select all that apply)",
+    "options": {
+      "A": "Facilitate urgent shelter placement",
+      "B": "Coach on de-escalation techniques with abuser",
+      "C": "Review safety planning and warning signs",
+      "D": "Encourage hiding in the home until violence stops",
+      "E": "Document all statements and findings accurately"
+    },
+    "correctAnswer": ["A", "C", "E"],
+    "rationale": "Urgent shelter, planning, and documentation are key; de-escalation/hiding with abuser are not evidence-based safety actions.",
+    "section": "Intimate Partner Violence—Lethality",
+    "type": "sata"
+  },
+  {
+    "questionText": "A child reveals bedtime bedwetting after parents’ separation. Which actions support adaptation? (Select all that apply)",
+    "options": {
+      "A": "Punish the child for regressive behavior",
+      "B": "Offer reassurance and limit shame",
+      "C": "Promote stress-reducing bedtime routine",
+      "D": "Refer to counseling if trouble persists",
+      "E": "Ignore the issue entirely"
+    },
+    "correctAnswer": ["B", "C", "D"],
+    "rationale": "Reassurance, routine, and counseling support adaptation; punishment and ignoring are harmful.",
+    "section": "Family Disruption—Child Coping",
+    "type": "sata"
+  },
+  {
+    "questionText": "Which parental statements indicate understanding of shaken baby syndrome prevention? (Select all that apply)",
+    "options": {
+      "A": "\"It’s okay to leave my baby in a safe crib and walk away if I feel frustrated\"",
+      "B": "\"Shaking stops fussiness faster than rocking\"",
+      "C": "\"I will call for help if I become overwhelmed\"",
+      "D": "\"Crying can be normal even if all needs are met\"",
+      "E": "\"Gently shaking is safe for older infants\""
+    },
+    "correctAnswer": ["A", "C", "D"],
+    "rationale": "Leaving baby in crib, seeking help, and realizing crying is normal are key; shaking is never safe.",
+    "section": "Pediatric Injury—Abuse Prevention",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse assesses a family that practices authoritarian parenting. Which child outcomes are most likely? (Select all that apply)",
+    "options": {
+      "A": "Strong self-esteem",
+      "B": "Compliance with rules",
+      "C": "Social withdrawal",
+      "D": "Fear of making mistakes",
+      "E": "Creativity and risk-taking"
+    },
+    "correctAnswer": ["B", "C", "D"],
+    "rationale": "Authoritarian parenting typically results in rule compliance, fear, and withdrawal—not self-esteem or creativity.",
+    "section": "Parenting Style—Authoritarian",
+    "type": "sata"
+  },
+  {
+    "questionText": "A team intervenes in a home with both physical neglect and suspected sexual abuse. Which approaches best promote child safety and recovery? (Select all that apply)",
+    "options": {
+      "A": "Ensure child’s immediate safety and removal from harm",
+      "B": "Rapidly refer for mental health evaluation",
+      "C": "Provide age-appropriate explanations about next steps",
+      "D": "Advise family to resolve the situation privately",
+      "E": "Begin multidisciplinary case management"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Immediate safety, mental health, communication, and multi-team case management are best practice.",
+    "section": "Child Abuse—Multiagency Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is guiding a family through recovery after domestic violence. What resources are essential for long-term stability? (Select all that apply)",
+    "options": {
+      "A": "Legal protection/advocacy",
+      "B": "Income or housing assistance",
+      "C": "Access to trauma-informed therapy",
+      "D": "Ongoing contact with the abuser for closure",
+      "E": "Continued safety assessment and planning"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Long-term recovery requires legal/housing/mental health help and safety planning. Ongoing contact with abuser is not recommended.",
+    "section": "DV—Long-Term Recovery",
+    "type": "sata"
+  },
+  {
+    "questionText": "A pregnant client reports presyncopal episodes and dizziness when lying flat during the third trimester. What should the nurse do first?",
+    "options": {
+      "A": "Position the client on her left side",
+      "B": "Check for gestational diabetes",
+      "C": "Increase fluid intake immediately",
+      "D": "Encourage deep breathing exercises"
+    },
+    "correctAnswer": "A",
+    "rationale": "This describes supine hypotensive (vena cava) syndrome in late pregnancy. Left lateral positioning relieves vena cava compression.",
+    "section": "Pregnancy—Third Trimester Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 16-year-old is worried she is not menstruating, but reports running cross country and significant stress over exams. Which explanation should the nurse provide?",
+    "options": {
+      "A": "Excessive exercise and stress can cause hypothalamic amenorrhea by suppressing gonadotropin secretion",
+      "B": "At her age, lack of periods is always abnormal",
+      "C": "Menarche usually begins after age 18 in athletes",
+      "D": "Vitamin C deficiency is the most likely culprit"
+    },
+    "correctAnswer": "A",
+    "rationale": "Hypothalamic amenorrhea often results from excessive exercise and stress in teens, causing cycle suppression.",
+    "section": "Amenorrhea—Adolescents",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman has irregular periods, hirsutism, and is found to have multiple ovarian cysts on ultrasound. What additional finding would be most expected?",
+    "options": {
+      "A": "Obesity",
+      "B": "Low fasting blood glucose",
+      "C": "Joint hypermobility",
+      "D": "High serum calcium"
+    },
+    "correctAnswer": "A",
+    "rationale": "Obesity commonly co-occurs with PCOS, along with androgen excess and metabolic risks.",
+    "section": "PCOS—Symptoms",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman postpartum presents with boggy uterus and heavy vaginal bleeding. What is the nurse’s first intervention?",
+    "options": {
+      "A": "Massage the uterine fundus",
+      "B": "Call the obstetrician immediately",
+      "C": "Insert an indwelling catheter",
+      "D": "Administer an opioid analgesic"
+    },
+    "correctAnswer": "A",
+    "rationale": "Uterine atony is the most common cause of postpartum hemorrhage; massage is first-line intervention.",
+    "section": "Postpartum Hemorrhage—Initial",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is teaching dietary guidelines for a pregnant adolescent. Which food should be prioritized to consume?",
+    "options": {
+      "A": "Lentils for protein and folic acid",
+      "B": "Soft cheeses for calcium",
+      "C": "Deli meats for convenience",
+      "D": "Raw sprouts for vitamins"
+    },
+    "correctAnswer": "A",
+    "rationale": "Lentils are high in protein and folic acid, both vital for fetal neural and tissue development. Soft cheeses, deli meats, and raw sprouts are food safety risks during pregnancy.",
+    "section": "Pregnancy—Nutrition",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman is diagnosed with menopause and expresses concern about osteoporosis risk. Which advice is most appropriate?",
+    "options": {
+      "A": "Engage in daily weight-bearing exercise",
+      "B": "Take calcium-only supplements without vitamin D",
+      "C": "Avoid all sunlight exposure",
+      "D": "Reduce intake of all dairy products"
+    },
+    "correctAnswer": "A",
+    "rationale": "Weight-bearing exercise preserves bone density and helps mitigate osteoporosis risk associated with menopause.",
+    "section": "Menopause—Osteoporosis Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A child with a history of sexual abuse is withdrawn, exhibits poor eye contact, and has enuresis. Which next action should the nurse take?",
+    "options": {
+      "A": "Facilitate trauma-informed mental health referral",
+      "B": "Request the child confront the suspected abuser directly",
+      "C": "Punish bedwetting to improve behavior",
+      "D": "Encourage the child not to talk about the experience"
+    },
+    "correctAnswer": "A",
+    "rationale": "Referral to mental health for trauma-informed care helps address abuse-related symptoms.",
+    "section": "Child Abuse—Support",
+    "type": "mc"
+  },
+  {
+    "questionText": "A pregnant woman asks about benefits of prenatal folic acid supplementation. The nurse’s response is based on preventing which condition?",
+    "options": {
+      "A": "Neural tube defects",
+      "B": "Gestational hypertension",
+      "C": "Macrosomia",
+      "D": "Infant colic"
+    },
+    "correctAnswer": "A",
+    "rationale": "Folic acid is essential for neural tube closure, reducing risk of spina bifida and related defects.",
+    "section": "Pregnancy—Nutrition Supplements",
+    "type": "mc"
+  },
+  {
+    "questionText": "During well-child visits, the nurse identifies bruising in various stages of healing and delays in social development. What should the nurse do first?",
+    "options": {
+      "A": "Report concerns promptly to appropriate authorities",
+      "B": "Wait for further evidence before acting",
+      "C": "Encourage family to monitor at home",
+      "D": "Provide home safety pamphlet"
+    },
+    "correctAnswer": "A",
+    "rationale": "These signs indicate possible abuse—mandatory reporting is the first legal and ethical step.",
+    "section": "Pediatric Abuse—Reporting",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman at 32 weeks gestation presents for evaluation with painless vaginal bleeding and soft, non-tender uterus. Which diagnosis is most likely?",
+    "options": {
+      "A": "Placenta previa",
+      "B": "Placental abruption",
+      "C": "Uterine rupture",
+      "D": "Incompetent cervix"
+    },
+    "correctAnswer": "A",
+    "rationale": "Placenta previa classically causes painless vaginal bleeding; the uterus stays relaxed and non-tender.",
+    "section": "Pregnancy—Third Trimester Bleeding",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 38-year-old woman with a history of uterine fibroids presents with worsening menorrhagia and fatigue. Which statement by the client requires the nurse to intervene most urgently?",
+    "options": {
+      "A": "\"My bleeding soaks through two pads every hour.\"",
+      "B": "\"I have mild cramps at the start of my period.\"",
+      "C": "\"My periods sometimes last 7–8 days.\"",
+      "D": "\"I occasionally pass small clots during menstruation.\""
+    },
+    "correctAnswer": "A",
+    "rationale": "Bleeding that soaks two or more pads per hour signals potential hemorrhage and needs urgent intervention.",
+    "section": "Women's Health—Menorrhagia",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient receiving magnesium sulfate for preeclampsia asks about possible side effects. Which symptom should the nurse instruct her to report immediately?",
+    "options": {
+      "A": "Difficulty breathing",
+      "B": "Red flushed skin",
+      "C": "Increased thirst",
+      "D": "Warm sensation at IV site"
+    },
+    "correctAnswer": "A",
+    "rationale": "Respiratory depression is a sign of magnesium toxicity and is potentially life-threatening.",
+    "section": "Preeclampsia—Magnesium Sulfate",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client being evaluated for infertility has irregular menses and is obese. Which laboratory result would most strongly indicate polycystic ovarian syndrome (PCOS)?",
+    "options": {
+      "A": "Elevated serum androgens",
+      "B": "Low TSH",
+      "C": "Decreased prolactin",
+      "D": "Elevated FSH"
+    },
+    "correctAnswer": "A",
+    "rationale": "Increased androgens, along with irregular cycles and obesity, are classic for PCOS.",
+    "section": "PCOS—Diagnostics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A postpartum woman is breastfeeding and develops cracked, bleeding nipples. What is the nurse’s most appropriate initial advice?",
+    "options": {
+      "A": "Observe the infant’s latch and positioning",
+      "B": "Advise weaning until healing occurs",
+      "C": "Recommend switching to formula immediately",
+      "D": "Apply alcohol-based cleansers after each feed"
+    },
+    "correctAnswer": "A",
+    "rationale": "Poor latch and positioning are common causes; initial assessment and correction are priority.",
+    "section": "Postpartum—Breastfeeding Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A newborn of a diabetic mother presents with jitteriness and a weak cry shortly after birth. Which immediate intervention takes priority?",
+    "options": {
+      "A": "Check blood glucose and feed promptly if low",
+      "B": "Document and monitor for 24 hours",
+      "C": "Administer subcutaneous insulin",
+      "D": "Delay feedings until symptoms resolve"
+    },
+    "correctAnswer": "A",
+    "rationale": "Hypoglycemia is common in infants of diabetic mothers. Prompt glucose check and feeding are essential.",
+    "section": "Newborn—Hypoglycemia",
+    "type": "mc"
+  },
+  {
+    "questionText": "A pregnant woman at 30 weeks states, 'I have not felt the baby move all day.' What is the nurse’s immediate next step?",
+    "options": {
+      "A": "Instruct her to come in for evaluation and fetal monitoring",
+      "B": "Advise rest and try kick counts again in the morning",
+      "C": "Reassure her decreased movement is normal in late pregnancy",
+      "D": "Schedule follow-up for next week"
+    },
+    "correctAnswer": "A",
+    "rationale": "Absence of fetal movement is potentially ominous and needs prompt assessment.",
+    "section": "Fetal Assessment—Kick Counts",
+    "type": "mc"
+  },
+  {
+    "questionText": "A postpartum mother appears detached, avoids eye contact with her newborn, and expresses feelings of hopelessness. Which priority nursing action is indicated?",
+    "options": {
+      "A": "Assess for postpartum depression and initiate mental health referral",
+      "B": "Encourage her to increase fluid intake",
+      "C": "Assign the baby to nursery care only",
+      "D": "Advise rest and sleep, no intervention needed"
+    },
+    "correctAnswer": "A",
+    "rationale": "These symptoms align with postpartum depression, requiring assessment and referral.",
+    "section": "Postpartum—Mental Health",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 10-year-old presents with precocious puberty, pubic hair, and advanced bone age. Which nurse action is most appropriate?",
+    "options": {
+      "A": "Refer for endocrine and further diagnostic evaluation",
+      "B": "Advise family to wait and observe development",
+      "C": "Begin female hormone therapy immediately",
+      "D": "Reassure that this is always normal variation"
+    },
+    "correctAnswer": "A",
+    "rationale": "Precocious puberty and advanced bone age require prompt endocrine assessment for treatable causes.",
+    "section": "Peds—Precocious Puberty",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman with endometriosis experiences worsening dysmenorrhea unresponsive to NSAIDs. What is the next evidence-based intervention?",
+    "options": {
+      "A": "Initiate hormonal suppression therapy as prescribed",
+      "B": "Advise use of ice packs and rest",
+      "C": "Recommend pelvic floor exercises only",
+      "D": "Suggest high dose vitamin supplementation"
+    },
+    "correctAnswer": "A",
+    "rationale": "Hormonal suppression is used if NSAIDs fail in endometriosis-associated pain.",
+    "section": "Endometriosis—Refractory Pain",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman with a history of preeclampsia is planning another pregnancy. Which advice is most important for the nurse to give?",
+    "options": {
+      "A": "Obtain preconception counseling and establish early prenatal care",
+      "B": "Avoid all exercise during pregnancy",
+      "C": "Double sodium intake in diet",
+      "D": "Plan for elective cesarean at 36 weeks"
+    },
+    "correctAnswer": "A",
+    "rationale": "Preconception counseling and early care are essential to monitor and mitigate preeclampsia recurrence risk.",
+    "section": "Preeclampsia—Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client who recently started combined oral contraceptives calls to report new onset severe right-sided chest pain and shortness of breath. What is the nurse’s best action?",
+    "options": {
+      "A": "Advise immediate emergency evaluation for pulmonary embolism",
+      "B": "Recommend warm compresses and rest",
+      "C": "Schedule a clinic visit in a week",
+      "D": "Increase hydration and monitor symptoms at home"
+    },
+    "correctAnswer": "A",
+    "rationale": "Sudden chest pain and dyspnea in a client on OCPs is suspicious for a pulmonary embolism—a life-threatening emergency.",
+    "section": "Women’s Health—OCP Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A woman at 25 weeks returns for routine prenatal care. Her fundal height measures 20 cm. What should the nurse do first?",
+    "options": {
+      "A": "Notify the healthcare provider for further assessment",
+      "B": "Document as normal and reassess at next visit",
+      "C": "Encourage increased fluid intake",
+      "D": "Repeat the measurement with client in standing position"
+    },
+    "correctAnswer": "A",
+    "rationale": "A fundal height lag of >3 cm from weeks of gestation may indicate growth restriction or oligohydramnios and needs further evaluation.",
+    "section": "Pregnancy—Fundal Height Concerns",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new mother asks how to decrease her risk of sudden infant death syndrome (SIDS) for her baby. What is the nurse’s best advice?",
+    "options": {
+      "A": "Place infant supine in crib for every sleep",
+      "B": "Allow baby to sleep in car seat if tired",
+      "C": "Use sleep positioners to reduce movement",
+      "D": "Cover baby with blankets to keep warm"
+    },
+    "correctAnswer": "A",
+    "rationale": "Supine sleeping is the most important modifiable risk factor for SIDS reduction.",
+    "section": "Newborn—SIDS Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 17-year-old presents with a foul-smelling vaginal discharge and lower abdominal pain. The nurse notes cervical motion tenderness. What complication must be considered a top priority?",
+    "options": {
+      "A": "Pelvic inflammatory disease (PID)",
+      "B": "Ovarian cyst rupture",
+      "C": "Urinary tract infection",
+      "D": "Endometrial cancer"
+    },
+    "correctAnswer": "A",
+    "rationale": "These are classic signs of PID, which can threaten future fertility and requires prompt treatment.",
+    "section": "Women’s Health—PID",
+    "type": "mc"
+  },
+  {
+    "questionText": "A postpartum woman is having difficulty bonding and states she regrets becoming a parent. What risk does the nurse recognize?",
+    "options": {
+      "A": "Risk for impaired parent–infant attachment",
+      "B": "Risk for deep vein thrombosis",
+      "C": "Risk for uterine atony",
+      "D": "Risk for infection"
+    },
+    "correctAnswer": "A",
+    "rationale": "Expressions of regret and difficulty bonding signal a risk for impaired attachment and require further psychosocial assessment.",
+    "section": "Postpartum—Bonding Issues",
+    "type": "mc"
+  },
+  {
+    "questionText": "A mother in the clinic states that her 4-year-old becomes withdrawn and fearful whenever her stepfather enters the room. What is the most appropriate nursing action?",
+    "options": {
+      "A": "Report these findings as possible child abuse",
+      "B": "Suggest family therapy and observe for several weeks",
+      "C": "Arrange for the child to attend daycare more often",
+      "D": "Reassure the mother that this is probably just shyness"
+    },
+    "correctAnswer": "A",
+    "rationale": "Fearful withdrawal in a child around a caregiver raises concern for abuse and should be reported.",
+    "section": "Child Abuse—Behavioral Clues",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse interviews a woman who was recently hospitalized for injuries consistent with intimate partner violence (IPV). Which approach is most therapeutic?",
+    "options": {
+      "A": "Ask permission before discussing sensitive topics",
+      "B": "Suggest she forgive her partner to move forward",
+      "C": "Immediately call her partner in for the interview",
+      "D": "Request detailed written documentation before offering support"
+    },
+    "correctAnswer": "A",
+    "rationale": "Asking permission to discuss IPV shows respect for autonomy and fosters a trusting, patient-centered environment.",
+    "section": "Intimate Partner Violence—Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client receiving prenatal care is identified as at risk for gestational hypertension. Which finding necessitates the most immediate follow-up?",
+    "options": {
+      "A": "Sudden swelling of face and hands",
+      "B": "Mild dependent edema of feet at end of day",
+      "C": "Occasional heartburn after meals",
+      "D": "Stable blood pressure of 110/68 mmHg"
+    },
+    "correctAnswer": "A",
+    "rationale": "Rapid swelling of face/hands is a warning sign of preeclampsia—needs immediate evaluation.",
+    "section": "Pregnancy—Preeclampsia Signs",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is reviewing the risks associated with intrauterine device (IUD) insertion. Which symptom, if experienced after insertion, should prompt the client to seek immediate care?",
+    "options": {
+      "A": "Severe lower abdominal pain and fever",
+      "B": "Mild cramping for 48 hours",
+      "C": "Spotting for one week",
+      "D": "Late period by 3–4 days"
+    },
+    "correctAnswer": "A",
+    "rationale": "Severe pain and fever after IUD insertion may indicate pelvic infection or perforation—this requires immediate evaluation.",
+    "section": "Women’s Health—IUD Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A primigravida at 12 weeks reports eating only rice for three weeks due to limited access to other food. What lab value is the nurse most concerned about?",
+    "options": {
+      "A": "Low hemoglobin",
+      "B": "Elevated ALT",
+      "C": "Elevated white blood count",
+      "D": "High potassium"
+    },
+    "correctAnswer": "A",
+    "rationale": "A monotonous rice diet is low in iron and folate, raising anemia risk; hemoglobin should be monitored.",
+    "section": "Pregnancy—Nutrition Deficiencies",
+    "type": "mc"
+  }
+  ];
+
+        // SELECT 85 RANDOM QUESTIONS, SHUFFLE
+        function sampleQuestions(arr, n) {
+            // For this simulation, we'll just use the provided 3 questions
+            // In a real scenario, this function would select and shuffle
+            if (arr.length < n) {
+                console.warn(`Warning: Not enough questions (${arr.length}) to sample ${n}. Using all available questions.`);
+                return [...arr]; // Return all available questions if less than n
+            }
+            const out = [];
+            const idxs = Array.from({length: arr.length}, (_, i) => i);
+            for (let i = idxs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+            }
+            for (let i = 0; i < Math.min(n, idxs.length); i++) out.push(arr[idxs[i]]);
+            return out;
+        }
+
+        // Set questions
+        let questions = []; // Will be set in initExam
+
+        // TIMER STATE
+        const DURATION_SEC = 3 * 60 * 60; // 3 hours
+        let timer = {
+            timeLeft: DURATION_SEC,
+            running: true,
+            interval: null
+        };
+
+        // STATE
+        let state = {
+            idx: 0,
+            answers: [], // Will be initialized in initExam
+            submitted: [], // Will be initialized in initExam
+            completed: false,
+            auto: false // set true if auto-submitted by timer
+        };
+
+        // RENDERING
+        function renderPalette() {
+            const palette = document.getElementById('qPalette');
+            if (!palette) return;
+            palette.innerHTML = '';
+            questions.forEach((q, i) => {
+                const btn = document.createElement('button');
+                btn.textContent = i + 1;
+                btn.className = 'q-btn';
+                if (state.idx === i) btn.classList.add('current');
+                if (state.submitted[i]) btn.classList.add('answered');
+                else btn.classList.add('unanswered');
+                palette.appendChild(btn);
+            });
+        }
+
+        function renderQuestion() {
+            const idx = state.idx;
+            const q = questions[idx];
+            const isMC = q.type === 'mc';
+            const selected = state.answers[idx];
+            let html = `<div class="question-text">${q.questionText || ''}</div>
+                        <form class="options" id="optionsForm">`;
+            if(q.options) {
+                Object.entries(q.options).forEach(([key, text]) => {
+                    let checked = isMC ? (selected === key) : (Array.isArray(selected) && selected.includes(key));
+                    let cls = checked ? "selected" : "";
+                    html += `<label class="option-label ${cls}">
+                        <input type="${isMC ? "radio" : "checkbox"}" name="opt" value="${key}" ${checked ? "checked" : ""} ${state.submitted[idx] ? "disabled" : ""}>
+                        <span><b>${key}.</b> ${text}</span>
+                    </label>`;
+                });
+            }
+            html += `</form>`;
+            document.getElementById('qArea').innerHTML = html;
+            document.getElementById('qArea').style.display = "flex";
+            document.getElementById('reviewArea').style.display = "none";
+        }
+
+        function renderFooter() {
+            const idx = state.idx;
+            document.getElementById('progressBar').textContent = `Question ${idx + 1} of ${questions.length}`;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = !canProceed();
+            nextBtn.textContent = (idx === questions.length - 1) ? "Finish Exam" : "Next";
+        }
+
+        function renderAll() {
+            renderPalette();
+            renderQuestion();
+            renderFooter();
+            // Only setup select logic if not completed or submitted
+            if (!state.completed && !state.submitted[state.idx]) {
+                const idx = state.idx;
+                const q = questions[idx];
+                const isMC = q.type === 'mc';
+                const form = document.getElementById('optionsForm');
+                if (form) {
+                    form.addEventListener('change', e => {
+                        let val = e.target.value;
+                        if (isMC) {
+                            state.answers[idx] = val;
+                        } else {
+                            let arr = Array.isArray(state.answers[idx]) ? [...state.answers[idx]] : [];
+                            if (e.target.checked) arr.push(val);
+                            else arr = arr.filter(x => x !== val);
+                            state.answers[idx] = arr;
+                        }
+                        // Update visual
+                        document.querySelectorAll('.option-label').forEach(label => {
+                            let input = label.querySelector('input');
+                            label.classList.toggle('selected', input.checked);
+                        });
+                        renderFooter();
+                    });
+                }
+            }
+            document.getElementById('qArea').style.height = "100%";
+            document.getElementById('qArea').style.overflowY = "auto";
+        }
+
+        function canProceed() {
+            const idx = state.idx;
+            if (state.submitted[idx]) return true;
+            const q = questions[idx];
+            if (q && q.type === 'mc') return !!state.answers[idx];
+            return Array.isArray(state.answers[idx]) && state.answers[idx].length > 0;
+        }
+
+        // BUTTON LOGIC
+        document.getElementById('nextBtn').onclick = () => {
+            const idx = state.idx;
+            state.submitted[idx] = true;
+            if (idx < questions.length - 1) {
+                state.idx++;
+                renderAll();
+            } else {
+                showModal();
+            }
+        };
+
+        // MODAL LOGIC
+        function showModal() {
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-bg">
+                    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                        <div class="modal-title" id="modal-title">Submit Exam?</div>
+                        <div class="modal-msg">You are about to submit your answers. Are you sure you want to finish and see your results?</div>
+                        <div class="modal-btns">
+                            <button class="modal-btn cancel" id="cancelModalBtn">Cancel</button>
+                            <button class="modal-btn" id="confirmModalBtn">Submit Exam</button>
+                        </div>
+                    </div>
+                </div>`;
+            modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+            document.getElementById('cancelModalBtn').onclick = () => {
+                modal.style.display = "none";
+                document.body.style.overflow = "";
+            };
+            document.getElementById('confirmModalBtn').onclick = () => {
+                modal.style.display = "none";
+                document.body.style.overflow = "";
+                timer.running = false;
+                state.completed = true;
+                renderReview();
+            };
+        }
+
+        // TIMER LOGIC
+        function renderTimer() {
+            const box = document.getElementById('timerBox');
+            if (!box) return;
+            if (state.completed) {
+                box.style.display = "none";
+                if (timer.interval) clearInterval(timer.interval);
+                return;
+            }
+            box.style.display = "inline-flex";
+            let t = timer.timeLeft;
+            let h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+            box.textContent = `Time Left: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            box.className = "timer-box" + (t <= 300 ? " urgent" : "");
+        }
+
+        function startTimer() {
+            renderTimer();
+            timer.running = true;
+            if (timer.interval) clearInterval(timer.interval);
+            timer.interval = setInterval(() => {
+                if (!timer.running) return;
+                timer.timeLeft--;
+                renderTimer();
+                if (timer.timeLeft <= 0) {
+                    timer.running = false;
+                    state.auto = true;
+                    state.completed = true;
+                    if (timer.interval) clearInterval(timer.interval);
+                    autoSubmitExam();
+                }
+            }, 1000);
+        }
+
+        function autoSubmitExam() {
+            // Mark all remaining as submitted
+            for (let i = 0; i < questions.length; ++i) state.submitted[i] = true;
+            renderReview(true);
+        }
+
+        // REVIEW SECTION AT THE END
+        function renderReview(auto=false) {
+            let corrects = [];
+            let wrongs = [];
+            questions.forEach((q, idx) => {
+                let user = state.answers[idx];
+                let right = false;
+                if (q.type === "mc") right = user === q.correctAnswer;
+                else {
+                    let u = Array.isArray(user) ? [...user].sort() : [];
+                    let c = [...q.correctAnswer].sort();
+                    right = u.length === c.length && u.every((v, i) => v === c[i]);
+                }
+                if (right) corrects.push(idx);
+                else wrongs.push(idx);
+            });
+
+            // Show score and review wrongs
+            let percent = Math.round(corrects.length / questions.length * 100);
+            let msg = percent === 100
+                ? "🏆 Perfect! You're ready."
+                : percent >= 80
+                    ? "Great work! Review missed questions below."
+                    : percent >= 60
+                        ? "Keep practicing. Review the rationales."
+                        : "Don't give up. Review, study, and try again!";
+            let html = `
+                <div class="score-ctn">
+                    <div class="score-title">Exam Complete</div>
+                    <div class="score-value">${corrects.length} / ${questions.length} <span style="font-size:1.08rem;color:#4a83f2;">(${percent}%)</span></div>
+                    <div class="score-msg">${msg}</div>
+                    ${auto ? `<div style="color:#f32d32;margin-top:10px;font-size:1.12rem;"><b>Time expired – exam auto-submitted</b></div>` : ""}
+                    <button class="restart-btn" onclick="location.reload()">Retake Exam</button>
+                </div>
+            `;
+            if (wrongs.length > 0) {
+                html += `<div style="text-align:center;margin-bottom:8px;font-size:1.05rem;font-weight:500;color:#b92525;">Incorrect Responses & Rationales</div>`;
+                wrongs.forEach(idx => {
+                    const q = questions[idx];
+                    const user = state.answers[idx];
+                    const isMC = q.type === "mc";
+                    html += `<div class="review-card">
+                        <div class="review-q">${q.questionText || ''}</div>
+                        <div class="review-options">`;
+                    if(q.options) {
+                        Object.entries(q.options).forEach(([key, text]) => {
+                            let uwrong = isMC ? (user === key) : (Array.isArray(user) && user.includes(key));
+                            let ucorrect = isMC ? (key === q.correctAnswer) : (Array.isArray(q.correctAnswer) && q.correctAnswer.includes(key));
+                            let classStr = uwrong ? "user-answer" : (ucorrect ? "correct-answer" : "");
+                            html += `<div class="option-label ${classStr}"><b>${key}.</b> ${text}</div>`;
+                        });
+                    }
+                    html += `</div>
+                        <div class="rationale"><b>Rationale:</b> ${q.rationale || ''}</div>
+                    </div>`;
+                });
+            }
+            document.getElementById('qArea').style.display = "none";
+            let reviewArea = document.getElementById('reviewArea');
+            reviewArea.style.display = "block";
+            reviewArea.innerHTML = html;
+            reviewArea.style.height = "100%";
+            reviewArea.style.overflowY = "auto";
+            document.querySelector('.footer-inner').innerHTML = "";
+            renderTimer();
+        }
+
+        // INIT function to be called when the exam starts
+        function initExam() {
+            // Set questions (using all 3 for testing as requested)
+            questions = sampleQuestions(allQuestions, 60);
+
+            // Set up state arrays based on question count
+            state.answers = Array(questions.length).fill(null);
+            state.submitted = Array(questions.length).fill(false);
+            state.idx = 0; // Reset to first question
+
+            renderAll();
+            startTimer();
+        }
+    </script>
+</body>
+</html>
+
