@@ -6,70 +6,101 @@
     <title>Nursing Exam Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        /* Base Dark Mode Variables */
+        :root {
+            --bg-color-dark: #0d0d0d;
+            --container-bg-dark: #1a1a1a;
+            --card-bg-dark: #222;
+            --text-color-dark: #f0f0f0;
+            --border-color-dark: #333;
+            --option-bg-dark: #383838;
+            --option-hover-bg-dark: #4a4a4a;
+            --feedback-bg-dark: rgba(255, 255, 255, 0.1);
+        }
+        /* Light Mode Overrides */
+        .light-mode {
+            --bg-color-dark: #f0f0f0;
+            --container-bg-dark: #ffffff;
+            --card-bg-dark: #f9f9f9;
+            --text-color-dark: #1a1a1a;
+            --border-color-dark: #e5e7eb;
+            --option-bg-dark: #f3f4f6;
+            --option-hover-bg-dark: #e5e7eb;
+            --feedback-bg-dark: #e5e7eb;
+        }
+
+        /* General Styling */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0d0d;
-            color: #f0f0f0;
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 1rem;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             max-width: 800px;
             width: 100%;
-            background-color: #1a1a1a;
+            background-color: var(--container-bg-dark);
             border-radius: 1.5rem;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             padding: 2.5rem;
             display: flex;
             flex-direction: column;
             gap: 2rem;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color-dark);
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .question-card, .results-card, .intro-card, .setup-card, .report-card {
-            background-color: #222;
+            background-color: var(--card-bg-dark);
             border-radius: 1rem;
             padding: 2.5rem;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-            border: 1px solid #444;
+            border: 1px solid var(--border-color-dark);
+            transition: background-color 0.3s, border-color 0.3s;
         }
+        
+        /* Progress Bar */
         .progress-bar {
             height: 0.75rem;
-            background-color: #333;
+            background-color: var(--border-color-dark);
             border-radius: 9999px;
             overflow: hidden;
+            transition: background-color 0.3s;
         }
         .progress {
             height: 100%;
-            background-image: linear-gradient(to right, #4c1d95, #7e22ce); /* Deep purple gradient */
+            background-image: linear-gradient(to right, #4c1d95, #7e22ce);
             transition: width 0.3s ease-in-out;
         }
+
+        /* Buttons & Interactions */
         .option-button {
             width: 100%;
             text-align: left;
             padding: 1.25rem 2rem;
             border-radius: 0.75rem;
-            background-color: #383838;
-            transition: transform 0.2s, background-color 0.2s;
+            background-color: var(--option-bg-dark);
+            transition: transform 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s;
             cursor: pointer;
             border: 1px solid transparent;
             font-weight: 500;
         }
         .option-button:hover:not(.correct, .incorrect, .disabled) {
-            background-color: #4a4a4a;
+            background-color: var(--option-hover-bg-dark);
             transform: translateY(-2px);
             border-color: #7e22ce;
         }
         .option-button.correct {
-            background-color: #1a644e; /* Deeper green */
+            background-color: #1a644e;
             color: white;
             border-color: #27c490;
         }
         .option-button.incorrect {
-            background-color: #a63f3f; /* Deeper red */
+            background-color: #a63f3f;
             color: white;
             border-color: #e55555;
         }
@@ -80,6 +111,7 @@
         .option-button.selected {
             background-color: #4c1d95;
             border-color: #7e22ce;
+            color: white;
         }
         .next-button, .mode-button {
             background-image: linear-gradient(to right, #7e22ce, #4c1d95);
@@ -94,6 +126,8 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(126, 34, 206, 0.6);
         }
+
+        /* Animations */
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
@@ -101,6 +135,8 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* UI Elements */
         .section-tag {
             background-color: #444;
             color: #ccc;
@@ -111,7 +147,7 @@
             text-transform: uppercase;
         }
         .report-item {
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid var(--border-color-dark);
             padding-bottom: 2rem;
             margin-bottom: 2rem;
         }
@@ -121,21 +157,40 @@
         .report-answer-incorrect {
             color: #e55555;
         }
+        
+        /* BETA Pulsing Badge */
+        .beta-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #222;
+            color: #ffa500;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            animation: pulse-orange 1.5s infinite;
+            border: 2px solid #ffa500;
+        }
+        @keyframes pulse-orange {
+            0% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 165, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0); }
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100">
+<body>
 
-<div class="container">
+<div class="container" id="main-content">
     <div id="intro-screen" class="intro-card text-center">
         <h1 class="text-4xl font-bold mb-4">Mother Baby Unit 1 SDE</h1>
-        <p class="text-gray-400 mb-8">This exam engine is designed to help you prepare for your nursing exams. The test consists of 45 randomized questions with immediate feedback and detailed rationales for enhanced learning, depending on the exam mode selected.</p>
+        <p class="text-gray-400 mb-8">This exam engine is designed to help you prepare for your nursing exams. The test consists of 45 randomized questions with immediate feedback and detailed rationales for enhanced learning, depending on the test mode selected.</p>
         <button id="start-button" class="next-button">Start Test</button>
     </div>
 
     <div id="setup-screen" class="setup-card text-center hidden">
-        <h2 class="text-3xl font-bold mb-4">Choose Your Exam Mode</h2>
-        <p class="text-gray-400 mb-8">Select a mode to begin your test.</p>
-        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+        <h2 class="text-3xl font-bold mb-4">Choose Your Exam Mode & Theme</h2>
+        <p class="text-gray-400 mb-8">Select a mode and theme to begin your test.</p>
+        <div class="flex flex-col space-y-4 mb-8">
             <button id="involved-mode-button" class="mode-button w-full">
                 <span class="block font-bold mb-1">Involved Exam</span>
                 <span class="block text-sm font-normal">Get instant feedback after each question.</span>
@@ -145,9 +200,21 @@
                 <span class="block text-sm font-normal">Get your score and all rationales at the end.</span>
             </button>
         </div>
+        <div id="theme-buttons" class="flex flex-col space-y-4 hidden">
+            <h3 class="text-xl font-bold mb-2">Select a Theme</h3>
+            <button id="dark-mode-button" class="mode-button w-full">
+                <span class="block font-bold mb-1">Dark Mode</span>
+                <span class="block text-sm font-normal">Sleek and easy on the eyes.</span>
+            </button>
+            <button id="light-mode-button" class="mode-button w-full">
+                <span class="block font-bold mb-1">Light Mode</span>
+                <span class="block text-sm font-normal">Classic bright theme.</span>
+            </button>
+        </div>
     </div>
 
-    <div id="quiz-container" class="hidden">
+    <div id="quiz-container" class="hidden relative">
+        <div class="beta-badge">BETA</div>
         <div class="flex justify-between items-center mb-6">
             <span id="question-counter" class="text-sm font-semibold text-gray-400">Question 1 of 45</span>
             <span id="score-counter" class="text-sm font-semibold text-gray-400">Score: 0</span>
@@ -156,7 +223,7 @@
             <div id="progress" class="progress" style="width: 0%;"></div>
         </div>
         
-        <div class="question-card fade-in">
+        <div id="question-card" class="question-card">
             <div class="flex items-center mb-4">
                 <span id="section-display" class="section-tag"></span>
             </div>
@@ -165,9 +232,9 @@
                 <!-- Options will be rendered here -->
             </div>
             
-            <div id="feedback-container" class="mt-8 hidden p-4 bg-gray-700 bg-opacity-30 rounded-lg">
+            <div id="feedback-container" class="mt-8 hidden p-4 rounded-lg" style="background-color: var(--feedback-bg-dark);">
                 <div id="feedback-text" class="text-lg font-bold mb-2"></div>
-                <div id="rationale-text" class="text-gray-300 leading-relaxed"></div>
+                <div id="rationale-text" class="leading-relaxed" style="color: var(--text-color-dark); opacity: 0.8;"></div>
             </div>
         </div>
 
@@ -193,8 +260,9 @@
 </div>
 
 <script>
-    // --- Question Bank ---
-    const questionBank = [
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Question Bank ---
+        const questionBank = [
   {
     "questionText": "A 28-year-old client, gravida 3, para 2, is in her first trimester. During her prenatal visit, she mentions that she has been experiencing increased salivation, a condition known as ptyalism. Which of the following nursing interventions is most appropriate for this client?",
     "type": "mc",
@@ -3679,270 +3747,275 @@
     "correctAnswer": "c",
     "rationale": "Referrals (social work, mental health, legal) extend care to specialized services."
   }
-           ];
+                    ];
 
-    // --- State Variables ---
-    let testQuestions = [];
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let isBlindMode = false;
-    let userAnswers = [];
-    let currentSelection = null;
-    const totalQuestions = 45;
+        // --- State Variables ---
+        let testQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isBlindMode = false;
+        let userAnswers = [];
 
-    // --- DOM Elements ---
-    const introScreen = document.getElementById('intro-screen');
-    const setupScreen = document.getElementById('setup-screen');
-    const quizContainer = document.getElementById('quiz-container');
-    const resultsScreen = document.getElementById('results-screen');
-    const reportScreen = document.getElementById('report-screen');
-    const questionCounter = document.getElementById('question-counter');
-    const scoreCounter = document.getElementById('score-counter');
-    const progress = document.getElementById('progress');
-    const sectionDisplay = document.getElementById('section-display');
-    const questionTextElement = document.getElementById('question-text');
-    const optionsContainer = document.getElementById('options-container');
-    const feedbackContainer = document.getElementById('feedback-container');
-    const feedbackTextElement = document.getElementById('feedback-text');
-    const rationaleTextElement = document.getElementById('rationale-text');
-    const nextButton = document.getElementById('next-button');
-    const startButton = document.getElementById('start-button');
-    const involvedModeButton = document.getElementById('involved-mode-button');
-    const blindModeButton = document.getElementById('blind-mode-button');
-    const viewReportButton = document.getElementById('view-report-button');
-    const retakeButton = document.getElementById('retake-button');
-    const finalScoreElement = document.getElementById('final-score');
-    const finalMessageElement = document.getElementById('final-message');
-    const reportContainer = document.getElementById('report-container');
-    const studyAreasElement = document.getElementById('study-areas');
+        // --- DOM Elements ---
+        const dom = {
+            mainContent: document.getElementById('main-content'),
+            introScreen: document.getElementById('intro-screen'),
+            setupScreen: document.getElementById('setup-screen'),
+            quizContainer: document.getElementById('quiz-container'),
+            resultsScreen: document.getElementById('results-screen'),
+            reportScreen: document.getElementById('report-screen'),
+            questionCounter: document.getElementById('question-counter'),
+            scoreCounter: document.getElementById('score-counter'),
+            progress: document.getElementById('progress'),
+            sectionDisplay: document.getElementById('section-display'),
+            questionTextElement: document.getElementById('question-text'),
+            optionsContainer: document.getElementById('options-container'),
+            feedbackContainer: document.getElementById('feedback-container'),
+            feedbackTextElement: document.getElementById('feedback-text'),
+            rationaleTextElement: document.getElementById('rationale-text'),
+            nextButton: document.getElementById('next-button'),
+            startButton: document.getElementById('start-button'),
+            involvedModeButton: document.getElementById('involved-mode-button'),
+            blindModeButton: document.getElementById('blind-mode-button'),
+            darkModeButton: document.getElementById('dark-mode-button'),
+            lightModeButton: document.getElementById('light-mode-button'),
+            viewReportButton: document.getElementById('view-report-button'),
+            retakeButton: document.getElementById('retake-button'),
+            finalScoreElement: document.getElementById('final-score'),
+            finalMessageElement: document.getElementById('final-message'),
+            reportContainer: document.getElementById('report-container'),
+            studyAreasElement: document.getElementById('study-areas'),
+            themeButtons: document.getElementById('theme-buttons'),
+            questionCard: document.getElementById('question-card'),
+        };
 
-    // --- Helper Functions ---
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
+        const totalQuestions = 45;
 
-    function startTest() {
-        introScreen.classList.add('hidden');
-        setupScreen.classList.remove('hidden');
-        quizContainer.classList.add('hidden');
-        resultsScreen.classList.add('hidden');
-        reportScreen.classList.add('hidden');
-    }
-
-    function startExam(mode) {
-        setupScreen.classList.add('hidden');
-        quizContainer.classList.remove('hidden');
-        
-        isBlindMode = (mode === 'blind');
-        currentQuestionIndex = 0;
-        score = 0;
-        userAnswers = [];
-        currentSelection = null;
-
-        shuffleArray(questionBank);
-        testQuestions = questionBank.slice(0, totalQuestions);
-
-        if (isBlindMode) {
-            scoreCounter.classList.add('hidden');
-        } else {
-            scoreCounter.classList.remove('hidden');
-        }
-        
-        renderQuestion();
-    }
-
-    function renderQuestion() {
-        if (currentQuestionIndex >= totalQuestions) {
-            showResults();
-            return;
+        // --- Helper Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
         }
 
-        const question = testQuestions[currentQuestionIndex];
-        
-        questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
-        if (!isBlindMode) {
-            scoreCounter.textContent = `Score: ${score}`;
+        function showScreen(screenToShow) {
+            const allScreens = [dom.introScreen, dom.setupScreen, dom.quizContainer, dom.resultsScreen, dom.reportScreen];
+            allScreens.forEach(screen => screen.classList.add('hidden'));
+            if (screenToShow) {
+                screenToShow.classList.remove('hidden');
+            }
         }
-        const progressPercentage = ((currentQuestionIndex) / totalQuestions) * 100;
-        progress.style.width = `${progressPercentage}%`;
-        
-        optionsContainer.innerHTML = '';
-        feedbackContainer.classList.add('hidden');
-        nextButton.classList.add('hidden');
-        
-        sectionDisplay.textContent = question.section;
-        questionTextElement.textContent = question.questionText;
-        
-        for (const [key, value] of Object.entries(question.options)) {
-            const button = document.createElement('button');
-            button.className = 'option-button text-gray-200 fade-in';
-            button.dataset.answer = key;
-            button.textContent = `${key.toUpperCase()}. ${value}`;
-            button.onclick = () => handleAnswer(button);
-            optionsContainer.appendChild(button);
+
+        function toggleTheme(isLight) {
+            document.body.classList.toggle('light-mode', isLight);
         }
-    }
 
-    function handleAnswer(selectedButton) {
-        const question = testQuestions[currentQuestionIndex];
-        const selectedAnswer = selectedButton.dataset.answer;
+        function startExam() {
+            showScreen(dom.quizContainer);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
 
-        if (isBlindMode) {
-            // In blind mode, allow changing selection
-            Array.from(optionsContainer.children).forEach(button => {
-                button.classList.remove('selected');
-            });
-            selectedButton.classList.add('selected');
-            currentSelection = selectedAnswer;
-        } else {
-            // In involved mode, lock the answer
-            Array.from(optionsContainer.children).forEach(button => {
+            shuffleArray(questionBank);
+            testQuestions = questionBank.slice(0, totalQuestions);
+
+            dom.scoreCounter.classList.toggle('hidden', isBlindMode);
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (currentQuestionIndex >= totalQuestions) {
+                showResults();
+                return;
+            }
+
+            const question = testQuestions[currentQuestionIndex];
+            
+            // Re-trigger the fade-in animation by removing and re-adding the class
+            dom.questionCard.classList.remove('fade-in');
+            void dom.questionCard.offsetWidth; // Force reflow
+            dom.questionCard.classList.add('fade-in');
+
+            dom.questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
+            if (!isBlindMode) {
+                dom.scoreCounter.textContent = `Score: ${score}`;
+            }
+            const progressPercentage = ((currentQuestionIndex) / totalQuestions) * 100;
+            dom.progress.style.width = `${progressPercentage}%`;
+            
+            dom.optionsContainer.innerHTML = '';
+            dom.feedbackContainer.classList.add('hidden');
+            dom.nextButton.classList.add('hidden');
+            
+            dom.sectionDisplay.textContent = question.section;
+            dom.questionTextElement.textContent = question.questionText;
+            
+            for (const [key, value] of Object.entries(question.options)) {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.dataset.answer = key;
+                button.textContent = `${key.toUpperCase()}. ${value}`;
+                button.addEventListener('click', () => handleAnswer(button, key));
+                dom.optionsContainer.appendChild(button);
+            }
+        }
+
+        function handleAnswer(selectedButton, selectedAnswer) {
+            const question = testQuestions[currentQuestionIndex];
+
+            Array.from(dom.optionsContainer.children).forEach(button => {
                 button.classList.add('disabled');
                 button.onclick = null;
             });
 
-            if (selectedAnswer === question.correctAnswer) {
-                score++;
-                selectedButton.classList.add('correct');
+            if (isBlindMode) {
+                selectedButton.classList.add('selected');
             } else {
-                selectedButton.classList.add('incorrect');
-                const correctButton = document.querySelector(`[data-answer="${question.correctAnswer}"]`);
-                if (correctButton) {
-                    correctButton.classList.add('correct');
-                }
-            }
-
-            // Record the user's answer
-            userAnswers.push({
-                question: question,
-                selectedAnswer: selectedAnswer
-            });
-
-            feedbackContainer.classList.remove('hidden');
-            feedbackTextElement.textContent = selectedAnswer === question.correctAnswer ? "Correct! 🎉" : "Incorrect.";
-            rationaleTextElement.textContent = question.rationale;
-            
-            scoreCounter.textContent = `Score: ${score}`;
-        }
-        
-        nextButton.classList.remove('hidden');
-    }
-
-    function handleNext() {
-        // Only process the answer if a selection was made
-        if (isBlindMode && currentSelection === null) {
-            return; // Don't proceed without an answer in blind mode
-        }
-
-        if (isBlindMode) {
-            const question = testQuestions[currentQuestionIndex];
-            const isCorrect = currentSelection === question.correctAnswer;
-            if (isCorrect) {
-                score++;
-            }
-            userAnswers.push({
-                question: question,
-                selectedAnswer: currentSelection
-            });
-        }
-
-        currentQuestionIndex++;
-        currentSelection = null;
-        renderQuestion();
-    }
-
-    function showResults() {
-        quizContainer.classList.add('hidden');
-        resultsScreen.classList.remove('hidden');
-        
-        const finalScore = (score / totalQuestions) * 100;
-        finalScoreElement.textContent = `${score}/${totalQuestions} (${finalScore.toFixed(0)}%)`;
-        
-        let message = "";
-        if (finalScore >= 90) {
-            message = "Excellent! You have a great understanding of the material. Keep up the great work!";
-        } else if (finalScore >= 70) {
-            message = "Well done! You have a solid grasp of the content. Reviewing the questions you missed can help you master the topics.";
-        } else if (finalScore >= 50) {
-            message = "Good effort. There's room for improvement. It's a great opportunity to go back and review the material.";
-        } else {
-            message = "Keep practicing! Reviewing the material and revisiting the test can help you improve significantly.";
-        }
-        finalMessageElement.textContent = message;
-    }
-    
-    function showReport() {
-        resultsScreen.classList.add('hidden');
-        reportScreen.classList.remove('hidden');
-        
-        reportContainer.innerHTML = '';
-        const incorrectSections = {};
-        
-        userAnswers.forEach((item, index) => {
-            const question = item.question;
-            const userChoice = item.selectedAnswer;
-            const isCorrect = userChoice === question.correctAnswer;
-            
-            if (!isCorrect) {
-                if (incorrectSections[question.section]) {
-                    incorrectSections[question.section]++;
+                if (selectedAnswer === question.correctAnswer) {
+                    score++;
+                    selectedButton.classList.add('correct');
                 } else {
-                    incorrectSections[question.section] = 1;
+                    selectedButton.classList.add('incorrect');
+                    const correctButton = document.querySelector(`[data-answer="${question.correctAnswer}"]`);
+                    if (correctButton) {
+                        correctButton.classList.add('correct');
+                    }
                 }
+                dom.feedbackContainer.classList.remove('hidden');
+                dom.feedbackTextElement.textContent = selectedAnswer === question.correctAnswer ? "Correct! 🎉" : "Incorrect.";
+                dom.rationaleTextElement.textContent = question.rationale;
+                dom.scoreCounter.textContent = `Score: ${score}`;
+            }
+
+            userAnswers.push({
+                question: question,
+                selectedAnswer: selectedAnswer,
+                isCorrect: selectedAnswer === question.correctAnswer
+            });
+            dom.nextButton.classList.remove('hidden');
+        }
+
+        function handleNext() {
+            currentQuestionIndex++;
+            renderQuestion();
+        }
+
+        function showResults() {
+            showScreen(dom.resultsScreen);
+            
+            // In blind mode, calculate score at the end
+            if (isBlindMode) {
+                score = userAnswers.filter(answer => answer.isCorrect).length;
             }
             
-            const reportItem = document.createElement('div');
-            reportItem.className = 'report-item';
+            const finalScorePercentage = (score / totalQuestions) * 100;
+            dom.finalScoreElement.textContent = `${score}/${totalQuestions} (${finalScorePercentage.toFixed(0)}%)`;
             
-            reportItem.innerHTML = `
-                <div class="flex items-center mb-4">
-                    <span class="section-tag">${question.section}</span>
-                </div>
-                <h3 class="text-xl font-semibold mb-4">${index + 1}. ${question.questionText}</h3>
-                <div class="space-y-2 mb-4">
-                    ${Object.entries(question.options).map(([key, value]) => {
-                        const isUserAnswer = key === userChoice;
-                        const isCorrectAnswer = key === question.correctAnswer;
-                        let className = 'text-gray-400';
-                        if (isUserAnswer && isCorrectAnswer) {
-                            className = 'report-answer-correct';
-                        } else if (isUserAnswer) {
-                            className = 'report-answer-incorrect';
-                        } else if (isCorrectAnswer) {
-                            className = 'report-answer-correct';
-                        }
-                        return `<p class="${className}">${key.toUpperCase()}. ${value}</p>`;
-                    }).join('')}
-                </div>
-                <div class="p-4 bg-gray-700 bg-opacity-30 rounded-lg">
-                    <div class="text-lg font-bold mb-2">Rationale</div>
-                    <div class="text-gray-300 leading-relaxed">${question.rationale}</div>
-                </div>
-            `;
-            reportContainer.appendChild(reportItem);
-        });
-
-        // Identify and display top study areas
-        const sortedSections = Object.entries(incorrectSections).sort(([, a], [, b]) => b - a);
-        if (sortedSections.length > 0) {
-            const topAreas = sortedSections.slice(0, 3).map(item => `**${item[0]}** (${item[1]} errors)`).join(', ');
-            studyAreasElement.innerHTML = `You should focus on these areas: ${topAreas}.`;
-        } else {
-            studyAreasElement.textContent = "Great job! You answered all questions correctly in the topics presented.";
+            let message;
+            if (finalScorePercentage >= 90) {
+                message = "Excellent! You have a great understanding of the material. Keep up the great work!";
+            } else if (finalScorePercentage >= 70) {
+                message = "Well done! You have a solid grasp of the content. Reviewing the questions you missed can help you master the topics.";
+            } else if (finalScorePercentage >= 50) {
+                message = "Good effort. There's room for improvement. It's a great opportunity to go back and review the material.";
+            } else {
+                message = "Keep practicing! Reviewing the material and revisiting the test can help you improve significantly.";
+            }
+            dom.finalMessageElement.textContent = message;
         }
-    }
+        
+        function showReport() {
+            showScreen(dom.reportScreen);
+            dom.reportContainer.innerHTML = '';
+            const incorrectSections = {};
+            
+            userAnswers.forEach((item, index) => {
+                if (!item.isCorrect) {
+                    incorrectSections[item.question.section] = (incorrectSections[item.question.section] || 0) + 1;
+                }
+                
+                const reportItem = document.createElement('div');
+                reportItem.className = 'report-item';
+                
+                reportItem.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <span class="section-tag">${item.question.section}</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">${index + 1}. ${item.question.questionText}</h3>
+                    <div class="space-y-2 mb-4">
+                        ${Object.entries(item.question.options).map(([key, value]) => {
+                            const isUserAnswer = key === item.selectedAnswer;
+                            const isCorrectAnswer = key === item.question.correctAnswer;
+                            let className = '';
+                            if (isUserAnswer && isCorrectAnswer) {
+                                className = 'report-answer-correct font-bold';
+                            } else if (isUserAnswer) {
+                                className = 'report-answer-incorrect font-bold';
+                            } else if (isCorrectAnswer) {
+                                className = 'report-answer-correct';
+                            }
+                            return `<p class="${className}">${key.toUpperCase()}. ${value}</p>`;
+                        }).join('')}
+                    </div>
+                    <div class="p-4 rounded-lg" style="background-color: var(--feedback-bg-dark);">
+                        <div class="text-lg font-bold mb-2">Rationale</div>
+                        <div class="leading-relaxed" style="color: var(--text-color-dark); opacity: 0.8;">${item.question.rationale}</div>
+                    </div>
+                `;
+                dom.reportContainer.appendChild(reportItem);
+            });
 
-    // --- Event Listeners ---
-    startButton.addEventListener('click', startTest);
-    involvedModeButton.addEventListener('click', () => startExam('involved'));
-    blindModeButton.addEventListener('click', () => startExam('blind'));
-    nextButton.addEventListener('click', handleNext);
-    viewReportButton.addEventListener('click', showReport);
-    retakeButton.addEventListener('click', startTest);
+            const sortedSections = Object.entries(incorrectSections).sort(([, a], [, b]) => b - a);
+            if (sortedSections.length > 0) {
+                const topAreas = sortedSections.slice(0, 3).map(item => `<strong>${item[0]}</strong> (${item[1]} errors)`).join(', ');
+                dom.studyAreasElement.innerHTML = `You should focus on these areas: ${topAreas}.`;
+            } else {
+                dom.studyAreasElement.textContent = "Great job! You answered all questions correctly in the topics presented.";
+            }
+        }
+
+        // --- Initial setup and Event Listeners ---
+        const init = () => {
+            dom.startButton.addEventListener('click', () => showScreen(dom.setupScreen));
+            
+            dom.involvedModeButton.addEventListener('click', () => {
+                isBlindMode = false;
+                dom.themeButtons.classList.remove('hidden');
+            });
+            
+            dom.blindModeButton.addEventListener('click', () => {
+                isBlindMode = true;
+                dom.themeButtons.classList.remove('hidden');
+            });
+
+            dom.darkModeButton.addEventListener('click', () => {
+                toggleTheme(false);
+                startExam();
+            });
+
+            dom.lightModeButton.addEventListener('click', () => {
+                toggleTheme(true);
+                startExam();
+            });
+
+            dom.nextButton.addEventListener('click', handleNext);
+            dom.viewReportButton.addEventListener('click', showReport);
+            dom.retakeButton.addEventListener('click', () => {
+                // Take user back to the intro screen for a new test
+                showScreen(dom.introScreen);
+            });
+
+            // Set default theme
+            toggleTheme(false);
+        };
+
+        init();
+    });
 </script>
 
 </body>
 </html>
+
