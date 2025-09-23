@@ -134,20 +134,27 @@
                     title: 'Unit 1: Cardiovascular/Perfusion & Renal/Urinary Systems',
                     subtitle: 'An in-depth study of cardiac function, circulatory dynamics, perfusion management, renal function, and urinary tract disorders.',
                     resources: [
-                        // Existing learning module
+                        // New exam simulation button added here
+                        {
+                            type: 'exam',
+                            title: 'Unit 1 Exam Simulation',
+                            description: 'A comprehensive exam simulation to test your knowledge of Unit 1 concepts.',
+                            icon: 'clipboard',
+                            link: '/MedSurgII/Unit1ExamSim.html'
+                        },
+                        // Existing learning modules
                         {
                             type: 'learn',
                             title: 'Cardiac ECG Learning Module',
                             description: 'An interactive module for understanding Electrocardiograms in cardiovascular care.',
-                            icon: 'activity', // Using 'activity' for heart rhythm/ECG related content
+                            icon: 'activity',
                             link: 'MSIICaridacEKGLearningModule.html'
                         },
-                        // New learning module added here
                         {
                             type: 'learn',
                             title: 'Heart Failure / MI Learning Module',
                             description: 'An essential module covering the pathophysiology and management of Heart Failure and Myocardial Infarction.',
-                            icon: 'heart', // 'heart' icon for heart-related content
+                            icon: 'heart',
                             link: 'MSIIHeartFailureLearningModule.html'
                         },
                         {
@@ -174,7 +181,7 @@
 
             const createResourceCard = (resource) => {
                 const typeStyles = {
-                    exam: { bg: 'bg-rose-50', border: 'border-rose-200', iconColor: 'text-rose-600', hover: 'hover:border-rose-400 hover:bg-rose-100' },
+                    exam: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' },
                     learn: { bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-600', hover: 'hover:border-sky-400 hover:bg-sky-100' },
                     final: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' }
                 };
@@ -217,7 +224,7 @@
 
                     const createSection = (title, icon, items) => {
                         if (items.length === 0) return '';
-                        const iconColor = { 'Learning Modules': 'text-sky-600', 'Diagnostic Exams': 'text-rose-600', 'Final Exam Prep': 'text-indigo-600' }[title] || 'text-slate-600';
+                        const iconColor = { 'Learning Modules': 'text-sky-600', 'Diagnostic Exams': 'text-indigo-600', 'Final Exam Prep': 'text-indigo-600' }[title] || 'text-slate-600';
                         return `
                             <div class="mb-8">
                                 <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
