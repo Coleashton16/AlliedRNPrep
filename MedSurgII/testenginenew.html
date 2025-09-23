@@ -124,12 +124,65 @@
             background-color: #fee2e2;
             border-color: #ef4444;
         }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .nav-item-container {
+            position: relative;
+        }
+        .check-icon {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 1rem;
+            height: 1rem;
+        }
+        .loading-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .grade-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-custom-light-gray h-screen flex flex-col overflow-hidden">
 
     <!-- Top Header -->
-    <header class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md">
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
         <div class="flex items-center space-x-4">
             <div class="font-bold">D. MALFOY</div>
             <div>DRACO MALFOY</div>
@@ -147,8 +200,15 @@
         </div>
     </header>
 
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
+
     <!-- Main Content Area -->
-    <div class="flex flex-1 overflow-hidden">
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
         <!-- Left Sidebar Navigation -->
         <aside class="w-16 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
             <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
@@ -177,8 +237,22 @@
         </div>
     </div>
 
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Starting Exam...</p>
+    </div>
+
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <h2 class="text-3xl font-bold mb-4">Exam Submitted Successfully!</h2>
+        <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+        <div class="text-6xl font-extrabold text-blue-600" id="final-grade"></div>
+        <button id="restart-btn" class="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+    </div>
+
     <!-- Bottom Footer -->
-    <footer class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md">
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
         <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
             <span id="question-counter">1 OF 5 QUESTIONS</span>
             <span>VERSION 5.0</span>
@@ -260,9 +334,15 @@
     let currentQuestionIndex = 0;
     let shuffledQuizData = [];
     let userAnswers = [];
+    let flaggedQuestions = Array(quizData.length).fill(false);
     let timeLeft = 7200; // 2 hours in seconds
     let timerInterval;
 
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const header = document.getElementById('header');
+    const mainContent = document.getElementById('main-content');
+    const footer = document.getElementById('footer');
     const navQuestionsContainer = document.getElementById('nav-questions');
     const questionContainer = document.getElementById('question-container');
     const reviewScreen = document.getElementById('review-screen');
@@ -273,6 +353,10 @@
     const endReviewBtn = document.getElementById('end-review-btn');
     const timerDisplay = document.getElementById('timer');
     const questionCounter = document.getElementById('question-counter');
+    const loadingAnimation = document.getElementById('loading-animation');
+    const gradeScreen = document.getElementById('grade-screen');
+    const finalGradeDisplay = document.getElementById('final-grade');
+    const restartBtn = document.getElementById('restart-btn');
 
     // --- Core Functions ---
 
@@ -330,19 +414,7 @@
         questionHtml.innerHTML = `
             <div class="flex items-center space-x-4 mb-6">
                 <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
-                <button class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">UNFLAG QUESTION</button>
-                <div class="flex space-x-2">
-                    <button class="p-2 rounded-md bg-gray-200 hover:bg-gray-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <button class="p-2 rounded-md bg-gray-200 hover:bg-gray-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5.293 6.707a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414L11.414 12l3.293 3.293a1 1 0 11-1.414 1.414L10 13.414l-3.293 3.293a1 1 0 01-1.414-1.414L8.586 12 5.293 8.707a1 1 0 010-1.414z" />
-                        </svg>
-                    </button>
-                </div>
+                <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}</button>
             </div>
             <div class="mb-4 text-sm font-medium text-gray-500">
                 <span class="mr-2">^</span> Which is the correct answer?
@@ -362,14 +434,15 @@
             const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
             const labelClass = isMultipleChoice ? 'radio-label' : 'check-label';
             const inputClass = isMultipleChoice ? 'radio-btn' : 'check-btn';
-
+            
             const optionDiv = document.createElement('div');
+            optionDiv.className = 'flex items-center space-x-2';
             optionDiv.innerHTML = `
                 <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${inputClass}">
                 <label for="option-${letter}" class="${labelClass}">
                     <span class="option-letter">${letter}</span>
                     <span class="flex-1">${optionText}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="strikethrough-btn h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -380,6 +453,34 @@
 
         questionHtml.appendChild(optionsContainer);
         questionContainer.appendChild(questionHtml);
+        
+        // Add event listeners for strike-through
+        document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const label = e.target.closest('label');
+                const textSpan = label.querySelector('span:nth-child(2)');
+                textSpan.classList.toggle('strikethrough');
+            });
+        });
+
+        // Add event listener for flag button
+        document.getElementById('flag-btn').addEventListener('click', () => {
+            flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+            document.getElementById('flag-btn').textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+            updateNavigationSidebar();
+        });
+
+        // Restore previous answer selection
+        if (userAnswers[currentQuestionIndex]) {
+            const savedAnswers = userAnswers[currentQuestionIndex];
+            if (Array.isArray(savedAnswers)) {
+                savedAnswers.forEach(answer => {
+                    const input = document.getElementById(`option-${answer}`);
+                    if (input) input.checked = true;
+                });
+            }
+        }
+
         updateNavigationSidebar();
         updateQuestionCounter();
     }
@@ -389,12 +490,31 @@
      */
     function updateNavigationSidebar() {
         navQuestionsContainer.innerHTML = '';
-        for (let i = 0; i < shuffledQuizData.length; i++) {
+        shuffledQuizData.forEach((_, i) => {
+            const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+            const navItemDiv = document.createElement('div');
+            navItemDiv.className = 'nav-item-container';
+
             const navItem = document.createElement('div');
-            navItem.className = `flex items-center justify-center w-8 h-8 rounded-full font-bold transition-colors ${i === currentQuestionIndex ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`;
+            navItem.className = `flex items-center justify-center w-8 h-8 rounded-full font-bold transition-colors relative ${i === currentQuestionIndex ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`;
             navItem.textContent = i + 1;
-            navQuestionsContainer.appendChild(navItem);
-        }
+            
+            if (isAnswered) {
+                const checkmark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                checkmark.setAttribute("class", "check-icon text-white bg-green-500 rounded-full");
+                checkmark.setAttribute("viewBox", "0 0 24 24");
+                checkmark.setAttribute("fill", "currentColor");
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("fill-rule", "evenodd");
+                path.setAttribute("d", "M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z");
+                path.setAttribute("clip-rule", "evenodd");
+                checkmark.appendChild(path);
+                navItem.appendChild(checkmark);
+            }
+
+            navItemDiv.appendChild(navItem);
+            navQuestionsContainer.appendChild(navItemDiv);
+        });
     }
 
     /**
@@ -435,10 +555,10 @@
      * Renders the review screen with missed questions.
      */
     function renderReviewScreen() {
-        questionContainer.classList.add('hidden');
+        mainContent.classList.add('hidden');
         reviewScreen.classList.remove('hidden');
-        document.querySelector('footer').classList.add('hidden');
-        document.querySelector('aside').classList.add('hidden');
+        header.classList.add('hidden');
+        footer.classList.add('hidden');
 
         reviewQuestionsContainer.innerHTML = '';
         
@@ -496,12 +616,96 @@
     }
 
     /**
+     * Calculates the final grade based on user answers.
+     * @returns {number} The final grade percentage.
+     */
+    function calculateGrade() {
+        let totalScore = 0;
+        const totalQuestions = shuffledQuizData.length;
+
+        shuffledQuizData.forEach((question, index) => {
+            const userAnswer = userAnswers[index] || [];
+            let questionScore = 0;
+
+            if (question.type === 'mc') {
+                if (userAnswer[0] === question.correctAnswer) {
+                    questionScore = 1;
+                }
+            } else if (question.type === 'sata') {
+                const correctAnswers = new Set(question.correctAnswer);
+                const userSelections = new Set(userAnswer);
+                let correctSelections = 0;
+
+                userSelections.forEach(selection => {
+                    if (correctAnswers.has(selection)) {
+                        correctSelections++;
+                    }
+                });
+                
+                if (correctAnswers.size > 0 && userSelections.size === correctAnswers.size) {
+                    questionScore = correctSelections / correctAnswers.size;
+                } else if (correctAnswers.size > 0 && userSelections.size < correctAnswers.size) {
+                    let hasIncorrect = false;
+                    userSelections.forEach(selection => {
+                        if (!correctAnswers.has(selection)) {
+                            hasIncorrect = true;
+                        }
+                    });
+                    if (!hasIncorrect) {
+                       questionScore = correctSelections / correctAnswers.size;
+                    }
+                }
+            }
+            totalScore += questionScore;
+        });
+
+        return Math.round((totalScore / totalQuestions) * 100);
+    }
+    
+    /**
+     * Handles the end of the exam review, showing a submission animation and grade.
+     */
+    function handleFinalSubmit() {
+        reviewScreen.classList.add('hidden');
+        loadingAnimation.classList.remove('hidden');
+
+        setTimeout(() => {
+            loadingAnimation.classList.add('hidden');
+            const finalGrade = calculateGrade();
+            finalGradeDisplay.textContent = `${finalGrade}%`;
+            gradeScreen.classList.remove('hidden');
+        }, 2000); // 2-second animation
+    }
+
+    /**
      * Submits the exam, stops the timer, and shows the review screen.
      */
     function submitExam() {
         clearInterval(timerInterval);
         saveUserAnswer();
         renderReviewScreen();
+    }
+
+    /**
+     * Starts the quiz after the initial start screen.
+     */
+    function startQuiz() {
+        startScreen.classList.add('hidden');
+        loadingAnimation.classList.remove('hidden');
+        document.querySelector('body').style.overflow = 'hidden';
+
+        setTimeout(() => {
+            loadingAnimation.classList.add('hidden');
+            header.classList.remove('hidden');
+            mainContent.classList.remove('hidden');
+            footer.classList.remove('hidden');
+            document.querySelector('body').style.overflow = '';
+            
+            shuffleArray(quizData);
+            shuffledQuizData = quizData;
+            startTimer();
+            renderQuestion();
+        }, 2000); // 2-second animation
     }
 
     // --- Event Listeners ---
@@ -512,18 +716,17 @@
     });
 
     submitExamBtn.addEventListener('click', submitExam);
-
-    endReviewBtn.addEventListener('click', () => {
-        // You could redirect or show a final message here
-        location.reload(); // Simple reload to restart the app for this example
+    
+    endReviewBtn.addEventListener('click', handleFinalSubmit);
+    
+    restartBtn.addEventListener('click', () => {
+        location.reload();
     });
+    
+    startBtn.addEventListener('click', startQuiz);
 
     // --- Initialization ---
     window.onload = function() {
-        shuffleArray(quizData);
-        shuffledQuizData = quizData;
-        startTimer();
-        renderQuestion();
         previousBtn.classList.add('cursor-not-allowed', 'opacity-50'); // Disable Previous button
     }
 
