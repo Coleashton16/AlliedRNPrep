@@ -1,274 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCLEX-Style Testing Engine</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .bg-custom-dark {
-            background-color: #1a202c;
-        }
-        .bg-custom-light-gray {
-            background-color: #f7f9fc;
-        }
-        .text-custom-light-blue {
-            color: #2563eb;
-        }
-        .btn-orange {
-            background-color: #f97316;
-        }
-        .btn-orange:hover {
-            background-color: #ea580c;
-        }
-        .btn-blue {
-            background-color: #2563eb;
-        }
-        .btn-blue:hover {
-            background-color: #1d4ed8;
-        }
-        .radio-btn {
-            display: none;
-        }
-        .radio-label {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            cursor: pointer;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s;
-            margin-bottom: 0.75rem;
-            position: relative;
-        }
-        .radio-label:hover {
-            background-color: #f1f5f9;
-        }
-        .radio-label .option-letter {
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #e5e7eb;
-            border-radius: 0.25rem;
-            font-weight: 500;
-            margin-right: 1rem;
-            transition: all 0.2s;
-        }
-        .radio-btn:checked + .radio-label {
-            background-color: #eff6ff;
-            border-color: #3b82f6;
-        }
-        .radio-btn:checked + .radio-label .option-letter {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .check-label {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            cursor: pointer;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s;
-            margin-bottom: 0.75rem;
-            position: relative;
-        }
-        .check-label:hover {
-            background-color: #f1f5f9;
-        }
-        .check-label .option-letter {
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #e5e7eb;
-            border-radius: 0.25rem;
-            font-weight: 500;
-            margin-right: 1rem;
-            transition: all 0.2s;
-        }
-        .check-btn:checked + .check-label {
-            background-color: #eff6ff;
-            border-color: #3b82f6;
-        }
-        .check-btn:checked + .check-label .option-letter {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .review-box {
-            background-color: #f9fafb;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e5e7eb;
-        }
-        .correct-answer {
-            background-color: #dcfce7;
-            border-color: #22c55e;
-        }
-        .incorrect-answer {
-            background-color: #fee2e2;
-            border-color: #ef4444;
-        }
-        .strikethrough {
-            text-decoration: line-through;
-            color: #9ca3af;
-        }
-        .nav-item-container {
-            position: relative;
-        }
-        .check-icon {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            width: 1rem;
-            height: 1rem;
-        }
-        .loading-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        .spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3b82f6;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .grade-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 99;
-            text-align: center;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCLEX-Style Testing Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bg-custom-dark {
+            background-color: #1f2937;
+        }
+        .text-custom-dark {
+            color: #1f2937;
+        }
+        .bg-custom-gray {
+            background-color: #e5e7eb;
+        }
+        .text-custom-gray {
+            color: #9ca3af;
+        }
+        .btn-orange {
+            background-color: #f97316;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c;
+        }
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        .nav-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-item.bg-gray-200:hover {
+            background-color: #d1d5db;
+        }
+        .nav-item.answered {
+            background-color: #10b981;
+            color: white;
+        }
+        .nav-item.answered.active {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .radio-btn, .check-btn {
+            display: none;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        .option-label .option-letter {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e7eb;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+        .radio-btn:checked + .option-label,
+        .check-btn:checked + .option-label {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .radio-btn:checked + .option-label .option-letter,
+        .check-btn:checked + .option-label .option-letter {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .review-box {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .check-icon {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 1rem;
+            height: 1rem;
+        }
+        .loading-animation, .grade-screen, .rationale-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-custom-light-gray h-screen flex flex-col overflow-hidden">
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
 
-    <!-- Top Header -->
-    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
-        <div class="flex items-center space-x-4">
-            <div class="font-bold">ARP</div>
-            <div>Allied RN Prep</div>
-            <div class="hidden sm:block">ALLIEDRNPREP EXAMINATION</div>
-        </div>
-        <div class="flex items-center space-x-6">
-            <div class="flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 100-2 1 1 002zM9 9a1 1 0 011-1h1a1 1 0 011 1v3a1 1 0 01-1 1h-1a1 1 0 01-1-1V9z" clip-rule="evenodd" />
-                </svg>
-                <span id="timer">02:00:00</span>
-            </div>
-            <button class="px-4 py-2 border rounded-md border-gray-500">EXAM CONTROLS</button>
-            <button class="px-4 py-2 border rounded-md border-gray-500">TOOL KIT</button>
-        </div>
-    </header>
+    <!-- Top Header - Custom design based on image -->
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
+        <div class="flex items-center space-x-6">
+            <div class="font-bold">DMALFOY</div>
+            <div class="hidden sm:block font-medium">DRACO MALFOY</div>
+            <div class="hidden sm:block text-gray-400">EXAMPLIFY UPDATED SCREENS TEST</div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.957.703l4.084-1.714a.75.75 0 00-.597-1.42l-3.375 1.416V6z" clip-rule="evenodd" />
+                </svg>
+                <span id="timer" class="font-semibold">02:00:00</span>
+            </div>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">EXAM CONTROLS</button>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">TOOL KIT</button>
+        </div>
+    </header>
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
-        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
-        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
-    </div>
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
 
-    <!-- Main Content Area -->
-    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
-        <!-- Left Sidebar Navigation -->
-        <aside class="w-16 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
-            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
-            </div>
-        </aside>
+    <!-- Main Content Area - Updated to a three-column layout -->
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-20 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
+            <div class="mb-4 text-xs text-gray-500">FILTER ></div>
+            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
+                <!-- Question navigation items will be injected here -->
+            </div>
+        </aside>
 
-        <!-- Question Section -->
-        <main id="question-container" class="flex-1 p-8 overflow-y-auto">
-            <!-- Question will be injected here -->
-        </main>
+        <!-- Question Section -->
+        <main class="flex-1 flex overflow-hidden">
+            <div id="question-container" class="flex-1 p-8 overflow-y-auto flex flex-col justify-between">
+                <!-- Question will be injected here -->
+            </div>
+            
+            <!-- Right Sidebar placeholder -->
+            <div class="hidden md:flex items-center justify-center bg-white border-l border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </main>
+    </div>
 
-        <!-- Right Sidebar (hidden in this version) -->
-        <aside class="w-8 border-l border-gray-200 flex items-center justify-center">
-            <div class="text-gray-400">&gt;</div>
-        </aside>
-    </div>
+    <!-- Review Screen -->
+    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
+        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <div id="review-questions" class="space-y-8">
+            <!-- Missed questions review will be injected here -->
+        </div>
+        <div class="mt-8 text-center">
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+        </div>
+    </div>
+    
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
+    </div>
 
-    <!-- DEBUG FIX: Moved Review Screen outside of the main-content div -->
-    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
-        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
-        <div id="review-questions" class="space-y-8">
-            <!-- Missed questions review will be injected here -->
-        </div>
-        <div class="mt-8 text-center">
-            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
-        </div>
-    </div>
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 md:w-1/2 mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-custom-dark">Exam Submitted Successfully!</h2>
+            <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+            <div class="text-6xl font-extrabold text-blue-600 mb-8" id="final-grade"></div>
+            <button id="restart-btn" class="px-6 py-3 btn-blue text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+        </div>
+    </div>
 
-    <!-- Submission Animation Screen -->
-    <div id="loading-animation" class="loading-animation hidden">
-        <div class="spinner"></div>
-        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
-    </div>
+    <!-- Bottom Footer -->
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
+            <span id="question-counter">1 OF 11 QUESTIONS</span>
+            <span class="hidden sm:block text-xs">VERSION 5.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition cursor-not-allowed opacity-50">Previous</button>
+            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
+            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
+        </div>
+    </footer>
 
-    <!-- Final Grade Screen -->
-    <div id="grade-screen" class="grade-screen hidden">
-        <h2 class="text-3xl font-bold mb-4">Exam Submitted Successfully!</h2>
-        <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
-        <div class="text-6xl font-extrabold text-blue-600" id="final-grade"></div>
-        <button id="restart-btn" class="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
-    </div>
-
-    <!-- Bottom Footer -->
-    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
-        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
-            <span id="question-counter">1 OF 5 QUESTIONS</span>
-            <span>VERSION 5.0</span>
-        </div>
-        <div class="flex items-center space-x-4">
-            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition">Previous</button>
-            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
-            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
-        </div>
-    </footer>
-
-<script>
-    // --- Data and State ---
-    // Note: This is an empty test bank. You'll need to add your questions here.
-    const quizData = [
-       {
+    <script>
+        // --- Data and State ---
+        // NOTE: This quiz data has been truncated to 2 questions for testing.
+        const quizData = [
+  {
     "questionText": "A 78-year-old patient with a history of chronic obstructive pulmonary disease (COPD) is admitted with hypoxemia. The nurse notes an ECG strip with an irregular rhythm, a rate of 110 bpm, and a P wave that precedes each QRS complex, but the P wave's shape and size vary from beat to beat. What is the most likely dysrhythmia?",
     "options": {
       "A": "Atrial fibrillation",
@@ -6888,444 +6879,470 @@
     "section": "Peritoneal Dialysis",
     "type": "mc"
   }
-    ];
+        ];
 
-    let currentQuestionIndex = 0;
-    let shuffledQuizData = [];
-    let userAnswers = [];
-    // The exam will now consist of 85 questions.
-    let flaggedQuestions = Array(85).fill(false);
-    let timeLeft = 7200; // 2 hours in seconds
-    let timerInterval;
+        let currentQuestionIndex = 0;
+        let shuffledQuizData = [];
+        let userAnswers = [];
+        let flaggedQuestions = Array(quizData.length).fill(false);
+        let timeLeft = 7200; // 2 hours in seconds
+        let timerInterval;
 
-    const startScreen = document.getElementById('start-screen');
-    const startBtn = document.getElementById('start-btn');
-    const header = document.getElementById('header');
-    const mainContent = document.getElementById('main-content');
-    const footer = document.getElementById('footer');
-    const navQuestionsContainer = document.getElementById('nav-questions');
-    const questionContainer = document.getElementById('question-container');
-    const reviewScreen = document.getElementById('review-screen');
-    const reviewQuestionsContainer = document.getElementById('review-questions');
-    const nextBtn = document.getElementById('next-btn');
-    const previousBtn = document.getElementById('previous-btn');
-    const submitExamBtn = document.getElementById('submit-exam-btn');
-    const endReviewBtn = document.getElementById('end-review-btn');
-    const timerDisplay = document.getElementById('timer');
-    const questionCounter = document.getElementById('question-counter');
-    const loadingAnimation = document.getElementById('loading-animation');
-    const gradeScreen = document.getElementById('grade-screen');
-    const finalGradeDisplay = document.getElementById('final-grade');
-    const restartBtn = document.getElementById('restart-btn');
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const header = document.getElementById('header');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const navQuestionsContainer = document.getElementById('nav-questions');
+        const questionContainer = document.getElementById('question-container');
+        const reviewScreen = document.getElementById('review-screen');
+        const reviewQuestionsContainer = document.getElementById('review-questions');
+        const nextBtn = document.getElementById('next-btn');
+        const previousBtn = document.getElementById('previous-btn');
+        const submitExamBtn = document.getElementById('submit-exam-btn');
+        const endReviewBtn = document.getElementById('end-review-btn');
+        const timerDisplay = document.getElementById('timer');
+        const questionCounter = document.getElementById('question-counter');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const gradeScreen = document.getElementById('grade-screen');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        const restartBtn = document.getElementById('restart-btn');
 
-    // --- Core Functions ---
+        // --- Core Functions ---
 
-    /**
-     * Shuffles an array using the Fisher-Yates algorithm.
-     * @param {Array} array The array to shuffle.
-     */
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
 
-    /**
-     * Starts the 2-hour exam timer.
-     */
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                submitExam();
-            } else {
-                timeLeft--;
-                updateTimerDisplay();
-            }
-        }, 1000);
-    }
+        /**
+         * Starts the 2-hour exam timer.
+         */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
 
-    /**
-     * Updates the timer display with the remaining time in HH:MM:SS format.
-     */
-    function updateTimerDisplay() {
-        const hours = Math.floor(timeLeft / 3600);
-        const minutes = Math.floor((timeLeft % 3600) / 60);
-        const seconds = timeLeft % 60;
-        timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
+        /**
+         * Updates the timer display with the remaining time in HH:MM:SS format.
+         */
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
 
-    /**
-     * Renders the current question and its options.
-     */
-    function renderQuestion() {
-        if (currentQuestionIndex >= shuffledQuizData.length) {
-            submitExam();
-            return;
-        }
+        /**
+         * Renders the current question and its options.
+         */
+        function renderQuestion() {
+            if (currentQuestionIndex >= shuffledQuizData.length) {
+                submitExam();
+                return;
+            }
 
-        const questionData = shuffledQuizData[currentQuestionIndex];
-        questionContainer.innerHTML = '';
-        const questionHtml = document.createElement('div');
-        questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm';
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            questionContainer.innerHTML = '';
+            const questionHtml = document.createElement('div');
+            questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm flex flex-col h-full';
 
-        // Header for the question
-        questionHtml.innerHTML = `
-            <div class="flex items-center space-x-4 mb-6">
-                <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
-                <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}</button>
-            </div>
-            <div class="mb-4 text-sm font-medium text-gray-500">
-                <span class="mr-2">^</span> Which is the correct answer?
-            </div>
-            <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
-            <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
-        `;
+            questionHtml.innerHTML = `
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
+                        <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                            ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600 hover:bg-gray-300 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.25a.75.75 0 01.75.75v10.5a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM12 18.75a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75z" />
+                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 14.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600 hover:bg-gray-300 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zm1.5 3.75a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5H4.5zm-1.5 6a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600 hover:bg-gray-300 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.5 5.653A.75.75 0 015.25 5h13.5a.75.75 0 01.75.653v1.894A2.25 2.25 0 0118 10.25v2.296a1.5 1.5 0 01-1.5 1.5H15a3 3 0 00-3-3V9a.75.75 0 00-.75-.75h-.75a.75.75 0 00-.75.75v2.25a3 3 0 00-3 3h-.188a1.5 1.5 0 01-1.5-1.5V10.25A2.25 2.25 0 016 7.547V5.653zM12 1.5a.75.75 0 01.75.75v3.75c0 .414-.336.75-.75.75h-.75a.75.75 0 01-.75-.75V2.25a.75.75 0 01.75-.75h.75zM12 18a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM12 2.25h.75a.75.75 0 01.75.75v10.5a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM12 18.75a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4 text-sm font-medium text-gray-500">
+                    <span class="mr-2">^</span> Which is the correct answer?
+                </div>
+                <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
+                <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
+                <div id="options-container" class="space-y-4 flex-1"></div>
+            `;
+            
+            const optionsContainer = questionHtml.querySelector('#options-container');
 
-        const optionsContainer = document.createElement('div');
-        optionsContainer.className = 'space-y-4';
+            const optionLetters = Object.keys(questionData.options);
+            optionLetters.forEach(letter => {
+                const optionText = questionData.options[letter];
+                const isMultipleChoice = questionData.type === 'mc';
+                const inputType = isMultipleChoice ? 'radio' : 'checkbox';
+                const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
+                
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'flex items-center space-x-2';
+                optionDiv.innerHTML = `
+                    <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${isMultipleChoice ? 'radio-btn' : 'check-btn'}">
+                    <label for="option-${letter}" class="option-label">
+                        <span class="option-letter">${letter}</span>
+                        <span class="flex-1">${optionText}</span>
+                        <button class="strikethrough-btn p-1 rounded-full hover:bg-gray-100 transition" type="button">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.822a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.577-3.01-9.964-7.822z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                    </label>
+                `;
+                optionsContainer.appendChild(optionDiv);
+            });
 
-        const optionLetters = Object.keys(questionData.options);
-        optionLetters.forEach(letter => {
-            const optionText = questionData.options[letter];
-            const isMultipleChoice = questionData.type === 'mc';
-            const inputType = isMultipleChoice ? 'radio' : 'checkbox';
-            const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
-            const labelClass = isMultipleChoice ? 'radio-label' : 'check-label';
-            const inputClass = isMultipleChoice ? 'radio-btn' : 'check-btn';
-            
-            const optionDiv = document.createElement('div');
-            optionDiv.className = 'flex items-center space-x-2';
-            optionDiv.innerHTML = `
-                <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${inputClass}">
-                <label for="option-${letter}" class="${labelClass}">
-                    <span class="option-letter">${letter}</span>
-                    <span class="flex-1">${optionText}</span>
-                    <svg class="strikethrough-btn h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </label>
-            `;
-            optionsContainer.appendChild(optionDiv);
-        });
+            questionContainer.appendChild(questionHtml);
+            
+            // Add event listeners for strike-through
+            document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent label click
+                    const label = e.target.closest('label');
+                    const textSpan = label.querySelector('span:nth-child(2)');
+                    textSpan.classList.toggle('strikethrough');
+                });
+            });
 
-        questionHtml.appendChild(optionsContainer);
-        questionContainer.appendChild(questionHtml);
-        
-        // Add event listeners for strike-through
-        document.querySelectorAll('.strikethrough-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent label click
-                const label = e.target.closest('label');
-                const textSpan = label.querySelector('span:nth-child(2)');
-                textSpan.classList.toggle('strikethrough');
-            });
-        });
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', () => {
+                    flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+                    flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    updateNavigationSidebar();
+                });
+            }
 
-        // Add event listener for flag button
-        document.getElementById('flag-btn').addEventListener('click', () => {
-            flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
-            document.getElementById('flag-btn').textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
-            updateNavigationSidebar();
-        });
+            // Restore previous answer selection
+            if (userAnswers[currentQuestionIndex]) {
+                const savedAnswers = userAnswers[currentQuestionIndex];
+                if (Array.isArray(savedAnswers)) {
+                    savedAnswers.forEach(answer => {
+                        const input = document.getElementById(`option-${answer}`);
+                        if (input) input.checked = true;
+                    });
+                }
+            }
 
-        // Restore previous answer selection
-        if (userAnswers[currentQuestionIndex]) {
-            const savedAnswers = userAnswers[currentQuestionIndex];
-            if (Array.isArray(savedAnswers)) {
-                savedAnswers.forEach(answer => {
-                    const input = document.getElementById(`option-${answer}`);
-                    if (input) input.checked = true;
-                });
-            }
-        }
+            updateNavigationSidebar();
+            updateQuestionCounter();
+            updateButtonStates();
+        }
 
-        updateNavigationSidebar();
-        updateQuestionCounter();
-        updateButtonStates();
-    }
+        /**
+         * Updates the left navigation sidebar with current question status.
+         */
+        function updateNavigationSidebar() {
+            navQuestionsContainer.innerHTML = '';
+            shuffledQuizData.forEach((_, i) => {
+                const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                const navItem = document.createElement('div');
+                navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                navItem.textContent = i + 1;
+                navItem.onclick = () => {
+                    saveUserAnswer();
+                    currentQuestionIndex = i;
+                    renderQuestion();
+                };
+                navQuestionsContainer.appendChild(navItem);
+            });
+        }
 
-    /**
-     * Updates the left navigation sidebar with current question status.
-     */
-    function updateNavigationSidebar() {
-        navQuestionsContainer.innerHTML = '';
-        shuffledQuizData.forEach((_, i) => {
-            const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
-            const navItemDiv = document.createElement('div');
-            navItemDiv.className = 'nav-item-container';
+        /**
+         * Updates the question counter in the footer.
+         */
+        function updateQuestionCounter() {
+            if (questionCounter) {
+                questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
+            }
+        }
 
-            const navItem = document.createElement('div');
-            navItem.className = `flex items-center justify-center w-8 h-8 rounded-full font-bold transition-colors relative cursor-pointer ${i === currentQuestionIndex ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`;
-            navItem.textContent = i + 1;
-            navItem.onclick = () => {
-                saveUserAnswer();
-                currentQuestionIndex = i;
-                renderQuestion();
-            };
-            
-            if (isAnswered) {
-                const checkmark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                checkmark.setAttribute("class", "check-icon text-white bg-green-500 rounded-full");
-                checkmark.setAttribute("viewBox", "0 0 24 24");
-                checkmark.setAttribute("fill", "currentColor");
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                path.setAttribute("fill-rule", "evenodd");
-                path.setAttribute("d", "M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z");
-                path.setAttribute("clip-rule", "evenodd");
-                checkmark.appendChild(path);
-                navItem.appendChild(checkmark);
-            }
+        /**
+         * Manages the enabled/disabled/visible state of footer buttons.
+         */
+        function updateButtonStates() {
+            if (previousBtn) {
+                if (currentQuestionIndex === 0) {
+                    previousBtn.disabled = true;
+                    previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
+                } else {
+                    previousBtn.disabled = false;
+                    previousBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+                }
+            }
 
-            navItemDiv.appendChild(navItem);
-            navQuestionsContainer.appendChild(navItemDiv);
-        });
-    }
+            if (nextBtn && submitExamBtn) {
+                if (currentQuestionIndex === shuffledQuizData.length - 1) {
+                    nextBtn.classList.add('hidden');
+                    submitExamBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitExamBtn.classList.add('hidden');
+                }
+            }
+        }
 
-    /**
-     * Updates the question counter in the footer.
-     */
-    function updateQuestionCounter() {
-        questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
-    }
+        /**
+         * Collects user's answer(s) for the current question.
+         */
+        function saveUserAnswer() {
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (!questionData) return;
+            let selectedAnswers = [];
+            if (questionData.type === 'mc') {
+                const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
+                if (selectedRadio) {
+                    selectedAnswers.push(selectedRadio.value);
+                }
+            } else if (questionData.type === 'sata') {
+                const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
+                selectedCheckboxes.forEach(checkbox => {
+                    selectedAnswers.push(checkbox.value);
+                });
+            }
+            userAnswers[currentQuestionIndex] = selectedAnswers;
+        }
 
-    /**
-     * Manages the enabled/disabled/visible state of footer buttons.
-     */
-    function updateButtonStates() {
-        // Previous Button
-        if (currentQuestionIndex === 0) {
-            previousBtn.disabled = true;
-            previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
-        } else {
-            previousBtn.disabled = false;
-            previousBtn.classList.remove('cursor-not-allowed', 'opacity-50');
-        }
+        /**
+         * Renders the review screen with missed questions.
+         */
+        function renderReviewScreen() {
+            if (mainContent) mainContent.classList.add('hidden');
+            if (reviewScreen) reviewScreen.classList.remove('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
 
-        // Next vs. Submit Button
-        if (currentQuestionIndex === shuffledQuizData.length - 1) {
-            nextBtn.classList.add('hidden');
-            submitExamBtn.classList.remove('hidden');
-        } else {
-            nextBtn.classList.remove('hidden');
-            submitExamBtn.classList.add('hidden');
-        }
-    }
+            if (!reviewQuestionsContainer) return;
+            reviewQuestionsContainer.innerHTML = '';
+            
+            const missedQuestions = [];
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let isCorrect = false;
 
-    /**
-     * Collects user's answer(s) for the current question.
-     */
-    function saveUserAnswer() {
-        const questionData = shuffledQuizData[currentQuestionIndex];
-        if (!questionData) return; // Guard clause
-        let selectedAnswers = [];
-        if (questionData.type === 'mc') {
-            const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
-            if (selectedRadio) {
-                selectedAnswers.push(selectedRadio.value);
-            }
-        } else if (questionData.type === 'sata') {
-            const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
-            selectedCheckboxes.forEach(checkbox => {
-                selectedAnswers.push(checkbox.value);
-            });
-        }
-        userAnswers[currentQuestionIndex] = selectedAnswers;
-    }
+                if (question.type === 'mc') {
+                    // Normalize correct answer to string for single choice
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    isCorrect = userAnswer[0] === correctAnswer;
+                } else if (question.type === 'sata') {
+                    const correctSet = new Set(question.correctAnswer);
+                    const userSet = new Set(userAnswer);
+                    isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
+                }
 
-    /**
-     * Renders the review screen with missed questions.
-     */
-    function renderReviewScreen() {
-        mainContent.classList.add('hidden');
-        reviewScreen.classList.remove('hidden');
-        header.classList.add('hidden');
-        footer.classList.add('hidden');
+                if (!isCorrect) {
+                    missedQuestions.push({ question, index });
+                }
+            });
 
-        reviewQuestionsContainer.innerHTML = '';
-        
-        const missedQuestions = [];
-        shuffledQuizData.forEach((question, index) => {
-            const userAnswer = userAnswers[index] || [];
-            let isCorrect = false;
+            if (missedQuestions.length === 0) {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
+            } else {
+                missedQuestions.forEach(({ question, index }) => {
+                    const userAnswer = userAnswers[index] || [];
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-box';
+                    let optionsHtml = '';
 
-            if (question.type === 'mc') {
-                isCorrect = userAnswer[0] === question.correctAnswer;
-            } else if (question.type === 'sata') {
-                const correctSet = new Set(question.correctAnswer);
-                const userSet = new Set(userAnswer);
-                isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
-            }
+                    Object.keys(question.options).forEach(letter => {
+                        const isUserSelected = userAnswer.includes(letter);
+                        let correctAnswers = question.correctAnswer;
+                        if (!Array.isArray(correctAnswers)) {
+                            correctAnswers = [correctAnswers];
+                        }
+                        const isCorrectAnswer = correctAnswers.includes(letter);
+                        
+                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
+                        if (isCorrectAnswer) {
+                            optionClasses += ' correct-answer';
+                        }
+                        if (isUserSelected && !isCorrectAnswer) {
+                            optionClasses += ' incorrect-answer';
+                        }
 
-            if (!isCorrect) {
-                missedQuestions.push({ question, index });
-            }
-        });
+                        optionsHtml += `
+                            <div class="${optionClasses}">
+                                <span class="option-letter bg-gray-300">${letter}</span>
+                                <span>${question.options[letter]}</span>
+                            </div>
+                        `;
+                    });
 
-        if (missedQuestions.length === 0) {
-            reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
-        } else {
-            missedQuestions.forEach(({ question, index }) => {
-                const userAnswer = userAnswers[index] || [];
-                const reviewItem = document.createElement('div');
-                reviewItem.className = 'review-box';
-                let optionsHtml = '';
+                    reviewItem.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
+                        <div class="space-y-2 mb-4">
+                            ${optionsHtml}
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-lg">
+                            <h4 class="font-semibold text-lg">Rationale:</h4>
+                            <p class="text-gray-700">${question.rationale}</p>
+                        </div>
+                    `;
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+            }
+        }
 
-                // Build options HTML for review
-                Object.keys(question.options).forEach(letter => {
-                    const isUserSelected = userAnswer.includes(letter);
-                    const isCorrectAnswer = (Array.isArray(question.correctAnswer) ? question.correctAnswer.includes(letter) : question.correctAnswer === letter);
-                    
-                    let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
-                    if (isCorrectAnswer) {
-                        optionClasses += ' correct-answer';
-                    }
-                    if (isUserSelected && !isCorrectAnswer) {
-                        optionClasses += ' incorrect-answer';
-                    }
+        /**
+         * Calculates the final grade based on user answers.
+         * @returns {number} The final grade percentage.
+         */
+        function calculateGrade() {
+            let totalScore = 0;
+            const totalQuestions = shuffledQuizData.length;
 
-                    optionsHtml += `
-                        <div class="${optionClasses}">
-                            <span class="option-letter bg-gray-300">${letter}</span>
-                            <span>${question.options[letter]}</span>
-                        </div>
-                    `;
-                });
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let questionScore = 0;
 
-                reviewItem.innerHTML = `
-                    <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
-                    <div class="space-y-2 mb-4">
-                        ${optionsHtml}
-                    </div>
-                    <div class="p-4 bg-gray-100 rounded-lg">
-                        <h4 class="font-semibold text-lg">Rationale:</h4>
-                        <p class="text-gray-700">${question.rationale}</p>
-                    </div>
-                `;
-                reviewQuestionsContainer.appendChild(reviewItem);
-            });
-        }
-    }
+                if (question.type === 'mc') {
+                     // Normalize correct answer to string for single choice
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    if (userAnswer[0] === correctAnswer) {
+                        questionScore = 1;
+                    }
+                } else if (question.type === 'sata') {
+                    const correctAnswers = new Set(question.correctAnswer);
+                    const userSelections = new Set(userAnswer);
+                    
+                    const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
 
-    /**
-     * Calculates the final grade based on user answers.
-     * @returns {number} The final grade percentage.
-     */
-    function calculateGrade() {
-        let totalScore = 0;
-        const totalQuestions = shuffledQuizData.length;
+                    if (!hasIncorrect && userSelections.size > 0) {
+                        questionScore = userSelections.size / correctAnswers.size;
+                    }
+                }
+                totalScore += questionScore;
+            });
 
-        shuffledQuizData.forEach((question, index) => {
-            const userAnswer = userAnswers[index] || [];
-            let questionScore = 0;
+            return Math.round((totalScore / totalQuestions) * 100);
+        }
+        
+        /**
+         * Handles the end of the exam review, showing a submission animation and grade.
+         */
+        function handleFinalSubmit() {
+            if (reviewScreen) reviewScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Calculating Grade...';
+            }
 
-            if (question.type === 'mc') {
-                if (userAnswer[0] === question.correctAnswer) {
-                    questionScore = 1;
-                }
-            } else if (question.type === 'sata') {
-                const correctAnswers = new Set(question.correctAnswer);
-                const userSelections = new Set(userAnswer);
-                
-                const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                const finalGrade = calculateGrade();
+                if (finalGradeDisplay) finalGradeDisplay.textContent = `${finalGrade}%`;
+                if (gradeScreen) gradeScreen.classList.remove('hidden');
+            }, 2000); // 2-second animation
+        }
 
-                if (!hasIncorrect && userSelections.size > 0) {
-                    questionScore = userSelections.size / correctAnswers.size;
-                }
-            }
-            totalScore += questionScore;
-        });
+        /**
+         * Submits the exam, stops the timer, and shows the review screen.
+         */
+        function submitExam() {
+            clearInterval(timerInterval);
+            saveUserAnswer();
+            renderReviewScreen();
+        }
 
-        return Math.round((totalScore / totalQuestions) * 100);
-    }
-    
-    /**
-     * Handles the end of the exam review, showing a submission animation and grade.
-     */
-    function handleFinalSubmit() {
-        reviewScreen.classList.add('hidden');
-        loadingAnimation.classList.remove('hidden');
-        const loadingText = document.querySelector('#loading-animation p');
-        if (loadingText) {
-            loadingText.textContent = 'Calculating Grade...';
-        }
+        /**
+         * Starts the quiz after the initial start screen.
+         */
+        function startQuiz() {
+            if (startScreen) startScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            document.querySelector('body').style.overflow = 'hidden';
 
-        setTimeout(() => {
-            loadingAnimation.classList.add('hidden');
-            const finalGrade = calculateGrade();
-            finalGradeDisplay.textContent = `${finalGrade}%`;
-            gradeScreen.classList.remove('hidden');
-        }, 2000); // 2-second animation
-    }
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Starting Exam...';
+            }
 
-    /**
-     * Submits the exam, stops the timer, and shows the review screen.
-     */
-    function submitExam() {
-        clearInterval(timerInterval);
-        saveUserAnswer();
-        renderReviewScreen();
-    }
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                if (header) header.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (footer) footer.classList.remove('hidden');
+                document.querySelector('body').style.overflow = '';
+                
+                shuffleArray(quizData);
+                shuffledQuizData = quizData.slice(0, 85);
+                userAnswers = Array(shuffledQuizData.length).fill([]);
+                startTimer();
+                renderQuestion();
+            }, 2000); // 2-second animation
+        }
 
-    /**
-     * Starts the quiz after the initial start screen.
-     */
-    function startQuiz() {
-        startScreen.classList.add('hidden');
-        loadingAnimation.classList.remove('hidden');
-        document.querySelector('body').style.overflow = 'hidden';
+        // --- Event Listeners ---
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                saveUserAnswer();
+                if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+        }
+        
+        if (previousBtn) {
+            previousBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    saveUserAnswer();
+                    currentQuestionIndex--;
+                    renderQuestion();
+                }
+            });
+        }
 
-        const loadingText = document.querySelector('#loading-animation p');
-        if (loadingText) {
-            loadingText.textContent = 'Starting Exam...';
-        }
+        if (submitExamBtn) {
+            submitExamBtn.addEventListener('click', submitExam);
+        }
+        
+        if (endReviewBtn) {
+            endReviewBtn.addEventListener('click', handleFinalSubmit);
+        }
+        
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', startQuiz);
+        }
 
-        setTimeout(() => {
-            loadingAnimation.classList.add('hidden');
-            header.classList.remove('hidden');
-            mainContent.classList.remove('hidden');
-            footer.classList.remove('hidden');
-            document.querySelector('body').style.overflow = '';
-            
-            shuffleArray(quizData);
-            // Selects the first 85 questions from the shuffled array.
-            shuffledQuizData = quizData.slice(0, 85);
-            userAnswers = Array(shuffledQuizData.length).fill([]);
-            startTimer();
-            renderQuestion();
-        }, 2000); // 2-second animation
-    }
-
-    // --- Event Listeners ---
-    nextBtn.addEventListener('click', () => {
-        saveUserAnswer();
-        if (currentQuestionIndex < shuffledQuizData.length - 1) {
-            currentQuestionIndex++;
-            renderQuestion();
-        }
-    });
-
-    previousBtn.addEventListener('click', () => {
-        if (currentQuestionIndex > 0) {
-            saveUserAnswer();
-            currentQuestionIndex--;
-            renderQuestion();
-        }
-    });
-
-    submitExamBtn.addEventListener('click', submitExam);
-    
-    endReviewBtn.addEventListener('click', handleFinalSubmit);
-    
-    restartBtn.addEventListener('click', () => {
-        location.reload();
-    });
-    
-    startBtn.addEventListener('click', startQuiz);
-
-</script>
+    </script>
 
 </body>
 </html>
