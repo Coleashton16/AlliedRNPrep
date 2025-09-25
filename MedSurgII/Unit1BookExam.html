@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bg-custom-dark {
+            background-color: #1f2937;
+        }
+        .text-custom-dark {
+            color: #1f2937;
+        }
+        .bg-custom-gray {
+            background-color: #e5e7eb;
+        }
+        .text-custom-gray {
+            color: #9ca3af;
+        }
+        .btn-orange {
+            background-color: #f97316;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c;
+        }
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        .nav-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-item.bg-gray-200:hover {
+            background-color: #d1d5db;
+        }
+        .nav-item.answered {
+            background-color: #d1d5db; /* A subdued color for answered questions */
+            color: #374151; /* Darker text for readability */
+        }
+        .nav-item.answered::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Using a box-shadow to simulate a checkmark */
+            box-shadow: 0 0 0 2px #10b981, 
+                        inset 0 0 0 1px white,
+                        inset 2px 2px 0 0 white,
+                        inset -2px 2px 0 0 white;
+            transform: rotate(-45deg);
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered::after {
+            background-color: white;
+            box-shadow: 0 0 0 2px white,
+                        inset 0 0 0 1px #10b981,
+                        inset 2px 2px 0 0 #10b981,
+                        inset -2px 2px 0 0 #10b981;
+        }
+
+        .radio-btn, .check-btn {
+            display: none;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        .option-label .option-letter {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Changed from rounded-0.25rem to fully rounded */
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+        .radio-btn:checked + .option-label,
+        .check-btn:checked + .option-label {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .radio-btn:checked + .option-label .option-letter,
+        .check-btn:checked + .option-label .option-letter {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .review-box {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .loading-animation, .grade-screen, .rationale-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Header - Custom design based on image -->
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
+        <div class="flex items-center space-x-6">
+            <div class="font-bold">ARP</div>
+            <div class="hidden sm:block font-medium">Allied RN Prep</div>
+            <div class="hidden sm:block text-gray-400">Medical Surgical II Unit 1 Exam</div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.957.703l4.084-1.714a.75.75 0 00-.597-1.42l-3.375 1.416V6z" clip-rule="evenodd" />
+                </svg>
+                <span id="timer" class="font-semibold">02:00:00</span>
+            </div>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">EXAM CONTROLS</button>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">TOOL KIT</button>
+        </div>
+    </header>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
+
+    <!-- Main Content Area - Updated to a three-column layout -->
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-20 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
+            <div class="mb-4 text-xs text-gray-500">FILTER ></div>
+            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
+                <!-- Question navigation items will be injected here -->
+            </div>
+        </aside>
+
+        <!-- Question Section -->
+        <main class="flex-1 flex overflow-hidden">
+            <div id="question-container" class="flex-1 p-8 overflow-y-auto flex flex-col justify-between">
+                <!-- Question will be injected here -->
+            </div>
+            
+            <!-- Right Sidebar placeholder -->
+            <div class="hidden md:flex items-center justify-center bg-white border-l border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Screen -->
+    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
+        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <div id="review-questions" class="space-y-8">
+            <!-- Missed questions review will be injected here -->
+        </div>
+        <div class="mt-8 text-center">
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+        </div>
+    </div>
+    
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
+    </div>
+
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 md:w-1/2 mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-custom-dark">Exam Submitted Successfully!</h2>
+            <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+            <div class="text-6xl font-extrabold text-blue-600 mb-8" id="final-grade"></div>
+            <button id="restart-btn" class="px-6 py-3 btn-blue text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+        </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
+            <span id="question-counter">1 OF 11 QUESTIONS</span>
+            <span class="hidden sm:block text-xs">VERSION 5.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition cursor-not-allowed opacity-50">Previous</button>
+            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
+            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data and State ---
+        // NOTE: This quiz data has been truncated to 2 questions for testing.
+        const quizData = [
+  {
+    "questionText": "A 65-year-old female with chronic heart failure presents with symptoms indicating possible fluid volume excess. Which of the following findings should the nurse expect? (Select all that apply)",
+    "options": {
+      "A": "Weight gain of 3 pounds in 24 hours",
+      "B": "Decreased urine output",
+      "C": "Distended neck veins",
+      "D": "Hypotension",
+      "E": "Peripheral edema"
+    },
+    "correctAnswer": ["A", "B", "C", "E"],
+    "rationale": "Weight gain, decreased urine output, distended neck veins, and peripheral edema are signs of fluid volume overload. Hypotension is not typical; blood pressure is usually elevated or normal.",
+    "section": "Fluid Volume Excess",
+    "type": "sata"
+  },
+  {
+    "questionText": "A patient is receiving IV fluids after an acute myocardial infarction and suddenly develops increased crackles in the lungs and elevated blood pressure. What is the nurse’s best immediate response?",
+    "options": {
+      "A": "Slow or discontinue the IV fluids",
+      "B": "Notify the dietary department to restrict sodium",
+      "C": "Give a prescribed pain medication",
+      "D": "Encourage deep breathing exercises"
+    },
+    "correctAnswer": "A",
+    "rationale": "Signs of fluid overload require the nurse to slow or stop IV fluids immediately to prevent worsening of the condition.",
+    "section": "Fluid Volume Excess",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is brought into the ER via EMS for chest pain. The patient appears flushed, anxious, nauseous, has a HR of 124, RR 18, and a BP of 142/91. The patient reports that this has happened in the past, but they did not seek treatment. Patient history reveals symptom onset was after doing yard work for ‘a few hours’. Which action by the nurse should occur first?",
+    "options": {
+      "A": "Prepare to administer a calcium channel blocker",
+      "B": "Prepare an intravenous injection of Milrinone to correct the heart rate",
+      "C": "Administer nitroglycerin for the angina",
+      "D": "Initiate immediate oxygen therapy via face mask at 2 L/min"
+    },
+    "correctAnswer": "C",
+    "rationale": "CSA or Chronic Stable Angina, occurs after moderate or prolonged exercise, such as yard work. Flushing, anxiety, nausea, tachycardia, and an elevated BP / RR are indicative of anxiety, likely related to the angina. A is incorrect since there is no underlying cardiac pathology treatable with a channel blocker. B is incorrect as Milrinone is an inotropic agent used in shock. D is incorrect.",
+    "section": "Cardiovascular",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is admitted to the ER following a fall into the lake. A nurse notes on the monitor a rhythm resembling V FIB, with varying complexes. Which action by the nurse is correct?",
+    "options": {
+      "A": "Assess the rhythm on the monitor and prepare resuscitation efforts per unit policy",
+      "B": "Assess patients pain level using SOCRATES",
+      "C": "Prepare an injection of amiodarone for ventricular DEfibrillation",
+      "D": "Obtain a 12 lead EKG immediately"
+    },
+    "correctAnswer": "D",
+    "rationale": "Remember, movement can cause artifacts in the rhythm monitor. A is not correct as treatment is determined from a 12 lead EKG, not a wall monitor. An arrhythmia noted on more than one lead on a 12 lead is diagnostic, not a one lead monitor. B is incorrect as it is not the primary focus. C is not correct as we cannot diagnose ventricular fibrillation using a wall monitor. Furthermore, shivering from being submerged in water and being cold, can produce artifacts on the monitor that resemble V fib. ALWAYS obtain a 12 lead.",
+    "section": "Cardiovascular",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse cares for a patient on the unit. The patient states “I had an NSTEMI, but my sister had a STEMI. Aren't they the same?”. Which statement by the nurse is most accurate? (Select all that apply)",
+    "options": {
+      "A": "An NSTEMI is a partial blockage of oxygen to the heart, while a STEMI is a full blockage of blood flow to the heart.",
+      "B": "An NSTEMI occurs more randomly and is less predictable than a STEMI.",
+      "C": "Both are a type of heart attack, yours was less severe than your sisters.",
+      "D": "NSTEMI patients usually have little to no rise in troponin levels, whereas a STEMI patient has a large spike in levels indicating the heart attack",
+      "E": "Both are due to a rupture of plaque inside the arteries."
+    },
+    "correctAnswer": ["A", "C", "E"],
+    "rationale": "NSTEMIS are not more predictable. NSTEMI patients DO have a rise in troponin, but angiogram studies are usually negative, especially in women.",
+    "section": "Cardiovascular",
+    "type": "sata"
+  },
+  {
+    "questionText": "The nurse cares for a patient on the unit. The patient has a PMHx of a brain aneurysm, type 2 diabetes, hypertension, and recently had the flu. The patient is admitted for a STEMI confirmed with a 12 lead EKG, and confirms the STEMI has been active for 7 hours. Which order would the nurse question?",
+    "options": {
+      "A": "Alteplase",
+      "B": "Cardiac angiography",
+      "C": "Aspirin",
+      "D": "Oxygen therapy"
+    },
+    "correctAnswer": "A",
+    "rationale": "Due to the PMHx of a brain aneurysm, alteplase is strongly contraindicated.",
+    "section": "Cardiovascular",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is reviewing the patient board for the unit. The nurse correctly identifies which patient to be at biggest risk for hypovolemic shock?",
+    "options": {
+      "A": "A patient who is recovering from an AMI",
+      "B": "A patient with 10/10 generalized pain",
+      "C": "A patient with a cardiac tamponade",
+      "D": "A patient who is currently on nasogastric suction"
+    },
+    "correctAnswer": "D",
+    "rationale": "A patient with an AMI who is recovering is at risk for cardiogenic shock. A patient with severe untreated pain is at risk for distributive shock. A patient with cardiac tamponade is at risk for obstructive shock. Nasogastric suction has the capacity to significantly reduce hydration status, leading to hypovolemia and shock.",
+    "section": "Shock",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse cares for a patient on a busy medical surgical unit. She receives a report on a patient with severe vomiting for 4 days due to an intestinal obstruction. Upon assessing the patient, which symptoms would alert the nurse to a compensatory state of shock? (Select all that apply)",
+    "options": {
+      "A": "Apical heart rate of 110 BPM",
+      "B": "Blood pressure of 80/62",
+      "C": "T of 102.4",
+      "D": "Marked elevated lactic acid",
+      "E": "Decreased pulse pressure",
+      "F": "Potassium of 5.4"
+    },
+    "correctAnswer": ["A", "E", "F"],
+    "rationale": "A low blood pressure is a characteristic of progressive stages of shock, as is a marked lactic acid. Compensatory may have SLIGHT lactic acid elevations, but not marked. C is a sign of infection, not shock. Mild hyperkalemia is a sign of compensatory shock.",
+    "section": "Shock",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is teaching about the stages of shock. Which statements by the group indicate that the teaching was successful?",
+    "options": {
+      "A": "Compensatory shock is where decreased tissue perfusion triggers protective measures to keep the vital organs perfused, but not the kidneys, GI tract, skin, and gallbladder.",
+      "B": "Compensatory shock usually does not respond to therapy, and its too late because the body is already failing since its compensating.",
+      "C": "In the progressive stage of shock, there is widespread cellular death.",
+      "D": "MODS is possible at every stage of shock and usually occurs when 75% of the condition has developed."
+    },
+    "correctAnswer": "A",
+    "rationale": "Compensatory shock means the body is compensating and protecting VITAL organs. This is why we see a decrease in urination, nutrition, nausea, hunger etc. B is not correct because compensatory will respond as will progressive, refractory may not respond to therapy at all. C is not correct because only some tissue death occurs in progressive. MODS is seen in refractory shock.",
+    "section": "Shock",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is providing oral care to a patient post op day one from an appendectomy and a whipple procedure. The nurse notes that the patient is experiencing an altered LOC. The nurse determines which assessment findings to be of most importance? (Select all that apply)",
+    "options": {
+      "A": "Hematocrit elevation from 45% to 56%",
+      "B": "Hemoglobin elevation from 12 to 15.3",
+      "C": "Lactic acidosis",
+      "D": "Potassium of 3.4",
+      "E": "Blood glucose of 105 mg/dL",
+      "F": "Pale, cool clammy skin",
+      "G": "Abdominal distension"
+    },
+    "correctAnswer": ["A", "B", "F", "G"],
+    "rationale": "All are signs of hypovolemic hemorrhagic shock from a surgical compilation. Surgery is a massive risk factor for this condition. Lactic acidosis is usually seen in later stages of shock, not in compensatory shock as seen after a surgical compilation. Potassium of 3.4 may be low, but is not contributing to overall pathology. Blood glucose of 105 is normal. Recall in hypovolemic shock, when fluid loss occurs, fluid is shifting OUT of the vessels and into the body, thereby artificially increasing HCT and HGB.",
+    "section": "Shock",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is working on the Post Anesthesia Care Unit (PACU) for patients receiving PCI following an MI. During the patient's assessment, a rapid response is called from across the hall. It is suspected that the patient is suffering from shock. What type of shock and what risk factors best explain why the patient is in shock?",
+    "options": {
+      "A": "Hypovolemic shock; post operative hemorrhage related to PCI.",
+      "B": "Cardiogenic shock; post operative side effect of a stent being placed into the occluded artery, causing sudden strain on the heart and CV system",
+      "C": "Obstructive shock; post operative adverse reaction to PCI which caused a thromboembolic event that transcended into the general CV system",
+      "D": "Hypovolemic shock; the patient has been NPO for the procedure for 12 hours causing fluid loss"
+    },
+    "correctAnswer": "C",
+    "rationale": "Obstructive shock. PCI is a significant catalyst for obstructive shock due to increasing clotting risk. While post operative hemorrhage will cause shock, the most likely type of shock to occur is obstructive due to increased clotting risk. Cardiogenic shock is not relevant and is due to a failing heart with much fluid and afterload, not damage from a stent. While a stent may cause injury, cardiogenic shock would occur much later. Being NPO minimally increases risk for hypovolemic shock, unless bleeding was present.",
+    "section": "Shock",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is working on a busy trauma unit in downtown Orlando. The nurse receives report from EMS for a patient found with marked decreased pulse pressure, significant hypotension at 60/21 despite vasopressin, tachycardia at 157 BPM, pale and cool mottled skin, and a lack of consciousness. The nurse recognizes this as refractory shock. Which actions does the nurse anticipate performing upon patients arrival? (Select all that apply)",
+    "options": {
+      "A": "Insertion of a 22 gauge IV into the left antecubital vein.",
+      "B": "Administration of oxygen titrated to keep SpO2 above 90%",
+      "C": "Place patient in trendelenburg position",
+      "D": "Prepare for RSI (Rapid Sequence Intubation)",
+      "E": "Place patient in the prone position"
+    },
+    "correctAnswer": ["B", "C", "D"],
+    "rationale": "While IV access is important, a large bore IV is required for rapid fluid resuscitation. Running fluids rapidly through a small bore IV will compromise vascular access. If a large bore IV cannot be obtained, a central venous catheter should be inserted. Prone positioning is strongly contraindicated in this patient.",
+    "section": "Shock",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is working on the Rapid Response team and is responding to a medical emergency at the bed side. Upon arrival, the nurse receives an SBAR that the patient has late stage heart failure and was admitted with cardiogenic shock. HR is 52, BP 81/40, RR 20, and T of 100.8. The nurse recognizes which medication is strongly contraindicated in this case for shock?",
+    "options": {
+      "A": "Norepinephrine",
+      "B": "Dopamine",
+      "C": "Vasopressin",
+      "D": "Milrinone"
+    },
+    "correctAnswer": "A",
+    "rationale": "Norepinephrine may cause reflexive bradycardia, and the patient has a HR of 52. Administration of this drug may cause patient demise. All other medications may be considered appropriate depending on the patient's condition.",
+    "section": "Cardiogenic Shock",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is working with a nursing student and is caring for a patient with a UTI on a busy medical surgical floor. Urinalysis results from 3 days ago revealed moderate proteinuria. Today, the urinalysis was WDL and clear. Which statement by the student nurse indicates correct understanding of this laboratory finding?",
+    "options": {
+      "A": "There was an error in the sample collection and it must be rerun.",
+      "B": "The urine is so dilute now from the renal failure that it dilutes the proteinuria from being detected.",
+      "C": "The patient has microalbuminuria and thus we cannot see the result on a routine urinalysis",
+      "D": "The infection was the cause of the leaking protein, and now that its clear, the urinalysis will return to normal."
+    },
+    "correctAnswer": "D",
+    "rationale": "Random findings of proteinuria, such as with a UTI, indicate that its cause is related to infection. When the infection clears, the proteinuria also clears. A is not true. B would still show proteinuria even if dilute. While C is true, generalized proteinuria would not just disappear and be replaced by microalbuminemia.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is working with a home health company and is speaking with a patient diagnosed with early stage renal failure. The patient is upset and visibly crying and states “I went to urgent care so many times for what I thought was a UTI. They did a urine test, and my protein was always 0. But when I went to the hospital the same day, they did another special urine test, and it was really high so I was diagnosed with early renal failure. Why did they lie to me?”. Which responses by the nurse indicate the correct understanding of the results? (Select all that apply)",
+    "options": {
+      "A": "UrgentCare clinics usually run a routine urinalysis, which would not show us microalbuminuria found in your urine.",
+      "B": "Proteinuria always occurs at random intervals in patients and we just got lucky at the hospital",
+      "C": "You're right. The urgent care clinic should have caught this. I can see this is difficult for you.",
+      "D": "You most likely had a UTI when we ran your test at the hospital, which inflated the protein levels in your urine."
+    },
+    "correctAnswer": ["A"],
+    "rationale": "Microalbuminuria requires special assay testing, and is not found on routine UA testing. B is not correct. C is not correct although it is therapeutic. D is not correct, as the test was run on the same day.",
+    "section": "Renal",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is providing education to an elderly male patient upon discharge. The nurse advises the patient to monitor urination closely, and to report any changes or difficulty to his provider immediately. The patient states “You are not a very smart nurse. I was admitted for my prostate. What does that have to do with my urine?”. Which response by the nurse is correct?",
+    "options": {
+      "A": "You're right. I apologize for the confusion.",
+      "B": "Patients with BPH commonly have urination issues, as the prostate may enlarge and press against the ureter causing issues with urine flow.",
+      "C": "The growth on your prostate may break off and create an obstruction in your renal system, which will decrease the flow of urine.",
+      "D": "BPH commonly causes you to excessively urinate, and is a sign of a worsening state. We need to make sure it doesn't progress."
+    },
+    "correctAnswer": "B",
+    "rationale": "BPH (benign prostatic hyperplasia) commonly presses against the ureter causing decreased flow. All other options are not correct.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient returns from a cystoscopy performed to investigate recurrent hematuria. The nurse notes the patient reports mild suprapubic discomfort and a slight pink tinge in the urine. Vital signs: HR 112, BP 128/85, RR 20, Temp 99.1°F. One hour later, the patient becomes increasingly restless, with a urine output drop to 20 mL/hr, complaints of diffuse lower abdominal pain, and pallor. The nurse’s first action should be:",
+    "options": {
+      "A": "Administer prescribed oral analgesics and encourage deep breathing",
+      "B": "Assess bladder distension with bedside ultrasound to rule out urinary retention",
+      "C": "Notify the provider to evaluate for possible bladder or vascular injury",
+      "D": "Increase IV fluid rate to promote diuresis and flush the urinary tract"
+    },
+    "correctAnswer": "C",
+    "rationale": "Mild discomfort and pink urine are expected post-cystoscopy, but tachycardia with reduced urine output and escalating abdominal pain signal possible hemorrhage or bladder perforation—a serious complication often masked by analgesics and sedation. Waiting to administer analgesics alone (A) delays recognition of bleeding or injury. Bladder retention assessment (B) is important but secondary if signs suggest internal bleeding or perforation. Prompt provider notification (C) is critical to allow timely imaging, hemoglobin monitoring, and possible surgical intervention. Increasing fluids (D) without ruling out hemorrhage can worsen complications and delay definitive care.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with acute kidney injury in the oliguric phase presents with subtle confusion and peripheral edema. Urine output is 250 mL over the past 12 hours, BUN and creatinine elevated. Which nursing action is the highest priority?",
+    "options": {
+      "A": "Restrict fluid intake to prevent overload",
+      "B": "Assess cardiovascular and respiratory status for signs of hypoperfusion",
+      "C": "Encourage oral hydration to stimulate diuresis",
+      "D": "Prepare for immediate initiation of hemodialysis"
+    },
+    "correctAnswer": "B",
+    "rationale": "Early recognition of hypoperfusion and volume status is key. Restricting fluids may worsen pre-renal injury. Diuresis is unlikely in oliguric phase. Dialysis is important but not always immediate.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with overactive bladder undergoing bladder training reports new onset nocturnal polyuria and frequent urge incontinence. Which underlying pathophysiologic mechanism best explains these symptoms?",
+    "options": {
+      "A": "Impaired detrusor muscle contractility",
+      "B": "Increased renal tubular sodium reabsorption",
+      "C": "Decreased tubular response to vasopressin leading to dilute urine",
+      "D": "Hypersecretion of aldosterone leading to fluid retention"
+    },
+    "correctAnswer": "C",
+    "rationale": "Impaired vasopressin action causes nocturnal polyuria via inability to concentrate urine leading to frequent urination at night.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "An older adult male with BPH reports weak stream, nocturia, and sensation of incomplete emptying. Bladder scan reveals 280 mL post-void residual. Which statement is most accurate regarding the pathophysiology?",
+    "options": {
+      "A": "Increased detrusor muscle strength causes obstruction",
+      "B": "Urethral blockage causes bladder hypertrophy and upper tract dilation",
+      "C": "Internal urethral sphincter relaxation causes reflux",
+      "D": "Prolonged overdistention reduces bladder compliance and detrusor contractility"
+    },
+    "correctAnswer": "D",
+    "rationale": "Chronic retention causes bladder muscle damage leading to poor emptying.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient receiving peritoneal dialysis develops cloudy effluent, abdominal tenderness, and fever. Which intervention should be prioritized?",
+    "options": {
+      "A": "Increase dialysate exchange frequency",
+      "B": "Administer intraperitoneal antibiotics promptly",
+      "C": "Hold dialysis and start hemodialysis immediately",
+      "D": "Encourage ambulation to promote fluid flow"
+    },
+    "correctAnswer": "B",
+    "rationale": "Cloudy effluent and symptoms indicate peritonitis; prompt antibiotics reduce morbidity.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "After kidney transplantation, the nurse assesses the patient with sudden oliguria, elevated serum creatinine, and graft site tenderness. What is the most concerning interpretation?",
+    "options": {
+      "A": "Acute infection of the graft",
+      "B": "Acute organ rejection requiring immediate intervention",
+      "C": "Post-op fluid imbalance causing transient changes",
+      "D": "Medication side effects causing nephrotoxicity"
+    },
+    "correctAnswer": "B",
+    "rationale": "Acute rejection commonly presents with oliguria, tenderness, and creatinine rise. Early detection guides treatment.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with chronic kidney disease is being taught dietary management. Which rationale best supports limiting sodium intake?",
+    "options": {
+      "A": "To reduce sensation of thirst and limit fluid intake",
+      "B": "To prevent hyperkalemia",
+      "C": "To increase calcium absorption",
+      "D": "To stimulate erythropoietin secretion"
+    },
+    "correctAnswer": "A",
+    "rationale": "Sodium restriction prevents fluid retention and hypertensive complications.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient admitted with septic shock develops acute tubular necrosis. What clinical finding best differentiates intrinsic from pre-renal acute kidney injury? (Select all that apply)",
+    "options": {
+      "A": "BUN:creatinine ratio less than 20:1",
+      "B": "Polyuria",
+      "C": "Decreased urine specific gravity",
+      "D": "Elevation in urinary sodium excretion greater than 40 mEq/L"
+    },
+    "correctAnswer": ["A", "D"],
+    "rationale": "In intrinsic AKI (ATN), BUN:creatinine ratio is normal or low and sodium excretion is increased due to tubular damage.",
+    "section": "Renal",
+    "type": "sata"
+  },
+  {
+    "questionText": "After a cystoscopy, the patient experiences continuous bladder spasms and severe suprapubic pain despite analgesics. Urine is dark red with clots. Vital signs reveal HR 110, BP 100/58. Prioritize the nursing action:",
+    "options": {
+      "A": "Administer antispasmodics and encourage deep breathing",
+      "B": "Notify the provider for possible bladder tamponade and bleeding control",
+      "C": "Increase oral fluid intake to flush the bladder",
+      "D": "Perform warm compresses to relieve spasms"
+    },
+    "correctAnswer": "B",
+    "rationale": "Signs suggest hemorrhage causing bladder tamponade—a medical emergency requiring prompt intervention.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient on continuous renal replacement therapy (CRRT) develops hypotension and tachycardia. Which is the most appropriate nursing action? (Select all that apply)",
+    "options": {
+      "A": "Increase dialysate flow rate",
+      "B": "Administer a fluid bolus and reassess hemodynamics",
+      "C": "Slow CRRT rate to reduce fluid removal",
+      "D": "Prepare to discontinue CRRT"
+    },
+    "correctAnswer": ["B", "C"],
+    "rationale": "Hypotension is a common complication of CRRT, often managed by fluid replacement and slowing ultrafiltration.",
+    "section": "Renal",
+    "type": "sata"
+  },
+  {
+    "questionText": "Which early warning sign should prompt immediate investigation for prostate cancer in a male patient? (Select all that apply)",
+    "options": {
+      "A": "Intermittent nocturia",
+      "B": "Weak or interrupted urine stream",
+      "C": "Mild discomfort during urination",
+      "D": "Blood tinged semen after intercourse"
+    },
+    "correctAnswer": ["B", "D"],
+    "rationale": "Weak interrupted stream and hematuria or blood in semen may signal prostate cancer; early detection is critical.",
+    "section": "Renal",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for a patient on retroperitoneal dialysis. The nurse administers 1000 ccs of dialysate. 6 hours later, the nurse is only able to remove 800ccs. Which action by the nurse is correct?",
+    "options": {
+      "A": "Have the patient stand, move around, and sit in a different position and attempt to remove the remaining fluid.",
+      "B": "Call the provider and inform the HCP that the patient absorbed the dialysate and request IV fluids to help perfusion",
+      "C": "Document the finding and note that the patient only dialysed into the 800ccs and the remaining was absorbed since it wasn't used.",
+      "D": "Prepare for respiratory support as retroperitoneal dialysis sometimes causes a hydrothorax, its just a matter of time for the patient to become symptomatic."
+    },
+    "correctAnswer": "A",
+    "rationale": "Repositioning allows the catheter to come off of the abdominal wall and helps the fluid settle near the end of the line, allowing proper drainage. All other options are incorrect. Although a hydrothorax is possible, symptoms would be immediate.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is receiving hemodialysis for CKD. The patient informs the nurse that the procedure makes him nauseous and that he would like his PRN ondansetron. The order states: Ondansetron, 2mg IV PRN q6h for nausea. Which response by the nurse is correct?",
+    "options": {
+      "A": "Im sorry, we cannot give you medications as it will interfere with the dialysis machine.",
+      "B": "Sure, we can get you that medication. We can also give it to you 6 hours after, which should be when you are done with the procedure.",
+      "C": "Im sorry, we cant because the dialysis machine will clean the drug out of your blood so it would be useless.",
+      "D": "Sure, ondansetron is excreted via the liver in the stool. It will not be removed by the machine."
+    },
+    "correctAnswer": "B",
+    "rationale": "PRN medications that are given multiple times a day are OK to give, especially anti nausea medication if indicated and safe. Ondansetron is NOT excreted via the stool, and even if it was, the dialyzer would clean the blood of the drug regardless of its excretion route.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient undergoing peritoneal dialysis develops hypotension, marked respiratory distress, and decreased oxygen saturation. Which pathophysiologic process most likely explains this presentation?",
+    "options": {
+      "A": "Intravascular fluid overload due to excessive dialysate volume",
+      "B": "Shift of fluid into peritoneal cavity causing pulmonary edema",
+      "C": "Dialysate-induced peritonitis causing systemic inflammatory response",
+      "D": "Ultrafiltration failure leading to azotemia and acidosis"
+    },
+    "correctAnswer": "B",
+    "rationale": "Dialysate in the retroperitoneal space exerts pressure restricting diaphragmatic movement and promotes third spacing, resulting in respiratory compromise—even before evident fluid overload may occur.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "When assessing a patient during a hemodialysis session, the nurse notes a sudden onset of muscle cramps, nausea, and diaphoresis. Vital signs show hypotension and tachycardia. The nurse recognizes these as manifestations of:",
+    "options": {
+      "A": "Disequilibrium syndrome caused by rapid solute shifts",
+      "B": "Dialyzer membrane reaction to blood exposure",
+      "C": "Electrolyte imbalance, specifically hypocalcemia",
+      "D": "Fluid volume excess due to dialysate failure"
+    },
+    "correctAnswer": "A",
+    "rationale": "Disequilibrium syndrome results from rapid removal of urea and osmolar changes causing cerebral edema and neurological symptoms along with systemic signs.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient on continuous ambulatory peritoneal dialysis reports cloudy effluent, abdominal pain, and low-grade fever. Dialysate analysis reveals elevated neutrophils. The nurse prioritizes which intervention?",
+    "options": {
+      "A": "Increasing dwell time and volume of dialysate to flush out microbes",
+      "B": "Initiating intraperitoneal broad-spectrum antibiotics per protocol",
+      "C": "Discontinuing peritoneal dialysis in favor of hemodialysis immediately",
+      "D": "Administering antipyretics and monitoring signs of sepsis"
+    },
+    "correctAnswer": "B",
+    "rationale": "Early aggressive intraperitoneal antibiotics improve outcomes in peritonitis; delaying or switching modalities without antibiotics risks systemic infection.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient preparing for hemodialysis via AV fistula access complains of localized numbness, bluish discoloration of fingers, and reduced capillary refill on the same limb. What critical condition should the nurse suspect and prepare to intervene for?",
+    "options": {
+      "A": "Steal syndrome resulting from vascular diversion",
+      "B": "Dialysis access infection with cellulitis",
+      "C": "Venous thromboembolism in access limb",
+      "D": "Neuropathy secondary to uremia"
+    },
+    "correctAnswer": "A",
+    "rationale": "Steal syndrome occurs when the fistula diverts blood from distal extremity causing ischemia and sensory changes—requiring urgent vascular assessment.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "Continuous renal replacement therapy (CRRT) differs from standard intermittent hemodialysis primarily by:",
+    "options": {
+      "A": "Requiring less anticoagulation due to slower toxin removal kinetics",
+      "B": "Using diffusion rather than convection as primary solute removal method",
+      "C": "Employing extracorporeal blood pumping versus native perfusion",
+      "D": "Causing fewer hemodynamic fluctuations through continuous ultrafiltration"
+    },
+    "correctAnswer": "D",
+    "rationale": "CRRT allows gentle, continuous fluid removal limiting hypotension in critically ill patients, unlike intermittent hemodialysis which may cause rapid shifts.",
+    "section": "Renal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A stable peritoneal dialysis patient calls the nurse reporting increased abdominal girth and decreased ultrafiltration over the past 2 days. Which underlying problem should the nurse suspect first?",
+    "options": {
+      "A": "Early catheter infection causing inflammation and decreased permeability",
+      "B": "Development of peritoneal membrane fibrosis impairing dialysis efficiency",
+      "C": "Patient's dietary noncompliance causing fluid overload",
+      "D": "Dialysate leakage into retroperitoneal space"
+    },
+    "correctAnswer": "B",
+    "rationale": "Long-term peritoneal dialysis can cause membrane fibrosis reducing ultrafiltration, manifesting as fluid retention and abdominal distention.",
+    "section": "Renal",
+    "type": "mc"
+  }
+        ];
+
+        let currentQuestionIndex = 0;
+        let shuffledQuizData = [];
+        let userAnswers = [];
+        let flaggedQuestions = Array(quizData.length).fill(false);
+        let timeLeft = 7200; // 2 hours in seconds
+        let timerInterval;
+
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const header = document.getElementById('header');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const navQuestionsContainer = document.getElementById('nav-questions');
+        const questionContainer = document.getElementById('question-container');
+        const reviewScreen = document.getElementById('review-screen');
+        const reviewQuestionsContainer = document.getElementById('review-questions');
+        const nextBtn = document.getElementById('next-btn');
+        const previousBtn = document.getElementById('previous-btn');
+        const submitExamBtn = document.getElementById('submit-exam-btn');
+        const endReviewBtn = document.getElementById('end-review-btn');
+        const timerDisplay = document.getElementById('timer');
+        const questionCounter = document.getElementById('question-counter');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const gradeScreen = document.getElementById('grade-screen');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- Core Functions ---
+
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Starts the 2-hour exam timer.
+         */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the timer display with the remaining time in HH:MM:SS format.
+         */
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            if (timerDisplay) {
+                timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        /**
+         * Renders the current question and its options.
+         */
+        function renderQuestion() {
+            if (currentQuestionIndex >= shuffledQuizData.length) {
+                submitExam();
+                return;
+            }
+
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (questionContainer) {
+                questionContainer.innerHTML = '';
+                const questionHtml = document.createElement('div');
+                questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm flex flex-col h-full';
+
+                questionHtml.innerHTML = `
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
+                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                                ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4 text-sm font-medium text-gray-500">
+                        <span class="mr-2">^</span> Which is the correct answer?
+                    </div>
+                    <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
+                    <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
+                    <div id="options-container" class="space-y-4 flex-1"></div>
+                `;
+                
+                const optionsContainer = questionHtml.querySelector('#options-container');
+
+                const optionLetters = Object.keys(questionData.options);
+                optionLetters.forEach(letter => {
+                    const optionText = questionData.options[letter];
+                    const isMultipleChoice = questionData.type === 'mc';
+                    const inputType = isMultipleChoice ? 'radio' : 'checkbox';
+                    const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'flex items-center space-x-2';
+                    optionDiv.innerHTML = `
+                        <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${isMultipleChoice ? 'radio-btn' : 'check-btn'}">
+                        <label for="option-${letter}" class="option-label">
+                            <span class="option-letter">${letter}</span>
+                            <span class="flex-1">${optionText}</span>
+                            <button class="strikethrough-btn p-1 rounded-full hover:bg-gray-100 transition" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.822a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.577-3.01-9.964-7.822z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </label>
+                    `;
+                    optionsContainer.appendChild(optionDiv);
+                });
+
+                questionContainer.appendChild(questionHtml);
+            }
+            
+            // Add event listeners for strike-through
+            document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent label click
+                    const label = e.target.closest('label');
+                    const textSpan = label.querySelector('span:nth-child(2)');
+                    textSpan.classList.toggle('strikethrough');
+                });
+            });
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', () => {
+                    flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+                    flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    updateNavigationSidebar();
+                });
+            }
+
+            // Restore previous answer selection
+            if (userAnswers[currentQuestionIndex]) {
+                const savedAnswers = userAnswers[currentQuestionIndex];
+                if (Array.isArray(savedAnswers)) {
+                    savedAnswers.forEach(answer => {
+                        const input = document.getElementById(`option-${answer}`);
+                        if (input) input.checked = true;
+                    });
+                }
+            }
+
+            updateNavigationSidebar();
+            updateQuestionCounter();
+            updateButtonStates();
+        }
+
+        /**
+         * Updates the left navigation sidebar with current question status.
+         */
+        function updateNavigationSidebar() {
+            if (navQuestionsContainer) {
+                navQuestionsContainer.innerHTML = '';
+                shuffledQuizData.forEach((_, i) => {
+                    const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                    const navItem = document.createElement('div');
+                    navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                    navItem.textContent = i + 1;
+                    navItem.onclick = () => {
+                        saveUserAnswer();
+                        currentQuestionIndex = i;
+                        renderQuestion();
+                    };
+                    navQuestionsContainer.appendChild(navItem);
+                });
+            }
+        }
+
+        /**
+         * Updates the question counter in the footer.
+         */
+        function updateQuestionCounter() {
+            if (questionCounter) {
+                questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
+            }
+        }
+
+        /**
+         * Manages the enabled/disabled/visible state of footer buttons.
+         */
+        function updateButtonStates() {
+            if (previousBtn) {
+                if (currentQuestionIndex === 0) {
+                    previousBtn.disabled = true;
+                    previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
+                } else {
+                    previousBtn.disabled = false;
+                    previousBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+                }
+            }
+
+            if (nextBtn && submitExamBtn) {
+                if (currentQuestionIndex === shuffledQuizData.length - 1) {
+                    nextBtn.classList.add('hidden');
+                    submitExamBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitExamBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        /**
+         * Collects user's answer(s) for the current question.
+         */
+        function saveUserAnswer() {
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (!questionData) return;
+            let selectedAnswers = [];
+            if (questionData.type === 'mc') {
+                const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
+                if (selectedRadio) {
+                    selectedAnswers.push(selectedRadio.value);
+                }
+            } else if (questionData.type === 'sata') {
+                const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
+                selectedCheckboxes.forEach(checkbox => {
+                    selectedAnswers.push(checkbox.value);
+                });
+            }
+            userAnswers[currentQuestionIndex] = selectedAnswers;
+        }
+
+        /**
+         * Renders the review screen with missed questions.
+         */
+        function renderReviewScreen() {
+            if (mainContent) mainContent.classList.add('hidden');
+            if (reviewScreen) reviewScreen.classList.remove('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+
+            if (!reviewQuestionsContainer) return;
+            reviewQuestionsContainer.innerHTML = '';
+            
+            const missedQuestions = [];
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let isCorrect = false;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    isCorrect = userAnswer[0] === correctAnswer;
+                } else if (question.type === 'sata') {
+                    const correctSet = new Set(question.correctAnswer);
+                    const userSet = new Set(userAnswer);
+                    isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
+                }
+
+                if (!isCorrect) {
+                    missedQuestions.push({ question, index });
+                }
+            });
+
+            if (missedQuestions.length === 0) {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
+            } else {
+                missedQuestions.forEach(({ question, index }) => {
+                    const userAnswer = userAnswers[index] || [];
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-box';
+                    let optionsHtml = '';
+
+                    Object.keys(question.options).forEach(letter => {
+                        const isUserSelected = userAnswer.includes(letter);
+                        let correctAnswers = question.correctAnswer;
+                        if (!Array.isArray(correctAnswers)) {
+                            correctAnswers = [correctAnswers];
+                        }
+                        const isCorrectAnswer = correctAnswers.includes(letter);
+                        
+                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
+                        if (isCorrectAnswer) {
+                            optionClasses += ' correct-answer';
+                        }
+                        if (isUserSelected && !isCorrectAnswer) {
+                            optionClasses += ' incorrect-answer';
+                        }
+
+                        optionsHtml += `
+                            <div class="${optionClasses}">
+                                <span class="option-letter bg-gray-300 rounded-full">${letter}</span>
+                                <span>${question.options[letter]}</span>
+                            </div>
+                        `;
+                    });
+
+                    reviewItem.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
+                        <div class="space-y-2 mb-4">
+                            ${optionsHtml}
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-lg">
+                            <h4 class="font-semibold text-lg">Rationale:</h4>
+                            <p class="text-gray-700">${question.rationale}</p>
+                        </div>
+                    `;
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+            }
+        }
+
+        /**
+         * Calculates the final grade based on user answers.
+         * @returns {number} The final grade percentage.
+         */
+        function calculateGrade() {
+            let totalScore = 0;
+            const totalQuestions = shuffledQuizData.length;
+
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let questionScore = 0;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    if (userAnswer[0] === correctAnswer) {
+                        questionScore = 1;
+                    }
+                } else if (question.type === 'sata') {
+                    const correctAnswers = new Set(question.correctAnswer);
+                    const userSelections = new Set(userAnswer);
+                    
+                    const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
+
+                    if (!hasIncorrect && userSelections.size > 0) {
+                        questionScore = userSelections.size / correctAnswers.size;
+                    }
+                }
+                totalScore += questionScore;
+            });
+
+            return Math.round((totalScore / totalQuestions) * 100);
+        }
+        
+        /**
+         * Handles the end of the exam review, showing a submission animation and grade.
+         */
+        function handleFinalSubmit() {
+            if (reviewScreen) reviewScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Calculating Grade...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                const finalGrade = calculateGrade();
+                if (finalGradeDisplay) finalGradeDisplay.textContent = `${finalGrade}%`;
+                if (gradeScreen) gradeScreen.classList.remove('hidden');
+            }, 2000); // 2-second animation
+        }
+
+        /**
+         * Submits the exam, stops the timer, and shows the review screen.
+         */
+        function submitExam() {
+            clearInterval(timerInterval);
+            saveUserAnswer();
+            renderReviewScreen();
+        }
+
+        /**
+         * Starts the quiz after the initial start screen.
+         */
+        function startQuiz() {
+            if (startScreen) startScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            document.querySelector('body').style.overflow = 'hidden';
+
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Starting Exam...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                if (header) header.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (footer) footer.classList.remove('hidden');
+                document.querySelector('body').style.overflow = '';
+                
+                shuffleArray(quizData);
+                shuffledQuizData = quizData.slice(0, 85);
+                userAnswers = Array(shuffledQuizData.length).fill([]);
+                startTimer();
+                renderQuestion();
+            }, 2000); // 2-second animation
+        }
+
+        // --- Event Listeners ---
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                saveUserAnswer();
+                if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+        }
+        
+        if (previousBtn) {
+            previousBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    saveUserAnswer();
+                    currentQuestionIndex--;
+                    renderQuestion();
+                }
+            });
+        }
+
+        if (submitExamBtn) {
+            submitExamBtn.addEventListener('click', submitExam);
+        }
+        
+        if (endReviewBtn) {
+            endReviewBtn.addEventListener('click', handleFinalSubmit);
+        }
+        
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', startQuiz);
+        }
+
+    </script>
+
+</body>
+</html>
