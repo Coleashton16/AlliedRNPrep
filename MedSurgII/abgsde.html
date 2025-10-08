@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Exam Engine</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1D4ED8',
+                        'secondary-gray': '#F3F4F6',
+                        'correct-green': '#10B981',
+                        'incorrect-red': '#EF4444',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for professional look */
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Inter', sans-serif;
+        }
+        .shadow-custom {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom focus styles for accessibility and design */
+        input:checked + label {
+            border-color: #1D4ED8;
+            background-color: #EFF6FF;
+        }
+        .option-label {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div id="app-container" class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-primary-blue mb-2">Diagnostic Exam Engine</h1>
+            <p class="text-lg text-gray-600">Testing Understanding: Acid-Base Balance & Clinical Prioritization</p>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+            <!-- Content will be injected here (Start Screen, Question, or Results) -->
+        </div>
+
+        <!-- Hidden Loading Spinner -->
+        <div id="loading" class="hidden text-center mt-8">
+            <svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-500 mt-2">Processing...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. Question Data ---
+        const questions = [
+            {
+                "questionText": "The nurse is talking with a comatose patient on a ventilator. The family is at the bed side. The family is asking what acidic foods caused the patient's pH imbalance. Which response by the nurse indicates understanding? (Select all that apply)",
+                "options": { "A": "Eating large amounts of foods like tomatoes, black coffee, and lemons can cause acidosis.", "B": "Acidosis relates to the level of H ions in the blood, the lower the pH, the more the acidic and the higher the H ions.", "C": "The patient's acidosis does not correlate with dietary discrepancies.", "D": "Acidosis relates to the level of H ions in the blood, the higher the pH, the more acidic the blood is and the higher the H ions are.", "E": "Eating foods high in bases, like broccoli and bananas, caused the body to overcompensate and turned the blood acidic." },
+                "correctAnswer": ["B", "C"],
+                "rationale": "While certain foods may be acidic or basic, they do not cause metabolic or respiratory acidosis directly. Acidosis relates to a higher H ion count in the blood, and a lower pH value. All other options are incorrect. The pH scale is logarithmic; a lower pH indicates a higher concentration of hydrogen ions, which makes the blood more acidic. Therefore, the patient's acidosis is not likely caused by their diet.",
+                "section": "Acid-Base Balance",
+                "type": "sata"
+            },
+            {
+                "questionText": "The nurse is assessing lab values from a patient in the ICU. The patient is AAO x 0, GCS of 3, and is currently on life support. Which assessment finding indicates an emergent change in the patient's condition?",
+                "options": { "A": "pH went down from 7.39 to 7.30", "B": "SpO2% fell from 95% to 91%", "C": "Body temp rose from 98.4 to 99.7", "D": "BP fell from 100/65 to 98/48" },
+                "correctAnswer": "A",
+                "rationale": "A decrease in pH from 7.39 to 7.30 represents the most emergent change. Although numerically small, the pH scale is logarithmic, meaning that even a 0.1 shift reflects roughly a tenfold change in hydrogen ion concentration. This drop signifies worsening acidosis, which can impair cellular function, damage organs, and rapidly become life-threatening without immediate intervention. The decline in SpO₂ is concerning but not yet emergent, the mild temperature increase is within normal limits, and the blood pressure change still maintains a mean arterial pressure (MAP) above 65 mmHg, preserving adequate organ perfusion. The ventilator settings need an immediate adjustment and the patient requires a further workup.",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is providing education to a patient recovering from DKA. The patient states “When I was sick, my heart was racing, I was breathing fast, and I am still really constipated. What is going on?”. Which response by the nurse is correct? (Select all that apply)",
+                "options": { "A": "DKA is a metabolic acidotic state, which can impair heart function, nerves, muscles, and may slow down the GI tract.", "B": "DKA is an increase in blood glucose, which prevents the heart, nerves, muscles, and GI from functioning properly.", "C": "DKA leads to an electrolyte imbalance in the body, causing a drop in potassium. Potassium is responsible for muscle excitability, and when it's low, causes the organs to be sluggish or compensate.", "D": "DKA causes extreme thirst in patients, leading to hypoosmolality, which can decrease nerve function and cause fluctuations.", "E": "DKA was causing your body to increase ventilation to counteract its effects." },
+                "correctAnswer": ["A", "E"],
+                "rationale": "DKA causes metabolic acidosis, which disrupts normal heart, nerve, muscle, and GI function (A). The body compensates with rapid, deep breathing (Kussmaul respirations) to reduce acid levels (E). The other options are incorrect because DKA does not directly block organ function with glucose, potassium is usually high at presentation, and DKA leads to hyperosmolality, not hypoosmolality.",
+                "section": "DKA",
+                "type": "sata"
+            },
+            {
+                "questionText": "The nurse is providing teaching to a novice nurse on the ventilator unit. Which statement by the new nurse requires correction?",
+                "options": { "A": "When the blood pH is high, we want to decrease the ventilator rate", "B": "When the blood pH is low, we want to lower the ventilator rate", "C": "Blood pH is not an indicated test to change ventilator settings", "D": "When the blood pH is low, we want to raise the ventilator rate." },
+                "correctAnswer": "B",
+                "rationale": "A low pH indicates acidosis. A high pH indicates alkalinity. CO2 turns into carbonic acid, increasing the blood acidity. By decreasing the ventilator rate, you increase acidity and vice versa. Therefore, with a patient presenting with low pH, or acidity, you would increase the ventilation rate to blow off excess CO2.",
+                "section": "Ventilator Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "The student nurse is at clinicals on a busy ICU floor. The preceptor asks “What body mechanism is the most rapid response for acid-base imbalance?” Which response by the student nurse is correct?",
+                "options": { "A": "Protein and chemical buffers", "B": "Respiratory rate changes", "C": "Increased renal excretion of bicarbonate", "D": "Increase of cellular metabolism to process acid" },
+                "correctAnswer": "A",
+                "rationale": "Protein and chemical buffers are the most immediate bodily changes to acid base imbalances. While B and C are buffers, they are NOT the most rapidly occurring. D is not correct.",
+                "section": "Physiology",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is caring for a patient on a busy medical surgical unit. Vital signs: BP 100/62, RR 9, HR 98, T 99.2. ABG: pH 7.49, Bicarbonate 32mEq/L. eGFR 56. The nurse suspects which of the following as a catalyst to the above state? (Select all that apply)",
+                "options": { "A": "Daily use of aspirin post MI for 3 years", "B": "Ketosis", "C": "Starvation", "D": "Renal failure", "E": "Severe emesis" },
+                "correctAnswer": ["A", "E"],
+                "rationale": "Salicylate (aspirin) toxicity is a known catalyst for metabolic alkalosis, especially with a low GFR, indicating decreased renal excretion of the RX. Severe emesis causes metabolic alkalosis via the loss of fluids and electrolytes. B, C, and D are all causes of metabolic acidosis.",
+                "section": "ABG Interpretation",
+                "type": "sata"
+            },
+            {
+                "questionText": "A new graduate nurse is working on a busy medical surgical floor. The nurse assesses a new admission, a 17 year old male experiencing chest pain, anxiety, and nausea. The vital signs are: HR 124, RR 41, T 98.6, BP 181/84. The ABG yields a pH of 7.49, PaO2 of 110 mm Hg, Paco2 30 mm Hg. The nurse understands that this is indicative of:",
+                "options": { "A": "Ischemic damage leading to increased oxygen demand secondary to a heart attack", "B": "Compensated metabolic acidosis related to lack of appetite from anxiety and pain", "C": "Uncompensated respiratory acidosis secondary to increased blood pressure which lowers perfusion", "D": "Uncompensated respiratory alkalosis secondary to hyperventilation" },
+                "correctAnswer": "D",
+                "rationale": "Respiratory alkalosis is present on the ABG, indicated by a high pH, increased PaO2, and decreased PaCO2. Anxiety attacks commonly cause chest pain and rapid breathing, which often lead to respiratory alkalosis. A is incorrect because we can't diagnose damage to the heart muscle (ischemic cardiac damage) without looking at CT angiograms, EKGs, and lab tests. B is incorrect because the question doesn't show any ABG values related to metabolic issues. C is incorrect because this isn't respiratory acidosis, and blood pressure (BP) doesn't directly cause respiratory alkalosis or acidosis.",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "A family member asks the nurse: “I know my brother has DKA and his blood is full of acid. I remember him telling me he had something called CKD as well. What does this mean for him?” Which response by the nurse is correct?",
+                "options": { "A": "It should have no effect, as DKA does not relate to the renal system since its diabetes.", "B": "Normally, the kidneys can compensate by producing basic solutions to raise blood pH. Since his kidneys aren't working, this protective measure is compromised.", "C": "Typically the kidneys don't respond to changes in blood pH for several days. Since he has impaired renal function, we may need to supplement the bicarb for him.", "D": "His respiratory system should take over and return his blood to a close to normal pH within a few days. We need to keep him here so that we can continue giving IV fluids and insulin." },
+                "correctAnswer": "C",
+                "rationale": "Renal compensation (metabolic) takes several days to become effective. Since the patient has CKD, this response will be limited and may jeopardize remaining renal function. IV bicarb can be supplemented if severely acidotic (6.9 or below) until homeostasis is achieved. A is not correct as diabetes directly affects the renal system. B is not correct since the kidneys don't produce a base, they retain. D is not correct as the respiratory system works within minutes, but is not as strong nor sustainable for pH correction.",
+                "section": "DKA and CKD",
+                "type": "mc"
+            },
+            {
+                "questionText": "Emergency department receives two patients:\nPt A: pH 7.25, PaCO₂ 39, HCO₃⁻ 16, vomiting, confused, shallow breathing.\nPt B: pH 7.33, PaCO₂ 67, HCO₃⁻ 36, COPD hx, agitated, cyanotic, using accessory muscles.\nWhich of the following must the nurse do FIRST?",
+                "options": { "A": "Prepare to administer sodium bicarbonate to Pt A", "B": "Immediately contact respiratory therapy for Pt B", "C": "Call rapid response for both patients", "D": "Assess potassium and cardiac rhythm on both patients" },
+                "correctAnswer": "D",
+                "rationale": "Both are at risk for life-threatening arrhythmias due to acid-base imbalance/hyperkalemia. While therapy and rapid response may follow, ABC priorities require cardiac monitoring first. All other options are tempting but miss urgent physiologic risks.",
+                "section": "Triage and Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "A postoperative patient with NG suction develops new confusion and a seizure.\nABG: pH 7.47, PaCO₂ 52, HCO₃⁻ 35, K⁺ 2.9, Ca²⁺ 7.8.\nWhat intervention addresses the highest risk?",
+                "options": { "A": "IV potassium replacement", "B": "0.9% saline rapid bolus", "C": "Stop NG suction and notify provider", "D": "Administer sodium bicarbonate" },
+                "correctAnswer": "C",
+                "rationale": "Ongoing suction drives metabolic alkalosis, hypokalemia, and risk for further seizures/arrhythmias. Correcting electrolytes is important but eliminating the causative agent is higher (root cause). Distractors don't prioritize source control.",
+                "section": "Clinical Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "Elderly heart failure patient with metabolic acidosis, serum K⁺ 6.1, mental status changes, hypotension.\nWhich finding, if present, is most life-threatening to address first?",
+                "options": { "A": "Tall, peaked T waves on ECG", "B": "Decreased urine output", "C": "Blood pressure 94/60 mm Hg", "D": "Slow, irregular pulse" },
+                "correctAnswer": "A",
+                "rationale": "Signals impending lethal arrhythmias due to hyperkalemia. While hypotension and renal hypoperfusion are critical, abnormal ECG heralds cardiac arrest risk. Distractors are common mistakes for prioritization.",
+                "section": "Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "ICU patient with sepsis develops rapid, deep respirations, cool/clammy skin, and ABG of pH 7.18, PaCO₂ 30, HCO₃⁻ 13, lactate 7.5.\nPrimary mechanism for acid-base compensation?",
+                "options": { "A": "Increased renal reabsorption of bicarbonate", "B": "Enhanced hemoglobin buffering", "C": "Hyperventilation from central chemoreceptor stimulation", "D": "Intracellular shift of potassium" },
+                "correctAnswer": "C",
+                "rationale": "Respiratory compensation is fastest; Kussmaul breathing is triggered by rising H⁺. Distractors reflect slower or secondary mechanisms.",
+                "section": "Pathophysiology",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which scenario exemplifies partial compensation for respiratory acidosis?",
+                "options": { "A": "pH 7.28, PaCO₂ 63, HCO₃⁻ 38", "B": "pH 7.36, PaCO₂ 58, HCO₃⁻ 34", "C": "pH 7.49, PaCO₂ 42, HCO₃⁻ 29", "D": "pH 7.29, PaCO₂ 34, HCO₃⁻ 16" },
+                "correctAnswer": "A",
+                "rationale": "Shows acidosis with high CO₂ and compensatory rise in HCO₃⁻, but pH remains abnormal. Distractors include full compensation, alkalosis, or unrelated ABGs.",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with DKA is receiving treatment. After 6 hours, ABG is: pH 7.41, PaCO₂ 29, HCO₃⁻ 17, glucose 110, K⁺ 3.2.\nWhat is the nurse’s priority action?",
+                "options": { "A": "Increase insulin infusion", "B": "Initiate potassium replacement", "C": "Decrease IV fluids", "D": "Increase sodium bicarbonate" },
+                "correctAnswer": "B",
+                "rationale": "As acidosis resolves, K⁺ drops rapidly, risking hypokalemia and cardiac arrest. Distractors assess insulin, fluids, bicarbonate, but ignore potassium risk.",
+                "section": "DKA Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which finding on physical assessment is LEAST likely in a patient with acute metabolic acidosis?",
+                "options": { "A": "Kussmaul respiration", "B": "Flaccid paralysis", "C": "Tall, peaked T waves", "D": "Positive Chvostek sign" },
+                "correctAnswer": "D",
+                "rationale": "Chvostek sign is linked to alkalosis and hypocalcemia, not acidosis. Other symptoms align with metabolic acidosis and related hyperkalemia.",
+                "section": "Clinical Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with severe vomiting has the following ABG: pH 7.56, HCO₃⁻ 36, PaCO₂ 44, symptoms: neuromuscular irritability, palpitations.\nWhat is the greatest immediate risk?",
+                "options": { "A": "Hypoventilation", "B": "Digoxin toxicity", "C": "Respiratory arrest", "D": "Hyperkalemia" },
+                "correctAnswer": "B",
+                "rationale": "Alkalosis increases digoxin toxicity risk, especially with hypokalemia. Distractors are misaligned; hyperkalemia is unlikely.",
+                "section": "Pathophysiology and Risk",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which intervention should the nurse anticipate for a patient with persistent pH <7.10 and unresponsive DKA?",
+                "options": { "A": "Sodium bicarbonate infusion", "B": "Increased rate of insulin", "C": "IM glucagon", "D": "IV KCl (potassium chloride)" },
+                "correctAnswer": "A",
+                "rationale": "Reserved for severe, persistent acidosis (<7.0–7.1) where standard DKA treatment fails. Distractors focus on routine DKA interventions or incorrect management.",
+                "section": "Emergency Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "On rounds, the nurse finds a patient with acute muscle weakness, confusion, and a pH of 7.19, PaCO₂ 42, HCO₃⁻ 15, normal O₂.\nWhat assessment finding should be reported IMMEDIATELY?",
+                "options": { "A": "Heart rate 52 with widened QRS", "B": "Handgrip weakness", "C": "Temperature 97.1°F", "D": "Gag reflex impaired" },
+                "correctAnswer": "A",
+                "rationale": "Indicates dangerous hyperkalemia-related conduction abnormality; can lead to cardiac arrest.",
+                "section": "Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with metabolic acidosis and diarrhea is treated with IV fluids and antidiarrheals. After therapy, labs: pH 7.31, HCO₃⁻ 20, serum lactate 4.8.\nWhich additional intervention may be indicated based on these findings?",
+                "options": { "A": "Blood transfusion", "B": "Sodium bicarbonate", "C": "Diuretic", "D": "100% oxygen by mask" },
+                "correctAnswer": "B",
+                "rationale": "Persistent acidosis and elevated lactate after volume resuscitation may require bicarbonate therapy if lactic acidosis is worsening. Distractors miss acid-base management.",
+                "section": "Treatment Planning",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which comorbid condition most increases risk for severe complications in acute acidosis due to DKA?",
+                "options": { "A": "Hypertension", "B": "End-stage renal disease", "C": "Mild anemia", "D": "Controlled asthma" },
+                "correctAnswer": "B",
+                "rationale": "Impaired renal function prevents acid elimination, increasing complication risk. Other distractors are less impactful.",
+                "section": "Pathophysiology and Risk",
+                "type": "mc"
+            },
+            {
+                "questionText": "During assessment, nurse finds a patient with pH 7.52, PaCO₂ 25, HCO₃⁻ 22, RR 34, anxiety and tingling fingers.\nWhich action should the nurse take FIRST?",
+                "options": { "A": "Reassure the patient and have them breathe into a paper bag", "B": "Prepare for intubation", "C": "Administer IV calcium gluconate", "D": "Provide 100% O₂" },
+                "correctAnswer": "A",
+                "rationale": "Treatment of respiratory alkalosis due to hyperventilation begins with calming and CO₂ retention strategy. Distractors reflect advanced therapy or incorrect management.",
+                "section": "Clinical Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with chronic kidney disease presents with dry skin, confusion, pH 7.30, HCO₃⁻ 18.\nWhat finding suggests impaired compensation and need for urgent intervention?",
+                "options": { "A": "Serum potassium 6.4", "B": "Pulse oximetry 96%", "C": "Urine output 600mL/24hr", "D": "Temperature 98.8°F" },
+                "correctAnswer": "A",
+                "rationale": "Severe hyperkalemia in CKD patient with acidosis requires immediate intervention due to arrhythmia risk. Distractors do not indicate acute risk.",
+                "section": "Prioritization and Risk",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which assessment finding, in a patient with alkalosis following massive transfusion, signals life-threatening progression?",
+                "options": { "A": "Tetany and positive Trousseau sign", "B": "Gag reflex absence", "C": "Irregular heart rhythm on monitor", "D": "Paresthesia around the mouth" },
+                "correctAnswer": "C",
+                "rationale": "Hypokalemia and hypocalcemia from alkalosis, worsened by transfusion citrate, predispose to fatal arrhythmias. Neuromuscular signs are notable, but arrhythmias pose immediate risk.",
+                "section": "Complications and Risk",
+                "type": "mc"
+            }
+        ];
+
+        // --- 2. State Management ---
+        const state = {
+            currentQuestionIndex: 0,
+            score: 0,
+            userAnswers: [],
+            quizStarted: false,
+            // SATA (Select All That Apply) answers in progress
+            currentSataSelection: new Set(),
+            // NEW: Risk Tracking Properties
+            questionStartTime: null, // Date.now() when question loads
+            initialSelection: null,  // First selected choice (string or sorted CSV for SATA)
+        };
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        // --- 3. Core Logic Functions ---
+
+        function startQuiz() {
+            state.quizStarted = true;
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.userAnswers = [];
+            state.currentSataSelection = new Set();
+            state.questionStartTime = null; 
+            state.initialSelection = null; 
+            render();
+        }
+
+        function checkAnswer(question, userSelection) {
+            const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+            const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+            // Check if every correct answer was selected AND nothing incorrect was selected
+            const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+            return isCorrect;
+        }
+
+        function submitAnswer() {
+            const currentQuestion = questions[state.currentQuestionIndex];
+            let userSelection = [];
+            let finalSelectionForComparison = ''; // Used to compare against initialSelection for change detection
+
+            // --- 1. Get User Selection and Check Validity ---
+            if (currentQuestion.type === 'mc') {
+                const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+                if (!checkedRadio) {
+                    showMessage("Please select one option before submitting.", 'warning');
+                    return;
+                }
+                userSelection = checkedRadio.value;
+                finalSelectionForComparison = userSelection;
+            } else if (currentQuestion.type === 'sata') {
+                userSelection = Array.from(state.currentSataSelection).sort();
+                if (userSelection.length === 0) {
+                    showMessage("Please select at least one option before submitting.", 'warning');
+                    return;
+                }
+                finalSelectionForComparison = userSelection.join(',');
+            }
+
+            // --- 2. Calculate Risk Metrics ---
+            const timeSpentMs = Date.now() - state.questionStartTime;
+            const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+            // Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+            let answerWasChanged = false;
+            // Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+            if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+                 answerWasChanged = true;
+            }
+            
+            // Time Risk Logic
+            let timeRisk = 0;
+            const fastThreshold = 10; // seconds: High risk for rushing
+            const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+            let timeRiskText = 'Normal Time (Risk +0)';
+
+            if (timeSpentSeconds < fastThreshold) {
+                timeRisk = 2; 
+                timeRiskText = 'Fast Answer (Risk +2)';
+            } else if (timeSpentSeconds > slowThreshold) {
+                timeRisk = 1; 
+                timeRiskText = 'Slow Answer (Risk +1)';
+            }
+
+            // Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+            const changeRisk = answerWasChanged ? 3 : 0;
+            const totalRiskScore = changeRisk + timeRisk;
+
+            const isCorrect = checkAnswer(currentQuestion, userSelection);
+            if (isCorrect) {
+                state.score++;
+            }
+            
+            // --- 3. Record the Answer and Metrics ---
+            state.userAnswers.push({
+                ...currentQuestion,
+                userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+                isCorrect: isCorrect,
+                timeSpent: timeSpentSeconds,
+                answerWasChanged: answerWasChanged,
+                riskScore: totalRiskScore,
+                timeRiskText: timeRiskText,
+            });
+
+            // Show neutral message to trigger the visual delay/button disable without revealing correctness
+            showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+            // Move to the next question after a slight delay for user feedback
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                state.currentSataSelection.clear(); // Reset SATA selection
+                render();
+                hideMessage();
+            }, 1200);
+        }
+
+        // --- 4. Rendering Functions (Views) ---
+
+        function render() {
+            if (!state.quizStarted) {
+                renderStartScreen();
+            } else if (state.currentQuestionIndex < questions.length) {
+                renderQuestion();
+            } else {
+                renderResults();
+            }
+        }
+
+        function renderStartScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Diagnostic Exam</h2>
+                    <p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${questions.length} high-yield questions designed to test your understanding of clinical acid-base balance and prioritization. You must answer each question to proceed, and there is no option to go back.</p>
+                    <p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+                    <button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+                        Start Exam Now
+                    </button>
+                    <p class="mt-6 text-sm text-red-500 font-medium">Warning: No backward navigation is allowed once started.</p>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            const currentQuestion = questions[state.currentQuestionIndex];
+            const qNum = state.currentQuestionIndex + 1;
+            const total = questions.length;
+            const isSATA = currentQuestion.type === 'sata';
+
+            // NEW: Risk Tracking Setup
+            state.questionStartTime = Date.now();
+            state.initialSelection = null;
+
+            let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+                const inputType = isSATA ? 'checkbox' : 'radio';
+                const inputName = 'option';
+                const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+                return `
+                    <div class="mb-3">
+                        <input
+                            type="${inputType}"
+                            id="option-${key}"
+                            name="${inputName}"
+                            value="${key}"
+                            class="hidden peer"
+                            ${isChecked ? 'checked' : ''}
+                            onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+                        />
+                        <label
+                            for="option-${key}"
+                            class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+                        >
+                            <span class="font-bold text-primary-blue mr-3">${key}:</span>
+                            ${text}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="mb-6 border-b pb-4">
+                    <p class="text-sm font-semibold text-primary-blue mb-1">
+                        Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+                    </p>
+                    <h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+                    <p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+                </div>
+
+                <form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+                    <div class="options-container mb-8">
+                        ${optionsHtml}
+                    </div>
+
+                    <div id="message-box" class="mb-4 hidden"></div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                            Submit & Next
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function handleOptionChange(input, key, type) {
+            let currentSelectionString;
+            
+            if (type === 'sata') {
+                if (input.checked) {
+                    state.currentSataSelection.add(key);
+                } else {
+                    state.currentSataSelection.delete(key);
+                }
+                // Use a sorted comma-separated string for reliable comparison
+                currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+            } else { // mc
+                currentSelectionString = key;
+            }
+
+            // Capture initial selection only once on the first actual selection (non-empty)
+            if (state.initialSelection === null && currentSelectionString !== '') {
+                state.initialSelection = currentSelectionString;
+            }
+        }
+
+        function renderResults() {
+            const total = questions.length;
+            const correctCount = state.score;
+            const percentage = Math.round((correctCount / total) * 100);
+            const isPassing = percentage >= 75; // Standard passing score
+
+            const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+            const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+            let resultsDetailHtml = state.userAnswers.map((item, index) => {
+                const isCorrect = item.isCorrect;
+                
+                // NEW: Risk Highlighting Logic
+                const isHighRiskIncorrect = !isCorrect && item.riskScore > 2; 
+
+                // Adjust result class based on high risk and incorrect status
+                let resultClass = '';
+                let riskText = '';
+                if (isCorrect) {
+                    resultClass = 'bg-green-50 border-correct-green';
+                } else if (isHighRiskIncorrect) {
+                    resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+                    riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+                } else {
+                    resultClass = 'bg-red-50 border-incorrect-red';
+                }
+
+                const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+                const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+                const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+                return `
+                    <div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+                            <div class="flex items-center space-x-4">
+                                ${resultIcon}
+                                ${riskText}
+                            </div>
+                        </div>
+                        
+                        <!-- NEW: Risk Metrics Display -->
+                        <div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+                            <p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+                            <p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+                            <p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+                            <p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+                        </div>
+                        <!-- END NEW: Risk Metrics Display -->
+
+                        <p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+                        <p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+                        <div class="bg-white p-4 rounded-md border border-gray-200">
+                            <h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+                            <p class="text-gray-600 text-sm">${item.rationale}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+                        ${statusText}
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+                    <p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+                    <button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+                        Restart Exam
+                    </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+                    ${resultsDetailHtml}
+                </div>
+            `;
+        }
+
+        // --- 5. Utility Functions ---
+
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('message-box');
+            let bgColor, borderColor;
+
+            if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+                bgColor = 'bg-blue-100';
+                borderColor = 'border-primary-blue';
+            } else if (type === 'error') {
+                bgColor = 'bg-incorrect-red/10';
+                borderColor = 'border-incorrect-red';
+            } else { // 'warning' for incomplete selection
+                bgColor = 'bg-yellow-100';
+                borderColor = 'border-yellow-400';
+            }
+
+            messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+
+            // Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+            if (type !== 'warning') {
+                document.querySelector('button[type="submit"]').style.display = 'none';
+            }
+        }
+
+        function hideMessage() {
+            const messageBox = document.getElementById('message-box');
+            messageBox.style.display = 'none';
+            // Show the submit button again
+            const submitButton = document.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.style.display = 'inline-flex';
+        }
+
+
+        // --- 6. Initialization ---
+        window.onload = function() {
+            render();
+        };
+
+        // Expose functions globally for HTML event handlers
+        window.startQuiz = startQuiz;
+        window.submitAnswer = submitAnswer;
+        window.handleOptionChange = handleOptionChange;
+    </script>
+</body>
+</html>
