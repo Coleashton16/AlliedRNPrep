@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Exam Engine</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1D4ED8',
+                        'secondary-gray': '#F3F4F6',
+                        'correct-green': '#10B981',
+                        'incorrect-red': '#EF4444',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for professional look */
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Inter', sans-serif;
+        }
+        .shadow-custom {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom focus styles for accessibility and design */
+        input:checked + label {
+            border-color: #1D4ED8;
+            background-color: #EFF6FF;
+        }
+        .option-label {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div id="app-container" class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-primary-blue mb-2">Diagnostic Exam Engine</h1>
+            <p class="text-lg text-gray-600">Testing Understanding: Patient Safety, Medication, and Education</p>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+            <!-- Content will be injected here (Start Screen, Question, or Results) -->
+        </div>
+
+        <!-- Hidden Loading Spinner -->
+        <div id="loading" class="hidden text-center mt-8">
+            <svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-500 mt-2">Processing...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. Question Data (New Set) ---
+        const questions = [
+            {
+                "questionText": "A nurse is teaching a patient newly diagnosed with type 2 diabetes how to self-administer insulin. Which teaching strategy best confirms the patient’s understanding?",
+                "options": { "A": "Ask the patient if they “understand” the instructions.", "B": "Have the patient demonstrate the injection technique while explaining each step.", "C": "Give the patient a pamphlet and ask them to read it at home.", "D": "Repeat the instructions slowly and assume comprehension." },
+                "correctAnswer": "B",
+                "rationale": "The **teach-back** or **show-back** method (having the patient demonstrate the skill) is the most effective way to confirm learning, especially for complex physical tasks like injections. Asking if they 'understand' (A) often yields a misleading 'yes'. Options C and D rely on passive reception of information.",
+                "section": "Patient Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which intervention most reduces the risk of medication errors during administration?",
+                "options": { "A": "Administering medications as quickly as possible to reduce on-time errors.", "B": "Verifying medication orders against the medication administration record (MAR) at the bedside.", "C": "Preparing medications for multiple patients at the same time to improve efficiency.", "D": "Relying on memory for commonly given doses." },
+                "correctAnswer": "B",
+                "rationale": "Verifying the **Rights of Medication Administration** (including Right Drug, Right Dose, Right Patient, Right Route, Right Time) at the point of care (the bedside) is the most critical step to prevent errors. Rushing (A), batching meds (C), and relying on memory (D) increase the risk of error.",
+                "section": "Medication Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A client with Alzheimer’s disease becomes agitated and repeatedly tries to leave the unit. The safest immediate nursing action is to:",
+                "options": { "A": "Apply soft restraints to prevent wandering.", "B": "Reorient the client to the unit and use a calming approach.", "C": "Sedate the client with an antipsychotic medication.", "D": "Lock the unit exit doors and notify the family." },
+                "correctAnswer": "B",
+                "rationale": "**De-escalation and non-pharmacological interventions** are always the first choice for agitation, especially in dementia. Restraints (A) and sedation (C) should be avoided as they can worsen agitation (increased delirium) and are considered chemical or physical restraints. Notifying the family (D) is important but is not the immediate intervention for safety.",
+                "section": "Behavioral Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which of the following is the highest-priority assessment before administering a scheduled opioid analgesic?",
+                "options": { "A": "Patient’s pain score.", "B": "Recent bowel movement frequency.", "C": "Respiratory rate and oxygen saturation.", "D": "Patient’s preference for nonpharmacologic measures." },
+                "correctAnswer": "C",
+                "rationale": "Opioids depress the Central Nervous System, with the primary life-threatening risk being **respiratory depression**. Assessing respiratory rate and oxygen saturation falls under **Airway and Breathing (ABC) priority** and must be done immediately before administration to ensure safety.",
+                "section": "Prioritization/Opioids",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with limited literacy needs discharge teaching about wound care. The nurse should:",
+                "options": { "A": "Provide written instructions at a 12th-grade reading level.", "B": "Use simple language, pictures, and ask the patient to demonstrate the steps.", "C": "Tell the patient to call the clinic if they have questions.", "D": "Give the full manufacturer wound-care pamphlet." },
+                "correctAnswer": "B",
+                "rationale": "For patients with limited literacy, communication should be simplified (plain language, 5th-grade level or lower), visual aids (pictures) should be used, and the **demonstration (show-back)** method must be utilized to confirm understanding.",
+                "section": "Patient Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which of these is an example of a correct “right” of medication administration?",
+                "options": { "A": "Right time — giving medication whenever convenient.", "B": "Right patient — verifying two identifiers before giving the medication.", "C": "Right documentation — documenting before administering.", "D": "Right route — choosing a different route to make administration easier." },
+                "correctAnswer": "B",
+                "rationale": "The **Right Patient** requires using at least two patient identifiers (e.g., name and date of birth) before giving any medication. Documentation (C) must occur *after* administration. The medication must be given at the Right Time (A) and via the **ordered** Right Route (D).",
+                "section": "Medication Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A postoperative client has been immobile for 48 hours. Which complication does the nurse identify as most likely to develop?",
+                "options": { "A": "Hypoglycemia.", "B": "Deep vein thrombosis (DVT).", "C": "Hyperactive bowel sounds.", "D": "Increased visual acuity." },
+                "correctAnswer": "B",
+                "rationale": "**Immobility**, especially prolonged bed rest, is a primary component of Virchow's Triad (venous stasis), making the patient highly susceptible to developing a Deep Vein Thrombosis (DVT).",
+                "section": "Immobility Complications",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which action best demonstrates cultural sensitivity when providing patient education?",
+                "options": { "A": "Using only English written materials because they’re standardized.", "B": "Asking about the patient’s preferred language, beliefs, and health practices.", "C": "Assuming family will translate information for the patient.", "D": "Avoiding questions about cultural preferences to respect privacy." },
+                "correctAnswer": "B",
+                "rationale": "Cultural competence requires the nurse to **assess and integrate** the patient’s individual cultural values and beliefs into the care plan, including communication needs and health practices. Assuming translation (C) or avoiding discussion (D) fails to meet this standard.",
+                "section": "Cultural Competence",
+                "type": "mc"
+            },
+            {
+                "questionText": "When preparing a patient’s oral medication, the nurse notes the order reads “give with food” but the patient is NPO for surgery. The nurse should:",
+                "options": { "A": "Hold the medication and clarify the order with the prescriber.", "B": "Give the medication with a sip of water despite NPO.", "C": "Administer the medication after the surgery without documentation.", "D": "Substitute the route with an IM dose." },
+                "correctAnswer": "A",
+                "rationale": "**Never assume, substitute, or administer outside of the order or safety guidelines.** The NPO status directly conflicts with the administration instructions ('with food'). The nurse must hold the medication and contact the prescriber for clarification or a modified order.",
+                "section": "Medication Administration",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with limited mobility is at risk for pressure injury. The best nursing intervention to prevent pressure ulcers is to:",
+                "options": { "A": "Reposition the patient at least every 2 hours and assess skin.", "B": "Massage reddened bony prominences vigorously.", "C": "Keep the patient on a hard surface to reduce friction.", "D": "Apply cornstarch to moist skin areas." },
+                "correctAnswer": "A",
+                "rationale": "**Frequent repositioning (every 2 hours minimum)** and regular skin assessment are the cornerstone of pressure injury prevention as they relieve pressure and promote circulation. Massaging reddened areas (B) is contraindicated as it can cause further tissue damage.",
+                "section": "Integumentary Care",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse suspects a medication error has occurred. The nurse’s first action should be to:",
+                "options": { "A": "Document the error in the patient’s chart and forget about it.", "B": "Notify the prescriber and monitor the patient for adverse effects.", "C": "Hide the error to avoid disciplinary action.", "D": "Leave the unit to avoid confrontation." },
+                "correctAnswer": "B",
+                "rationale": "The immediate priority following any suspected error is **patient safety**. This requires assessing the patient's condition, notifying the prescriber for immediate corrective action/orders, and monitoring for adverse effects. Documentation and reporting (internal incident reports) follow these critical steps.",
+                "section": "Medication Errors",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which technique is most appropriate when teaching a patient with hearing impairment?",
+                "options": { "A": "Sit directly facing the patient, speak clearly, and use written reinforcement.", "B": "Speak loudly from behind the patient for privacy.", "C": "Use complex medical terminology to ensure thoroughness.", "D": "Avoid eye contact to prevent distraction." },
+                "correctAnswer": "A",
+                "rationale": "Facing the patient and speaking clearly allows for **lip-reading and visual cues**. Using written materials reinforces key information. Speaking loudly (B) can distort sound and is ineffective, while avoiding eye contact (D) hinders communication.",
+                "section": "Communication",
+                "type": "mc"
+            },
+            {
+                "questionText": "While ambulating a patient with orthostatic hypotension, the patient reports dizziness and feels faint. The nurse should first:",
+                "options": { "A": "Continue walking to the chair in the hallway.", "B": "Assist the patient to sit or lie down and check vital signs.", "C": "Tell the patient to breathe deeply and keep walking.", "D": "Increase the speed of ambulation to reach the nearest bed." },
+                "correctAnswer": "B",
+                "rationale": "The first action is to ensure **patient safety and prevent a fall**. Assisting the patient to sit or lie down (e.g., against the wall or on the floor) reduces the risk of injury and allows the blood pressure to stabilize before assessing vital signs.",
+                "section": "Safety/Falls",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse educating a patient about antibiotics explains that the patient must finish the entire course. Which statement indicates understanding?",
+                "options": { "A": "“I will stop the antibiotics when I feel better.”", "B": "“I will take antibiotics only when I remember.”", "C": "“I will complete all doses as prescribed, even if I feel well.”", "D": "“I will double the dose if I miss one.”" },
+                "correctAnswer": "C",
+                "rationale": "Completing the entire course of antibiotics ensures all pathogenic bacteria are killed, which prevents **antibiotic resistance** and recurrence of infection. Stopping early (A) or taking sporadically (B) encourages resistance.",
+                "section": "Medication Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "An elderly patient who uses a walker is at risk for falls when moving from bed to chair. The most appropriate nursing action is to:",
+                "options": { "A": "Encourage the patient to get up quickly to maintain independence.", "B": "Ensure proper footwear, clear pathway, and assist during transfers.", "C": "Keep the patient in bed at all times.", "D": "Allow the patient to transfer without supervision to promote autonomy." },
+                "correctAnswer": "B",
+                "rationale": "The most appropriate action is a multi-faceted safety approach that supports mobility while **minimizing fall risk**. This includes removing environmental hazards and providing assistance/supervision during the transfer.",
+                "section": "Safety/Falls",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse preparing to administer a transdermal nitroglycerin patch should:",
+                "options": { "A": "Apply the patch over hair without removal.", "B": "Remove the old patch, dispose properly, and apply to a new hairless area.", "C": "Cut the patch in half to reduce cost.", "D": "Apply two patches to one area for increased effect." },
+                "correctAnswer": "B",
+                "rationale": "**Removing the old patch** prevents drug overdose, and **rotating the site** to a clean, hairless area ensures consistent absorption and prevents skin irritation. Patches should never be cut (C) or layered (D) unless specifically ordered.",
+                "section": "Medication Administration",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which sign is an early indicator of sensory overload in a hospitalized patient?",
+                "options": { "A": "Calm, slow responses.", "B": "Increased restlessness and irritability.", "C": "Improved attention to tasks.", "D": "Decreased blood pressure and heart rate." },
+                "correctAnswer": "B",
+                "rationale": "**Sensory overload** occurs when a person receives too much stimulation, leading to anxiety, difficulty concentrating, and often manifests as increased restlessness, agitation, and irritability. Options A, C, and D are signs of sensory deprivation or are normal physiological responses.",
+                "section": "Sensory Perception",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient refuses a medication due to religious beliefs. The best nursing response is to:",
+                "options": { "A": "Force the medication because it’s ordered.", "B": "Document the refusal, explore the patient’s reasons, and notify the prescriber.", "C": "Tell the patient they will be punished for noncompliance.", "D": "Substitute a different medication without consulting the prescriber." },
+                "correctAnswer": "B",
+                "rationale": "Patients have the right to **refuse treatment**. The nurse must respect this right, document the refusal, understand the patient's rationale, and then immediately notify the prescriber so alternative treatments can be considered or ordered.",
+                "section": "Ethics/Rights",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which technique is most effective when teaching a visually impaired patient how to use an inhaler?",
+                "options": { "A": "Provide only written instructions in large font.", "B": "Use tactile/verbal cues and have the patient demonstrate technique.", "C": "Give an audio recording and assume it’s sufficient.", "D": "Encourage the patient to have a family member administer meds." },
+                "correctAnswer": "B",
+                "rationale": "Since the patient cannot rely on visual instruction, the nurse must use **tactile feedback (touch and manipulation)** of the device and clear **verbal instructions**. Confirming understanding through demonstration is essential for a skill.",
+                "section": "Patient Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is caring for a patient on multiple medications who is visually impaired. To reduce the chance of error, the nurse should:",
+                "options": { "A": "Place all medications in one cup to simplify administration.", "B": "Use large-print labels, verify identity with two identifiers, and assist with administration.", "C": "Rely on the patient’s description of the pills by shape.", "D": "Administer medications without verification to be efficient." },
+                "correctAnswer": "B",
+                "rationale": "Reducing error involves maximizing the patient's ability to participate safely through **large-print labels** and ensuring the nurse adheres to the safety standards of **two patient identifiers** and direct assistance.",
+                "section": "Medication Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A postoperative patient has a scheduled dose of heparin for DVT prophylaxis. Prior to administration, the nurse should verify:",
+                "options": { "A": "Hemoglobin only.", "B": "Platelet count to assess for heparin-induced thrombocytopenia (HIT) risk.", "C": "Urine output only.", "D": "Blood glucose level." },
+                "correctAnswer": "B",
+                "rationale": "**Heparin-Induced Thrombocytopenia (HIT)** is a serious complication where heparin causes a severe drop in platelets, increasing the risk of clotting. Therefore, the platelet count must be monitored, especially prior to administration.",
+                "section": "Medication Administration",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which intervention is most appropriate to reduce urinary stasis in an immobile patient?",
+                "options": { "A": "Encourage adequate hydration and assist with turning and toileting schedule.", "B": "Restrict fluids to reduce bladder distension.", "C": "Keep the patient supine at all times.", "D": "Limit toileting assistance to every 8 hours." },
+                "correctAnswer": "A",
+                "rationale": "Urinary stasis (slow or stopped urine flow) leads to UTIs and kidney stones. This is best prevented by **increasing fluid intake** (adequate hydration) and **mobilizing the patient** (turning/toileting) to allow gravity and movement to assist bladder emptying.",
+                "section": "Elimination/Mobility",
+                "type": "mc"
+            },
+            {
+                "questionText": "When using the teach-back method, the nurse’s best statement is:",
+                "options": { "A": "“You seem to understand—can you repeat it?”", "B": "“I want you to teach-back so I know I explained it correctly; tell me how you will do this at home.”", "C": "“Did you understand everything?”", "D": "“You must remember these instructions; they’re important.”" },
+                "correctAnswer": "B",
+                "rationale": "The **teach-back method** shifts the burden of communication to the nurse (I want to know *I* explained it correctly), is non-judgmental, and focuses on application (how you will do this at home). Asking if they 'understand' (C) is not teach-back.",
+                "section": "Patient Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient on a continuous IV opioid infusion shows a respiratory rate of 8 breaths/min and decreased responsiveness. The nurse should first:",
+                "options": { "A": "Administer naloxone per protocol and stimulate the patient.", "B": "Increase the opioid infusion rate to relieve pain.", "C": "Document and notify the family only.", "D": "Leave the patient and call the prescriber later." },
+                "correctAnswer": "A",
+                "rationale": "A respiratory rate of 8/min indicates **severe respiratory depression** due to the opioid. The immediate, life-saving intervention is to administer the opioid antagonist **naloxone** (Narcan) to reverse the effect and stimulate the patient to breathe.",
+                "section": "Prioritization/Opioids",
+                "type": "mc"
+            },
+            {
+                "questionText": "A client with dementia often becomes disoriented at night (sundowning). Which nursing intervention can help reduce sundowning?",
+                "options": { "A": "Increase caffeine before bedtime.", "B": "Maintain a calm environment, reduce nighttime noise, and provide familiar objects.", "C": "Keep lights off completely to promote sleep.", "D": "Encourage frequent naps during the day only." },
+                "correctAnswer": "B",
+                "rationale": "**Sundowning** is exacerbated by fatigue, changing routines, and environmental confusion. Maintaining a consistent, calm, and safe environment with familiar cues helps mitigate this disorientation. Caffeine (A) or complete darkness (C) would worsen the confusion.",
+                "section": "Behavioral Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which action by the nurse best promotes medication safety in a busy unit?",
+                "options": { "A": "Prepare and administer all medications while multitasking.", "B": "Use barcode medication administration and scan patient identifiers and meds.", "C": "Skip double-checks for high-alert meds to save time.", "D": "Allow family members to administer controlled substances." },
+                "correctAnswer": "B",
+                "rationale": "**Barcode Medication Administration (BCMA)** is a technology proven to significantly reduce medication errors by providing a final electronic check of the **Rights** before the drug enters the patient, validating the correct patient, drug, and dose.",
+                "section": "Medication Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient who has been immobile for several days complains of calf pain and calf swelling. The nurse should:",
+                "options": { "A": "Encourage the patient to ambulate immediately without assessment.", "B": "Stop further ambulation and notify the provider—assess for DVT signs.", "C": "Apply a heating pad and massage the calf vigorously.", "D": "Ignore the complaint; it’s common and self-limiting." },
+                "correctAnswer": "B",
+                "rationale": "Calf pain and swelling in an immobile patient strongly suggest a **Deep Vein Thrombosis (DVT)**. Ambulation or massaging the calf could dislodge the clot and cause a fatal pulmonary embolism (PE). The priority is to stop movement and notify the provider immediately.",
+                "section": "Prioritization/DVT",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which statement by a patient indicates good understanding after a teaching session about using a new anticoagulant?",
+                "options": { "A": "“I will stop the medication if I notice any unusual bleeding and call my prescriber.”", "B": "“I won’t worry about bleeding—this medicine is safe.”", "C": "“I will take double doses if I miss one.”", "D": "“I will stop the medication after one week regardless of instructions.”" },
+                "correctAnswer": "A",
+                "rationale": "Anticoagulants carry an inherent risk of bleeding. Understanding includes knowing to **monitor for signs of bleeding** and **notifying the prescriber** immediately if it occurs, but not stopping without consultation.",
+                "section": "Medication Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is teaching safe transfer techniques to a new nursing assistant. The nurse’s best instruction is to:",
+                "options": { "A": "Use proper body mechanics—bend at the knees, keep load close, avoid twisting.", "B": "Use back muscles rather than legs to lift for strength.", "C": "Lift alone regardless of patient weight.", "D": "Twist the torso to increase leverage." },
+                "correctAnswer": "A",
+                "rationale": "**Proper body mechanics** protect the nurse's back and the patient's safety. This involves keeping the back straight, using leg muscles to lift, keeping the object close to the body, and avoiding twisting.",
+                "section": "Ergonomics/Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient who speaks limited English needs medication teaching. The nurse should:",
+                "options": { "A": "Use a professional medical interpreter and confirm understanding with teach-back.", "B": "Ask the patient’s family to interpret to save time.", "C": "Use gestures only and hope the patient understands.", "D": "Provide instructions in English and assume comprehension." },
+                "correctAnswer": "A",
+                "rationale": "**Professional medical interpreters** ensure accuracy, use correct medical terminology, and maintain patient confidentiality. Family members (B) may omit or misinterpret crucial information. Assuming comprehension (D) creates a high risk for medication error.",
+                "section": "Communication/Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is administering an intramuscular vaccine. Which site is contraindicated for this adult client?",
+                "options": { "A": "Deltoid muscle.", "B": "Ventrogluteal muscle if client is ambulatory and no contraindications.", "C": "Dorsogluteal site due to risk of sciatic nerve injury.", "D": "Vastus lateralis in infants." },
+                "correctAnswer": "C",
+                "rationale": "The **Dorsogluteal site** (upper outer quadrant of the buttock) is **contraindicated** due to the high risk of injury to the underlying sciatic nerve. The Ventrogluteal (B), Deltoid (A), and Vastus Lateralis (D) are generally safe sites for IM injections.",
+                "section": "Skills/Injections",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which is the most appropriate nursing action when a patient demonstrates confusion and inability to follow safety instructions?",
+                "options": { "A": "Place the patient in a room far from the nurses’ station to reduce stimulation.", "B": "Implement fall precautions, close observation, and remove hazardous items.", "C": "Ignore the behavior unless the patient falls.", "D": "Discontinue safety measures to promote independence." },
+                "correctAnswer": "B",
+                "rationale": "Inability to follow safety instructions indicates a high risk for injury. The nurse must implement **enhanced safety measures**, including fall precautions, increased monitoring, and environmental hazard reduction.",
+                "section": "Safety/Delirium",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with type 1 diabetes receives morning insulin but is NPO until surgery. The nurse should:",
+                "options": { "A": "Administer full dose of insulin as usual.", "B": "Hold insulin and notify the prescriber for an adjusted order.", "C": "Double the dose the next scheduled time.", "D": "Give subcutaneous glucose instead." },
+                "correctAnswer": "B",
+                "rationale": "Administering a full dose of insulin to an NPO patient will lead to **severe hypoglycemia** since they are not consuming carbohydrates. The nurse must hold the dose and notify the prescriber for an order (usually a lower sliding scale or IV glucose infusion).",
+                "section": "Medication Administration",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which communication technique is best when caring for a patient with aphasia after stroke?",
+                "options": { "A": "Use simple yes/no questions, allow extra time, and use visual cues.", "B": "Talk faster to encourage responses.", "C": "Avoid eye contact and speak in a low monotone.", "D": "Present multiple-step commands at once." },
+                "correctAnswer": "A",
+                "rationale": "Aphasia impairs the ability to understand or express speech. The nurse should use **short phrases, yes/no questions**, and give **extra time** for the patient to process and formulate responses, using visual aids to help comprehension.",
+                "section": "Communication",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is prescribed digoxin. Prior to giving the dose, the nurse should:",
+                "options": { "A": "Check the patient’s apical pulse for 1 full minute and withhold if <60 in adults (per facility policy).", "B": "Give the medication regardless of heart rate.", "C": "Check only blood pressure.", "D": "Assume the prescriber will check the pulse." },
+                "correctAnswer": "A",
+                "rationale": "Digoxin decreases heart rate and is held if the **apical pulse is below 60 beats per minute** (or based on facility policy/prescriber order), as administering it could cause severe bradycardia or arrhythmia. The nurse is responsible for this check.",
+                "section": "Medication Administration",
+                "type": "mc"
+            },
+            {
+                "questionText": "During bedside teaching, the patient repeatedly gives unrelated responses. The nurse suspects cognitive impairment and should next:",
+                "options": { "A": "End teaching and discharge the patient.", "B": "Perform a brief cognitive screen and notify the provider.", "C": "Lecture the patient longer to ensure comprehension.", "D": "Ignore and proceed with written instructions." },
+                "correctAnswer": "B",
+                "rationale": "Unrelated responses suggest **impaired cognition or acute delirium**. The nurse must validate this with a screening tool and notify the provider, as teaching is likely ineffective and alternative communication/treatment is needed.",
+                "section": "Assessment/Cognition",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which intervention best decreases the risk of aspiration in a patient with dysphagia?",
+                "options": { "A": "Feed the patient in a supine position to allow gravity to help.", "B": "Allow large bites and fast feeding to finish quickly.", "C": "Sit the patient upright, provide small bites, and monitor during meals.", "D": "Give thin liquids only to encourage swallowing." },
+                "correctAnswer": "C",
+                "rationale": "Sitting the patient **upright (high Fowler’s)** uses gravity to prevent food/liquid from entering the trachea. **Small bites** and **monitoring** ensure the patient is actively swallowing. Thin liquids (D) are usually contraindicated in dysphagia as they are the easiest to aspirate.",
+                "section": "Aspiration Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with chronic kidney disease is prescribed an antibiotic that is primarily renally excreted. The nurse should:",
+                "options": { "A": "Administer the usual dose without checking labs.", "B": "Verify renal function (e.g., creatinine clearance) and consult dosing guidelines.", "C": "Assume renal dosing isn’t necessary.", "D": "Double the dose to ensure efficacy." },
+                "correctAnswer": "B",
+                "rationale": "In CKD, drugs excreted by the kidneys (renally excreted) can quickly build up to toxic levels. The nurse must verify **renal function (creatinine clearance/eGFR)** and ensure the dose is appropriately reduced (**renal dosing**) according to established guidelines.",
+                "section": "Pharmacology/CKD",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which nursing action best prevents medication administration errors with high-alert medications (e.g., insulin, heparin)?",
+                "options": { "A": "Use independent double-checks and follow facility policies.", "B": "Allow a single unlicensed staff member to prepare and give these meds alone.", "C": "Store high-alert meds next to routine meds for convenience.", "D": "Rely on memory for mixing and dilution steps." },
+                "correctAnswer": "A",
+                "rationale": "The standard of care for high-alert medications is the use of **independent double-checks**, where two licensed practitioners confirm the dose, patient, drug, and route separately before administration. This is the single best preventative strategy.",
+                "section": "Medication Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient complains of new-onset confusion and visual hallucinations after starting a new medication. The nurse should:",
+                "options": { "A": "Review the medication list for agents with central nervous system side effects and notify the provider.", "B": "Tell the patient hallucinations are normal and will pass.", "C": "Increase the dose to build tolerance.", "D": "Discontinue all medications immediately without consulting provider." },
+                "correctAnswer": "A",
+                "rationale": "New neurological symptoms require assessment and reporting. The nurse should check if the new medication is known to cause **CNS side effects** (confusion, delirium) and notify the provider immediately, as a dose adjustment or discontinuation may be necessary.",
+                "section": "Pharmacology/Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which assessment finding would alert the nurse to early hypovolemia in an immobile postoperative patient?",
+                "options": { "A": "Bounding pulse and high urine output.", "B": "Orthostatic changes in pulse and blood pressure and decreased urine output.", "C": "Warm, dry skin and low heart rate.", "D": "Increased bowel sounds and hypertension." },
+                "correctAnswer": "B",
+                "rationale": "**Hypovolemia (fluid volume deficit)** causes the body to compensate by constricting blood vessels, leading to **orthostatic hypotension** (BP drop upon standing) and releasing ADH to conserve fluid, resulting in **decreased urine output**.",
+                "section": "Fluid Balance",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with severe dementia repeatedly removes their oxygen cannula. The safest first intervention is to:",
+                "options": { "A": "Restrain the patient physically to keep cannula in place.", "B": "Assess cause of distress, apply simpler securement, and use distraction or repositioning.", "C": "Leave the cannula off and do nothing.", "D": "Administer sedatives without assessment." },
+                "correctAnswer": "B",
+                "rationale": "The first step is always to look for the **root cause** (e.g., is the tubing tangled, is the patient anxious, do they feel restricted?). Non-pharmacological interventions like **distraction and repositioning** should be tried before considering restraints or sedatives.",
+                "section": "Safety/Restraints",
+                "type": "mc"
+            },
+            {
+                "questionText": "When educating a patient about a new oral anticoagulant, which statement indicates misunderstanding?",
+                "options": { "A": "“I will inform providers I am on this medication before any procedure.”", "B": "“I will watch for signs of unusual bleeding and report them.”", "C": "“I can stop taking it whenever I feel like it.”", "D": "“I will avoid starting other medications without checking.”" },
+                "correctAnswer": "C",
+                "rationale": "Anticoagulants are typically used to prevent stroke or embolism and **must not be stopped abruptly** without the prescriber's order, as this could immediately increase the risk of a severe clotting event.",
+                "section": "Medication Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "A hospitalized client with limited mobility needs range-of-motion (ROM) exercises. The nurse should:",
+                "options": { "A": "Perform passive ROM if the client cannot move the limb independently.", "B": "Force the joint beyond the point of resistance to increase flexibility.", "C": "Skip ROM if the patient reports mild discomfort.", "D": "Perform ROM only once on admission." },
+                "correctAnswer": "A",
+                "rationale": "**Passive ROM** is performed by the nurse to prevent contractures, joint stiffness, and muscle atrophy when the patient cannot move the limb independently. Joints should **never** be forced past resistance (B) or to the point of pain.",
+                "section": "Mobility/ROM",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is teaching a patient how to read an over-the-counter medication label for safe dosing. The nurse should instruct the patient to:",
+                "options": { "A": "Ignore active ingredients and focus on price.", "B": "Read active ingredients, dosage instructions, and warnings before use.", "C": "Use a lower dose than recommended to be safe.", "D": "Mix medications with similar names." },
+                "correctAnswer": "B",
+                "rationale": "The active ingredient identifies the drug, while dosage instructions and warnings provide critical safety information to prevent overdose or harmful drug interactions.",
+                "section": "Medication Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "During a medication reconciliation, the nurse finds a patient is taking two medications with similar names. The nurse’s priority action is to:",
+                "options": { "A": "Continue both medications because the patient says they take them.", "B": "Clarify with the provider and pharmacist to ensure correct medication and avoid look-alike/sound-alike errors.", "C": "Stop both medications immediately.", "D": "Ask family to decide." },
+                "correctAnswer": "B",
+                "rationale": "Medication reconciliation is designed to prevent **polypharmacy and look-alike/sound-alike errors**. The priority is to verify the correct intended order by consulting the healthcare team (provider/pharmacist).",
+                "section": "Medication Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with a history of COPD becomes dyspneic after receiving a benzodiazepine. The nurse recognizes this may be due to:",
+                "options": { "A": "Benzodiazepines causing respiratory depression, especially in patients with compromised respiratory function.", "B": "Improved respiratory function from the medication.", "C": "Allergic reaction in all COPD patients.", "D": "Increased respiratory drive." },
+                "correctAnswer": "A",
+                "rationale": "Benzodiazepines are CNS depressants that can significantly **suppress the respiratory drive**. This effect is heightened in patients with pre-existing respiratory compromise, like COPD, leading to dyspnea or respiratory failure.",
+                "section": "Pharmacology/COPD",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which position is best for a patient after a possible aspiration event to reduce risk of further aspiration?",
+                "options": { "A": "Left lateral decubitus with head slightly down (if no spinal precautions).", "B": "Supine flat on back.", "C": "Trendelenburg with head down.", "D": "Right lateral with head elevated." },
+                "correctAnswer": "A",
+                "rationale": "The **left lateral decubitus position** minimizes the effect of gravity on stomach contents, keeping them in the stomach and reducing the risk of further reflux and aspiration. The head-down positioning (modified Trendelenburg) can further protect the airway by pooling stomach contents away from the esophagus.",
+                "section": "Aspiration Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nursing student asks how to prioritize patient teaching for someone with low health literacy. The best advice is to:",
+                "options": { "A": "Provide lots of written materials to cover everything.", "B": "Focus on 1–3 key actions, use plain language, pictures, and verify understanding by teach-back.", "C": "Avoid teaching because the patient won’t understand.", "D": "Use only medical jargon to be precise." },
+                "correctAnswer": "B",
+                "rationale": "For low health literacy, teaching must be **focused, simplified (plain language/pictures)**, and **validated (teach-back)**. Overloading with information (A) or jargon (D) is ineffective and harmful.",
+                "section": "Patient Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is prescribed a new psychotropic medication and reports blurred vision and dry mouth the next day. The nurse should:",
+                "options": { "A": "Recognize these as common anticholinergic side effects, assess severity, and notify the provider as appropriate.", "B": "Tell the patient hallucinations are normal and will pass.", "C": "Immediately discontinue the medication without consulting provider.", "D": "Increase the dose to overcome side effects." },
+                "correctAnswer": "A",
+                "rationale": "**Blurred vision and dry mouth** are classic, common **anticholinergic side effects** of many psychotropic medications. The nurse should recognize these, assess if the patient can tolerate them, and notify the prescriber for potential management or dose adjustment.",
+                "section": "Pharmacology/Assessment",
+                "type": "mc"
+            }
+        ];
+
+        // --- 2. State Management ---
+        const state = {
+            currentQuestionIndex: 0,
+            score: 0,
+            userAnswers: [],
+            quizStarted: false,
+            // SATA (Select All That Apply) answers in progress
+            currentSataSelection: new Set(),
+            // NEW: Risk Tracking Properties
+            questionStartTime: null, // Date.now() when question loads
+            initialSelection: null,  // First selected choice (string or sorted CSV for SATA)
+        };
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        // --- 3. Core Logic Functions ---
+
+        function startQuiz() {
+            state.quizStarted = true;
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.userAnswers = [];
+            state.currentSataSelection = new Set();
+            state.questionStartTime = null; 
+            state.initialSelection = null; 
+            render();
+        }
+
+        function checkAnswer(question, userSelection) {
+            const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+            const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+            // Check if every correct answer was selected AND nothing incorrect was selected
+            const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+            return isCorrect;
+        }
+
+        function submitAnswer() {
+            const currentQuestion = questions[state.currentQuestionIndex];
+            let userSelection = [];
+            let finalSelectionForComparison = ''; // Used to compare against initialSelection for change detection
+
+            // --- 1. Get User Selection and Check Validity ---
+            if (currentQuestion.type === 'mc') {
+                const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+                if (!checkedRadio) {
+                    showMessage("Please select one option before submitting.", 'warning');
+                    return;
+                }
+                userSelection = checkedRadio.value;
+                finalSelectionForComparison = userSelection;
+            } else if (currentQuestion.type === 'sata') {
+                userSelection = Array.from(state.currentSataSelection).sort();
+                if (userSelection.length === 0) {
+                    showMessage("Please select at least one option before submitting.", 'warning');
+                    return;
+                }
+                finalSelectionForComparison = userSelection.join(',');
+            }
+
+            // --- 2. Calculate Risk Metrics ---
+            const timeSpentMs = Date.now() - state.questionStartTime;
+            const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+            // Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+            let answerWasChanged = false;
+            // Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+            if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+                 answerWasChanged = true;
+            }
+            
+            // Time Risk Logic
+            let timeRisk = 0;
+            const fastThreshold = 10; // seconds: High risk for rushing
+            const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+            let timeRiskText = 'Normal Time (Risk +0)';
+
+            if (timeSpentSeconds < fastThreshold) {
+                timeRisk = 2; 
+                timeRiskText = 'Fast Answer (Risk +2)';
+            } else if (timeSpentSeconds > slowThreshold) {
+                timeRisk = 1; 
+                timeRiskText = 'Slow Answer (Risk +1)';
+            }
+
+            // Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+            const changeRisk = answerWasChanged ? 3 : 0;
+            const totalRiskScore = changeRisk + timeRisk;
+
+            const isCorrect = checkAnswer(currentQuestion, userSelection);
+            if (isCorrect) {
+                state.score++;
+            }
+            
+            // --- 3. Record the Answer and Metrics ---
+            state.userAnswers.push({
+                ...currentQuestion,
+                userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+                isCorrect: isCorrect,
+                timeSpent: timeSpentSeconds,
+                answerWasChanged: answerWasChanged,
+                riskScore: totalRiskScore,
+                timeRiskText: timeRiskText,
+            });
+
+            // Show neutral message to trigger the visual delay/button disable without revealing correctness
+            showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+            // Move to the next question after a slight delay for user feedback
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                state.currentSataSelection.clear(); // Reset SATA selection
+                render();
+                hideMessage();
+            }, 1200);
+        }
+
+        // --- 4. Rendering Functions (Views) ---
+
+        function render() {
+            if (!state.quizStarted) {
+                renderStartScreen();
+            } else if (state.currentQuestionIndex < questions.length) {
+                renderQuestion();
+            } else {
+                renderResults();
+            }
+        }
+
+        function renderStartScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Diagnostic Exam</h2>
+                    <p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${questions.length} high-yield questions designed to test your understanding of clinical **Patient Safety, Medication Administration, and Education**. You must answer each question to proceed, and there is no option to go back.</p>
+                    <p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+                    <button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+                        Start Exam Now
+                    </button>
+                    <p class="mt-6 text-sm text-red-500 font-medium">Warning: No backward navigation is allowed once started.</p>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            const currentQuestion = questions[state.currentQuestionIndex];
+            const qNum = state.currentQuestionIndex + 1;
+            const total = questions.length;
+            const isSATA = currentQuestion.type === 'sata';
+
+            // NEW: Risk Tracking Setup
+            state.questionStartTime = Date.now();
+            state.initialSelection = null;
+
+            let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+                const inputType = isSATA ? 'checkbox' : 'radio';
+                const inputName = 'option';
+                const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+                return `
+                    <div class="mb-3">
+                        <input
+                            type="${inputType}"
+                            id="option-${key}"
+                            name="${inputName}"
+                            value="${key}"
+                            class="hidden peer"
+                            ${isChecked ? 'checked' : ''}
+                            onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+                        />
+                        <label
+                            for="option-${key}"
+                            class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+                        >
+                            <span class="font-bold text-primary-blue mr-3">${key}:</span>
+                            ${text}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="mb-6 border-b pb-4">
+                    <p class="text-sm font-semibold text-primary-blue mb-1">
+                        Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+                    </p>
+                    <h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+                    <p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+                </div>
+
+                <form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+                    <div class="options-container mb-8">
+                        ${optionsHtml}
+                    </div>
+
+                    <div id="message-box" class="mb-4 hidden"></div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                            Submit & Next
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function handleOptionChange(input, key, type) {
+            let currentSelectionString;
+            
+            if (type === 'sata') {
+                if (input.checked) {
+                    state.currentSataSelection.add(key);
+                } else {
+                    state.currentSataSelection.delete(key);
+                }
+                // Use a sorted comma-separated string for reliable comparison
+                currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+            } else { // mc
+                currentSelectionString = key;
+            }
+
+            // Capture initial selection only once on the first actual selection (non-empty)
+            if (state.initialSelection === null && currentSelectionString !== '') {
+                state.initialSelection = currentSelectionString;
+            }
+        }
+
+        function renderResults() {
+            const total = questions.length;
+            const correctCount = state.score;
+            const percentage = Math.round((correctCount / total) * 100);
+            const isPassing = percentage >= 75; // Standard passing score
+
+            const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+            const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+            let resultsDetailHtml = state.userAnswers.map((item, index) => {
+                const isCorrect = item.isCorrect;
+                
+                // NEW: Risk Highlighting Logic
+                const isHighRiskIncorrect = !isCorrect && item.riskScore > 2; 
+
+                // Adjust result class based on high risk and incorrect status
+                let resultClass = '';
+                let riskText = '';
+                if (isCorrect) {
+                    resultClass = 'bg-green-50 border-correct-green';
+                } else if (isHighRiskIncorrect) {
+                    resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+                    riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+                } else {
+                    resultClass = 'bg-red-50 border-incorrect-red';
+                }
+
+                const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+                const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+                const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+                return `
+                    <div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+                            <div class="flex items-center space-x-4">
+                                ${resultIcon}
+                                ${riskText}
+                            </div>
+                        </div>
+                        
+                        <!-- NEW: Risk Metrics Display -->
+                        <div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+                            <p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+                            <p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+                            <p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+                            <p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+                        </div>
+                        <!-- END NEW: Risk Metrics Display -->
+
+                        <p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+                        <p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+                        <div class="bg-white p-4 rounded-md border border-gray-200">
+                            <h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+                            <p class="text-gray-600 text-sm">${item.rationale}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+                        ${statusText}
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+                    <p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+                    <button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+                        Restart Exam
+                    </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+                    ${resultsDetailHtml}
+                </div>
+            `;
+        }
+
+        // --- 5. Utility Functions ---
+
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('message-box');
+            let bgColor, borderColor;
+
+            if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+                bgColor = 'bg-blue-100';
+                borderColor = 'border-primary-blue';
+            } else if (type === 'error') {
+                bgColor = 'bg-incorrect-red/10';
+                borderColor = 'border-incorrect-red';
+            } else { // 'warning' for incomplete selection
+                bgColor = 'bg-yellow-100';
+                borderColor = 'border-yellow-400';
+            }
+
+            messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+
+            // Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+            if (type !== 'warning') {
+                document.querySelector('button[type="submit"]').style.display = 'none';
+            }
+        }
+
+        function hideMessage() {
+            const messageBox = document.getElementById('message-box');
+            messageBox.style.display = 'none';
+            // Show the submit button again
+            const submitButton = document.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.style.display = 'inline-flex';
+        }
+
+
+        // --- 6. Initialization ---
+        window.onload = function() {
+            render();
+        };
+
+        // Expose functions globally for HTML event handlers
+        window.startQuiz = startQuiz;
+        window.submitAnswer = submitAnswer;
+        window.handleOptionChange = handleOptionChange;
+    </script>
+</body>
+</html>
