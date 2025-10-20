@@ -158,6 +158,20 @@
                             link: 'MBUnit1sde.html'
                         }
                     ]
+                },
+                {
+                    id: 'unit-2-cellular',
+                    title: 'Unit 2',
+                    subtitle: 'Cellular regulation, intrapartum and Respiratory',
+                    resources: [
+                        {
+                            type: 'learn',
+                            title: 'Unit 2 SDE',
+                            description: 'Student-developed learning resource for Unit 2.',
+                            icon: 'folder-plus',
+                            link: 'unit2sde.html'
+                        }
+                    ]
                 }
                 // Add more units as needed for Mother/Baby content
             ]
@@ -181,15 +195,15 @@
                 };
                 const styles = typeStyles[resource.type] || typeStyles.learn;
                 return `
-                    <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="group block p-5 rounded-xl border-2 transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-lg ${styles.bg} ${styles.border} ${styles.hover}">
-                        <div class="flex items-start gap-4">
-                            <div class="p-2 rounded-lg ${styles.iconColor}"><i data-feather="${resource.icon}" class="w-6 h-6"></i></div>
-                            <div>
-                                <h4 class="font-bold text-slate-800 group-hover:text-black break-words">${resource.title}</h4>
-                                <p class="text-sm text-slate-600 mt-1 break-words">${resource.description}</p>
+                        <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="group block p-5 rounded-xl border-2 transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-lg ${styles.bg} ${styles.border} ${styles.hover}">
+                            <div class="flex items-start gap-4">
+                                <div class="p-2 rounded-lg ${styles.iconColor}"><i data-feather="${resource.icon}" class="w-6 h-6"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 group-hover:text-black break-words">${resource.title}</h4>
+                                    <p class="text-sm text-slate-600 mt-1 break-words">${resource.description}</p>
+                                </div>
                             </div>
-                        </div>
-                    </a>`;
+                        </a>`;
             };
             
             // Clear existing navigation and content before populating
@@ -201,7 +215,7 @@
                 navLink.href = `#${unit.id}`;
                 navLink.dataset.target = unit.id;
                 navLink.className = 'nav-link text-slate-700 hover:bg-slate-200 px-3 py-2 rounded-md text-sm font-medium transition-colors';
-                navLink.innerHTML = `<span class="font-semibold">${unit.title.split(':')[0]}</span>: ${unit.title.split(':')[1] || 'Overview'}`;
+                navLink.innerHTML = `<span class="font-semibold">${unit.title.split(':')[0]}</span>: ${unit.title.split(':')[1] || unit.title.split(':')[0] || 'Overview'}`;
                 navContainer.appendChild(navLink);
 
                 const section = document.createElement('section');
@@ -220,12 +234,12 @@
                         if (items.length === 0) return '';
                         const iconColor = { 'Learning Modules': 'text-sky-600', 'Diagnostic Exams': 'text-rose-600', 'Final Exam Prep': 'text-indigo-600' }[title] || 'text-slate-600';
                         return `
-                            <div class="mb-8">
-                                <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
-                                    <i data-feather="${icon}" class="w-5 h-5 ${iconColor}"></i><span>${title}</span>
-                                </h3>
-                                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">${items.map(createResourceCard).join('')}</div>
-                            </div>`;
+                                <div class="mb-8">
+                                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
+                                        <i data-feather="${icon}" class="w-5 h-5 ${iconColor}"></i><span>${title}</span>
+                                    </h3>
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">${items.map(createResourceCard).join('')}</div>
+                                </div>`;
                     };
                     
                     resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
@@ -235,11 +249,11 @@
                     contentHTML += resourcesHTML;
                 } else {
                     contentHTML += `
-                        <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
-                            <i data-feather="folder" class="w-12 h-12 mx-auto text-slate-400"></i>
-                            <h3 class="mt-4 text-lg font-semibold text-slate-700 text-wrap">No Resources Available Yet</h3>
-                            <p class="mt-1 text-slate-500 text-wrap">Please check back later for materials related to this unit.</p>
-                        </div>`;
+                            <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
+                                <i data-feather="folder" class="w-12 h-12 mx-auto text-slate-400"></i>
+                                <h3 class="mt-4 text-lg font-semibold text-slate-700 text-wrap">No Resources Available Yet</h3>
+                                <p class="mt-1 text-slate-500 text-wrap">Please check back later for materials related to this unit.</p>
+                            </div>`;
                 }
                 section.innerHTML = contentHTML;
                 contentContainer.appendChild(section);
@@ -276,3 +290,4 @@
     </script>
 </body>
 </html>
+
