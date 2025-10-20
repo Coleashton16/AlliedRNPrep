@@ -3,150 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Maintenance</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/google/material-design-icons/master/png/social/public/2x/baseline_construction_black_24dp.png" type="image/png">
+    <title>Service Temporarily Unavailable | AlliedRNPrep</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Use a modern font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        canvas {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
+
+        /* Custom keyframes for animations */
+        @keyframes fadeInMoveUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulseX {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes signalPulse {
+            0% {
+                transform: scale(0.1);
+                opacity: 1;
+                border-width: 3px;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+                border-width: 0px;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen relative overflow-hidden">
+<body class="bg-slate-950 text-white flex items-center justify-center min-h-screen p-4 sm:p-6">
 
-    <!-- Background Canvas Animation -->
-    <canvas id="maintenanceCanvas"></canvas>
+    <div class="absolute inset-0 bg-slate-950 [mask-image:radial-gradient(100%_100%_at_top,transparent_30%,#000)] z-0"></div>
 
-    <!-- Main Content Container -->
-    <div class="relative z-20 max-w-2xl mx-auto p-8 sm:p-12 md:p-16 text-center rounded-3xl bg-gray-800 bg-opacity-70 backdrop-blur-md shadow-2xl transform transition-all duration-500 ease-in-out hover:scale-105 border border-gray-700">
-        <!-- Icon -->
-        <div class="flex justify-center mb-6 animate-pulse">
-            <svg class="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.842 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.842 3.313-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.842-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.842-3.313 2.37-2.37.525.322.951.233 1.066-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+    <div class="relative z-10 bg-slate-800 rounded-3xl shadow-2xl p-8 sm:p-12 lg:p-16 max-w-xl text-center border border-slate-700 animate-fadeInMoveUp">
+
+        <!-- Central X with pulsing rings -->
+        <div class="relative flex items-center justify-center mb-8">
+            <!-- Central Signal Rings -->
+            <div class="relative w-40 h-40">
+                <div class="absolute inset-0 rounded-full border-4 border-red-500 opacity-0 animate-[signalPulse_2.5s_cubic-bezier(0.25,0.46,0.45,0.94)_infinite]"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-red-500 opacity-0 animate-[signalPulse_2.5s_cubic-bezier(0.25,0.46,0.45,0.94)_infinite_1.25s]"></div>
+            </div>
+
+            <!-- Red 'X' icon -->
+            <div class="absolute top-1/2 left-1/2 -ml-6 -mt-6 w-12 h-12 flex justify-center items-center animate-[pulseX_2s_infinite]">
+                <svg class="w-12 h-12 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
         </div>
 
-        <!-- Headline -->
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-500 mb-4 animate-fade-in">We'll be right back.</h1>
-        <h2 class="text-xl sm:text-2xl font-bold text-gray-300 mb-2">Website Under Maintenance</h2>
-
-        <!-- Description -->
-        <p class="text-gray-400 text-sm sm:text-base leading-relaxed mb-6">We are currently performing some essential upgrades to improve your experience. We apologize for any inconvenience this may cause and appreciate your patience.</p>
-
-        <!-- Estimated Time -->
-        <div class="p-4 rounded-xl bg-gray-700 bg-opacity-50 inline-block">
-            <p class="text-gray-200 text-sm font-semibold">Estimated downtime:</p>
-            <p class="text-teal-400 text-lg sm:text-xl font-bold mt-1">~ 2 hours</p>
+        <!-- Main Content -->
+        <div class="mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-gray-100 leading-tight tracking-tight mb-2">Service Interruption</h1>
+            <p class="text-gray-400 leading-relaxed text-base sm:text-lg">
+                We are currently experiencing an unexpected service interruption. Our technical team is working to resolve the issue and restore full functionality as quickly as possible. We sincerely apologize for any inconvenience this may cause.
+            </p>
         </div>
 
-        <!-- Social Media/Contact Links (Optional) -->
-        <div class="mt-8 flex justify-center space-x-4">
-            <a href="#" class="text-gray-500 hover:text-gray-300 transition-colors duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.851.07 1.17.067 1.716.248 2.316.471.608.237 1.157.654 1.636 1.132.479.479.896 1.028 1.133 1.636.223.6.403 1.146.47 2.316.058 1.267.07 1.647.07 4.851s-.012 3.584-.07 4.851c-.067 1.17-.248 1.716-.471 2.316-.237.608-.654 1.157-1.132 1.636-.479.479-1.028.896-1.636 1.133-.6.223-1.146.403-2.316.47-1.267.058-1.647.07-4.851.07s-3.584-.012-4.851-.07c-1.17-.067-1.716-.248-2.316-.471-.608-.237-1.157-.654-1.636-1.132-.479-.479-.896-1.028-1.133-1.636-.223-.6-.403-1.146-.47-2.316-.058-1.267-.07-1.647-.07-4.851s.012-3.584.07-4.851c.067-1.17.248-1.716.471-2.316.237-.608.654-1.157 1.132-1.636.479-.479 1.028-.896 1.636-1.133.6-.223 1.146-.403 2.316-.47 1.267-.058 1.647-.07 4.851-.07zm0-2.163c-3.262 0-3.67.012-4.94.072-1.27.062-2.112.28-2.82.55-.708.27-1.294.63-1.85 1.186-.556.556-.916 1.142-1.186 1.85-.27.708-.488 1.55-.55 2.82-.06 1.27-.072 1.678-.072 4.94s.012 3.67.072 4.94c.062 1.27.28 2.112.55 2.82.27.708.63 1.294 1.186 1.85.556.556 1.142.916 1.85 1.186.708.27 1.55.488 2.82.55 1.27.06 1.678.072 4.94.072s3.67-.012 4.94-.072c1.27-.062 2.112-.28 2.82-.55.708-.27 1.294-.63 1.85-1.186.556-.556.916-1.142 1.186-1.85.27-.708.488-1.55.55-2.82.06-1.27.072-1.678.072-4.94s-.012-3.67-.072-4.94c-.062-1.27-.28-2.112-.55-2.82-.27-.708-.63-1.294-1.186-1.85-.556-.556-.916-1.142-1.186-1.85-.27-.708-.488-1.55-.55-2.82-.06-1.27-.072-1.678-.072-4.94zm-2.163 12.062c-2.115 0-3.832-1.717-3.832-3.832s1.717-3.832 3.832-3.832 3.832 1.717 3.832 3.832-1.717 3.832-3.832 3.832zm0-6.195c-1.29 0-2.363 1.073-2.363 2.363s1.073 2.363 2.363 2.363 2.363-1.073 2.363-2.363-1.073-2.363-2.363-2.363zm4.277-4.471c-.708 0-1.282.574-1.282 1.282s.574 1.282 1.282 1.282 1.282-.574 1.282-1.282-.574-1.282-1.282-1.282z"/></svg>
-            </a>
-            <a href="#" class="text-gray-500 hover:text-gray-300 transition-colors duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.604.111.82-.26.82-.577 0-.285-.01-1.04-.015-2.043-3.338.724-4.043-1.61-4.043-1.61-.542-1.373-1.322-1.743-1.322-1.743-1.087-.745.084-.73.084-.73 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.492.998.108-.776.42-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.312.465-2.383 1.235-3.221-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.22.955-.266 1.96-.399 2.964-.399s2.009.133 2.964.399c2.295-1.542 3.3-1.22 3.3-1.22.645 1.653.24 2.873.105 3.176.77.838 1.235 1.909 1.235 3.221 0 4.609-2.806 5.624-5.478 5.922.42.36.814 1.096.814 2.215 0 1.597-.015 2.887-.015 3.282 0 .319.215.69.825.575a11.97 11.97 0 008.206-11.387c0-6.627-5.373-12-12-12z"/></svg>
-            </a>
-            <a href="#" class="text-gray-500 hover:text-gray-300 transition-colors duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22 6.13c-.68.3-1.4.5-2.17.6.77-.46 1.35-1.2.98-2.05-.72.43-1.52.74-2.36.9-.68-.7-1.65-1.14-2.73-1.14-2.05 0-3.72 1.67-3.72 3.72 0 .29.03.57.08.84-3.1.16-5.85-1.65-7.7-4.1-.32.55-.5 1.2-.5 1.94 0 1.29.65 2.45 1.64 3.12-.6-.02-1.15-.19-1.64-.45v.04c0 1.8 1.27 3.3 2.95 3.65-.3.08-.62.12-.96.12-.24 0-.48-.02-.7-.07.47 1.46 1.82 2.53 3.44 2.56-1.27.99-2.87 1.59-4.6 1.59-.3 0-.6-.02-.89-.06 1.62 1.04 3.55 1.65 5.6 1.65 6.72 0 10.38-5.56 10.38-10.38v-.52c.72-.52 1.34-1.1 1.84-1.78z"/></svg>
-            </a>
-        </div>
+        <!-- Call to Action Button -->
+        <a href="javascript:location.reload()" class="inline-block bg-red-600 text-white font-medium py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50">
+            Refresh Page
+        </a>
     </div>
 
-    <script>
-        const canvas = document.getElementById('maintenanceCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        const particleCount = 100;
-        const maxRadius = 2;
-        const maxVelocity = 0.5;
-        const maxDistance = 100;
-
-        function setCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.radius = Math.random() * maxRadius;
-                this.vx = (Math.random() - 0.5) * maxVelocity;
-                this.vy = (Math.random() - 0.5) * maxVelocity;
-                this.alpha = Math.random();
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Wrap around the screen
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-                ctx.fill();
-            }
-        }
-
-        function drawLines() {
-            for (let i = 0; i < particleCount; i++) {
-                for (let j = i + 1; j < particleCount; j++) {
-                    const p1 = particles[i];
-                    const p2 = particles[j];
-                    const distance = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-
-                    if (distance < maxDistance) {
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${1 - (distance / maxDistance) * 0.7})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            drawLines();
-            requestAnimationFrame(animate);
-        }
-
-        window.onload = function() {
-            setCanvasSize();
-            animate();
-        };
-
-        window.onresize = setCanvasSize;
-
-    </script>
 </body>
 </html>
