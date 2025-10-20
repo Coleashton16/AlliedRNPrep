@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Nursing Diagnostic Exam</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1D4ED8',
+                        'secondary-gray': '#F3F4F6',
+                        'correct-green': '#10B981',
+                        'incorrect-red': '#EF4444',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for professional look */
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Inter', sans-serif;
+        }
+        .shadow-custom {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom focus styles for accessibility and design */
+        input:checked + label {
+            border-color: #1D4ED8;
+            background-color: #EFF6FF;
+        }
+        .option-label {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div id="app-container" class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-primary-blue mb-2">Clinical Nursing Diagnostic Exam</h1>
+            <p class="text-lg text-gray-600">Maternity, Pediatric, and Oncology Nursing Priority Review</p>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+            <!-- Content will be injected here (Start Screen, Question, or Results) -->
+        </div>
+
+        <!-- Hidden Loading Spinner -->
+        <div id="loading" class="hidden text-center mt-8">
+            <svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-500 mt-2">Processing...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. Question Data (New Set) ---
+        const questions = [
+            {
+                "questionText": "A 45 year old G2P1 female is giving birth to a 38 week old male. Upon admission, she describes 6/10 abdominal pain and cramping. Which action by the nurse is most appropriate?",
+                "options": { "A": "Administer 0.5mg morphine via epidural", "B": "Coach the laboring mother on breathing technique", "C": "Providing warm liquid to sip on to distract from the pain", "D": "Gently massaging the abdominal area to relieve cramping" },
+                "correctAnswer": "B",
+                "rationale": "Pain is an expected part of labor, and non-pharmacological methods are the first line of defense to help patients manage pain and maintain focus. **Coaching breathing techniques** is the most appropriate initial nursing action. Administering pain medication (A) is not the first step in expected labor. The patient should be NPO (C) in case of an emergency C-section. Gentle massage (D) may not be effective or appropriate for abdominal cramping during labor.",
+                "section": "Labor and Delivery",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse receives a phone call on the labor and delivery floor from a patient at home. The patient states that she can now anticipate her contractions, and they are lasting 30 seconds each and are moderately intense and becoming worse. She is 35 weeks pregnant. Which response from the nurse is correct?",
+                "options": { "A": "I understand. Please try not to allow the contractions to continue. If they last more than 15 minutes, come into the office.", "B": "I understand. These are Braxton Hicks contractions and are not of concern. If anything changes, please come into the office.", "C": "I understand. Please sit or lay down on the ground and call 911. Low intensity frequent contractions can be signs of a miscarriage.", "D": "I understand. Please sit or lay down on the ground and call 911. You may be going into active labor." },
+                "correctAnswer": "D",
+                "rationale": "Contractions that form a **pattern (can be anticipated)**, are **30 seconds long**, and are **increasing in intensity** strongly indicate **active labor**, even at 35 weeks (preterm labor). Since the contractions are getting worse, the patient should not wait (A). Braxton Hicks (B) are random and usually subside with movement. Miscarriage (C) is not a primary concern at 35 weeks gestation.",
+                "section": "Labor Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 27-year-old G1P0 at 41 weeks gestation is admitted with ruptured membranes for 14 hours and reports contractions every 4 minutes, lasting 60 seconds, with moderate intensity. Her temperature is 100.8°F (38.2°C). Vaginal exam: 6cm/90% effaced/0 station; clear amniotic fluid. Which nursing intervention is most critical at this time?",
+                "options": { "A": "Encourage frequent ambulation to promote labor progress", "B": "Begin IV antibiotics as ordered and monitor maternal temperature trends", "C": "Offer ice chips for comfort and oral hydration", "D": "Prepare the patient for immediate Cesarean birth" },
+                "correctAnswer": "B",
+                "rationale": "Prolonged ruptured membranes (ROM > 12-18 hours) combined with **maternal fever (100.8°F)** strongly suggests an intrauterine infection (**chorioamnionitis**). The infection risk demands prompt **IV antibiotics** to prevent maternal and fetal sepsis. This is a higher priority than comfort (C) or ambulation (A). Cesarean birth (D) is not immediately indicated without signs of fetal distress.",
+                "section": "Infection and ROM",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 35-year-old multiparous woman in active labor is on external fetal monitoring. Over 30 minutes, the nurse observes recurrent late decelerations, minimal variability, and a maternal BP of 88/54 following recent epidural placement. The patient reports dizziness, and the fetal heart rate baseline is now 170 bpm. The nurse can A) Reposition the patient to Left Lateral. B) increase IV fluids. C) Administer O2 via non-rebreather. D) Notify provider of fetal status. What is the correct order of the interventions?",
+                "options": { "A": "C, A, B, D.", "B": "D, C, A, B.", "C": "A, B, C, D.", "D": "B, D, A, C." },
+                "correctAnswer": "C",
+                "rationale": "The root cause of the fetal distress (late decelerations) is likely **maternal hypotension** secondary to the epidural, leading to reduced uteroplacental perfusion. The immediate priority is to **treat the cause** and improve circulation: 1. **Reposition** (A: Left Lateral) and 2. **Increase fluids** (B: IV bolus) to raise BP. 3. **Oxygenation** (C) is a secondary measure to optimize fetal oxygen. 4. **Notify the provider** (D) immediately after initial corrective actions are implemented.",
+                "section": "Fetal Monitoring",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 19-year-old in second stage of labor, G2P1, begins to scream that she 'needs to push now' between contractions—she is trembling, diaphoretic, and cries, 'I can't do this.' She is 9cm dilated at last check 20 minutes ago. Fetal heart rate is baseline 135 with accelerations. What should the nurse do first?",
+                "options": { "A": "Request immediate anesthesia for pain relief", "B": "Perform a sterile vaginal exam to assess dilation and station", "C": "Provide reassurance and coach with breathing techniques", "D": "Encourage the patient to begin pushing with the next contraction" },
+                "correctAnswer": "B",
+                "rationale": "The patient is likely experiencing the **transition phase**, which is characterized by intense physical symptoms and the overwhelming urge to push. However, the nurse must **verify full dilation (10cm)** by performing a sterile vaginal exam **before** allowing the patient to push (D). Pushing before 10cm can cause cervical edema or trauma. Comfort (C) follows the safety assessment (B).",
+                "section": "Labor Progress",
+                "type": "mc"
+            },
+            {
+                "questionText": "A laboring woman at 6cm dilation with ruptured membranes suddenly feels a rush of fluid and reports a rope-like structure at her vulva. FHR drops to 80 bpm. What is the nurse’s immediate priority?",
+                "options": { "A": "Reposition the patient to knee-chest and call for help", "B": "Apply an internal fetal scalp electrode", "C": "Prepare the patient for epidural anesthesia", "D": "Administer a tocolytic medication" },
+                "correctAnswer": "A",
+                "rationale": "The description (rope-like structure) combined with the sudden bradycardia (**FHR drops to 80 bpm**) is indicative of an umbilical cord prolapse, an **obstetric emergency**. The immediate priority is to relieve pressure on the cord, which is accomplished by repositioning (knee-chest or Trendelenburg) and manually elevating the presenting part off the cord while calling for immediate assistance. All other options delay life-saving intervention.",
+                "section": "Obstetric Emergencies",
+                "type": "mc"
+            },
+            {
+                "questionText": "A G1P0, 38 weeks, is in active labor, requesting pain meds. She is NPO due to risk for emergent surgery. Cervix 4cm/70% effaced/-2 station; FHR is 140, moderate variability. The physician orders IV morphine. Which action should the nurse take first?",
+                "options": { "A": "Double-check cervical dilation and contraction pattern", "B": "Explain potential effects of morphine on newborn respiratory status", "C": "Administer morphine as ordered", "D": "Offer clear fluids for comfort prior to giving medication" },
+                "correctAnswer": "A",
+                "rationale": "Before administering opioids during labor, the nurse must confirm that the labor is not rapidly progressing. Administering opioids too close to delivery can cause **neonatal respiratory depression**. Double-checking dilation and the contraction pattern is a safety measure to ensure the medication has adequate time to metabolize before birth.",
+                "section": "Medication Administration in L&D",
+                "type": "mc"
+            },
+            {
+                "questionText": "A multigravida delivers vaginally after a long second stage. One hour later, you find her fundus soft, boggy, and displaced up and right of umbilicus with increased vaginal bleeding. What’s the nurse’s first action?",
+                "options": { "A": "Call the provider for orders", "B": "Administer IV oxytocin as ordered", "C": "Massage the uterine fundus and assist the patient to void", "D": "Apply an ice pack to perineum" },
+                "correctAnswer": "C",
+                "rationale": "A **soft, boggy, displaced fundus** with bleeding indicates **uterine atony** (the primary cause of postpartum hemorrhage) complicated by a **full bladder** (displaces the uterus). The immediate, non-invasive nursing action is to **massage the fundus** to stimulate contraction and assist the patient to **void** or straight catheterize to empty the bladder. Oxytocin (B) often follows but is a medication order; C is the first independent nursing action.",
+                "section": "Postpartum Hemorrhage",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 32-week pregnant woman calls reporting intermittent, irregular cramping that subsides with walking and a soft abdomen between episodes. What should the nurse advise?",
+                "options": { "A": "Come to labor and delivery for assessment", "B": "These are likely Braxton Hicks contractions, rest and hydration are recommended", "C": "Immediately call 911", "D": "Begin timing contractions and hold your urine until arrival" },
+                "correctAnswer": "B",
+                "rationale": "Contractions that are **irregular** and **subside with activity or rest** are classic signs of **false labor (Braxton Hicks contractions)**. The correct nursing advice is to try non-pharmacologic measures like rest and hydration before deciding on further action.",
+                "section": "Labor Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is assessing a patient. The nurse observes thick, green, foul-smelling fluid. The FHR is 90 with minimal variability. What is the priority intervention the nurse should perform?",
+                "options": { "A": "Administer oxygen and notify the provider for possible meconium aspiration risk", "B": "Continue to monitor every 30 minutes", "C": "Place the patient in high Fowler’s position", "D": "Offer sips of water and repeat FHR check in 5 minutes" },
+                "correctAnswer": "A",
+                "rationale": "**Thick, green, foul-smelling fluid** (suggesting meconium and/or infection) combined with **FHR bradycardia (90 bpm)** and **minimal variability** indicates severe fetal distress and potential hypoxia. The priority intervention is to increase fetal oxygenation (via maternal oxygen) and immediately notify the provider for an emergency response.",
+                "section": "Fetal Monitoring",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 24-year-old with continuous epidural analgesia complains of lightheadedness, nausea, and sweating; you note BP 80/42 and FHR 110. What is the nurse’s initial intervention?",
+                "options": { "A": "Increase IV fluids and place mother in left lateral position", "B": "Turn off the epidural infusion", "C": "Offer patient oral fluids", "D": "Prepare for emergency Cesarean section" },
+                "correctAnswer": "A",
+                "rationale": "The symptoms and low blood pressure (**BP 80/42**) are characteristic of **epidural-induced hypotension**, which compromises uteroplacental blood flow and causes fetal bradycardia (**FHR 110**). The initial intervention is to rapidly administer an **IV fluid bolus** and position the mother in **left lateral decubitus** to shift the uterus off the vena cava, maximizing cardiac output and perfusion.",
+                "section": "Labor and Delivery",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nulliparous patient at 10cm dilatation, +2 station shows rapid breaths, pale face, pale lips, diaphoresis, tachycardia, wide eyes, and shouts 'I can’t do this.' What is the nurses priority response?",
+                "options": { "A": "Provide reassurance, coach pushing with contractions", "B": "Call anesthesia to reduce opioids as the patient is most likely overdosing", "C": "Instruct the patient to begin panting breaths to delay pushing", "D": "Prepare for urgent cesarean delivery" },
+                "correctAnswer": "A",
+                "rationale": "The patient is at **10 cm dilation** (second stage). The dramatic physical and emotional symptoms are normal signs of the second stage and the overwhelming nature of labor. The priority nursing intervention is to **reassure the patient and coach her to effectively use her energy by pushing with contractions**.",
+                "section": "Labor Progress",
+                "type": "mc"
+            },
+            {
+                "questionText": "The RN is on a busy maternity floor. The nurse notes abrupt variable FHR decelerations coinciding with contractions in a laboring patient with intact membranes. What action is most appropriate?",
+                "options": { "A": "Assist the patient to change position and monitor", "B": "Increase pitocin drip", "C": "Begin amnioinfusion", "D": "Discontinue fetal monitoring" },
+                "correctAnswer": "A",
+                "rationale": "**Variable decelerations** are typically caused by **umbilical cord compression** (VEAL CHOP mnemonic). The first and most appropriate non-invasive nursing action is to assist the patient to **change position** (e.g., side-to-side) to relieve the pressure on the cord. Increasing Pitocin (B) or discontinuing monitoring (D) is contraindicated.",
+                "section": "Fetal Monitoring",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is caring for a mother on the L/D ward. The nurse notes a distended bladder displacing the uterus upward and laterally. What intervention is indicated?",
+                "options": { "A": "Encourage patient to void or request emergent UA catheterization.", "B": "Continue monitoring and recheck in 2 hrs", "C": "Start IV fluids to improve urine output", "D": "Ask patient to bear down during contractions" },
+                "correctAnswer": "A",
+                "rationale": "A **distended bladder** physically obstructs the uterus, impeding labor progress and increasing the risk of uterine atony and postpartum hemorrhage. The bladder must be **emptied promptly**, either by encouraging the patient to void or by straight catheterization.",
+                "section": "Postpartum Care",
+                "type": "mc"
+            },
+            {
+                "questionText": "Continuous fetal monitoring shows FHR mirrors the contraction pattern with return to baseline at end of each contraction, minimal variability. What is the best explanation?",
+                "options": { "A": "Early decelerations due to head compression; monitor, no intervention needed", "B": "Sign of severe hypoxia; consider C-section", "C": "Variable decelerations from cord compression", "D": "Late decelerations from uteroplacental insufficiency, provide O2" },
+                "correctAnswer": "A",
+                "rationale": "FHR changes that **mirror contractions (decel starts and ends with contraction)** are classified as **Early Decelerations**. These are caused by **fetal head compression** and are generally considered benign and require no intervention other than continued monitoring.",
+                "section": "Fetal Monitoring",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is providing community teaching on URI (upper respiratory infections) to a group of new mothers. Which statement by the parents reflects correct understanding?",
+                "options": { "A": "Infants and children under 3 are at increased risk due to a lack of an immune response", "B": "Infants and children under 5 are at increased risk due to shortening of the trachea making it easier for bacteria to enter", "C": "Infants and children under 3 are at increased risk due to smaller airways and underdeveloped supporting cartilage", "D": "Infants and children under 6 are at increased risk due to community exposure to bacteria" },
+                "correctAnswer": "C",
+                "rationale": "Infants are at increased risk for URIs and respiratory distress because their **airways are smaller** and they have **underdeveloped cartilage** (making airways prone to collapse) and an **immature immune system**. There is an immune response (A), and tracheal length (B) is not a primary factor. All children are exposed to community pathogens (D), but the physical anatomy makes the difference in severity.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is speaking with a parent at discharge. Which statement by the parent requires immediate intervention?",
+                "options": { "A": "My child is not at risk for airway obstructions over the common cold, and I can follow up with my pediatrician.", "B": "My child is not at risk for breathing difficulty due to his nose and throat malformations", "C": "Children are most likely to develop asthma and it is the most common chronic disease in children.", "D": "If my child has trouble clearing his airway, I may use a bulb syringe to clear the secretions." },
+                "correctAnswer": "A",
+                "rationale": "Statement A is incorrect and dangerous. **Children are at significant risk for airway obstructions** related to mucus and edema caused by common viruses (colds). Due to their small airways, mucus/edema can quickly cause a severe obstruction. Statement D is correct, and C is a true statement.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is evaluating a pediatric patient on the unit. The patient has an obstructed left nare from tissue hyperplasia and a severe cleft palette. The nurse notes an increased effort in breathing and an O2 saturation of 90%. Which intervention by the nurse is correct?",
+                "options": { "A": "Place the patient prone to help clear airway obstructions by allowing gravity to assist in clearing secretions.", "B": "Calling rapid response to immediately intubate the patient due to the hypoxic drive taking over and use of accessory muscles", "C": "Recommending a bronchoscopy to the provider to rule out lower airway disease pathology as nose and throat pathologies do not usually cause respiratory difficulty.", "D": "Discontinuing the humidifier on the oxygen line as the excess moisture is leading to pulmonary fluid and a subsequent decrease in alveolar surface area and increased work of breathing." },
+                "correctAnswer": "C",
+                "rationale": "While the patient has upper airway issues, a healthy child compensates well. **Increased work of breathing and O2 saturation of 90%** suggest a lower airway pathology is contributing or is the primary problem. Further diagnostic workup, such as a bronchoscopy (C), is indicated. Bradypnea (B) is a sign of respiratory failure, but the scenario describes increased effort, not bradypnea. The humidifier (D) is beneficial for secretions.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "A new grad RN is working on a busy acute care medical ward in a pediatric hospital. The nurse receives a report on four patients. Which patient should the nurse assess first?",
+                "options": { "A": "A 6 year old male with an open and maintained airway with an O2 saturation of 95%.", "B": "A 9 year old female with tachypnea, increased respiratory effort who is pale, anxious, and newly agitated.", "C": "A 5 year old male with bradypnea, lethargy, and decreased respiratory effort.", "D": "A 3 year old female with a heart rate of 54, T 103.2, complaining of nausea and abdominal pain with severe emesis." },
+                "correctAnswer": "C",
+                "rationale": "A sudden shift to **bradypnea (abnormally slow breathing)**, **lethargy**, and **decreased respiratory effort** in a pediatric patient is a sign of **impending respiratory failure** and requires immediate intervention (ABC Priority). Option B (distress) is serious, but C (failure) is an emergent, immediate threat to life. Option D (bradycardia, fever) is serious but not the immediate respiratory threat of C.",
+                "section": "Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "A parent asks the nurse why their child is more at risk for developing respiratory related issues. Which response by the nurse most accurately reflects why this is?",
+                "options": { "A": "Infants primarily breathe through their noses with very little mucus so they are more likely to contract an infection.", "B": "Newborns are more likely to develop respiratory distress due to having no surfactant and relying solely on breathing", "C": "Infants tongues are smaller than their oropharynx which leads to an easier path for bacteria to cause infection", "D": "Children have smaller tonsils and adenoid tissue since their immune system is less developed." },
+                "correctAnswer": "A",
+                "rationale": "Infants are obligate nose breathers, and the **decreased production of mucus** (a natural defense mechanism) makes them highly susceptible to respiratory infections and difficulties when the nose is congested. Options B, C, and D are factually incorrect regarding pediatric anatomy/physiology.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is reviewing the anatomy of infants to prepare for RSV season. Which anatomical difference with infants places them at higher risk for infection?",
+                "options": { "A": "Infants are more likely to have a respiratory infection due to undeveloped lung tissue.", "B": "Infants are more likely to have a respiratory infection due to decreased mucus production", "C": "Infants are more susceptible to infection due to decreased circulation which inhibits white blood cells from preventing an infection", "D": "Infants sinuses develop before their lungs and leads to an increased pathway for bacteria to enter." },
+                "correctAnswer": "B",
+                "rationale": "Infants have **decreased mucus production** compared to older children and adults, which is a major factor in their susceptibility to respiratory infections (like RSV), as mucus helps trap and clear pathogens. Options A, C, and D are inaccurate statements.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "A concerned mother presents to the ED very concerned for her 8 year old child. She states the child may have cancer. Upon exam, the nurse notes palpable tonsils, bilateral swollen areas at the back of the throat, T 98.2, and all other findings WNL. Which thought process by the nurse reflects understanding?",
+                "options": { "A": "Lymphoma (cancer of the lymph nodes) is very common in this age group, and the swelling is a major red flag and the provider needs to be alerted.", "B": "The swelling of the tonsils and adenoids are suggestive of an acute infection and further workup is needed.", "C": "Enlarged tonsils and adenoids are a common finding and reflect proper growth and development of the child.", "D": "The child most likely has acute lymphoblastic leukemia and the cancer may have irritated the tonsils and adenoids causing them to swell." },
+                "correctAnswer": "C",
+                "rationale": "**Enlarged tonsil and adenoid tissue** are a **normal physiological finding** in school-age children (4-12 years old) as part of the lymphoid tissue development, and they typically atrophy by adolescence. Since the child's vital signs are normal, this finding is not immediately alarming or indicative of cancer (A, D) or acute infection (B).",
+                "section": "Pediatric Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is assessing a 14 year old male who presents to the ED. The nurse notes clubbing of the fingers, anorexia, nausea, vomiting, muscle wasting, shortness of breath with course crackles and adventitious lung sounds, and an O2 saturation of 90% on 2L/min of oxygen. Which condition should the nurse suspect?",
+                "options": { "A": "Neglect of the child", "B": "Chronic Obstructive Pulmonary Disorder", "C": "Acute respiratory failure", "D": "Cystic Fibrosis." },
+                "correctAnswer": "D",
+                "rationale": "This constellation of symptoms is characteristic of **Cystic Fibrosis (CF)**. Specifically, **finger clubbing** (chronic hypoxia) combined with **pulmonary issues** (crackles, adventitious sounds) and **gastrointestinal/nutritional deficits** (anorexia, muscle wasting) points to this systemic disorder.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 9 month old male presents with a T of 99.7, clear runny nose, cough started 2 days ago, wheezing, and poor feeding. The nurse correctly identifies this as which condition?",
+                "options": { "A": "Acute respiratory distress complicated by infection", "B": "Acute bronchiolitis RSV infection", "C": "Rhinovirus infection causing the common cold", "D": "Acute allergies to the environment causing respiratory disturbance." },
+                "correctAnswer": "B",
+                "rationale": "The presentation of a **low-grade fever, clear runny nose, cough, wheezing, and poor feeding** in an infant during winter/spring months is highly suggestive of **Acute Bronchiolitis caused by RSV** (Respiratory Syncytial Virus). This is the most common cause of lower respiratory tract infection and wheezing in infants.",
+                "section": "Pediatric Respiratory",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is caring for a newborn diagnosed with epiglottitis. The nurse is precepting a student nurse. Which action by the student nurse represents an immediate threat to the patient?",
+                "options": { "A": "Not sanitizing the stethoscope before use", "B": "Auscultation of only anterior and lateral breath sounds", "C": "Visualization of the throat utilizing a penlight", "D": "Grabbing a tracheostomy tray and emergency equipment to have at bedside." },
+                "correctAnswer": "C",
+                "rationale": "In a child suspected or diagnosed with epiglottitis, any attempt at **visualization of the throat (using a penlight or tongue blade)** can trigger a spasm of the swollen epiglottis, leading to **complete airway obstruction**. This is an immediate, life-threatening danger. Option D is an appropriate preparatory action.",
+                "section": "Pediatric Emergency",
+                "type": "mc"
+            },
+            {
+                "questionText": "A concerned mother calls the RN at a clinic using a landline telephone. The mother states that her baby is blatantly refusing to lie down and is drooling a lot. Which response by the nurse is most appropriate given this scenario? Select all that apply.",
+                "options": { "A": "I understand your baby does not want to lie down and is drooling. I need you to calmly call emergency services and have the infant brought to the ER immediately.", "B": "I understand. Your baby most likely has a respiratory infection. Please schedule an appointment with your pediatrician on the next in office date.", "C": "I understand. This is very concerning. Please bring your infant into the office immediately for further workup.", "D": "I understand. During this age of trust vs mistrust, infants dont want to be away from you which can cause anxiety making them restless and nauseous which can lead to drooling.", "E": "I understand. This is characteristic of cystic fibrosis and a further workup is warranted." },
+                "correctAnswer": ["A", "C"],
+                "rationale": "The combination of **refusing to lie down (tripod position)** and **excessive drooling** are **hallmark signs of epiglottitis**, a rapidly progressing, life-threatening airway emergency. The nurse must instruct the parent to seek immediate emergency care (A or C) to secure the airway. Delaying care (B) or providing an inaccurate explanation (D, E) is inappropriate and dangerous.",
+                "section": "Pediatric Emergency",
+                "type": "sata"
+            },
+            {
+                "questionText": "What are the three hallmark signs of epiglottitis? Select all that apply.",
+                "options": { "A": "Dysphagia", "B": "Distress", "C": "Diaphoresis", "D": "Drooling", "E": "Diarrhea" },
+                "correctAnswer": ["A", "B", "D"],
+                "rationale": "The classic '3 D's' of epiglottitis are: **Dysphagia** (difficulty swallowing), **Drooling** (due to inability to swallow saliva), and **Distress** (respiratory, often with restlessness/anxiety). Diaphoresis (C) and Diarrhea (E) are not considered hallmark signs.",
+                "section": "Pediatric Emergency",
+                "type": "sata"
+            },
+            {
+                "questionText": "A nurse is assessing a newly admitted 6 month old child. The nurse notes a temperature of 102.8, child is refusing to lie down, drooling, anxiety, and dysphagia. The mother reports this just began an hour ago. Which action by the nurse is correct.",
+                "options": { "A": "Press the rapid response assist button for immediate help.", "B": "Call the provider and request a portable chest x ray for pneumonia", "C": "Instruct the PCT to retrieve a tracheotomy and care kit with all needed supplies from the supply rooms", "D": "Move the patient to a left lateral recumbent position and apply suction to the mouth to remove excretions and clear the airway." },
+                "correctAnswer": "A",
+                "rationale": "The symptoms (fever, refusal to lie down, drooling, dysphagia) strongly suggest **acute epiglottitis**, which is a life-threatening medical emergency. The nurse's highest priority is to **activate the emergency response system (RRT/Code)** for immediate airway management. Suctioning (D) or visualization of the throat should be avoided as it can cause complete airway obstruction. Ordering an X-ray (B) delays critical care.",
+                "section": "Pediatric Emergency",
+                "type": "mc"
+            },
+            {
+                "questionText": "A new grad RN is caring for an infant with epiglottitis. Which action by the PCT requires immediate correction?",
+                "options": { "A": "Repositioning the child on his back", "B": "Not leaving the child unattended", "C": "Retrieving care supplies for cleaning a tracheostomy for the RN", "D": "Repositioning the patient in semifowlers position." },
+                "correctAnswer": "A",
+                "rationale": "A patient with suspected or confirmed epiglottitis should **NEVER be placed on their back (supine)**, as this position increases the risk that the swollen epiglottis will completely occlude the trachea. The child should be allowed to maintain a position of comfort (usually sitting upright/tripod).",
+                "section": "Pediatric Emergency",
+                "type": "mc"
+            },
+            {
+                "questionText": "The parents of a child newly diagnosed with cystic fibrosis inquires what caused this disease. Which response by the nurse is correct?",
+                "options": { "A": "Cystic fibrosis is a result of the autoimmune system destroying the soft tissue in the body", "B": "Cystic fibrosis is an autosomal recessive disorder meaning both you and your partner had a recessive gene for the disease", "C": "Cystic fibrosis is caused by prolonged asthmatic conditions which damaged the lungs and immune system", "D": "Cystic fibrosis is the hardening and fibrotic formation of scar tissue in the lungs leading to airway resistance" },
+                "correctAnswer": "B",
+                "rationale": "**Cystic Fibrosis (CF)** is an inherited genetic condition caused by a mutation in the CFTR gene, making it an **autosomal recessive disorder**. This means both parents must carry a copy of the recessive gene for the child to inherit the disease.",
+                "section": "Cystic Fibrosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with cystic fibrosis presents to the hospital with difficulty breathing, increased mucus production, gastric upset, nausea, and skin tenting. Which action by the nurse is required immediately?",
+                "options": { "A": "Administration of a mucolytic agent to thin secretions", "B": "Administer Sodium Chloride 0.9% IV", "C": "Administration of oxygen at 100% on a non rebreather", "D": "Administer ADEK vitamin supplementation." },
+                "correctAnswer": "B",
+                "rationale": "**Skin tenting** is a sign of **dehydration/hypovolemia**. In CF, dehydration thickens the mucus further, compounding the respiratory issues. Therefore, the immediate priority is **fluid resuscitation (IV 0.9% NaCl)** to restore hydration, which in turn helps thin the tenacious mucus. Mucolytics (A) and oxygen (C) are supportive but less effective if the patient is severely dehydrated.",
+                "section": "Cystic Fibrosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is reviewing the chart for a child admitted with newly diagnosed cystic fibrosis. Which test confirms this diagnosis?",
+                "options": { "A": "Sweat Chloride test of 61 mEq/L.", "B": "SpO2% of 91%.", "C": "Hypoinflation of the lungs on x ray.", "D": "PFT with decreased force in vital capacity and increase in residual" },
+                "correctAnswer": "A",
+                "rationale": "The definitive diagnostic test for Cystic Fibrosis is the **Sweat Chloride test**. A value **greater than 60 mEq/L** is diagnostic for CF. The other findings (B, C, D) are suggestive of chronic pulmonary disease but are not diagnostic for CF itself.",
+                "section": "Cystic Fibrosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A concerned parent asks the nurse why their child is receiving enzymes with their meals and why they are feeding their child such fatty and protein rich foods. Which answer by the nurse is accurate?",
+                "options": { "A": "We feed a diet high in fat and enzymes to help them recover from RSV with increased energy to fight the infection", "B": "Enzymes are given to prevent the specific part of the food from being absorbed due to metabolic dysfunction", "C": "We give nutrient rich food and enzymes to aid in cystic fibrosis patients absorption of nutrients", "D": "Enzymes are given with meals to aid in absorption of nutrients." },
+                "correctAnswer": "C",
+                "rationale": "In CF, thick mucus blocks the pancreatic ducts, preventing digestive enzymes from reaching the small intestine. This results in **malabsorption**. Therefore, CF patients require a **high-calorie, high-fat, high-protein diet** along with **Pancreatic Enzyme Replacement Therapy (PERT)** to aid in the digestion and absorption of nutrients (C).",
+                "section": "Cystic Fibrosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with cystic fibrosis is requesting lunch and requests a meal order from the PCT. Which meal is best for this patient?",
+                "options": { "A": "Chicken fingers and mac and cheese bites with milk and apple sauce", "B": "Chicken soup with a kale and bell pepper salad with milk and yogurt", "C": "Steak bites with fries and apple slices", "D": "Tuna salad with whole grain bread and lettuce with orange juice and banana slices" },
+                "correctAnswer": "B",
+                "rationale": "The ideal meal for a CF patient is one that is **high in calories, fat, and protein**, and includes **fat-soluble vitamins (A, D, E, K)**. Option B is the most nutritionally complete choice, offering high protein/fat (chicken/yogurt) and vitamins (kale/bell pepper/milk), aligning with the dietary needs.",
+                "section": "Cystic Fibrosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with cystic fibrosis inquires what will be included in the plan of care for the day. Which actions by the nurse would reflect an accurate plan of care? Select all that apply.",
+                "options": { "A": "Chest physiotherapy 3 times daily", "B": "Dietary restrictions to vitamin B and C rich foods", "C": "Inhaled pancreatic enzymes", "D": "Inhaled antibiotics", "E": "High calorie and High protein foods" },
+                "correctAnswer": ["A", "D", "E"],
+                "rationale": "Key components of CF care include: **Chest Physiotherapy (CPT)** (A) to loosen secretions; **Inhaled Antibiotics** (D) to manage chronic pulmonary infections; and a **High Calorie/Protein/Fat Diet** (E) to counteract malabsorption. Pancreatic enzymes (C) are taken orally with meals, not inhaled. Vitamins B and C are water-soluble and typically not restricted (B).",
+                "section": "Cystic Fibrosis",
+                "type": "sata"
+            },
+            {
+                "questionText": "A child diagnosed with cystic fibrosis seems depressed and withdrawn after diagnosis. Which action by the nurse best promotes development?",
+                "options": { "A": "Allowing the child to participate in management of the disease by choosing foods and vitamin supplements", "B": "Encouraging the child to participate in school outdoor activities daily", "C": "Allowing the child to refuse treatment daily due to discomfort", "D": "Disallowing the child to consume culturally procured foods to prevent aspiration" },
+                "correctAnswer": "A",
+                "rationale": "For pediatric patients with chronic diseases, promoting **autonomy and control** (Erikson's stages) is vital for development. **Allowing the child to participate in care decisions** (A) empowers them and improves compliance. While activity is important (B), management choices are more central to psychosocial health. Refusal of necessary treatment (C) is inappropriate, and restricting food (D) harms cultural connection.",
+                "section": "Psychosocial Care",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse walks into a room to find a child inconsolably crying on the bed in the fetal position. The child tells the nurse they are terrified of cystic fibrosis because they are terrified of needles and don't want constant blood tests to monitor the disease. Which response by the nurse is most accurate?",
+                "options": { "A": "I know you're afraid, but we have to do weekly blood tests to make sure you are healthy. We can numb your arm so you wont feel it!", "B": "The good news is we can see how you are doing based on your poop! We don't have to use needles all the time!", "C": "I understand you are feeling afraid. We can see how you are doing with your foods and diet so you wont ever need a needle poke again!", "D": "I know you are fearful, but you will get used to the needles and it will become second nature." },
+                "correctAnswer": "B",
+                "rationale": "This response provides comfort while being therapeutically accurate. **Stool characteristics** (pale, greasy, foul-smelling, fatty stools, known as steatorrhea) are a primary, non-invasive indicator used to monitor the effectiveness of pancreatic enzyme replacement therapy in CF. This validates the child's fear and offers a realistic alternative to constant needles.",
+                "section": "Cystic Fibrosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A family member calls the hospital and demands to speak to the primary care providers care team for their 6 year old son. She is irate and threatening to sue the clinic since they missed a diagnosis of cancer since her visit 4 months prior. Which best explains this scenario?",
+                "options": { "A": "Most children suddenly become ill and rapidly develop cancer, especially leukemia.", "B": "Cancer is slow growing in children and should have easily been caught.", "C": "Children are experts at hiding their illness due to fear of physicians and needles which may have aided in the evasion of diagnosis", "D": "Children develop cancer rapidly from diet due to decreased immune function, and this parent was likely partaking in a fast food typical american diet." },
+                "correctAnswer": "A",
+                "rationale": "Unlike many adult cancers, **pediatric cancers (especially Acute Lymphoblastic Leukemia - ALL)** are often **rapidly proliferating and aggressive**. Children can go from presenting with vague, common symptoms to being critically ill very quickly (A). This rapid progression makes early diagnosis difficult. Options B, C, and D are factually incorrect or inappropriate.",
+                "section": "Pediatric Oncology",
+                "type": "mc"
+            },
+            {
+                "questionText": "A concerned parent stops all diagnostics for their 7 year old child in the emergency department and demands answers. They express concern that the hospital is running a CBC and screening for a child with a runny nose and joint pain, which they state is obviously the common cold. They accuse the hospital of intentionally raising the cost of the visit with unnecessary testing. Which response by the care team is accurate?",
+                "options": { "A": "You're right. The hospital does upcharge its patients to increase diagnostic results which does lead to additional testing.", "B": "We run a CBC which can test for abnormal blood cell counts since children are very prone to developing leukemia.", "C": "Your provider ordered a CBC to rule out leukemia since cancer typically mimics the symptoms of common childhood illness.", "D": "A CBC is common protocol for all patients admitted to the ED and is a part of standard care." },
+                "correctAnswer": "C",
+                "rationale": "The vague, flu-like symptoms of **runny nose, lethargy, and joint pain** often **mimic common viral childhood illnesses**. However, these are also the non-specific presenting symptoms of **pediatric leukemia (ALL)**. The CBC is ordered precisely because these symptoms must be investigated to rule out malignancy (C). Statement B is inaccurate as children are not 'very prone' but ALL is the most common childhood cancer. A and D are incorrect reasons.",
+                "section": "Pediatric Oncology",
+                "type": "mc"
+            },
+            {
+                "questionText": "The lab calls the RN with an emergent blood test result. The nurse immediately instructs the family to leave the room, and the room is converted to a positive pressure room. Which lab result most likely initiated these actions?",
+                "options": { "A": "Positive PCR test for tuberculosis", "B": "ANC <1000", "C": "WBC of 2.3", "D": "COVID-19 test which was positive." },
+                "correctAnswer": "B",
+                "rationale": "An **ANC (Absolute Neutrophil Count) less than 1000** (or less than 500) indicates severe neutropenia, requiring **Neutropenic (Reverse Isolation) Precautions**. This involves protecting the patient from the environment, often requiring a **positive pressure room**. Tuberculosis (A) and COVID-19 (D) require *negative* pressure rooms to contain airborne pathogens.",
+                "section": "Oncology",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is providing education to a group regarding ALL. Which statement by the nurse indicates understanding of this disease?",
+                "options": { "A": "The bone marrow turns into cancer and releases abnormal osteoblasts which destroy the white blood cells leading to decreased ANC counts", "B": "Infection and smoking risks are not reliable risk factors for development of ALL.", "C": "Downs syndrome children are at increased risk for development of ALL.", "D": "Radiation is not a cause for ALL but rather is a cause for epithelial cancers." },
+                "correctAnswer": "C",
+                "rationale": "It is well-established that children with **Down Syndrome** have a significantly **increased risk** of developing Acute Lymphoblastic Leukemia (ALL) and Acute Myeloid Leukemia (AML). Option A is anatomically inaccurate; ALL involves lymphoblasts. Option B is partially true, but C is the most accurate statement regarding known ALL risk factors.",
+                "section": "Pediatric Oncology",
+                "type": "mc"
+            },
+            {
+                "questionText": "A child tells the school nurse they are experiencing lethargy, malaise, anorexia, and joint pain with red spots on their skin. Which action by the school nurse is correct?",
+                "options": { "A": "Call the parents and advise them to take the child straight to the emergency room", "B": "Call the parents and request to give the child a dose of advil to help with joint pain which is a sign of growing pains", "C": "Send the child to class as these are signs of overt anxiety", "D": "Call the parents and request them to pick up the child as they most likely have developed a viral infection." },
+                "correctAnswer": "A",
+                "rationale": "The combination of **lethargy, malaise, joint pain, and petechiae (red spots/bruising)** is highly suspicious for **Leukemia** (ALL), which requires urgent diagnosis and treatment. The school nurse should elevate the urgency to the highest level, advising the parent to seek emergency care immediately (A). Treating the pain as growing pains (B) or assuming a viral infection (D) is a potentially fatal delay in care.",
+                "section": "Pediatric Oncology",
+                "type": "mc"
+            },
+            {
+                "questionText": "A child returning from chemotherapy is positive for significant muscle cramping and ECG abnormalities. The care team immediately administers IV insulin and glucagon in D5W. The nurse knows that his is due to:",
+                "options": { "A": "Hyperkalemia related to severe vomiting which is a side effect of the chemotherapy", "B": "Hyperkalemia which is a sign of cancer cell lysis causing blood toxicity", "C": "Hypocalcemia which is due to the chemotherapy causing a drop in kidney function leading to loss of calcium in the urine", "D": "Hyponatremia due to a decrease in fluid intake as chemo causes significant nausea and dehydration." },
+                "correctAnswer": "B",
+                "rationale": "The combination of muscle cramping and ECG changes suggests **severe hyperkalemia**. This is a hallmark of **Tumor Lysis Syndrome (TLS)**, a complication of chemotherapy where massive numbers of cancer cells are destroyed, releasing high levels of potassium, phosphorus, and uric acid into the bloodstream (B). The insulin and D5W are administered to drive potassium back into the cells.",
+                "section": "Oncology",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 9-year-old with sickle cell disease is admitted for vaso-occlusive crisis. Which nursing intervention should be prioritized to prevent further sickling and complications?",
+                "options": { "A": "Administer oxygen via nasal cannula as ordered", "B": "Initiate IV fluids and maintain hydration", "C": "Apply warm compresses to painful joints", "D": "Encourage ambulation to prevent deep vein thrombosis" },
+                "correctAnswer": "B",
+                "rationale": "The primary goal during a vaso-occlusive crisis is to reverse and prevent further sickling. **Hydration (IV fluids)** is the most effective initial intervention as it reduces blood viscosity and improves blood flow to affected areas. While oxygen (A) may be used if the patient is hypoxic, hydration addresses the fundamental circulatory problem.",
+                "section": "Hematology/Sickle Cell",
+                "type": "mc"
+            },
+            {
+                "questionText": "A child with sickle cell disease presents with sudden chest pain, cough, and shortness of breath. Which action should the nurse take first?",
+                "options": { "A": "Notify the provider immediately", "B": "Assess oxygen saturation and apply oxygen", "C": "Administer prescribed pain medication", "D": "Obtain a chest X-ray" },
+                "correctAnswer": "B",
+                "rationale": "These symptoms are classic signs of **Acute Chest Syndrome (ACS)**, a life-threatening complication of sickle cell disease. Per the ABC priority framework, the nurse must immediately **assess and support oxygenation (B)** before notifying the provider (A) or administering medication (C).",
+                "section": "Hematology/Sickle Cell",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is teaching parents of a child with sickle cell disease about infection prevention. Which statement indicates a need for further teaching?",
+                "options": { "A": "“We will seek medical attention if our child has a fever.”", "B": "“Our child should receive all recommended vaccinations.”", "C": "“We can give our child aspirin for pain relief.”", "D": "“Hand hygiene is important for everyone in the household.”" },
+                "correctAnswer": "C",
+                "rationale": "**Aspirin is contraindicated in children** due to the risk of Reye’s syndrome (which can lead to encephalopathy and liver damage). Parents should use acetaminophen or ibuprofen for pain relief. Statements A, B, and D reflect correct understanding of essential infection and crisis prevention.",
+                "section": "Hematology/Sickle Cell",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is caring for a child with sickle cell disease who is receiving a blood transfusion. Which assessment finding requires immediate intervention?",
+                "options": { "A": "Mild back pain", "B": "Temperature increase of 0.5°C", "C": "Urticaria and wheezing", "D": "Slight tachycardia" },
+                "correctAnswer": "C",
+                "rationale": "**Urticaria (hives) and wheezing** are signs of an **allergic or anaphylactic transfusion reaction**. This is an immediate, life-threatening emergency requiring the nurse to stop the transfusion, maintain the IV line with 0.9% NaCl, and initiate emergency measures.",
+                "section": "Hematology/Transfusion",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 7-year-old with sickle cell disease is scheduled for a splenectomy. Which postoperative assessment finding is most concerning?",
+                "options": { "A": "Mild incisional pain", "B": "Decreased appetite", "C": "Fever and tachycardia", "D": "Fatigue" },
+                "correctAnswer": "C",
+                "rationale": "The spleen filters blood and is crucial for immunity. After a splenectomy, the patient is at extremely high risk for overwhelming infection and sepsis. **Fever and tachycardia** are the most concerning findings as they may indicate **sepsis**, requiring immediate intervention to prevent mortality.",
+                "section": "Hematology/Sickle Cell",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is developing a care plan for a child with sickle cell disease who is experiencing chronic pain. Which intervention is most appropriate for long-term management?",
+                "options": { "A": "Schedule regular opioid doses", "B": "Encourage participation in physical therapy", "C": "Provide distraction techniques during pain episodes", "D": "Teach relaxation and guided imagery techniques" },
+                "correctAnswer": "D",
+                "rationale": "Long-term management of chronic pain emphasizes empowering the child through **nonpharmacologic coping strategies**. Teaching techniques like **relaxation and guided imagery** allows the child to gain a sense of control over their pain and reduces reliance on medication for daily management.",
+                "section": "Hematology/Sickle Cell",
+                "type": "mc"
+            }
+        ];
+
+        // --- 2. State Management ---
+        const state = {
+            currentQuestionIndex: 0,
+            score: 0,
+            userAnswers: [],
+            quizStarted: false,
+            // SATA (Select All That Apply) answers in progress
+            currentSataSelection: new Set(),
+            // NEW: Risk Tracking Properties
+            questionStartTime: null, // Date.now() when question loads
+            initialSelection: null,  // First selected choice (string or sorted CSV for SATA)
+        };
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        // --- 3. Core Logic Functions ---
+
+        function startQuiz() {
+            state.quizStarted = true;
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.userAnswers = [];
+            state.currentSataSelection = new Set();
+            state.questionStartTime = null; 
+            state.initialSelection = null; 
+            render();
+        }
+
+        function checkAnswer(question, userSelection) {
+            const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+            const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+            // Check if every correct answer was selected AND nothing incorrect was selected
+            const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+            return isCorrect;
+        }
+
+        function submitAnswer() {
+            const currentQuestion = questions[state.currentQuestionIndex];
+            let userSelection = [];
+            let finalSelectionForComparison = ''; // Used to compare against initialSelection for change detection
+
+            // --- 1. Get User Selection and Check Validity ---
+            if (currentQuestion.type === 'mc') {
+                const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+                if (!checkedRadio) {
+                    showMessage("Please select one option before submitting.", 'warning');
+                    return;
+                }
+                userSelection = checkedRadio.value;
+                finalSelectionForComparison = userSelection;
+            } else if (currentQuestion.type === 'sata') {
+                userSelection = Array.from(state.currentSataSelection).sort();
+                if (userSelection.length === 0) {
+                    showMessage("Please select at least one option before submitting.", 'warning');
+                    return;
+                }
+                finalSelectionForComparison = userSelection.join(',');
+            }
+
+            // --- 2. Calculate Risk Metrics ---
+            const timeSpentMs = Date.now() - state.questionStartTime;
+            const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+            // Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+            let answerWasChanged = false;
+            // Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+            if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+                 answerWasChanged = true;
+            }
+            
+            // Time Risk Logic
+            let timeRisk = 0;
+            const fastThreshold = 10; // seconds: High risk for rushing
+            const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+            let timeRiskText = 'Normal Time (Risk +0)';
+
+            if (timeSpentSeconds < fastThreshold) {
+                timeRisk = 2; 
+                timeRiskText = 'Fast Answer (Risk +2)';
+            } else if (timeSpentSeconds > slowThreshold) {
+                timeRisk = 1; 
+                timeRiskText = 'Slow Answer (Risk +1)';
+            }
+
+            // Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+            const changeRisk = answerWasChanged ? 3 : 0;
+            const totalRiskScore = changeRisk + timeRisk;
+
+            const isCorrect = checkAnswer(currentQuestion, userSelection);
+            if (isCorrect) {
+                state.score++;
+            }
+            
+            // --- 3. Record the Answer and Metrics ---
+            state.userAnswers.push({
+                ...currentQuestion,
+                userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+                isCorrect: isCorrect,
+                timeSpent: timeSpentSeconds,
+                answerWasChanged: answerWasChanged,
+                riskScore: totalRiskScore,
+                timeRiskText: timeRiskText,
+            });
+
+            // Show neutral message to trigger the visual delay/button disable without revealing correctness
+            showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+            // Move to the next question after a slight delay for user feedback
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                state.currentSataSelection.clear(); // Reset SATA selection
+                render();
+                hideMessage();
+            }, 1200);
+        }
+
+        // --- 4. Rendering Functions (Views) ---
+
+        function render() {
+            if (!state.quizStarted) {
+                renderStartScreen();
+            } else if (state.currentQuestionIndex < questions.length) {
+                renderQuestion();
+            } else {
+                renderResults();
+            }
+        }
+
+        function renderStartScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
+                    <p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${questions.length} critical thinking questions covering **Maternity, Pediatric, and Oncology** nursing. You must answer each question to proceed, and there is no option to go back.</p>
+                    <p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+                    <button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+                        Start Exam Now
+                    </button>
+                    <p class="mt-6 text-sm text-red-500 font-medium">Warning: No backward navigation is allowed once started.</p>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            const currentQuestion = questions[state.currentQuestionIndex];
+            const qNum = state.currentQuestionIndex + 1;
+            const total = questions.length;
+            const isSATA = currentQuestion.type === 'sata';
+
+            // NEW: Risk Tracking Setup
+            state.questionStartTime = Date.now();
+            state.initialSelection = null;
+
+            let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+                const inputType = isSATA ? 'checkbox' : 'radio';
+                const inputName = 'option';
+                const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+                return `
+                    <div class="mb-3">
+                        <input
+                            type="${inputType}"
+                            id="option-${key}"
+                            name="${inputName}"
+                            value="${key}"
+                            class="hidden peer"
+                            ${isChecked ? 'checked' : ''}
+                            onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+                        />
+                        <label
+                            for="option-${key}"
+                            class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+                        >
+                            <span class="font-bold text-primary-blue mr-3">${key}:</span>
+                            ${text}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="mb-6 border-b pb-4">
+                    <p class="text-sm font-semibold text-primary-blue mb-1">
+                        Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+                    </p>
+                    <h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+                    <p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+                </div>
+
+                <form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+                    <div class="options-container mb-8">
+                        ${optionsHtml}
+                    </div>
+
+                    <div id="message-box" class="mb-4 hidden"></div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                            Submit & Next
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function handleOptionChange(input, key, type) {
+            let currentSelectionString;
+            
+            if (type === 'sata') {
+                if (input.checked) {
+                    state.currentSataSelection.add(key);
+                } else {
+                    state.currentSataSelection.delete(key);
+                }
+                // Use a sorted comma-separated string for reliable comparison
+                currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+            } else { // mc
+                currentSelectionString = key;
+            }
+
+            // Capture initial selection only once on the first actual selection (non-empty)
+            if (state.initialSelection === null && currentSelectionString !== '') {
+                state.initialSelection = currentSelectionString;
+            }
+        }
+
+        function renderResults() {
+            const total = questions.length;
+            const correctCount = state.score;
+            const percentage = Math.round((correctCount / total) * 100);
+            const isPassing = percentage >= 75; // Standard passing score
+
+            const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+            const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+            let resultsDetailHtml = state.userAnswers.map((item, index) => {
+                const isCorrect = item.isCorrect;
+                
+                // NEW: Risk Highlighting Logic
+                const isHighRiskIncorrect = !isCorrect && item.riskScore > 2; 
+
+                // Adjust result class based on high risk and incorrect status
+                let resultClass = '';
+                let riskText = '';
+                if (isCorrect) {
+                    resultClass = 'bg-green-50 border-correct-green';
+                } else if (isHighRiskIncorrect) {
+                    resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+                    riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+                } else {
+                    resultClass = 'bg-red-50 border-incorrect-red';
+                }
+
+                const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+                const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+                const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+                return `
+                    <div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+                            <div class="flex items-center space-x-4">
+                                ${resultIcon}
+                                ${riskText}
+                            </div>
+                        </div>
+                        
+                        <!-- NEW: Risk Metrics Display -->
+                        <div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+                            <p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+                            <p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+                            <p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+                            <p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+                        </div>
+                        <!-- END NEW: Risk Metrics Display -->
+
+                        <p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+                        <p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+                        <div class="bg-white p-4 rounded-md border border-gray-200">
+                            <h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+                            <p class="text-gray-600 text-sm">${item.rationale}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+                        ${statusText}
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+                    <p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+                    <button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+                        Restart Exam
+                    </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+                    <p class="text-sm text-gray-600 mb-6">Review questions flagged as <strong class="text-red-700">🚨 HIGH RISK INCORRECT</strong> first, as these indicate areas where you were both incorrect and uncertain/rushing.</p>
+                    ${resultsDetailHtml}
+                </div>
+            `;
+        }
+
+        // --- 5. Utility Functions ---
+
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('message-box');
+            let bgColor, borderColor;
+
+            if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+                bgColor = 'bg-blue-100';
+                borderColor = 'border-primary-blue';
+            } else if (type === 'error') {
+                bgColor = 'bg-incorrect-red/10';
+                borderColor = 'border-incorrect-red';
+            } else { // 'warning' for incomplete selection
+                bgColor = 'bg-yellow-100';
+                borderColor = 'border-yellow-400';
+            }
+
+            messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+
+            // Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+            if (type !== 'warning') {
+                document.querySelector('button[type="submit"]').style.display = 'none';
+            }
+        }
+
+        function hideMessage() {
+            const messageBox = document.getElementById('message-box');
+            messageBox.style.display = 'none';
+            // Show the submit button again
+            const submitButton = document.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.style.display = 'inline-flex';
+        }
+
+
+        // --- 6. Initialization ---
+        window.onload = function() {
+            render();
+        };
+
+        // Expose functions globally for HTML event handlers
+        window.startQuiz = startQuiz;
+        window.submitAnswer = submitAnswer;
+        window.handleOptionChange = handleOptionChange;
+    </script>
+</body>
+</html>
