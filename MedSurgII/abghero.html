@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABG Hero - Nursing Gamified</title>
+    <title>ABG Mastery - AlliedRNPrep</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             overflow: hidden;
-            background-color: #f0f4f8;
+            background-color: #f8fafc; /* slate-50 */
         }
         .screen {
             display: none;
@@ -34,11 +34,14 @@
         .feedback-banner.show {
             transform: translateY(0);
         }
-        .btn-answer:hover {
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .btn-answer:active {
+        .btn:active {
             transform: translateY(0);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
@@ -51,32 +54,39 @@
             50% { transform: scale(1.05); }
         }
         .pulse-animation {
-            animation: pulse 2s infinite;
+            animation: pulse 2s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
 
     <div id="game-container" class="w-full max-w-2xl mx-auto">
         
         <!-- Menu Screen -->
         <div id="menu-screen" class="screen active flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-xl">
-            <svg class="w-20 h-20 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <h1 class="text-5xl font-bold text-slate-900 mb-2">ABG Hero</h1>
-            <p class="text-slate-600 mb-6">Master Arterial Blood Gas interpretation. Are you ready?</p>
+            <!-- AlliedRNPrep Logo -->
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <svg class="w-12 h-12 text-cyan-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4V8M12 16V20M8 12H4M20 12H16M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 12C14.2091 12 16 13.7909 16 16C16 18.2091 14.2091 20 12 20C9.79086 20 8 18.2091 8 16C8 13.7909 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h1 class="text-4xl font-bold text-slate-900 tracking-tight">AlliedRNPrep</h1>
+            </div>
+            <h2 class="text-3xl font-bold text-cyan-600 mb-2">ABG Mastery</h2>
+            <p class="text-slate-500 mb-6 max-w-md">An interactive gamified trainer to perfect your Arterial Blood Gas interpretations.</p>
             <div class="bg-slate-100 p-4 rounded-lg text-left mb-8 w-full max-w-md">
                 <h3 class="font-bold text-lg mb-2 text-slate-800">How to Play:</h3>
                 <ul class="list-disc list-inside text-slate-600 space-y-1">
                     <li>Analyze the provided ABG values.</li>
-                    <li>Choose the correct interpretation.</li>
+                    <li>Choose the correct interpretation from four options.</li>
                     <li>You have 3 lives. Each wrong answer costs a life.</li>
                     <li>Get 10 correct answers in a row to level up!</li>
                 </ul>
             </div>
-            <button id="start-button" class="w-full max-w-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105 pulse-animation">
+            <button id="start-button" class="btn w-full max-w-sm bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg pulse-animation">
                 Start Challenge
             </button>
-            <div class="mt-4 text-sm text-slate-500">High Score: <span id="high-score-display-menu">0</span></div>
+            <div class="mt-4 text-sm text-slate-400">High Score: <span id="high-score-display-menu">0</span></div>
         </div>
 
         <!-- Game Screen -->
@@ -84,12 +94,12 @@
             <!-- HUD -->
             <div class="w-full flex justify-between items-center mb-6 p-4 bg-white rounded-2xl shadow-md">
                 <div>
-                    <span class="text-slate-500 text-sm">Level</span>
-                    <p class="text-2xl font-bold text-blue-500" id="level-display">1</p>
+                    <span class="text-slate-500 text-sm font-medium">Level</span>
+                    <p class="text-2xl font-bold text-cyan-600" id="level-display">1</p>
                 </div>
                 <div class="text-center">
-                    <span class="text-slate-500 text-sm">Score</span>
-                    <p class="text-2xl font-bold" id="score-display">0</p>
+                    <span class="text-slate-500 text-sm font-medium">Score</span>
+                    <p class="text-2xl font-bold text-slate-700" id="score-display">0</p>
                 </div>
                 <div class="flex space-x-1" id="lives-display">
                     <!-- Hearts will be generated here -->
@@ -98,7 +108,7 @@
 
             <!-- Question Card -->
             <div class="w-full bg-white p-8 rounded-2xl shadow-xl text-center relative">
-                <div class="absolute top-4 right-4 text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full" id="question-count-display">Streak: 0</div>
+                <div class="absolute top-4 right-4 text-sm font-semibold bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full" id="question-count-display">Streak: 0</div>
                 <h2 class="text-xl text-slate-600 mb-6">Interpret these ABG values:</h2>
                 <div class="flex justify-around items-center mb-8">
                     <div class="text-center">
@@ -107,7 +117,7 @@
                     </div>
                     <div class="text-center">
                         <p class="text-sm text-slate-500">PaCO₂</p>
-                        <p class="text-4xl font-bold text-green-500" id="paco2-value">55</p>
+                        <p class="text-4xl font-bold text-blue-500" id="paco2-value">55</p>
                     </div>
                     <div class="text-center">
                         <p class="text-sm text-slate-500">HCO₃</p>
@@ -131,7 +141,7 @@
                 <div class="bg-white p-8 rounded-2xl shadow-2xl w-11/12 max-w-lg text-left m-4 transform transition-all" id="explanation-content">
                     <h3 id="explanation-title" class="text-2xl font-bold mb-4 text-slate-800"></h3>
                     <div id="explanation-text" class="text-slate-600 space-y-3"></div>
-                    <button id="next-question-button" class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-lg transition-transform transform hover:scale-105">
+                    <button id="next-question-button" class="btn mt-6 w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-lg">
                         Next Question
                     </button>
                 </div>
@@ -144,7 +154,7 @@
              <svg class="w-20 h-20 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <h1 class="text-4xl font-bold text-slate-900 mb-2">Level Up!</h1>
             <p class="text-slate-600 mb-6" id="level-complete-message">You've mastered Level 1! Get ready for more complex cases.</p>
-            <button id="next-level-button" class="w-full max-w-sm bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105">
+            <button id="next-level-button" class="btn w-full max-w-sm bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg">
                 Start Level <span id="next-level-display">2</span>
             </button>
         </div>
@@ -153,16 +163,20 @@
         <div id="game-over-screen" class="screen flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-xl">
              <svg class="w-20 h-20 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
             <h1 class="text-5xl font-bold text-slate-900 mb-2">Game Over</h1>
-            <p class="text-slate-600 mb-6">Don't give up! Every attempt makes you stronger.</p>
-            <div class="bg-slate-100 p-4 rounded-lg mb-8">
+            <p class="text-slate-500 mb-6">Don't give up! Every attempt makes you stronger.</p>
+            <div class="bg-slate-100 p-4 rounded-lg mb-8 w-full max-w-xs">
                 <p class="text-slate-500">Final Score</p>
                 <p class="text-4xl font-bold text-slate-800" id="final-score-display">0</p>
                  <p class="mt-2 text-sm text-slate-500">High Score: <span id="high-score-display-gameover">0</span></p>
             </div>
-            <button id="restart-button" class="w-full max-w-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105">
+            <button id="restart-button" class="btn w-full max-w-sm bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg">
                 Try Again
             </button>
         </div>
+        
+        <footer class="text-center mt-6 text-slate-400 text-sm">
+            &copy; 2025 AlliedRNPrep. All Rights Reserved.
+        </footer>
     </div>
 
 <script>
@@ -383,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.hco3Value.textContent = question.values.hco3;
         DOMElements.questionCountDisplay.textContent = `Streak: ${gameState.correctStreak}`;
         
-        // Color coding
+        // Color coding for values - this is pedagogically useful
         DOMElements.phValue.className = `text-4xl font-bold ${question.values.ph < 7.35 || question.values.ph > 7.45 ? 'text-red-500' : 'text-green-500'}`;
         DOMElements.paco2Value.className = `text-4xl font-bold ${question.values.paco2 < 35 || question.values.paco2 > 45 ? 'text-blue-500' : 'text-green-500'}`;
         DOMElements.hco3Value.className = `text-4xl font-bold ${question.values.hco3 < 22 || question.values.hco3 > 26 ? 'text-indigo-500' : 'text-green-500'}`;
@@ -394,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         answers.forEach(answer => {
             const button = document.createElement('button');
             button.textContent = answer;
-            button.className = 'btn-answer p-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg shadow transition';
+            button.className = 'btn p-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg shadow-sm';
             button.onclick = () => checkAnswer(answer);
             DOMElements.answerButtonsContainer.appendChild(button);
         });
@@ -423,14 +437,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const { ph, paco2, hco3 } = values;
         const ROME_EXPLANATION = (paco2 < 35 || paco2 > 45) ?
-            "<strong>R</strong>espiratory is <strong>O</strong>pposite (pH ↑ PaCO₂ ↓, or pH ↓ PaCO₂ ↑)." :
-            "<strong>M</strong>etabolic is <strong>E</strong>qual (pH ↑ HCO₃ ↑, or pH ↓ HCO₃ ↓).";
+            "The primary cause is likely <strong>R</strong>espiratory since pH and PaCO₂ are moving in <strong>O</strong>pposite directions." :
+            "The primary cause is likely <strong>M</strong>etabolic since pH and HCO₃ are moving in <strong>E</strong>qual directions.";
 
         let explanationHtml = `
             <p><strong>1. Analyze pH (${ph}):</strong> ${ph < 7.35 ? `Below 7.35 is <strong>Acidosis</strong>.` : ph > 7.45 ? `Above 7.45 is <strong>Alkalosis</strong>.` : `Within normal range (7.35-7.45).`}</p>
             <p><strong>2. Check PaCO₂ (${paco2}):</strong> ${paco2 < 35 ? `Low (alkalotic).` : paco2 > 45 ? `High (acidotic).` : `Normal (35-45).`}</p>
             <p><strong>3. Check HCO₃ (${hco3}):</strong> ${hco3 < 22 ? `Low (acidotic).` : hco3 > 26 ? `High (alkalotic).` : `Normal (22-26).`}</p>
-            <p><strong>4. Determine Cause (ROME):</strong> ${ROME_EXPLANATION}</p>
+            <p><strong>4. Determine Cause (ROME Mnemonic):</strong> ${ROME_EXPLANATION}</p>
             <p class="mt-4 pt-4 border-t border-slate-200"><strong>Conclusion:</strong> The correct interpretation is <strong>${correctAnswer}</strong>.</p>
         `;
         DOMElements.explanationText.innerHTML = explanationHtml;
@@ -482,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const endGame = () => {
         if (gameState.score > gameState.highScore) {
             gameState.highScore = gameState.score;
-            localStorage.setItem('abgHeroHighScore', gameState.highScore);
+            localStorage.setItem('abgMasteryHighScore', gameState.highScore);
         }
         updateHighScoreDisplay();
         DOMElements.finalScoreDisplay.textContent = gameState.score;
@@ -491,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Init & Event Listeners ---
     const init = () => {
-        gameState.highScore = parseInt(localStorage.getItem('abgHeroHighScore')) || 0;
+        gameState.highScore = parseInt(localStorage.getItem('abgMasteryHighScore')) || 0;
         updateHighScoreDisplay();
         switchScreen('menu');
 
@@ -512,4 +526,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
