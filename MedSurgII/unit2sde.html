@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acid-Base and Critical Care Diagnostic</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1D4ED8',
+                        'secondary-gray': '#F3F4F6',
+                        'correct-green': '#10B981',
+                        'incorrect-red': '#EF4444',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for professional look */
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Inter', sans-serif;
+        }
+        .shadow-custom {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom focus styles for accessibility and design */
+        input:checked + label {
+            border-color: #1D4ED8;
+            background-color: #EFF6FF;
+        }
+        .option-label {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div id="app-container" class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-primary-blue mb-2">Acid-Base and Critical Care Diagnostic</h1>
+            <p class="text-lg text-gray-600">Testing Understanding: Fluid/Electrolytes, GI, and Respiratory Emergencies</p>
+        </header>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+            <!-- Content will be injected here (Start Screen, Question, or Results) -->
+        </div>
+
+        <!-- Hidden Loading Spinner -->
+        <div id="loading" class="hidden text-center mt-8">
+            <svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-500 mt-2">Processing...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. Question Data (New Set) ---
+        const rawQuestions = [
+            {
+                "questionText": "The nurse is talking to a comatose patient on a ventilator. The family is at the bed side. The family is asking what acidic foods caused the patient's pH imbalance. Which response by the nurse indicates understanding? (Select all that apply)",
+                "options": { "A": "Eating large amounts of foods like tomatoes, black coffee, and lemons can cause acidosis.", "B": "Acidosis relates to the level of H ions in the blood, the lower the pH, the more the acidic and the higher the H ions.", "C": "The patient's acidosis does not correlate with dietary discrepancies.", "D": "Acidosis relates to the level of H ions in the blood, the higher the pH, the more acidic the blood is and the higher the H ions are.", "E": "Eating foods high in bases, like broccoli and bananas, caused the body to overcompensate and turned the blood acidic." },
+                "correctAnswer": ["B", "C"],
+                "rationale": "While certain foods may be acidic or basic, they do not cause metabolic or respiratory acidosis directly. Acidosis relates to a higher H ion count in the blood, and a lower pH value. The pH scale is logarithmic, where a lower pH indicates a higher concentration of hydrogen ions. All other options are incorrect.",
+                "section": "Acid-Base Balance",
+                "type": "sata"
+            },
+            {
+                "questionText": "The nurse is assessing lab values from a patient in the ICU. The patient is AAO x 0, GCS of 3, and is currently on life support. Which assessment finding indicates an emergent change in the patient's condition?",
+                "options": { "A": "pH went down from 7.39 to 7.30", "B": "SpO2% fell from 95% to 91%", "C": "Body temp rose from 98.4 to 99.7", "D": "BP fell from 100/65 to 98/48" },
+                "correctAnswer": "A",
+                "rationale": "A decrease in **pH from 7.39 to 7.30** represents the most emergent change. Due to the logarithmic nature of the pH scale, this small numerical drop reflects a significant worsening of acidosis, which severely impairs cellular and organ function and requires immediate ventilator adjustment or intervention. Other changes are concerning but not as immediately life-threatening.",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is providing education to a patient recovering from DKA. The patient states “When I was sick, my heart was racing, I was breathing fast, and I am still really constipated. What is going on?”. Which response by the nurse is correct? (Select all that apply)",
+                "options": { "A": "DKA is a metabolic acidotic state, which can impair heart function, nerves, muscles, and may slow down the GI tract.", "B": "DKA is an increase in blood glucose, which prevents the heart, nerves, muscles, and GI from functioning properly.", "C": "DKA leads to an electrolyte imbalance in the body, causing a drop in potassium. Potassium is responsible for muscle excitability, and when it's low, causes the organs to be sluggish or compensate.", "D": "DKA causes extreme thirst in patients, leading to hypoosmolality, which can decrease nerve function and cause fluctuations.", "E": "DKA was causing your body to increase ventilation to counteract its effects." },
+                "correctAnswer": ["A", "E"],
+                "rationale": "DKA causes **metabolic acidosis**, which disrupts normal cardiac, nerve, muscle, and GI function (A). The body compensates for the high acid load by increasing ventilation (**Kussmaul respirations**) to blow off CO2 (carbonic acid) (E). DKA leads to hyperosmolality, and potassium is usually high during the initial acidotic state.",
+                "section": "DKA",
+                "type": "sata"
+            },
+            {
+                "questionText": "The nurse is providing teaching to a novice nurse on the ventilator unit. Which statement by the new nurse requires correction?",
+                "options": { "A": "When the blood pH is high, we want to decrease the ventilator rate", "B": "When the blood pH is low, we want to lower the ventilator rate", "C": "Blood pH is not an indicated test to change ventilator settings", "D": "When the blood pH is low, we want to raise the ventilator rate." },
+                "correctAnswer": "B",
+                "rationale": "A **low pH indicates acidosis**. To correct acidosis, you must increase CO2 excretion. Decreasing the ventilator rate (B) *increases* PaCO2, thereby *increasing* acidity. Therefore, to treat low pH (acidosis), you must **increase the ventilation rate** to 'blow off' excess CO2.",
+                "section": "Ventilator Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "The student nurse is at clinicals on a busy ICU floor. The preceptor asks “What body mechanism is the most rapid response for acid-base imbalance?” Which response by the student nurse is correct?",
+                "options": { "A": "Protein and chemical buffers", "B": "Respiratory rate changes", "C": "Increased renal excretion of bicarbonate", "D": "Increase of cellular metabolism to process acid" },
+                "correctAnswer": "A",
+                "rationale": "**Protein and chemical buffers** (e.g., bicarbonate, phosphate, hemoglobin) are the body's **immediate** and most rapid defense against pH changes (seconds). The respiratory system (B) responds within minutes, while renal compensation (C) takes hours to days.",
+                "section": "Physiology",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is caring for a patient on a busy medical surgical unit. Vital signs: BP 100/62, RR 9, HR 98, T 99.2. ABG: pH 7.49, Bicarbonate 32mEq/L. eGFR 56. The nurse suspects which of the following as a catalyst to the above state? (Select all that apply)",
+                "options": { "A": "Daily use of aspirin post MI for 3 years", "B": "Ketosis", "C": "Starvation", "D": "Renal failure", "E": "Severe emesis" },
+                "correctAnswer": ["A", "E"],
+                "rationale": "The ABG (High pH 7.49, High HCO3 32) indicates **Metabolic Alkalosis**. Severe emesis (E) causes loss of stomach acid (HCl), leading to alkalosis. High-dose Salicylate (aspirin) use (A) can also cause metabolic alkalosis. Options B, C, and D are all causes of **Metabolic Acidosis**.",
+                "section": "ABG Interpretation",
+                "type": "sata"
+            },
+            {
+                "questionText": "A new graduate nurse is working on a busy medical surgical floor. The nurse assesses a new admission, a 17 year old male experiencing chest pain, anxiety, and nausea. The vital signs are: HR 124, RR 41, T 98.6, BP 181/84. The ABG yields a pH of 7.49, PaO2 of 110 mm Hg, Paco2 30 mm Hg. The nurse understands that this is indicative of:",
+                "options": { "A": "Ischemic damage leading to increased oxygen demand secondary to a heart attack", "B": "Compensated metabolic acidosis related to lack of appetite from anxiety and pain", "C": "Uncompensated respiratory acidosis secondary to increased blood pressure which lowers perfusion", "D": "Uncompensated respiratory alkalosis secondary to hyperventilation" },
+                "correctAnswer": "D",
+                "rationale": "The ABG (High pH 7.49, Low PaCO2 30, normal HCO3) indicates **Uncompensated Respiratory Alkalosis**. The elevated Respiratory Rate (RR 41) from **anxiety/hyperventilation** is the cause, blowing off too much CO2. Chest pain and nausea can accompany severe panic attacks.",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "A family member asks the nurse: “I know my brother has DKA and his blood is full of acid. I remember him telling me he had something called CKD as well. What does this mean for him?” Which response by the nurse is correct?",
+                "options": { "A": "It should have no effect, as DKA does not relate to the renal system since its diabetes.", "B": "Normally, the kidneys can compensate by producing basic solutions to raise blood pH. Since his kidneys aren't working, this protective measure is compromised.", "C": "Typically the kidneys don't respond to changes in blood pH for several days. Since he has impaired renal function, we may need to supplement the bicarb for him.", "D": "His respiratory system should take over and return his blood to a close to normal pH within a few days. We need to keep him here so that we can continue giving IV fluids and insulin." },
+                "correctAnswer": "C",
+                "rationale": "The kidneys provide the **metabolic compensatory mechanism** for acid-base balance, but this process **takes several days** to become fully effective. With existing **CKD (Chronic Kidney Disease)**, this compensation is severely limited. Due to impaired renal function, the patient may need IV bicarbonate supplementation if the acidosis is severe.",
+                "section": "DKA and CKD",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is providing education to a group of middle aged adults regarding cirrhosis. Upon completion of the education, which statement would reflect correct understanding of this disease?",
+                "options": { "A": "Cirrhosis is the enlargening of the liver which is shown on lab work rapidly.", "B": "Cirrhosis is always caused by alcoholism, viruses, and genetic factors.", "C": "Cirrhosis is usually not detected until late stage liver failure develops", "D": "Cirrhosis is characterized by nodules that enlarge the bile ducts and cause inflammation of the liver." },
+                "correctAnswer": "C",
+                "rationale": "The liver is highly regenerative, meaning many patients remain **asymptomatic until late-stage disease** (decompensated cirrhosis), making the diagnosis delayed (C). Cirrhosis is characterized by liver scarring (fibrosis) and shrinking, not just enlargement (A). While alcohol and viruses are common causes, other factors exist (B).",
+                "section": "Cirrhosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is teaching a nursing student in a busy medical surgical unit. The nurse asks the student “what is the pathophysiology of cirrhosis?” Which statement by the student indicates understanding?",
+                "options": { "A": "Cirrhosis is the inflammation of the liver", "B": "Cirrhosis is caused by a blockage in the gall bladder which causes bile backflow which erodes the liver", "C": "Cirrhosis is the after effect of a liver damaged by a virus", "D": "Cirrhosis is the initial enlarging and then shrinking and hardening of the liver." },
+                "correctAnswer": "D",
+                "rationale": "**Cirrhosis** is the **end-stage** of chronic liver disease, characterized by widespread fibrosis (hardening/scarring) and regenerative nodules, leading to the liver tissue shrinking and becoming hardened (D). Inflammation (A) is a component of the preceding stages (hepatitis).",
+                "section": "Cirrhosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient diagnosed with cholestatic cirrhosis (biliary cirrhosis) asks the nurse what diet is best for lunch to support their body with this disease. Which nursing recommendation is best for this patient?",
+                "options": { "A": "Fat rich salmon with lentils and kale.", "B": "Pork chop with coffee and rice", "C": "Canned turkey salad with tofu and eggs", "D": "Spinach and kale salad with soybean oil and sashimi" },
+                "correctAnswer": "A",
+                "rationale": "Patients with cirrhosis need a diet that supports liver function while being easily digestible. Cholestatic disease impairs bile flow and fat absorption. **Omega-3 rich sources like salmon** (A) are preferred healthy fats and are beneficial, while kale and lentils provide fiber. Pork (B) is high in saturated fat. Canned meats (C) are high in sodium. Sashimi (D) poses an infection risk.",
+                "section": "Cirrhosis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is admitted to the PCU with chronic cirrhosis. Which new finding is most indicative of a worsening condition requiring urgent provider notification?",
+                "options": { "A": "Icterus (yellowing of the sclera)", "B": "Nausea and vomiting", "C": "Ascites and a round protuberant abdomen", "D": "Palpable painful mass below ribcage upon inhalation" },
+                "correctAnswer": "D",
+                "rationale": "A **palpable, painful mass below the ribcage upon inhalation** strongly suggests **splenomegaly** (enlarged spleen) caused by **worsening portal hypertension**. Acute splenomegaly or pain indicates severe, ongoing deterioration of the portal system and requires urgent provider notification. Icterus (A), Nausea (B), and chronic Ascites (C) are typical, expected signs of advanced cirrhosis.",
+                "section": "Cirrhosis Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is assessing a patient with decompensated chronic cirrhosis. Which finding requires priority intervention by the nurse?",
+                "options": { "A": "Serum potassium of 6.8 mEq/mL with cramping and chest pain", "B": "Hemotypsis with SOB and generalized discomfort", "C": "Profuse sanguineous drainage from the rectum", "D": "8/10 abdominal pain with vomiting and tremors" },
+                "correctAnswer": "B",
+                "rationale": "Per the **ABC priority framework**, the **Airway** is always the priority. **Hemoptysis (coughing up blood) and Shortness of Breath (SOB)** suggest bleeding from ruptured esophageal varices into the airway, compromising the patient's breathing and placing them at risk for aspiration and respiratory failure. Severe hyperkalemia (A) and rectal bleeding (C) are highly critical but secondary to the airway threat.",
+                "section": "Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with advanced decompensated cirrhosis receives a liver transplant and is ready to be discharged. Vital signs are stable. The nurse is educating the patient on the early warning signs of recurrence of liver dysfunction. Which instruction by the nurse is correct?",
+                "options": { "A": "Yellowing of the eyes, skin, nails, and peripheries are signs of impending liver dysfunction.", "B": "Nausea, vomiting, cramping, sweating, and diarrhea are signs of impending liver dysfunction.", "C": "Abdominal pain, changes in behavior or memory, nausea, and fatigue are signs of impending liver dysfunction.", "D": "Impending liver dysfunction cannot be detected, therefore, you will need frequent lab tests to determine liver function." },
+                "correctAnswer": "C",
+                "rationale": "Early signs of recurring hepatic dysfunction, which could indicate graft rejection or disease progression, often manifest as vague symptoms such as **fatigue, nausea, and changes in mental status/behavior** (early hepatic encephalopathy). Jaundice (A) is a sign of *current* dysfunction, not an early warning. Liver dysfunction can be detected (D), but clinical signs precede laboratory changes.",
+                "section": "Cirrhosis/Transplant",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is diagnosed with late stage liver failure with hepatic encephalopathy and receives daily retroperitoneal dialysis. Which education does the nurse prioritize as part of the discharge teaching?",
+                "options": { "A": "It is imperative that you abstain from consuming all protein to help maintain liver function", "B": "Avoid large crowds and contact with strangers as it could worsen your liver condition", "C": "Avoid intake of leafy green vegetables as excess vitamin K can strain the liver when its processed", "D": "In instances of severe liver related pain, you may take a full dose of acetaminophen at home" },
+                "correctAnswer": "B",
+                "rationale": "Patients with severe liver disease are **immunosuppressed** and have impaired liver reserve. An infection (from crowds/ill persons) can rapidly precipitate **hepatic encephalopathy** or full liver failure. Patients should be taught to avoid infection risk (B). Protein (A) is required but restricted, not fully abstained from. Acetaminophen (D) is hepatotoxic and must be avoided.",
+                "section": "Cirrhosis/Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "The family calls the hospice care nurse triage line in regards to a patient with end stage liver disease. The patient is AAO x 2, pain 2/10 in the abdomen, and has significant icterus and jaundice. Which update by the family would alert the RN to the patient's immediate pending demise?",
+                "options": { "A": "“He has been urinating a lot less, but he was urinating normally yesterday!”", "B": "“His skin has almost doubled in yellowish discoloration since last week.”", "C": "“His hands and legs are swollen and they act like memory foam when I press my thumb into them.”", "D": "“His nausea and GI upset have completely resolved since last week!”" },
+                "correctAnswer": "A",
+                "rationale": "A **sudden and recent decrease in urinary flow (Oliguria)** in a patient with end-stage liver disease is a cardinal sign of **Hepatorenal Syndrome (HRS)**. HRS is kidney failure caused by advanced liver failure and indicates an extremely poor and rapidly fatal prognosis. The other symptoms (B, C) are signs of chronic, worsening disease but not acute collapse.",
+                "section": "Cirrhosis/Decline",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with cirrhosis presents to the emergency department with 10/10 abdominal pain, chills, tenderness, and malaise. The patient tells the admitting nurse that this is new onset and has never happened before. The patient is NOT on an ascites draining regimen yet. The ascitic fluid leukocyte count was 682 PMN. What does this lab finding indicate?",
+                "options": { "A": "Ruptured liver membranes causing an immediate local immune reaction", "B": "Bowel perforation from the ascites which caused intra-abdominal sepsis", "C": "Spontaneous bacterial peritonitis related to the cirrhosis and ascites", "D": "Bacteremia from the peripheral intravenous catheter insertion" },
+                "correctAnswer": "C",
+                "rationale": "**Spontaneous Bacterial Peritonitis (SBP)** is a life-threatening complication of ascites in cirrhosis. The diagnosis is confirmed by an ascitic fluid absolute polymorphonuclear (PMN) leukocyte count **>250 cells/mm3**. The symptoms (new-onset abdominal pain, fever, chills, tenderness) and the PMN count of 682 strongly indicate SBP.",
+                "section": "Cirrhosis Complications",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is assessing a group of people for who is most at risk for developing cirrhosis. Which patient listed below does the nurse correctly identify as the most at-risk individual?",
+                "options": { "A": "A 20 year old male who was a prior intravenous drug user", "B": "An 85 year old male who served in Vietnam who utilizes alcohol as a coping mechanism for PTSD.", "C": "A 57 year old female with a family history of cancer", "D": "A 23 year old female who habitually utilizes NSAIDS for menstrual pain" },
+                "correctAnswer": "B",
+                "rationale": "The 85-year-old Vietnam veteran (B) represents multiple compounding risk factors: potential exposure to **Hepatitis C** during the war (through shared needles, etc.) combined with **heavy chronic alcohol use**. This combination creates the highest immediate risk for severe, accelerated cirrhosis. While IV drug use (A) is a risk for Hep C, B presents the most established combination of factors.",
+                "section": "Cirrhosis Risk Factors",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nursing student asks their clinical instructor which specific laboratory test is most reliable and specific for hepatitis. Which response by the professor would be considered correct?",
+                "options": { "A": "LDH (Lactate dehydrogenase for hepatic cell destruction)", "B": "Hyperbillirubinemia", "C": "Elevated serum direct conjugated bilirubin", "D": "ALT (Alanine aminotransferase for hepatic cell destruction)" },
+                "correctAnswer": "D",
+                "rationale": "While all options relate to liver function, **ALT (Alanine Aminotransferase)** is the enzyme found primarily in the liver and is considered the **most specific** marker for hepatocellular injury or inflammation (hepatitis). LDH (A) is less specific, and bilirubin changes (B, C) reflect bile flow issues more than acute cell damage.",
+                "section": "Cirrhosis/Labs",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is providing discharge teaching to a newly diagnosed patient with cirrhosis. The provider implements a dietary restriction of no more than 1-2gm of sodium per day. The patient tells the nurse, extremely agitated, that this sucks and will be impossible for them. Which response by the nurse is correct?",
+                "options": { "A": "I know its difficult to cut out salt. But over time, you will get used to it.", "B": "I'm sorry. It's never fun to have to reduce dietary intake of anything.", "C": "You're right. It is impossible. Just stay as low as you can.", "D": "I understand. This is only temporary until we get your liver enzymes lower." },
+                "correctAnswer": "A",
+                "rationale": "The most effective therapeutic communication provides **validation and reassurance based on fact**. Taste preferences for salty foods are acquired; reminding the patient that their palate will adjust over time offers a positive perspective that encourages long-term compliance (A). Option D is factually untrue, and B/C are non-therapeutic.",
+                "section": "Cirrhosis/Patient Education",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse receives a frantic call from a patient with cirrhosis and advanced ascities in respiratory distress. The patient is on IV lasix but had a dose 30 minutes ago. Which nursing action is the priority?",
+                "options": { "A": "Administer oxygen via nasal cannula at 4L/min", "B": "Raise the HOB to whatever the client wants along with the feet", "C": "Administer another dose of lasix for emergent diuresis", "D": "Assist the patient into a left lateral lying position" },
+                "correctAnswer": "B",
+                "rationale": "Respiratory distress from severe ascites (**Hepatopulmonary Syndrome**) is a mechanical problem. The priority is to maximize lung expansion and comfort. **Sitting the patient up (raising the HOB) and elevating the feet** (to promote venous return) is the immediate, non-invasive nursing action that relieves mechanical pressure. Option A is tempting but 4L/min is too high for nasal cannula without a provider order, and C is dangerous and requires an order.",
+                "section": "Cirrhosis/Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse cares for a patient with acute pancreatitis. Which condition does the nurse monitor for while the patient is in the inpatient unit?",
+                "options": { "A": "Type II Diabetes Mellitus", "B": "Nausea", "C": "Vomiting", "D": "Blood clotting" },
+                "correctAnswer": "A",
+                "rationale": "The pancreas produces insulin. Acute and chronic pancreatitis can permanently damage the insulin-producing beta cells, leading to **insulin deficiency and the development of Type II Diabetes Mellitus** (A). Nausea and vomiting (B, C) are expected symptoms, not monitored complications. Pancreatitis causes bleeding/hemorrhage, not increased clotting (D).",
+                "section": "Pancreatitis",
+                "type": "mc"
+            },
+            {
+                "questionText": "The nurse is assessing a patient with acute pancreatitis in the ER. When assessing lung sounds, the nurse notes absent lung sounds on the left side, and normal lung sounds on the right. Which explanation is most accurate for this assessment finding?",
+                "options": { "A": "Fluid in the left lung from acute inflammation", "B": "Atelectasis related to acute pancreatitis", "C": "MODS causing respiratory failure", "D": "Accumulation of fluid pressing against the diaphragm preventing inspiration" },
+                "correctAnswer": "B",
+                "rationale": "**Atelectasis** (collapse of the alveoli/lung segment) and pleural effusion (fluid) are common **pulmonary complications of acute pancreatitis**, often occurring in the left lower lobe due to diaphragmatic inflammation and immobility. Atelectasis is a more accurate description of the complication than general fluid accumulation (A).",
+                "section": "Pancreatitis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with acute pancreatitis reports severe constipation and 4/10 abdominal pain while being observed in the adult PCU floor. Bowel sounds absent in the LRQ, but present in all others. Which action by the nurse is correct?",
+                "options": { "A": "Do nothing as this is a side effect of pancreatitis", "B": "Have the UAP assist the patient with ambulation to promote intestinal function", "C": "Report finding to the HCP immediately as this can be a sign of a paralytic ileus.", "D": "Administer a standing ordered dose of Metoclopramide to promote intestinal motility / peristalsis." },
+                "correctAnswer": "C",
+                "rationale": "The combination of absent bowel sounds in a quadrant, severe constipation, and abdominal pain is highly suggestive of a **paralytic ileus** (bowel paralysis). This is a serious complication of pancreatitis and can lead to bowel obstruction, necrosis, and sepsis. It must be reported to the HCP immediately.",
+                "section": "Pancreatitis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient diagnosed with acute pancreatitis is being assessed on the ICU floor since being admitted 4 days prior. Which finding by the nurse would necessitate activating a rapid response?",
+                "options": { "A": "7/10 abdominal pain despite placing the patient in the fetal position", "B": "Severe emesis after consuming chicken tenders and onion rings", "C": "Diaphoresis (sweating) and nausea unrelieved by IV ondansetron", "D": "Oozing from IV site and bleeding from the gums" },
+                "correctAnswer": "D",
+                "rationale": "**Oozing from the IV site and bleeding from the gums** are signs of unmanaged bleeding and consumption of clotting factors, which may indicate **Disseminated Intravascular Coagulation (DIC)**. DIC is a major complication of severe pancreatitis and is a medical emergency requiring a rapid response team activation.",
+                "section": "Pancreatitis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with acute pancreatitis has an emergency ABG drawn. The RT notifies the RN of the results. The results read: PaO2 80, pH 7.31 PaCO2 48, and HCo3 22. Which reasoning by the RN identifies the cause of these results?",
+                "options": { "A": "Acute Respiratory Distress Syndrome caused by Acute Pancreatitis", "B": "Uncompensated metabolic acidosis related to Acute Pancreatitis", "C": "Compensated metabolic alkalosis related to acute pancreatitis", "D": "Uncompensated respiratory alkalosis related to acute pancreatitis" },
+                "correctAnswer": "A",
+                "rationale": "The ABG shows a **low pH (7.31)**, **high PaCO2 (48)**, and **normal HCO3 (22-26)**, which is **Uncompensated Respiratory Acidosis**. This pattern, especially with a low PaO2 (80) and acute onset, is highly suggestive of a severe pulmonary complication like **Acute Respiratory Distress Syndrome (ARDS)**, a known complication of acute pancreatitis.",
+                "section": "ABG/Pancreatitis",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient presents to the emergency department with complaints of chills, fever, right upper quadrant pain, and weight loss. The patient is noted to have an increased aPTT, and elevated ALP. The patient is not jaundiced. The patient has a past medical history of biliary disease. Which clinical manifestation is the patient displaying signs of?",
+                "options": { "A": "Acute pancreatitis", "B": "Sepsis", "C": "Pancreatic cancer", "D": "Liver Abscess" },
+                "correctAnswer": "D",
+                "rationale": "The combination of **fever, chills, RUQ pain, and weight loss** in the context of biliary disease (which can seed bacteria) is highly characteristic of a **Liver Abscess**. An elevated aPTT and ALP suggest liver/biliary involvement. Pancreatitis (A) and Cancer (C) present differently; Sepsis (B) is a potential consequence, not the primary diagnosis.",
+                "section": "GI/Biliary",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is diagnosed with a liver abscess and is in the PCU unit. The nurse is considering the plan of care for the day. Which care item does the nurse include?",
+                "options": { "A": "Initiate an NPO status", "B": "Encourage high protein and high carbohydrate diet", "C": "Administer antiemetics once daily at night", "D": "Discharge patient home after CBC returns to normal and s/s of disease are gone" },
+                "correctAnswer": "B",
+                "rationale": "Patients with infection and increased metabolic demands (such as a liver abscess) require a **high-calorie, high-protein, and high-carbohydrate diet** to promote healing and strength. NPO (A) is not necessary unless the patient is unable to tolerate oral intake. Discharge (D) requires confirmation via a follow-up imaging study (CT/MRI) to ensure the abscess has resolved, not just a normal CBC.",
+                "section": "GI/Biliary",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is starting on PERT following acute pancreatitis. The nurse is providing education about the medication. Which action by the nurse indicates the patient does not understand the education?",
+                "options": { "A": "Swallowing the medication with morning coffee", "B": "Swallowing the pill with cool liquid and spacing out additional capsules throughout the meal", "C": "Swallowing the tablets whole", "D": "Always takes the medication with food or snacks to ensure absorption" },
+                "correctAnswer": "A",
+                "rationale": "**PERT (Pancreatic Enzyme Replacement Therapy)** must **NEVER** be mixed with or administered with **hot liquids (like coffee)** or highly acidic foods, as the heat and acidity can degrade the enzymes, rendering them ineffective. All other instructions (B, C, D) are correct practices for enzyme therapy.",
+                "section": "Pancreatitis/Medication",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is suffering from alcohol withdrawal and is on maintenance dose fentanyl and sedation. The nurse receives an ABG as follows: pH 7.3, PaCO2 56, PaO2 80, HC03 24. Which nursing action is the priority?",
+                "options": { "A": "Stop the fentanyl infusion and administer naloxone immediately", "B": "Slow down the sedation IV to mitigate metabolic acidosis", "C": "Increase fentanyl and sedation per providers orders to stop the hyperventilation", "D": "Discontinue all sedation and fentanyl infusions" },
+                "correctAnswer": "A",
+                "rationale": "The ABG shows **Respiratory Acidosis** (Low pH 7.3, High PaCO2 56). This is caused by the **CNS depressant effects of the fentanyl and sedation** reducing the respiratory drive. The priority is to reverse the life-threatening respiratory depression by **stopping the opioid and administering naloxone** (Narcan) to address the root cause and restore ventilation.",
+                "section": "ABG/Prioritization",
+                "type": "mc"
+            },
+            {
+                "questionText": "A 23 year old female is brought into the ED with complaints of chest pain, diaphoresis, pale appearance, shaking, and nausea following a motor vehicle collision where she struck a pedestrian. ABG lists the pH as 7.56, PaCo2 31, PaO2 of 110, and HCo3 of 23. Which explains this presentation and ABG?",
+                "options": { "A": "Lung trauma from the MVC causing respiratory depression", "B": "Severe panic attack leading to the symptoms and respiratory alkalosis", "C": "Damage to the frontal lobe causing respiratory depression and respiratory acidosis", "D": "Abdominal trauma causing severe emesis and subsequent metabolic alkalosis" },
+                "correctAnswer": "B",
+                "rationale": "The ABG shows **Respiratory Alkalosis** (High pH 7.56, Low PaCO2 31). This is caused by **hyperventilation**. The physical symptoms (chest pain, shaking, diaphoresis, nausea) are classic manifestations of a severe **panic attack** in response to the traumatic event (striking a pedestrian).",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient presents to the emergency department with an ABG as follows: pH 7.56, PaCo2 49, PaO2 95, HCo3 34. Which scenario below represents a potential cause for this abnormal ABG?",
+                "options": { "A": "Severe emesis from the patient consuming gas station sushi the day before presentation", "B": "Lack of gastric motility from a paralytic ileus causing metabolic alkalosis", "C": "Anxiety attack from failing a nursing school exam causing respiratory alkalosis", "D": "Overdose on fentanyl causing respiratory acidosis." },
+                "correctAnswer": "A",
+                "rationale": "The ABG shows **Metabolic Alkalosis** (High pH 7.56, High HCO3 34). Severe **emesis (vomiting)** (A) causes the loss of hydrochloric acid (HCl), which is the most common non-iatrogenic cause of this imbalance. The high PaCO2 (49) is the patient's respiratory system attempting to compensate by retaining CO2.",
+                "section": "ABG Interpretation",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is scheduled for a surgical procedure where bleeding is highly likely. The patient is a Jehovah's witness and refuses all blood products. Which response by the nurse is correct?",
+                "options": { "A": "I understand. We will try to not let you die in surgery and flood you with IV fluids and hope for the best.", "B": "I understand. Would you be open to autologous blood transfusioning during your surgery?", "C": "I understand. We cannot proceed with the surgery unless you consent to the use of blood products.", "D": "I understand. I recommend electing for a laparoscopic surgery to mitigate bleeding risk." },
+                "correctAnswer": "B",
+                "rationale": "The nurse's role is to clarify the patient's refusal and explore acceptable alternatives. **Autologous transfusion** (reinfusing the patient's own blood, collected weeks prior, or salvaged during surgery) is often acceptable to Jehovah's Witnesses as it does not involve donor blood. This is the most appropriate, supportive, and safe response.",
+                "section": "Ethics/Transfusion",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse is caring for a patient in the ICU who is severely hypovolemic and anemic and on a ventilator. The nurse notes that the patient is a Jehovah's witness, yet the patient was found with marijuana paraphernalia and tattoos throughout his body. The nurse understands the patient emergently needs a blood transfusion. Which action by the nurse is correct?",
+                "options": { "A": "Administer the blood products as the patient does not display active signs of being a Jehovah's witness.", "B": "Administer hetastarch as ordered to increase BP and oncotic pressure", "C": "Administer pRBC to increase vascular RBC availability", "D": "Administer FFP to increase vascular volume" },
+                "correctAnswer": "B",
+                "rationale": "The nurse must respect the patient's stated **religious refusal of blood products**, regardless of their lifestyle choices (A). For severe hypovolemia/anemia without transfusion, volume expanders like **Hetastarch** (B) or other non-blood colloids/crystalloids are the appropriate alternatives to increase blood pressure and oncotic pressure.",
+                "section": "Ethics/Transfusion",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse receives an order to administer a homologous blood transfusion to an anemic patient. The nurse obtains type A rh - blood and prepares the infusion with a 500 mL bag of LRS to coadminister with the blood. Which action requires immediate correction?",
+                "options": { "A": "Administration of blood products with LRS", "B": "Administration of A rh - blood as the blood bank MUST start the infusion", "C": "Utilizing a 20g IVC to administer the product", "D": "Flushing the IVC with 10mL NS before and after infusion" },
+                "correctAnswer": "A",
+                "rationale": "**Blood products should ONLY be co-administered with Normal Saline (0.9% NaCl)**. Lactated Ringer's Solution (LRS) contains calcium, which can cause the donor blood product to clot and should never be hung with blood. This is a critical error requiring immediate correction.",
+                "section": "Transfusion Safety",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient who was receiving a blood transfusion developed mild itching and a localized hivelike rash on one arm. The nurse immediately stopped the transfusion and notified the provider. Which action is appropriate at this time?",
+                "options": { "A": "Slow the infusion of the blood product by 25%", "B": "Stop the infusion immediately and flush the IV with 10mL of NS.", "C": "Administer diphenhydramine 50mg IV push in a separate line", "D": "Report an allergic reaction and prepare to administer epinephrine" },
+                "correctAnswer": "C",
+                "rationale": "The symptoms (itching, mild rash) are consistent with a **minor allergic reaction**. After stopping the blood, the priority is treating the reaction. **Diphenhydramine** (C) is the drug of choice for a minor allergic transfusion reaction. Flushing the line (B) is contraindicated as it pushes remaining donor blood into the patient. Epinephrine (D) is reserved for severe anaphylactic reactions.",
+                "section": "Transfusion Reactions",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient presents to the emergency department secondary to a syncopal episode. EMS reports VS stable in the field. PT labs reveal a low hB level. Patient complains of low grade fever, and spontaneous yellowing of the eyes and some of the skin. Past medical history reveals a blood transfusion 18 days prior. Which condition does the nurse suspect?",
+                "options": { "A": "Hemolytic transfusion reaction", "B": "Hepatitis", "C": "Cirrhosis", "D": "Active bleed causing lysis of blood cells" },
+                "correctAnswer": "A",
+                "rationale": "The constellation of symptoms (**low-grade fever, jaundice, and anemia**) presenting **several days (2-30 days) after a blood transfusion** is characteristic of a **Delayed Hemolytic Transfusion Reaction (DHTR)**, where the patient's body slowly breaks down donor RBCs due to a previously undetected antibody.",
+                "section": "Transfusion Reactions",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient activates the call light on a busy PCU floor. Upon entering the room, the nurse notes the patient is diaphoretic, pale, and using abdominal muscles to breathe. The O2 saturation reads 89%, HR 114, and BP 135/84. The patient received a blood transfusion 2 hours prior. Which examination finding does the nurse expect?",
+                "options": { "A": "Bilateral crackles and X-RAY infiltrates in both lung fields", "B": "Jugular venous distension", "C": "Bilateral lower extremity edema", "D": "S1 S2 and an S3 heart sound related to cardiac damage" },
+                "correctAnswer": "A",
+                "rationale": "Severe respiratory distress (SOB, hypoxia, accessory muscle use) 2 hours post-transfusion suggests **Transfusion-Related Acute Lung Injury (TRALI)**. This complication involves acute, non-cardiogenic pulmonary edema. The nurse would expect to find **bilateral crackles** (from fluid) and corresponding infiltrates on a chest X-ray (A). The other findings are characteristic of fluid overload (TACO), which is less likely with this acute, severe respiratory presentation.",
+                "section": "Transfusion Reactions",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with an active chest tube for a pneumothorax suddenly reports to the RN increased shortness of breath and 7/10 chest pain. What is the nurses priority action?",
+                "options": { "A": "Notify the HCP of a deviated chest tube", "B": "Clamp the chest tube and wrap end in sterile gauze", "C": "Assess patient for tracheal deviation", "D": "Lower the drainage system to promote gravity flow" },
+                "correctAnswer": "C",
+                "rationale": "Increased shortness of breath and chest pain in a patient with a pneumothorax chest tube may signal the development of a **Tension Pneumothorax** (a medical emergency). **Tracheal deviation** is a late and critical sign of tension pneumothorax. The priority is to assess for this life-threatening sign (C) and prepare for immediate intervention.",
+                "section": "Chest Tubes",
+                "type": "mc"
+            },
+            {
+                "questionText": "A client has flail chest following a severe motor vehicle accident. Which assessment finding is most concerning?",
+                "options": { "A": "Asymmetrical chest expansion", "B": "Paradoxical chest movement", "C": "RR of 24", "D": "O2 sat of 93% on RA" },
+                "correctAnswer": "B",
+                "rationale": "**Paradoxical chest movement** (the flail segment moves inward with inspiration and outward with expiration) is the **defining feature of flail chest**. This leads to inefficient ventilation, V/Q mismatch, and severe respiratory compromise, making it the most concerning assessment finding.",
+                "section": "Chest Trauma",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient is admitted to the unit with a chest wound and is exhibiting signs of dyspnea, tachycardia, and hypoxia. The chest wound is on the left mid-axillary area of the chest. Upon assessment, the nurse notes an unequal rise and fall of the chest. Breath sounds are absent on the L side. A slight ‘sucking’ sound can be heard on inhalation and exhalation. Which type of pneumothorax does this indicate?",
+                "options": { "A": "Closed", "B": "Open", "C": "Tension", "D": "Spontaneous" },
+                "correctAnswer": "B",
+                "rationale": "An **Open Pneumothorax** (sucking chest wound) is caused by a chest wall defect that allows air to enter the pleural space directly from the outside, creating the characteristic **sucking sound** and leading to an unequal rise and fall of the chest (B). A tension pneumothorax (C) is a complication where the air cannot escape, causing tracheal deviation.",
+                "section": "Chest Trauma",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with chest trauma is scheduled for a thoracentesis. Which position does the nurse anticipate placing the patient in?",
+                "options": { "A": "Supine with head flat", "B": "Sitting upright, leaning forward", "C": "Lying on unaffected side", "D": "Trendelenburg position" },
+                "correctAnswer": "B",
+                "rationale": "The standard positioning for a **thoracentesis** (removal of fluid/air from the pleural space) is **sitting upright, leaning forward over a bedside table or on the unaffected side** (B). This spreads the ribs, widens the intercostal space, and allows the fluid to pool near the posterior lower chest wall for optimal access.",
+                "section": "Respiratory Procedures",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient’s chest tube is accidentally disconnected from its drainage unit by a visitor. What is the nurse’s FIRST and most crucial action?",
+                "options": { "A": "Position the client in high-Fowler’s", "B": "Notify the provider and document", "C": "Immediately clamp the chest tube near the insertion site", "D": "Immerse the exposed end of the chest tube in a container of sterile water" },
+                "correctAnswer": "D",
+                "rationale": "When a chest tube disconnects, the priority is to re-establish the **water seal** to prevent air from rushing into the pleural space and causing a tension pneumothorax. **Immersing the exposed end in sterile water** creates a temporary one-way valve, allowing air to escape but not enter. Clamping (C) is often contraindicated as it can cause a tension pneumothorax.",
+                "section": "Chest Tube Emergency",
+                "type": "mc"
+            },
+            {
+                "questionText": "A client with a chest tube for a hemothorax has the following assessment findings. Which requires immediate intervention?",
+                "options": { "A": "Sanguineous drainage of 100 mL/hr", "B": "Mild bubbling in the suction control chamber", "C": "Fluctuation of water in the water-seal chamber with breathing", "D": "Sudden cessation of drainage with signs of respiratory distress" },
+                "correctAnswer": "D",
+                "rationale": "A **sudden cessation of drainage combined with respiratory distress** suggests the chest tube is occluded (kinked or clotted). This prevents the release of fluid/air, leading to a rapid buildup of pressure and a potential **tension pneumothorax**. This requires immediate assessment and intervention (e.g., checking for kinks, milking the tube, notifying the HCP).",
+                "section": "Chest Tube Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse notes continuous, vigorous bubbling in the water-seal chamber of a chest tube system. What is the priority nursing action?",
+                "options": { "A": "Increase suction pressure", "B": "Check for air leaks in the system", "C": "Ask the patient to cough and breathe deeply", "D": "Clamp the tubing to stop the bubbling" },
+                "correctAnswer": "B",
+                "rationale": "**Continuous, vigorous bubbling** in the **water-seal chamber** (which should only have gentle tidaling or intermittent bubbling) indicates a significant **air leak** in the system or the patient. The priority action is to systematically locate the source of the leak (B) to restore the integrity of the closed system.",
+                "section": "Chest Tube Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "When assisting with chest tube removal, what is the nurse’s most important action prior to the procedure?",
+                "options": { "A": "Place the patient supine", "B": "Administer pain medication 30–45 minutes before removal", "C": "Apply a sterile occlusive dressing four-sided", "D": "Ask the patient to perform deep breathing exercises" },
+                "correctAnswer": "B",
+                "rationale": "Chest tube removal is a painful procedure. The most important action to promote patient comfort, reduce anxiety, and ensure the patient can follow breathing commands is to **administer analgesic medication** (B) 30 to 45 minutes prior to the procedure. The dressing (C) is applied *after* removal.",
+                "section": "Chest Tube Procedure",
+                "type": "mc"
+            },
+            {
+                "questionText": "A nurse observes that a chest tube drainage system is knocked over and all fluid spills onto the floor. The patient is breathing fine, with no distress. What is the nurse’s priority action?",
+                "options": { "A": "Refill the chamber with sterile water and continue monitoring", "B": "Replace the drainage system immediately", "C": "Clamp the tube until a new system is available", "D": "Lay the patient flat and call the provider" },
+                "correctAnswer": "B",
+                "rationale": "The drainage unit is a closed system that maintains sterility and the water seal. Once the unit is compromised and the fluid is spilled, the system is no longer functioning correctly and must be **immediately replaced** (B) with a new, sterile unit to re-establish the water seal and prevent infection. Clamping (C) is generally avoided as it risks a tension pneumothorax.",
+                "section": "Chest Tube Emergency",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with ARDS is on mechanical ventilation. The nurse notes increasing peak inspiratory pressures and worsening hypoxemia. What is the priority nursing action?",
+                "options": { "A": "Increase the FiO₂ setting", "B": "Assess for decreased lung compliance", "C": "Administer a sedative", "D": "Suction the endotracheal tube" },
+                "correctAnswer": "B",
+                "rationale": "Increasing peak inspiratory pressures and worsening hypoxemia are classic signs of **decreased lung compliance** (stiffness) in ARDS. While the other actions might follow, the priority is to **assess the underlying problem** (B) to guide the appropriate treatment (e.g., sedation, checking for pneumothorax, adjusting PEEP).",
+                "section": "ARDS/Ventilation",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which finding is most characteristic of ARDS on a chest X-ray?",
+                "options": { "A": "Unilateral consolidation", "B": "Bilateral diffuse infiltrates", "C": "Pleural effusion", "D": "Hyperinflated lungs" },
+                "correctAnswer": "B",
+                "rationale": "**ARDS (Acute Respiratory Distress Syndrome)** is pathologically characterized by fluid accumulation in the alveolar space, leading to **bilateral, diffuse, patchy infiltrates** (whiteout) on the chest X-ray (B). Unilateral findings (A) or hyperinflation (D) suggest other pathologies.",
+                "section": "ARDS",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with ARDS is receiving high PEEP on the ventilator. Which complication should the nurse monitor for most closely?",
+                "options": { "A": "Pulmonary embolism", "B": "Pneumothorax", "C": "Atelectasis", "D": "Pleural effusion" },
+                "correctAnswer": "B",
+                "rationale": "**High PEEP (Positive End-Expiratory Pressure)** provides positive pressure to keep the alveoli open, but it significantly increases the risk of **barotrauma** (lung injury from pressure), which can cause rupture of the lung tissue and a **Pneumothorax** (B).",
+                "section": "ARDS/Ventilation",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which intervention is most likely to improve oxygenation in a patient with severe ARDS?",
+                "options": { "A": "Prone positioning", "B": "Increasing IV fluids", "C": "Reducing PEEP", "D": "Administering bronchodilators" },
+                "correctAnswer": "A",
+                "rationale": "**Prone positioning** (placing the patient on their abdomen) is a crucial intervention in severe ARDS. It improves oxygenation by redistributing blood flow and ventilation to less-damaged, better-perfused areas of the lung, maximizing V/Q matching.",
+                "section": "ARDS Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with ARDS is restless and has a PaO₂ of 55 mmHg on 100% FiO₂. What is the nurse’s priority action?",
+                "options": { "A": "Increase ventilator rate", "B": "Notify the provider immediately", "C": "Reassure the patient", "D": "Administer a sedative" },
+                "correctAnswer": "B",
+                "rationale": "A PaO₂ of **55 mmHg on 100% FiO₂** is indicative of **refractory hypoxemia**, a hallmark of severe ARDS that is unresponsive to conventional oxygenation. This is a critical situation, and the priority action is to **immediately notify the provider** (B) to initiate advanced, life-saving measures (e.g., nitric oxide, paralytics, ECMO consultation, or prone positioning).",
+                "section": "ARDS Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which assessment finding is most consistent with the early exudative phase of ARDS?",
+                "options": { "A": "Crackles on auscultation", "B": "Bradycardia", "C": "Decreased urine output", "D": "Jaundice" },
+                "correctAnswer": "A",
+                "rationale": "The **early exudative phase** of ARDS involves the leaking of fluid (exudate) into the alveoli. This fluid accumulation causes the classic sound of **crackles** upon auscultation (A). The other findings are general systemic issues not specific to the early lung pathology.",
+                "section": "ARDS Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which laboratory value is most concerning in a patient with ARDS?",
+                "options": { "A": "PaCO₂ 48 mmHg", "B": "PaO₂ 58 mmHg", "C": "HCO₃⁻ 24 mEq/L", "D": "pH 7.38" },
+                "correctAnswer": "B",
+                "rationale": "A PaO₂ value of **58 mmHg** is severely low and signifies **hypoxemic respiratory failure**. Maintaining adequate oxygenation is the paramount challenge in ARDS, making this the most critical lab value. The other values are within or near normal limits.",
+                "section": "ARDS Assessment",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with ARDS is receiving enteral nutrition. Which finding requires immediate nursing intervention?",
+                "options": { "A": "Gastric residual volume of 50 mL", "B": "Abdominal distension and vomiting", "C": "Bowel sounds present", "D": "Mild diarrhea" },
+                "correctAnswer": "B",
+                "rationale": "**Abdominal distension and vomiting** are signs of severe feeding intolerance and represent a **high risk for aspiration**, which can cause a serious setback or mortality in an ARDS patient. The nurse must stop the feeding immediately and notify the provider.",
+                "section": "ARDS Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "Which medication is most likely to be ordered to reduce inflammation in ARDS?",
+                "options": { "A": "Furosemide", "B": "Methylprednisolone", "C": "Albuterol", "D": "Morphine" },
+                "correctAnswer": "B",
+                "rationale": "ARDS is a severe inflammatory process. **Corticosteroids** like **Methylprednisolone** (B) are often used to attempt to suppress this overwhelming inflammatory response. Furosemide (A) is for fluid removal, and Albuterol (C) is a bronchodilator.",
+                "section": "ARDS Management",
+                "type": "mc"
+            },
+            {
+                "questionText": "A patient with ARDS is on mechanical ventilation. Which ventilator setting is most important to prevent further lung injury?",
+                "options": { "A": "High tidal volume", "B": "Low tidal volume", "C": "High respiratory rate", "D": "High FiO₂" },
+                "correctAnswer": "B",
+                "rationale": "The most important ventilatory strategy in ARDS is **Lung Protective Ventilation**, which uses **Low Tidal Volumes** (B) to reduce barotrauma and volutrauma (injury caused by excessive pressure or volume) to the already damaged lungs. High tidal volumes (A) can worsen lung injury.",
+                "section": "ARDS/Ventilation",
+                "type": "mc"
+            }
+        ];
+
+        // --- 2. State Management ---
+        const state = {
+            questions: [], // Shuffled questions will be stored here
+            currentQuestionIndex: 0,
+            score: 0,
+            userAnswers: [],
+            quizStarted: false,
+            currentSataSelection: new Set(),
+            questionStartTime: null,
+            initialSelection: null,
+        };
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        // --- 3. Core Logic Functions ---
+
+        // Fisher-Yates (Knuth) Shuffle Algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            state.quizStarted = true;
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.userAnswers = [];
+            state.currentSataSelection = new Set();
+            state.questionStartTime = null; 
+            state.initialSelection = null; 
+            
+            // SHUFFLE QUESTIONS HERE
+            state.questions = shuffleArray([...rawQuestions]);
+
+            render();
+        }
+
+        function checkAnswer(question, userSelection) {
+            const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+            const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+            // Check if every correct answer was selected AND nothing incorrect was selected
+            const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+            return isCorrect;
+        }
+
+        function submitAnswer() {
+            const currentQuestion = state.questions[state.currentQuestionIndex];
+            let userSelection = [];
+            let finalSelectionForComparison = ''; 
+
+            // --- 1. Get User Selection and Check Validity ---
+            if (currentQuestion.type === 'mc') {
+                const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+                if (!checkedRadio) {
+                    showMessage("Please select one option before submitting.", 'warning');
+                    return;
+                }
+                userSelection = checkedRadio.value;
+                finalSelectionForComparison = userSelection;
+            } else if (currentQuestion.type === 'sata') {
+                userSelection = Array.from(state.currentSataSelection).sort();
+                if (userSelection.length === 0) {
+                    showMessage("Please select at least one option before submitting.", 'warning');
+                    return;
+                }
+                finalSelectionForComparison = userSelection.join(',');
+            }
+
+            // --- 2. Calculate Risk Metrics ---
+            const timeSpentMs = Date.now() - state.questionStartTime;
+            const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+            // Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+            let answerWasChanged = false;
+            // Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+            if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+                 answerWasChanged = true;
+            }
+            
+            // Time Risk Logic
+            let timeRisk = 0;
+            const fastThreshold = 10; // seconds: High risk for rushing
+            const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+            let timeRiskText = 'Normal Time (Risk +0)';
+
+            if (timeSpentSeconds < fastThreshold) {
+                timeRisk = 2; 
+                timeRiskText = 'Fast Answer (Risk +2)';
+            } else if (timeSpentSeconds > slowThreshold) {
+                timeRisk = 1; 
+                timeRiskText = 'Slow Answer (Risk +1)';
+            }
+
+            // Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+            const changeRisk = answerWasChanged ? 3 : 0;
+            const totalRiskScore = changeRisk + timeRisk;
+
+            const isCorrect = checkAnswer(currentQuestion, userSelection);
+            if (isCorrect) {
+                state.score++;
+            }
+            
+            // --- 3. Record the Answer and Metrics ---
+            state.userAnswers.push({
+                ...currentQuestion,
+                userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+                isCorrect: isCorrect,
+                timeSpent: timeSpentSeconds,
+                answerWasChanged: answerWasChanged,
+                riskScore: totalRiskScore,
+                timeRiskText: timeRiskText,
+            });
+
+            // Show neutral message to trigger the visual delay/button disable without revealing correctness
+            showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+            // Move to the next question after a slight delay for user feedback
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                state.currentSataSelection.clear(); // Reset SATA selection
+                render();
+                hideMessage();
+            }, 1200);
+        }
+
+        // --- 4. Rendering Functions (Views) ---
+
+        function render() {
+            if (!state.quizStarted) {
+                renderStartScreen();
+            } else if (state.currentQuestionIndex < state.questions.length) {
+                renderQuestion();
+            } else {
+                renderResults();
+            }
+        }
+
+        function renderStartScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center py-10">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
+                    <p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${rawQuestions.length} randomized critical thinking questions covering **Acid-Base, GI (Cirrhosis/Pancreatitis), and Respiratory** care. You must answer each question to proceed, and there is no option to go back.</p>
+                    <p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+                    <button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+                        Start Exam Now
+                    </button>
+                    <p class="mt-6 text-sm text-red-500 font-medium">Warning: Questions are randomized and there is no backward navigation allowed once started.</p>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            const currentQuestion = state.questions[state.currentQuestionIndex];
+            const qNum = state.currentQuestionIndex + 1;
+            const total = state.questions.length;
+            const isSATA = currentQuestion.type === 'sata';
+
+            // NEW: Risk Tracking Setup
+            state.questionStartTime = Date.now();
+            state.initialSelection = null;
+
+            let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+                const inputType = isSATA ? 'checkbox' : 'radio';
+                const inputName = 'option';
+                const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+                return `
+                    <div class="mb-3">
+                        <input
+                            type="${inputType}"
+                            id="option-${key}"
+                            name="${inputName}"
+                            value="${key}"
+                            class="hidden peer"
+                            ${isChecked ? 'checked' : ''}
+                            onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+                        />
+                        <label
+                            for="option-${key}"
+                            class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+                        >
+                            <span class="font-bold text-primary-blue mr-3">${key}:</span>
+                            ${text}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="mb-6 border-b pb-4">
+                    <p class="text-sm font-semibold text-primary-blue mb-1">
+                        Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+                    </p>
+                    <h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+                    <p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+                </div>
+
+                <form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+                    <div class="options-container mb-8">
+                        ${optionsHtml}
+                    </div>
+
+                    <div id="message-box" class="mb-4 hidden"></div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                            Submit & Next
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function handleOptionChange(input, key, type) {
+            let currentSelectionString;
+            
+            if (type === 'sata') {
+                if (input.checked) {
+                    state.currentSataSelection.add(key);
+                } else {
+                    state.currentSataSelection.delete(key);
+                }
+                // Use a sorted comma-separated string for reliable comparison
+                currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+            } else { // mc
+                currentSelectionString = key;
+            }
+
+            // Capture initial selection only once on the first actual selection (non-empty)
+            if (state.initialSelection === null && currentSelectionString !== '') {
+                state.initialSelection = currentSelectionString;
+            }
+        }
+
+        function renderResults() {
+            const total = state.questions.length;
+            const correctCount = state.score;
+            const percentage = Math.round((correctCount / total) * 100);
+            const isPassing = percentage >= 75; // Standard passing score
+
+            const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+            const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+            let resultsDetailHtml = state.userAnswers.map((item, index) => {
+                const isCorrect = item.isCorrect;
+                
+                // NEW: Risk Highlighting Logic
+                const isHighRiskIncorrect = !isCorrect && item.riskScore > 2; 
+
+                // Adjust result class based on high risk and incorrect status
+                let resultClass = '';
+                let riskText = '';
+                if (isCorrect) {
+                    resultClass = 'bg-green-50 border-correct-green';
+                } else if (isHighRiskIncorrect) {
+                    resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+                    riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+                } else {
+                    resultClass = 'bg-red-50 border-incorrect-red';
+                }
+
+                const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+                const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+                const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+                return `
+                    <div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+                            <div class="flex items-center space-x-4">
+                                ${resultIcon}
+                                ${riskText}
+                            </div>
+                        </div>
+                        
+                        <!-- NEW: Risk Metrics Display -->
+                        <div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+                            <p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+                            <p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+                            <p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+                            <p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+                        </div>
+                        <!-- END NEW: Risk Metrics Display -->
+
+                        <p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+                        <p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+                        <div class="bg-white p-4 rounded-md border border-gray-200">
+                            <h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+                            <p class="text-gray-600 text-sm">${item.rationale}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            quizContainer.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+                        ${statusText}
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+                    <p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+                    <button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+                        Restart Exam
+                    </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+                    <p class="text-sm text-gray-600 mb-6">Review questions flagged as <strong class="text-red-700">🚨 HIGH RISK INCORRECT</strong> first, as these indicate areas where you were both incorrect and uncertain/rushing.</p>
+                    ${resultsDetailHtml}
+                </div>
+            `;
+        }
+
+        // --- 5. Utility Functions ---
+
+        function showMessage(text, type) {
+            const messageBox = document.getElementById('message-box');
+            let bgColor, borderColor;
+
+            if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+                bgColor = 'bg-blue-100';
+                borderColor = 'border-primary-blue';
+            } else if (type === 'error') {
+                bgColor = 'bg-incorrect-red/10';
+                borderColor = 'border-incorrect-red';
+            } else { // 'warning' for incomplete selection
+                bgColor = 'bg-yellow-100';
+                borderColor = 'border-yellow-400';
+            }
+
+            messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+
+            // Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+            if (type !== 'warning') {
+                document.querySelector('button[type="submit"]').style.display = 'none';
+            }
+        }
+
+        function hideMessage() {
+            const messageBox = document.getElementById('message-box');
+            messageBox.style.display = 'none';
+            // Show the submit button again
+            const submitButton = document.querySelector('button[type="submit"]');
+            if(submitButton) submitButton.style.display = 'inline-flex';
+        }
+
+
+        // --- 6. Initialization ---
+        window.onload = function() {
+            render();
+        };
+
+        // Expose functions globally for HTML event handlers
+        window.startQuiz = startQuiz;
+        window.submitAnswer = submitAnswer;
+        window.handleOptionChange = handleOptionChange;
+    </script>
+</body>
+</html>
