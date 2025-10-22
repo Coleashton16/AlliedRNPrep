@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABG Hero - Nursing Gamified</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #f0f4f8;
+        }
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .screen.active {
+            display: flex;
+        }
+        .heart {
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .heart.lost {
+            transform: scale(0.8);
+            color: #cbd5e1; /* slate-300 */
+        }
+        .feedback-banner {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(-200%);
+        }
+        .feedback-banner.show {
+            transform: translateY(0);
+        }
+        .btn-answer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .btn-answer:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="game-container" class="w-full max-w-2xl mx-auto">
+        
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="screen active flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-xl">
+            <svg class="w-20 h-20 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h1 class="text-5xl font-bold text-slate-900 mb-2">ABG Hero</h1>
+            <p class="text-slate-600 mb-6">Master Arterial Blood Gas interpretation. Are you ready?</p>
+            <div class="bg-slate-100 p-4 rounded-lg text-left mb-8 w-full max-w-md">
+                <h3 class="font-bold text-lg mb-2 text-slate-800">How to Play:</h3>
+                <ul class="list-disc list-inside text-slate-600 space-y-1">
+                    <li>Analyze the provided ABG values.</li>
+                    <li>Choose the correct interpretation.</li>
+                    <li>You have 3 lives. Each wrong answer costs a life.</li>
+                    <li>Get 10 correct answers in a row to level up!</li>
+                </ul>
+            </div>
+            <button id="start-button" class="w-full max-w-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105 pulse-animation">
+                Start Challenge
+            </button>
+            <div class="mt-4 text-sm text-slate-500">High Score: <span id="high-score-display-menu">0</span></div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen flex-col items-center">
+            <!-- HUD -->
+            <div class="w-full flex justify-between items-center mb-6 p-4 bg-white rounded-2xl shadow-md">
+                <div>
+                    <span class="text-slate-500 text-sm">Level</span>
+                    <p class="text-2xl font-bold text-blue-500" id="level-display">1</p>
+                </div>
+                <div class="text-center">
+                    <span class="text-slate-500 text-sm">Score</span>
+                    <p class="text-2xl font-bold" id="score-display">0</p>
+                </div>
+                <div class="flex space-x-1" id="lives-display">
+                    <!-- Hearts will be generated here -->
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="w-full bg-white p-8 rounded-2xl shadow-xl text-center relative">
+                <div class="absolute top-4 right-4 text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full" id="question-count-display">Streak: 0</div>
+                <h2 class="text-xl text-slate-600 mb-6">Interpret these ABG values:</h2>
+                <div class="flex justify-around items-center mb-8">
+                    <div class="text-center">
+                        <p class="text-sm text-slate-500">pH</p>
+                        <p class="text-4xl font-bold text-red-500" id="ph-value">7.28</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-slate-500">PaCO₂</p>
+                        <p class="text-4xl font-bold text-green-500" id="paco2-value">55</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-slate-500">HCO₃</p>
+                        <p class="text-4xl font-bold text-indigo-500" id="hco3-value">24</p>
+                    </div>
+                </div>
+
+                <!-- Answer Buttons -->
+                <div id="answer-buttons" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Buttons are generated here -->
+                </div>
+            </div>
+            
+            <!-- Feedback Banner -->
+            <div id="feedback-banner" class="feedback-banner fixed top-0 left-0 right-0 p-4 text-center text-white font-bold z-50">
+                <span id="feedback-message"></span>
+            </div>
+            
+            <!-- Explanation Modal -->
+            <div id="explanation-modal" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center hidden">
+                <div class="bg-white p-8 rounded-2xl shadow-2xl w-11/12 max-w-lg text-left m-4 transform transition-all" id="explanation-content">
+                    <h3 id="explanation-title" class="text-2xl font-bold mb-4 text-slate-800"></h3>
+                    <div id="explanation-text" class="text-slate-600 space-y-3"></div>
+                    <button id="next-question-button" class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg shadow-lg transition-transform transform hover:scale-105">
+                        Next Question
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Level Complete Screen -->
+        <div id="level-complete-screen" class="screen flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-xl">
+             <svg class="w-20 h-20 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h1 class="text-4xl font-bold text-slate-900 mb-2">Level Up!</h1>
+            <p class="text-slate-600 mb-6" id="level-complete-message">You've mastered Level 1! Get ready for more complex cases.</p>
+            <button id="next-level-button" class="w-full max-w-sm bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105">
+                Start Level <span id="next-level-display">2</span>
+            </button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen flex-col items-center justify-center text-center p-8 bg-white rounded-2xl shadow-xl">
+             <svg class="w-20 h-20 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+            <h1 class="text-5xl font-bold text-slate-900 mb-2">Game Over</h1>
+            <p class="text-slate-600 mb-6">Don't give up! Every attempt makes you stronger.</p>
+            <div class="bg-slate-100 p-4 rounded-lg mb-8">
+                <p class="text-slate-500">Final Score</p>
+                <p class="text-4xl font-bold text-slate-800" id="final-score-display">0</p>
+                 <p class="mt-2 text-sm text-slate-500">High Score: <span id="high-score-display-gameover">0</span></p>
+            </div>
+            <button id="restart-button" class="w-full max-w-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transition-transform transform hover:scale-105">
+                Try Again
+            </button>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- DOM Elements ---
+    const screens = {
+        menu: document.getElementById('menu-screen'),
+        game: document.getElementById('game-screen'),
+        levelComplete: document.getElementById('level-complete-screen'),
+        gameOver: document.getElementById('game-over-screen'),
+    };
+    const DOMElements = {
+        startButton: document.getElementById('start-button'),
+        restartButton: document.getElementById('restart-button'),
+        nextLevelButton: document.getElementById('next-level-button'),
+        nextQuestionButton: document.getElementById('next-question-button'),
+        levelDisplay: document.getElementById('level-display'),
+        scoreDisplay: document.getElementById('score-display'),
+        livesDisplay: document.getElementById('lives-display'),
+        questionCountDisplay: document.getElementById('question-count-display'),
+        phValue: document.getElementById('ph-value'),
+        paco2Value: document.getElementById('paco2-value'),
+        hco3Value: document.getElementById('hco3-value'),
+        answerButtonsContainer: document.getElementById('answer-buttons'),
+        feedbackBanner: document.getElementById('feedback-banner'),
+        feedbackMessage: document.getElementById('feedback-message'),
+        explanationModal: document.getElementById('explanation-modal'),
+        explanationTitle: document.getElementById('explanation-title'),
+        explanationText: document.getElementById('explanation-text'),
+        levelCompleteMessage: document.getElementById('level-complete-message'),
+        nextLevelDisplay: document.getElementById('next-level-display'),
+        finalScoreDisplay: document.getElementById('final-score-display'),
+        highScoreDisplays: [
+             document.getElementById('high-score-display-menu'),
+             document.getElementById('high-score-display-gameover')
+        ]
+    };
+
+    // --- Game State ---
+    let gameState = {
+        level: 1,
+        score: 0,
+        lives: 3,
+        highScore: 0,
+        currentQuestion: null,
+        correctStreak: 0,
+    };
+
+    // --- Game Constants ---
+    const LIVES_START = 3;
+    const STREAK_TO_LEVEL_UP = 10;
+    const NORMAL_RANGES = {
+        ph: { low: 7.35, high: 7.45 },
+        paco2: { low: 35, high: 45 },
+        hco3: { low: 22, high: 26 },
+    };
+    const ANSWER_OPTIONS = [
+        "Uncompensated Respiratory Acidosis", "Uncompensated Respiratory Alkalosis",
+        "Uncompensated Metabolic Acidosis", "Uncompensated Metabolic Alkalosis",
+        "Partially Compensated Respiratory Acidosis", "Partially Compensated Respiratory Alkalosis",
+        "Partially Compensated Metabolic Acidosis", "Partially Compensated Metabolic Alkalosis",
+        "Fully Compensated Respiratory Acidosis", "Fully Compensated Respiratory Alkalosis",
+        "Fully Compensated Metabolic Acidosis", "Fully Compensated Metabolic Alkalosis",
+    ];
+    
+    // --- Sound Effects ---
+    let sounds;
+    const setupSounds = () => {
+        sounds = {
+            correct: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 } }).toDestination(),
+            incorrect: new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.1, release: 0.2 } }).toDestination(),
+            levelUp: new Tone.PolySynth(Tone.Synth).toDestination(),
+        };
+    };
+
+    const playSound = (sound) => {
+        if (!sounds) return;
+        try {
+            if (sound === 'correct') {
+                sounds.correct.triggerAttackRelease('C5', '8n', Tone.now());
+                sounds.correct.triggerAttackRelease('G5', '8n', Tone.now() + 0.1);
+            } else if (sound === 'incorrect') {
+                sounds.incorrect.triggerAttackRelease('G2', '8n');
+            } else if (sound === 'levelUp') {
+                 sounds.levelUp.triggerAttackRelease(['C4', 'E4', 'G4', 'C5'], '8n', Tone.now());
+            }
+        } catch (error) {
+            console.error("Audio playback error:", error);
+        }
+    };
+
+    // --- Game Logic ---
+    const rand = (min, max, decimals = 2) => parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
+
+    const generateABGValues = (level) => {
+        const difficulty = Math.min(level, 4);
+        const randType = Math.floor(Math.random() * difficulty);
+
+        const scenarioType = randType === 0 ? 'uncompensated' :
+                             randType === 1 ? 'partially_compensated' :
+                             randType === 2 ? 'fully_compensated' : 'mixed';
+
+        const isMetabolic = Math.random() > 0.5;
+        const isAcidosis = Math.random() > 0.5;
+        let ph, paco2, hco3;
+
+        if (isMetabolic) {
+            if (isAcidosis) { // Metabolic Acidosis
+                hco3 = rand(12, 21);
+                if (scenarioType === 'uncompensated') { paco2 = rand(35, 45); ph = rand(7.20, 7.34); }
+                else if (scenarioType === 'partially_compensated') { paco2 = rand(25, 34); ph = rand(7.25, 7.34); }
+                else { paco2 = rand(25, 34); ph = rand(7.35, 7.40); }
+            } else { // Metabolic Alkalosis
+                hco3 = rand(27, 40);
+                if (scenarioType === 'uncompensated') { paco2 = rand(35, 45); ph = rand(7.46, 7.60); }
+                else if (scenarioType === 'partially_compensated') { paco2 = rand(46, 55); ph = rand(7.46, 7.55); }
+                else { paco2 = rand(46, 55); ph = rand(7.40, 7.45); }
+            }
+        } else { // Respiratory
+            if (isAcidosis) { // Respiratory Acidosis
+                paco2 = rand(46, 70);
+                if (scenarioType === 'uncompensated') { hco3 = rand(22, 26); ph = rand(7.20, 7.34); }
+                else if (scenarioType === 'partially_compensated') { hco3 = rand(27, 35); ph = rand(7.25, 7.34); }
+                else { hco3 = rand(27, 35); ph = rand(7.35, 7.40); }
+            } else { // Respiratory Alkalosis
+                paco2 = rand(20, 34);
+                if (scenarioType === 'uncompensated') { hco3 = rand(22, 26); ph = rand(7.46, 7.60); }
+                else if (scenarioType === 'partially_compensated') { hco3 = rand(18, 21); ph = rand(7.46, 7.55); }
+                else { hco3 = rand(18, 21); ph = rand(7.40, 7.45); }
+            }
+        }
+        return { ph: ph.toFixed(2), paco2: Math.round(paco2), hco3: Math.round(hco3) };
+    };
+    
+    const getCorrectInterpretation = (values) => {
+        const { ph, paco2, hco3 } = values;
+        
+        const phState = ph < NORMAL_RANGES.ph.low ? 'acidosis' : ph > NORMAL_RANGES.ph.high ? 'alkalosis' : 'normal';
+        const paco2State = paco2 > NORMAL_RANGES.paco2.high ? 'acidosis' : paco2 < NORMAL_RANGES.paco2.low ? 'alkalosis' : 'normal';
+        const hco3State = hco3 < NORMAL_RANGES.hco3.low ? 'acidosis' : hco3 > NORMAL_RANGES.hco3.high ? 'alkalosis' : 'normal';
+        
+        let primary, compensation = "Uncompensated";
+
+        if (phState !== 'normal') { // Uncompensated or Partially Compensated
+            if ((phState === 'acidosis' && paco2State === 'acidosis') || (phState === 'alkalosis' && paco2State === 'alkalosis')) {
+                primary = 'Respiratory';
+                if ( (phState === 'acidosis' && hco3State === 'alkalosis') || (phState === 'alkalosis' && hco3State === 'acidosis') ) {
+                    compensation = 'Partially Compensated';
+                }
+            } else if ((phState === 'acidosis' && hco3State === 'acidosis') || (phState === 'alkalosis' && hco3State === 'alkalosis')) {
+                primary = 'Metabolic';
+                 if ( (phState === 'acidosis' && paco2State === 'alkalosis') || (phState === 'alkalosis' && paco2State === 'acidosis') ) {
+                    compensation = 'Partially Compensated';
+                }
+            }
+        } else { // Fully Compensated
+            compensation = 'Fully Compensated';
+            if (paco2State !== 'normal') primary = 'Respiratory';
+            else primary = 'Metabolic';
+        }
+        
+        const result = phState === 'normal' 
+            ? (ph < 7.40 ? 'Acidosis' : 'Alkalosis')
+            : (phState.charAt(0).toUpperCase() + phState.slice(1));
+
+        return `${compensation} ${primary} ${result}`;
+    };
+
+    const generateNewQuestion = () => {
+        const values = generateABGValues(gameState.level);
+        const correctAnswer = getCorrectInterpretation(values);
+        gameState.currentQuestion = { values, correctAnswer };
+    };
+
+    const checkAnswer = (selectedAnswer) => {
+        const currentQuestion = gameState.currentQuestion;
+        const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+
+        showFeedback(isCorrect);
+        showExplanation(currentQuestion.values, currentQuestion.correctAnswer, isCorrect);
+        
+        if (isCorrect) {
+            playSound('correct');
+            gameState.score += 10 * gameState.level;
+            gameState.correctStreak++;
+        } else {
+            playSound('incorrect');
+            gameState.lives--;
+            gameState.correctStreak = 0;
+        }
+        updateHUD();
+    };
+
+    // --- UI Update Functions ---
+    const switchScreen = (screenName) => {
+        Object.values(screens).forEach(screen => screen.classList.remove('active'));
+        screens[screenName].classList.add('active');
+    };
+
+    const updateHUD = () => {
+        DOMElements.levelDisplay.textContent = gameState.level;
+        DOMElements.scoreDisplay.textContent = gameState.score;
+        
+        DOMElements.livesDisplay.innerHTML = '';
+        for (let i = 0; i < LIVES_START; i++) {
+            const heart = document.createElement('span');
+            heart.innerHTML = '❤️';
+            heart.className = `heart text-2xl text-red-500 ${i >= gameState.lives ? 'lost' : ''}`;
+            DOMElements.livesDisplay.appendChild(heart);
+        }
+    };
+    
+    const displayQuestion = () => {
+        const question = gameState.currentQuestion;
+        DOMElements.phValue.textContent = question.values.ph;
+        DOMElements.paco2Value.textContent = question.values.paco2;
+        DOMElements.hco3Value.textContent = question.values.hco3;
+        DOMElements.questionCountDisplay.textContent = `Streak: ${gameState.correctStreak}`;
+        
+        // Color coding
+        DOMElements.phValue.className = `text-4xl font-bold ${question.values.ph < 7.35 || question.values.ph > 7.45 ? 'text-red-500' : 'text-green-500'}`;
+        DOMElements.paco2Value.className = `text-4xl font-bold ${question.values.paco2 < 35 || question.values.paco2 > 45 ? 'text-blue-500' : 'text-green-500'}`;
+        DOMElements.hco3Value.className = `text-4xl font-bold ${question.values.hco3 < 22 || question.values.hco3 > 26 ? 'text-indigo-500' : 'text-green-500'}`;
+
+        // Generate answer buttons
+        const answers = generateAnswerOptions(question.correctAnswer);
+        DOMElements.answerButtonsContainer.innerHTML = '';
+        answers.forEach(answer => {
+            const button = document.createElement('button');
+            button.textContent = answer;
+            button.className = 'btn-answer p-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg shadow transition';
+            button.onclick = () => checkAnswer(answer);
+            DOMElements.answerButtonsContainer.appendChild(button);
+        });
+    };
+    
+    const generateAnswerOptions = (correctAnswer) => {
+        let options = new Set([correctAnswer]);
+        while (options.size < 4) {
+            const randomIndex = Math.floor(Math.random() * ANSWER_OPTIONS.length);
+            options.add(ANSWER_OPTIONS[randomIndex]);
+        }
+        return [...options].sort(() => Math.random() - 0.5); // Shuffle
+    };
+
+    const showFeedback = (isCorrect) => {
+        DOMElements.feedbackMessage.textContent = isCorrect ? "Correct!" : "Incorrect!";
+        DOMElements.feedbackBanner.className = `feedback-banner fixed top-0 left-0 right-0 p-4 text-center text-white font-bold z-50 show ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`;
+        setTimeout(() => {
+            DOMElements.feedbackBanner.classList.remove('show');
+        }, 1500);
+    };
+    
+    const showExplanation = (values, correctAnswer, isCorrect) => {
+        DOMElements.explanationTitle.textContent = isCorrect ? 'Excellent! Here\'s why:' : 'Not quite. Here\'s the breakdown:';
+        DOMElements.explanationTitle.className = `text-2xl font-bold mb-4 ${isCorrect ? 'text-green-600' : 'text-red-600'}`;
+        
+        const { ph, paco2, hco3 } = values;
+        const ROME_EXPLANATION = (paco2 < 35 || paco2 > 45) ?
+            "<strong>R</strong>espiratory is <strong>O</strong>pposite (pH ↑ PaCO₂ ↓, or pH ↓ PaCO₂ ↑)." :
+            "<strong>M</strong>etabolic is <strong>E</strong>qual (pH ↑ HCO₃ ↑, or pH ↓ HCO₃ ↓).";
+
+        let explanationHtml = `
+            <p><strong>1. Analyze pH (${ph}):</strong> ${ph < 7.35 ? `Below 7.35 is <strong>Acidosis</strong>.` : ph > 7.45 ? `Above 7.45 is <strong>Alkalosis</strong>.` : `Within normal range (7.35-7.45).`}</p>
+            <p><strong>2. Check PaCO₂ (${paco2}):</strong> ${paco2 < 35 ? `Low (alkalotic).` : paco2 > 45 ? `High (acidotic).` : `Normal (35-45).`}</p>
+            <p><strong>3. Check HCO₃ (${hco3}):</strong> ${hco3 < 22 ? `Low (acidotic).` : hco3 > 26 ? `High (alkalotic).` : `Normal (22-26).`}</p>
+            <p><strong>4. Determine Cause (ROME):</strong> ${ROME_EXPLANATION}</p>
+            <p class="mt-4 pt-4 border-t border-slate-200"><strong>Conclusion:</strong> The correct interpretation is <strong>${correctAnswer}</strong>.</p>
+        `;
+        DOMElements.explanationText.innerHTML = explanationHtml;
+        DOMElements.explanationModal.style.display = 'flex';
+    };
+    
+    const hideExplanation = () => {
+        DOMElements.explanationModal.style.display = 'none';
+        
+        if (gameState.lives <= 0) {
+            endGame();
+        } else if (gameState.correctStreak >= STREAK_TO_LEVEL_UP) {
+            levelUp();
+        } else {
+            generateNewQuestion();
+            displayQuestion();
+        }
+    };
+    
+    const updateHighScoreDisplay = () => {
+         DOMElements.highScoreDisplays.forEach(el => el.textContent = gameState.highScore);
+    };
+
+    // --- Game Flow Functions ---
+    const startGame = () => {
+        gameState.level = 1;
+        gameState.score = 0;
+        gameState.lives = LIVES_START;
+        gameState.correctStreak = 0;
+        startLevel();
+    };
+
+    const startLevel = () => {
+        generateNewQuestion();
+        updateHUD();
+        displayQuestion();
+        switchScreen('game');
+    };
+
+    const levelUp = () => {
+        playSound('levelUp');
+        gameState.level++;
+        gameState.correctStreak = 0;
+        DOMElements.levelCompleteMessage.textContent = `You've mastered Level ${gameState.level - 1}! Get ready for more complex cases.`;
+        DOMElements.nextLevelDisplay.textContent = gameState.level;
+        switchScreen('levelComplete');
+    };
+
+    const endGame = () => {
+        if (gameState.score > gameState.highScore) {
+            gameState.highScore = gameState.score;
+            localStorage.setItem('abgHeroHighScore', gameState.highScore);
+        }
+        updateHighScoreDisplay();
+        DOMElements.finalScoreDisplay.textContent = gameState.score;
+        switchScreen('gameOver');
+    };
+
+    // --- Init & Event Listeners ---
+    const init = () => {
+        gameState.highScore = parseInt(localStorage.getItem('abgHeroHighScore')) || 0;
+        updateHighScoreDisplay();
+        switchScreen('menu');
+
+        DOMElements.startButton.onclick = async () => {
+            // Tone.js requires user interaction to start
+            await Tone.start();
+            console.log('Audio context started');
+            setupSounds();
+            startGame();
+        };
+        DOMElements.restartButton.onclick = startGame;
+        DOMElements.nextLevelButton.onclick = startLevel;
+        DOMElements.nextQuestionButton.onclick = hideExplanation;
+    };
+
+    init();
+});
+</script>
+</body>
+</html>
+
