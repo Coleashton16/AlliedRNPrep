@@ -91,7 +91,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
 
             <!-- Left Sidebar Navigation -->
-            <aside class="md:col-span-3 lg:col-span-2">
+            <aside class="md-col-span-3 lg:col-span-2">
                 <div class="sticky top-24">
                     <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Course Units</h3>
                     <nav id="unit-navigation" class="flex flex-col space-y-1">
@@ -184,8 +184,14 @@
                             description: 'Master the concepts of acid-base balance, ABG interpretation, and related nursing interventions.',
                             icon: 'bar-chart-2',
                             link: '/MedSurgII/acidbaselearningmodule.html'
+                        },
+                        {
+                            type: 'game',
+                            title: 'ABG Hero',
+                            description: 'Test your ABG interpretation skills with this interactive game.',
+                            icon: 'shield',
+                            link: '/MedSurgii/abghero'
                         }
-                        // Other submodules for this unit will be added here.
                     ]
                 }
             ]
@@ -205,19 +211,20 @@
                 const typeStyles = {
                     exam: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' },
                     learn: { bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-600', hover: 'hover:border-sky-400 hover:bg-sky-100' },
+                    game: { bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-600', hover: 'hover:border-amber-400 hover:bg-amber-100' },
                     final: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' }
                 };
                 const styles = typeStyles[resource.type] || typeStyles.learn;
                 return `
-                        <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="group block p-5 rounded-xl border-2 transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-lg ${styles.bg} ${styles.border} ${styles.hover}">
-                            <div class="flex items-start gap-4">
-                                <div class="p-2 rounded-lg ${styles.iconColor}"><i data-feather="${resource.icon}" class="w-6 h-6"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800 group-hover:text-black break-words">${resource.title}</h4>
-                                    <p class="text-sm text-slate-600 mt-1 break-words">${resource.description}</p>
-                                </div>
-                            </div>
-                        </a>`;
+                                <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="group block p-5 rounded-xl border-2 transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-lg ${styles.bg} ${styles.border} ${styles.hover}">
+                                    <div class="flex items-start gap-4">
+                                        <div class="p-2 rounded-lg ${styles.iconColor}"><i data-feather="${resource.icon}" class="w-6 h-6"></i></div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800 group-hover:text-black break-words">${resource.title}</h4>
+                                            <p class="text-sm text-slate-600 mt-1 break-words">${resource.description}</p>
+                                        </div>
+                                    </div>
+                                </a>`;
             };
             
             // Clear existing navigation and content before populating
@@ -240,13 +247,19 @@
 
                 if (unit.resources.length > 0) {
                     const learningModules = unit.resources.filter(r => r.type === 'learn');
+                    const games = unit.resources.filter(r => r.type === 'game');
                     const exams = unit.resources.filter(r => r.type === 'exam');
                     const finalExams = unit.resources.filter(r => r.type === 'final');
                     let resourcesHTML = '';
 
                     const createSection = (title, icon, items) => {
                         if (items.length === 0) return '';
-                        const iconColor = { 'Learning Modules': 'text-sky-600', 'Diagnostic Exams': 'text-indigo-600', 'Final Exam Prep': 'text-indigo-600' }[title] || 'text-slate-600';
+                        const iconColor = { 
+                            'Learning Modules': 'text-sky-600', 
+                            'Games & Simulations': 'text-amber-600',
+                            'Diagnostic Exams': 'text-indigo-600', 
+                            'Final Exam Prep': 'text-indigo-600' 
+                        }[title] || 'text-slate-600';
                         return `
                                 <div class="mb-8">
                                     <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
@@ -257,17 +270,18 @@
                     };
                     
                     resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
+                    resourcesHTML += createSection('Games & Simulations', 'play-circle', games);
                     resourcesHTML += createSection('Diagnostic Exams', 'clipboard', exams);
                     resourcesHTML += createSection('Final Exam Prep', 'award', finalExams);
                     
                     contentHTML += resourcesHTML;
                 } else {
                     contentHTML += `
-                            <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
-                                <i data-feather="folder" class="w-12 h-12 mx-auto text-slate-400"></i>
-                                <h3 class="mt-4 text-lg font-semibold text-slate-700 text-wrap">No Resources Available Yet</h3>
-                                <p class="mt-1 text-slate-500 text-wrap">Please check back later for materials related to this unit.</p>
-                            </div>`;
+                                <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
+                                    <i data-feather="folder" class="w-12 h-12 mx-auto text-slate-400"></i>
+                                    <h3 class="mt-4 text-lg font-semibold text-slate-700 text-wrap">No Resources Available Yet</h3>
+                                    <p class="mt-1 text-slate-500 text-wrap">Please check back later for materials related to this unit.</p>
+                                </div>`;
                 }
                 section.innerHTML = contentHTML;
                 contentContainer.appendChild(section);
@@ -304,3 +318,4 @@
     </script>
 </body>
 </html>
+
