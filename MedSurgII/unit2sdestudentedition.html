@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bg-custom-dark {
+            background-color: #1f2937;
+        }
+        .text-custom-dark {
+            color: #1f2937;
+        }
+        .bg-custom-gray {
+            background-color: #e5e7eb;
+        }
+        .text-custom-gray {
+            color: #9ca3af;
+        }
+        .btn-orange {
+            background-color: #f97316;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c;
+        }
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        .nav-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-item.bg-gray-200:hover {
+            background-color: #d1d5db;
+        }
+        .nav-item.answered {
+            background-color: #d1d5db; /* A subdued color for answered questions */
+            color: #374151; /* Darker text for readability */
+        }
+        .nav-item.answered::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Using a box-shadow to simulate a checkmark */
+            box-shadow: 0 0 0 2px #10b981, 
+                        inset 0 0 0 1px white,
+                        inset 2px 2px 0 0 white,
+                        inset -2px 2px 0 0 white;
+            transform: rotate(-45deg);
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered::after {
+            background-color: white;
+            box-shadow: 0 0 0 2px white,
+                        inset 0 0 0 1px #10b981,
+                        inset 2px 2px 0 0 #10b981,
+                        inset -2px 2px 0 0 #10b981;
+        }
+
+        .radio-btn, .check-btn {
+            display: none;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        .option-label .option-letter {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Changed from rounded-0.25rem to fully rounded */
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+        .radio-btn:checked + .option-label,
+        .check-btn:checked + .option-label {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .radio-btn:checked + .option-label .option-letter,
+        .check-btn:checked + .option-label .option-letter {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .review-box {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .loading-animation, .grade-screen, .rationale-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Header - Custom design based on image -->
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
+        <div class="flex items-center space-x-6">
+            <div class="font-bold">ARP</div>
+            <div class="hidden sm:block font-medium">Allied RN Prep</div>
+            <div class="hidden sm:block text-gray-400">Medical Surgical II Unit 2 Exam</div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.957.703l4.084-1.714a.75.75 0 00-.597-1.42l-3.375 1.416V6z" clip-rule="evenodd" />
+                </svg>
+                <span id="timer" class="font-semibold">02:00:00</span>
+            </div>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">EXAM CONTROLS</button>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">TOOL KIT</button>
+        </div>
+    </header>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
+
+    <!-- Main Content Area - Updated to a three-column layout -->
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-20 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
+            <div class="mb-4 text-xs text-gray-500">FILTER ></div>
+            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
+                <!-- Question navigation items will be injected here -->
+            </div>
+        </aside>
+
+        <!-- Question Section -->
+        <main class="flex-1 flex overflow-hidden">
+            <div id="question-container" class="flex-1 p-8 overflow-y-auto flex flex-col justify-between">
+                <!-- Question will be injected here -->
+            </div>
+            
+            <!-- Right Sidebar placeholder -->
+            <div class="hidden md:flex items-center justify-center bg-white border-l border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Screen -->
+    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
+        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <div id="review-questions" class="space-y-8">
+            <!-- Missed questions review will be injected here -->
+        </div>
+        <div class="mt-8 text-center">
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+        </div>
+    </div>
+    
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
+    </div>
+
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 md:w-1/2 mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-custom-dark">Exam Submitted Successfully!</h2>
+            <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+            <div class="text-6xl font-extrabold text-blue-600 mb-8" id="final-grade"></div>
+            <button id="restart-btn" class="px-6 py-3 btn-blue text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+        </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
+            <span id="question-counter">1 OF 11 QUESTIONS</span>
+            <span class="hidden sm:block text-xs">VERSION 5.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition cursor-not-allowed opacity-50">Previous</button>
+            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
+            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data and State ---
+        // NOTE: This quiz data has been truncated to 2 questions for testing.
+        const quizData = [
+  {
+    "questionText": "A nurse is caring for a client with a pneumothorax who is on mechanical ventilation and has a chest tube connected to a water-seal drainage system. The nurse notes continuous bubbling in the water-seal chamber. What is the nurse’s priority action?",
+    "options": {
+      "A": "Document the finding as expected while the client is on a ventilator.",
+      "B": "Check all connections and tubing for an air leak.",
+      "C": "Clamp the chest tube near the drainage system for 10 minutes.",
+      "D": "Increase the suction pressure on the chest drainage system."
+    },
+    "correctAnswer": "B",
+    "rationale": "Continuous bubbling in the water-seal chamber indicates an air leak in the system or the patient. The nurse must systematically check all tubing and connections to locate and correct the leak to restore the integrity of the closed system. Bubbling should be intermittent, not continuous.",
+    "section": "Chest Tubes/Ventilation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a mechanically ventilated client in the ICU. Which nursing intervention is most effective in preventing ventilator-associated pneumonia (VAP)?",
+    "options": {
+      "A": "Suction the endotracheal tube every 8 hours.",
+      "B": "Keep the head of the bed elevated 30–45 degrees.",
+      "C": "Change ventilator tubing daily.",
+      "D": "Provide sedation to prevent the client from coughing."
+    },
+    "correctAnswer": "B",
+    "rationale": "Elevating the head of the bed to 30–45 degrees (semi-Fowler's position) significantly reduces the risk of aspiration of gastric or oral secretions, which is a major contributing factor to VAP. This is a core component of the VAP prevention bundle.",
+    "section": "Ventilator Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following patients is at the highest risk for PE?",
+    "options": {
+      "A": "A pregnant woman with no previous medical conditions.",
+      "B": "A 70 year old male that does aerobic exercise 4 times a week.",
+      "C": "A 2 day post-op hip replacement patient that is ambulating in the hallway and doing PT.",
+      "D": "A 45 year old female who has been completely immobile after a CVA for 2 weeks."
+    },
+    "correctAnswer": "D",
+    "rationale": "The highest risk factor is prolonged immobility (two weeks after a CVA), which causes venous stasis—one of the components of Virchow's Triad—greatly increasing the risk for DVT formation and subsequent PE. The post-op patient (C) is mitigating risk by ambulating.",
+    "section": "Hematology/PE",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is providing teaching about prevention of PE. Which statement by the patient indicates the need for further teaching.",
+    "options": {
+      "A": "I should join a support group to help me quit smoking.",
+      "B": "Remaining active will reduce my risk for PE.",
+      "C": "When traveling I should cross my legs to keep my blood flow going.",
+      "D": "I should look for a trainer to help me lose weight."
+    },
+    "correctAnswer": "C",
+    "rationale": "Crossing the legs compresses veins and decreases blood flow (venous stasis), promoting clot formation, thus indicating a need for further teaching. When traveling, one should get up and stretch the legs frequently.",
+    "section": "Patient Education",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is working on a busy ICU floor and cares for a patient on a ventilator. The ventilator is set to 18 breaths per minute, but an ABG result yields a pH of 7.50. Which action by the provider would the nurse question?",
+    "options": {
+      "A": "Increase the ventilator rate from 18 to 20 to compensate for acidosis and repeat ABG in 1 hour.",
+      "B": "Decrease the ventilator rate from 18 to 14 to compensate for alkalosis and repeat ABG in 1 hour.",
+      "C": "Maintain current ventilator settings and notify RT to consult on ventilator adjustment",
+      "D": "Assess for possible pain or anxious state contributing to hyperventilation prior to adjusting ventilator settings."
+    },
+    "correctAnswer": "A",
+    "rationale": "The pH of 7.50 indicates respiratory alkalosis (too little CO2/acid). Increasing the ventilator rate (A) would cause the patient to blow off *more* CO2, thereby worsening the alkalosis. The nurse should question this order, as the appropriate adjustment is to decrease the rate.",
+    "section": "Ventilator Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse hears a high-pressure alarm sounding on a mechanically ventilated patient. What should the nurse do first?",
+    "options": {
+      "A": "Check for a disconnected ventilator circuit.",
+      "B": "Assess the patient for coughing or secretions.",
+      "C": "Silence the alarm and notify respiratory therapy.",
+      "D": "Increase the tidal volume setting."
+    },
+    "correctAnswer": "B",
+    "rationale": "High-pressure alarms signal increased resistance. The nurse should assess the patient first for immediate, common, and reversible causes such as coughing, biting the tube, or excessive secretions before manipulating the machine or calling for assistance. (Note: Disconnection causes a low-pressure alarm).",
+    "section": "Ventilator Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which nursing action best helps reduce the risk for ventilator-associated pneumonia (VAP)?",
+    "options": {
+      "A": "Performing oral care every 4 hours with chlorhexidine",
+      "B": "Maintaining FiO₂ at the lowest possible level",
+      "C": "Keeping the head of the bed flat during suctioning",
+      "D": "Suctioning only when the patient coughs"
+    },
+    "correctAnswer": "A",
+    "rationale": "Regular oral hygiene with chlorhexidine (A) significantly reduces the bacterial load in the oral cavity. This prevents the micro-aspiration of pathogens, which is the primary cause of VAP. This is a core part of the VAP prevention bundle.",
+    "section": "Ventilator Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse hears a high-pressure alarm on the ventilator. Which of the following could be the cause? (Select all that apply)",
+    "options": {
+      "A": "Patient is coughing or biting the tube",
+      "B": "Disconnected tubing",
+      "C": "Excessive secretions",
+      "D": "Kinked ventilator tubing",
+      "E": "The patient has pulled out the ET tube"
+    },
+    "correctAnswer": [
+      "A",
+      "C",
+      "D"
+    ],
+    "rationale": "High-pressure alarms indicate obstruction or resistance in the airway or tubing. Causes include: coughing/biting the tube (A), excessive secretions (C), or kinked tubing (D). Disconnection (B) or tube displacement (E) cause a low-pressure alarm.",
+    "section": "Ventilator Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "After extubation, which assessment finding requires immediate intervention?",
+    "options": {
+      "A": "Hoarseness",
+      "B": "Sore throat",
+      "C": "Stridor",
+      "D": "Mild cough"
+    },
+    "correctAnswer": "C",
+    "rationale": "Stridor (C) is a high-pitched, crowing sound caused by severe upper airway obstruction from laryngeal edema or spasm. This is an immediate respiratory emergency that requires urgent intervention and preparation for possible re-intubation.",
+    "section": "Respiratory Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "What is a priority nursing intervention that happens after a patient is extubated?",
+    "options": {
+      "A": "Administer a SABA.",
+      "B": "Apply a nasal canula",
+      "C": "Focused respiratory assessment, which monitors for signs of respiratory distress",
+      "D": "IV fluid bolus"
+    },
+    "correctAnswer": "C",
+    "rationale": "The priority after extubation is to continuously monitor the airway for compromise. A focused respiratory assessment (C) monitors for signs of distress, especially stridor, which indicates upper airway obstruction.",
+    "section": "Respiratory Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "What should the nurse do when their patient with a nasal cannula complains of nasal dryness?",
+    "options": {
+      "A": "Switch to a non-rebreather mask",
+      "B": "Turn off oxygen",
+      "C": "Call the provider",
+      "D": "Apply a water-soluble lubricant to the nostrils"
+    },
+    "correctAnswer": "D",
+    "rationale": "Applying a water-soluble lubricant to the nostrils protects mucous membranes, which helps prevent irritation, cracking, and blistering caused by the drying effects of oxygen. This is the simplest and most appropriate intervention.",
+    "section": "Oxygen Therapy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with cirrhosis is scheduled for a paracentesis. Which finding requires the nurse to hold the procedure and notify the provider?",
+    "options": {
+      "A": "Sodium 134 mEq/L",
+      "B": "INR 3.2",
+      "C": "Albumin 2.6 g/dL",
+      "D": "Abdominal girth 46 inches"
+    },
+    "correctAnswer": "B",
+    "rationale": "A severely elevated INR (3.2) indicates significant coagulopathy (clotting impairment) due to liver disease, posing a dangerously high risk for uncontrollable bleeding during an invasive procedure like a paracentesis. This is an absolute contraindication.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is reviewing the chart of a patient with acute pancreatitis: 0800: HR 110, BP 124/70, SpO₂ 96% / 1000: HR 126, BP 92/58, SpO₂ 90% / 1030: Patient reports increasing anxiety and restlessness. What is the priority action?",
+    "options": {
+      "A": "Reassess vital signs in 30 minutes.",
+      "B": "Notify provider and prepare for fluid resuscitation.",
+      "C": "Administer prescribed morphine.",
+      "D": "Elevate the head of the bed."
+    },
+    "correctAnswer": "B",
+    "rationale": "The rapid deterioration (tachycardia, hypotension, declining SpO2, anxiety) indicates hypovolemic shock due to third-spacing of fluid in pancreatitis. Immediate notification and preparation for aggressive IV fluid resuscitation are essential.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A football player presented to the ED after a heavy chest collision with another player on the chest. The patient is having trouble breathing and is in pain. The nurse knows this patient is at risk for:",
+    "options": {
+      "A": "Pulmonary contusion",
+      "B": "Tension pneumothorax",
+      "C": "Simple rib fracture",
+      "D": "Flail chest"
+    },
+    "correctAnswer": "D",
+    "rationale": "Severe blunt force chest trauma carries a high risk for Flail Chest (multiple rib fractures), which impairs ventilation due to paradoxical movement and leads to respiratory distress.",
+    "section": "Chest Trauma",
+    "type": "mc"
+  },
+  {
+    "questionText": "Vigorous or excessive bubbling in the water seal chamber is a normal finding and the nurse should document it as an expected finding. True or False",
+    "options": {
+      "A": "True",
+      "B": "False",
+      "C": "Only expected if the patient is on suction",
+      "D": "Only expected immediately after insertion"
+    },
+    "correctAnswer": "B",
+    "rationale": "False (B). Vigorous or continuous bubbling in the water-seal chamber is abnormal and always signals a persistent air leak in the system or the patient's chest. Bubbling should be gentle and intermittent (tidaling), or completely stopped if the lung has fully re-expanded.",
+    "section": "Chest Tubes",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following patients may require ventilation support?",
+    "options": {
+      "A": "Patient with COPD with respirations of 22 and an O2 Sat of 92%",
+      "B": "Patient who came in with constricting blunt trauma to the chest.",
+      "C": "Patient with pneumonia who has a productive cough.",
+      "D": "Patient with asthma exacerbation and feeling of chest tightness."
+    },
+    "correctAnswer": "B",
+    "rationale": "A patient with constricting blunt trauma to the chest is at risk for restrictive injury or flail chest, which severely limits lung expansion and gas exchange, often requiring immediate positive-pressure mechanical ventilation to maintain adequate breathing.",
+    "section": "Respiratory Support",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 35 year old woman arrives at the emergency department hyperventilating after learning her child was in an accident. Her ABG results are: pH: 7.51, PaCO2: 28 mmHg, HCO3: 23 mEq/L. Which interpretation best describes this result?",
+    "options": {
+      "A": "Metabolic alkalosis.",
+      "B": "Respiratory alkalosis.",
+      "C": "Metabolic acidosis.",
+      "D": "Respiratory acidosis."
+    },
+    "correctAnswer": "B",
+    "rationale": "The elevated pH (alkalosis) and low PaCO₂ confirm uncompensated respiratory alkalosis, caused by the hyperventilation.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 58 year old man with acute respiratory distress syndrome is on mechanical ventilation. His most recent ABG shows: pH: 7.28, PaCO2: 56 mmHg, PaO2: 58 mmHg, HCO₃⁻: 25 mEq/L. Which condition do these results indicate?",
+    "options": {
+      "A": "Respiratory alkalosis, partially compensated.",
+      "B": "Metabolic acidosis, uncompensated.",
+      "C": "Respiratory acidosis, uncompensated.",
+      "D": "Metabolic alkalosis, compensated."
+    },
+    "correctAnswer": "C",
+    "rationale": "The low pH (acidosis) and elevated PaCO2 confirm an uncompensated respiratory acidosis (CO2 retention). The normal HCO₃⁻ level means there is no metabolic compensation yet.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with chronic pancreatitis is prescribed pancreatic enzyme replacements. The nurse should teach the patient to take them:",
+    "options": {
+      "A": "On an empty stomach at bedtime",
+      "B": "Once a week",
+      "C": "With meals and snacks",
+      "D": "Only when pain occurs"
+    },
+    "correctAnswer": "C",
+    "rationale": "Pancreatic Enzyme Replacement Therapy (PERT) must be taken with all meals and snacks so the enzymes can mix with the food in the intestine to aid digestion and prevent malabsorption.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "Esophageal varices develop in cirrhosis due to:",
+    "options": {
+      "A": "Increased production of stomach acid.",
+      "B": "Portal hypertension causing backup of blood flow.",
+      "C": "Direct toxic effect of alcohol on the esophagus.",
+      "D": "Vitamin K deficiency."
+    },
+    "correctAnswer": "B",
+    "rationale": "Portal hypertension increases venous pressure in the portal system, forcing blood to shunt into collateral veins, primarily in the esophagus, causing them to distend and form varices.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client came in with COPD exacerbation and was complaining of shortness of breath and headaches. ABG labs showed values of pH 7.28, PaCO2 55, and HCO3 27. With these results, what electrolyte imbalance should the nurse look out for in treating this patient?",
+    "options": {
+      "A": "Hypernatremia",
+      "B": "Hypomagnesemia",
+      "C": "Hyperkalemia",
+      "D": "Hypocalcemia"
+    },
+    "correctAnswer": "C",
+    "rationale": "The acidosis (low pH) causes a shift of hydrogen ions into the cells, pushing potassium out into the bloodstream, resulting in Hyperkalemia, which poses a significant risk for cardiac dysrhythmias.",
+    "section": "Acid-Base Balance",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client came in to the unit for severe vomiting for multiple days. Her ABG values are pH 7.48, PaCO2 44, and HCO3 32. Which of the following actions can the nurse do to correct this client's acid-base imbalance?",
+    "options": {
+      "A": "Administer bronchodilators as ordered",
+      "B": "Administer sodium bicarbonate as ordered",
+      "C": "Encourage breathing in and out of a paper bag",
+      "D": "Administer antiemetic medications and IV fluids containing NaCl and potassium"
+    },
+    "correctAnswer": "D",
+    "rationale": "The patient has metabolic alkalosis (high pH, high HCO3) due to loss of HCl from vomiting. Treatment involves correcting the cause (antiemetics) and replacing fluid and lost electrolytes (IV fluids with NaCl and potassium).",
+    "section": "Acid-Base Balance",
+    "type": "mc"
+  },
+  {
+    "questionText": "How would you interpret your patient's ABG as followed, pH- 7.3, PaCO2- 51, HCO3- 24",
+    "options": {
+      "A": "Respiratory alkalosis",
+      "B": "Metabolic alkaosis",
+      "C": "Respiratory acidosis",
+      "D": "Metabolic acidosis"
+    },
+    "correctAnswer": "C",
+    "rationale": "The low pH (acidosis) and elevated PaCO2 confirm an uncompensated respiratory acidosis.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following would be a cause of metabolic alkalosis?",
+    "options": {
+      "A": "Prolonged vomiting",
+      "B": "Diabetic Ketoacidosis",
+      "C": "Drug overdose induced respiratory depression",
+      "D": "Hyperventilation"
+    },
+    "correctAnswer": "A",
+    "rationale": "Prolonged vomiting causes the loss of hydrochloric acid (HCl) from the stomach, which is the most common cause of metabolic alkalosis.",
+    "section": "Acid-Base Balance",
+    "type": "mc"
+  },
+  {
+    "questionText": "What conditions may cause respiratory alkalosis? (Select all that apply)",
+    "options": {
+      "A": "Pain",
+      "B": "Acute alcohol intoxication",
+      "C": "PE",
+      "D": "Fever",
+      "E": "Hyperventilation"
+    },
+    "correctAnswer": [
+      "A",
+      "C",
+      "D",
+      "E"
+    ],
+    "rationale": "Respiratory alkalosis is caused by hyperventilation, which is triggered by conditions that increase the respiratory drive, such as pain, fever, PE (due to anxiety/hypoxia), and direct hyperventilation. Acute alcohol intoxication causes respiratory depression (acidosis).",
+    "section": "Acid-Base Balance",
+    "type": "sata"
+  },
+  {
+    "questionText": "What condition do these ABG levels represent: pH 7.27, PaCO2 40, HCO3 18?",
+    "options": {
+      "A": "Respiratory alkalosis",
+      "B": "Metabolic acidosis",
+      "C": "Respiratory acidosis",
+      "D": "Metabolic alkalosis"
+    },
+    "correctAnswer": "B",
+    "rationale": "The low pH (acidosis) and low HCO3 (base deficit) indicate uncompensated metabolic acidosis. The normal PaCO2 means there is no respiratory compensation.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient’s ABG results are: pH 7.48, PaCO₂ 30 mmHg, HCO₃⁻ 24 mEq/L. Which of the following findings best explains the cause?",
+    "options": {
+      "A": "Prolonged vomiting",
+      "B": "Anxiety and hyperventilation",
+      "C": "Kidney failure",
+      "D": "Diarrhea"
+    },
+    "correctAnswer": "B",
+    "rationale": "The ABG shows Respiratory Alkalosis (high pH, low PaCO2). This is caused by hyperventilation, most commonly triggered by anxiety.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a patient with pneumonia. Which assessment finding indicates impaired gas exchange?",
+    "options": {
+      "A": "Oxygen saturation of 96% on room air",
+      "B": "Respiratory rate of 18 breaths per minute",
+      "C": "Confusion and restlessness",
+      "D": "Clear breath sounds bilaterally"
+    },
+    "correctAnswer": "C",
+    "rationale": "Confusion and restlessness (C) are classic, early signs of hypoxia and impaired gas exchange because the brain is highly sensitive to reduced oxygen levels.",
+    "section": "Respiratory Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with a history of chronic kidney disease is seen in the emergency department showing symptoms of warm, flushed skin, hyporeflexia, and hypotension. What diagnosis do you expect of the patient?",
+    "options": {
+      "A": "Metabolic alkalosis.",
+      "B": "Respiratory acidosis.",
+      "C": "Metabolic acidosis.",
+      "D": "Respiratory alkalosis."
+    },
+    "correctAnswer": "C",
+    "rationale": "CKD impairs the kidneys' ability to excrete acid and synthesize bicarbonate, leading to chronic Metabolic Acidosis (C). Symptoms like warm, flushed skin and hyporeflexia are associated with the systemic effects of acidosis.",
+    "section": "Acid-Base Balance",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient presents to the ED with increased anxiety, muscle cramping, and increased heart rate. The ABG is as follows: pH 7.53, PaCO2 30, and HCO3 of 25. The nurse determines that the patient is suffering which condition?",
+    "options": {
+      "A": "Respiratory alkalosis.",
+      "B": "Metabolic alkalosis.",
+      "C": "Metabolic acidosis.",
+      "D": "Respiratory acidosis."
+    },
+    "correctAnswer": "A",
+    "rationale": "The ABG (High pH 7.53, Low PaCO2 30, Normal HCO3 25) indicates Uncompensated Respiratory Alkalosis (A), consistent with hyperventilation due to anxiety.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which nursing actions are included in the verification of correct ET tube placement? (Select all that apply.)",
+    "options": {
+      "A": "Measuring arterial blood gases immediately",
+      "B": "Observing for symmetric chest wall movement",
+      "C": "Performing a chest x-ray",
+      "D": "Assessing for bilateral breath sounds",
+      "E": "Checking end-tidal carbon dioxide levels"
+    },
+    "correctAnswer": [
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "rationale": "Standard methods for verifying ET tube placement include assessing bilateral breath sounds, observing symmetrical chest movement, rapidly confirming tracheal placement via end-tidal CO2 monitoring, and definitive confirmation via chest X-ray. ABGs reflect gas exchange but not tube location.",
+    "section": "Ventilator Management",
+    "type": "sata"
+  },
+  {
+    "questionText": "Which finding would best indicate a complication associated with flail chest?",
+    "options": {
+      "A": "Clear breath sounds bilaterally",
+      "B": "Severe hypoxemia and hypercarbia despite oxygen therapy",
+      "C": "Increased vital capacity and stable ABGs",
+      "D": "Normal chest wall movement"
+    },
+    "correctAnswer": "B",
+    "rationale": "The primary complication of flail chest is respiratory failure due to impaired ventilation. This is best indicated by severe hypoxemia and hypercarbia (poor gas exchange) refractory to simple oxygen delivery.",
+    "section": "Chest Trauma",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient was admitted to the unit yesterday with a diagnosis of acute pancreatitis. Which order should the nurse question?",
+    "options": {
+      "A": "30 units of regular insulin SQ q8h",
+      "B": "20 mg morphine PO q4h PRN",
+      "C": "20 mg atorvastatin PO daily",
+      "D": "20 mg famotidine IV q12h"
+    },
+    "correctAnswer": "B",
+    "rationale": "Morphine has traditionally been questioned in pancreatitis due to concern over Oddi sphincter spasm, although this is debated. Alternatives like hydromorphone or fentanyl are often preferred, making this the order the nurse should question for clarification.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is diagnosed with hepatic encephalopathy. Upon entering the room and conducting an LOC assessment, the patient is alert and oriented x2, unable to concentrate when asked questions, and has frequent mood swings. What lab value is suspected to have a direct correlation with the patient's current behavior?",
+    "options": {
+      "A": "Increased serum ammonia",
+      "B": "Increased AST",
+      "C": "Increased ALT",
+      "D": "Decreased serum albumin"
+    },
+    "correctAnswer": "A",
+    "rationale": "The buildup of serum ammonia, which crosses the blood-brain barrier, is the direct cause of the cognitive and behavioral changes (confusion, lethargy, asterixis) seen in hepatic encephalopathy.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following arterial blood gas values indicates respiratory acidosis?",
+    "options": {
+      "A": "pH 7.48, PaCO₂ 30 mm Hg",
+      "B": "pH 7.32, PaCO₂ 50 mm Hg",
+      "C": "pH 7.45, PaCO₂ 38 mm Hg",
+      "D": "pH 7.30, PaCO₂ 28 mm Hg"
+    },
+    "correctAnswer": "B",
+    "rationale": "Respiratory acidosis is defined by a low pH (<7.35) and an elevated PaCO₂ (>45 mmHg) due to hypoventilation and CO₂ retention. Option B (pH 7.32, PaCO₂ 50 mm Hg) matches this pattern.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "True or False: A pH of 7.38 with a PaCO₂ of 48 mm Hg and an HCO₃⁻ of 28 mEq/L indicates complete compensation of respiratory acidosis.",
+    "options": {
+      "A": "True",
+      "B": "False",
+      "C": "Partially Compensated Metabolic Alkalosis",
+      "D": "Uncompensated Respiratory Acidosis"
+    },
+    "correctAnswer": "A",
+    "rationale": "True (A). The pH (7.38) is within the normal range (7.35–7.45), indicating full compensation. The elevated PaCO₂ (primary problem) is balanced by the elevated HCO₃⁻ (compensation).",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient presents to the emergency department after a motor vehicle crash with severe chest pain and SOB. The nurse notes tracheal deviation to the left, absent breath sound on the right, and distended neck veins. Which condition should the nurse suspect?",
+    "options": {
+      "A": "Hemothorax",
+      "B": "Pulmonary Embolism",
+      "C": "Tension Pneumothorax",
+      "D": "Pleural Effusion"
+    },
+    "correctAnswer": "C",
+    "rationale": "The combination of tracheal deviation, absent breath sounds on the affected side, and distended neck veins is the classic triad of a Tension Pneumothorax, which requires urgent decompression.",
+    "section": "Chest Trauma",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient on mechanical ventilation is becoming increasingly restless and SpO2 is at 84%. The nurse verifies that the ventilator is on and functioning. What is the nurse's priority action?",
+    "options": {
+      "A": "Increase the ventilator rate.",
+      "B": "Assess for displacement or obstruction of the endotracheal tube.",
+      "C": "Call respiratory therapy for ventilator adjustment.",
+      "D": "Administer a sedative for anxiety."
+    },
+    "correctAnswer": "B",
+    "rationale": "Sudden hypoxemia and restlessness indicate a critical airway or breathing problem. The priority is to assess the airway (B) for immediate mechanical issues such as a displaced, kinked, or obstructed endotracheal tube before changing settings or calling for assistance.",
+    "section": "Ventilator Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "What nursing intervention would you do for a patient who is showing signs of respiratory alkalosis due to anxiety?",
+    "options": {
+      "A": "Have the patient breathe into a paper bag",
+      "B": "Provide rehydration",
+      "C": "Administer bronchodilators, anti-inflammatories, and mucolytics as prescribed",
+      "D": "Administer bicarbonate if prescribed"
+    },
+    "correctAnswer": "A",
+    "rationale": "Respiratory alkalosis is caused by hyperventilation (excessive CO2 loss). Having the patient breathe into a paper bag (A) helps them re-inhale CO2, increasing the CO2 level and correcting the alkalosis.",
+    "section": "Acid-Base Balance",
+    "type": "mc"
+  },
+  {
+    "questionText": "A 56-year-old patient with acute respiratory failure is placed on mechanical ventilation. The healthcare provider orders a mode that delivers a preset tidal volume at a set rate but also allows the patient to take spontaneous breaths between the machine-delivered breaths. Each spontaneous breath is unassisted by the ventilator. Which mechanical ventilation mode is the nurse implementing?",
+    "options": {
+      "A": "Continuous Positive Airway Pressure (CPAP)",
+      "B": "Assist-Control Ventilation (ACV)",
+      "C": "Synchronized Intermittent Mandatory Ventilation (SIMV)",
+      "D": "Pressure Support Ventilation (PSV)"
+    },
+    "correctAnswer": "C",
+    "rationale": "Synchronized Intermittent Mandatory Ventilation (SIMV) delivers mandatory breaths at a set rate and tidal volume while permitting the patient to take their own spontaneous, unassisted breaths between machine breaths.",
+    "section": "Ventilator Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a patient with a chest tube inserted for a right pneumothorax. While repositioning the patient, the chest tube becomes disconnected from the drainage system. What is the nurse’s first action?",
+    "options": {
+      "A": "Clamp the chest tube immediately to prevent air entry.",
+      "B": "Place the open end of the chest tube in a container of sterile water to restore the water seal.",
+      "C": "Apply an occlusive dressing over the insertion site.",
+      "D": "Reconnect the chest tube to the system after wiping it with an alcohol pad."
+    },
+    "correctAnswer": "B",
+    "rationale": "If the chest tube disconnects, the priority is to re-establish the water seal to prevent air from entering the pleural space and causing a tension pneumothorax. Submerging the open end of the tube in sterile water (B) creates a temporary one-way seal.",
+    "section": "Chest Tube Emergency",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a client with cirrhosis. Which finding indicates worsening portal hypertension?",
+    "options": {
+      "A": "Decreased abdominal girth",
+      "B": "Presence of asterixis",
+      "C": "Development of ascites and esophageal varices",
+      "D": "Elevated albumin levels"
+    },
+    "correctAnswer": "C",
+    "rationale": "Portal hypertension increases pressure in the portal circulation, leading directly to the development of ascites and the formation of collateral veins in the esophagus (esophageal varices), indicating worsening disease.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "In hepatic encephalopathy, the buildup of __________ in the bloodstream leads to confusion and altered mental status.",
+    "options": {
+      "A": "Bilirubin",
+      "B": "Ammonia",
+      "C": "Lactic Acid",
+      "D": "Uric Acid"
+    },
+    "correctAnswer": "B",
+    "rationale": "Hepatic encephalopathy is caused by the liver's failure to convert ammonia (B) into urea. The toxic accumulation of ammonia then affects brain function, leading to confusion, lethargy, and altered mental status.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "When caring for a client with bleeding esophageal varices, the nurse prepares to give vasopressin. Which route of administration is appropriate?",
+    "options": {
+      "A": "By inhalation",
+      "B": "By intravenous infusion",
+      "C": "Through a Sengstaken-Blakemore Tube",
+      "D": "Orally"
+    },
+    "correctAnswer": "B",
+    "rationale": "Vasopressin is a potent vasoconstrictor used to reduce portal pressure and control variceal bleeding. It must be administered via continuous intravenous infusion (B) to ensure rapid, systemic, and therapeutic effects.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client admitted to the hospital has been diagnosed with acute pancreatitis. Which assessment question would be the most appropriate for the nurse to ask the patient in regards to their diagnosis?",
+    "options": {
+      "A": "Does the pain in your lower abdomen radiate to your hip?",
+      "B": "Does the pain in your lower abdomen radiate to your groin?",
+      "C": "Does the pain in your stomach radiate to your back?",
+      "D": "Does the pain in your stomach radiate to your lower middle abdomen?"
+    },
+    "correctAnswer": "C",
+    "rationale": "The pain associated with acute pancreatitis is classically severe, located in the epigastric region (stomach), and often radiates straight through to the back (C), which is highly specific for the disorder.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a client with cirrhosis who is at risk for developing hepatic encephalopathy. Which of the following assessment findings should the nurse report to the provider immediately?",
+    "options": {
+      "A": "Caput medusae on the abdomen",
+      "B": "Spider angiomas on the chest",
+      "C": "Asterixis (flapping tremor of the hands)",
+      "D": "Bruising on the extremities"
+    },
+    "correctAnswer": "C",
+    "rationale": "Asterixis (C) is an acute, key sign of worsening hepatic encephalopathy resulting from elevated ammonia levels. This indicates declining neurologic function and requires immediate reporting and intervention.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with acute pancreatitis starts breathing very fast and seems confused. Lab results show a low bicarbonate level. What acid-base problem is this?",
+    "options": {
+      "A": "Respiratory acidosis",
+      "B": "Respiratory alkalosis",
+      "C": "Metabolic acidosis",
+      "D": "Metabolic alkalosis"
+    },
+    "correctAnswer": "C",
+    "rationale": "A low bicarbonate level signals a deficit of base, resulting in Metabolic Acidosis (C). The fast breathing (Kussmaul respirations) is the body's respiratory compensation to try to blow off acid (CO2).",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client is stating they are having continuous \"boring\" pain that radiates to the back. The nurse suspects acute pancreatitis. True or False",
+    "options": {
+      "A": "True",
+      "B": "False"
+    },
+    "correctAnswer": "A",
+    "rationale": "True. 'Boring' pain, often constant and radiating to the back, is a classic description of the severe pain experienced with acute pancreatitis.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following complications is most directly caused by portal hypertension in a patient with cirrhosis?",
+    "options": {
+      "A": "Hepatic encephalopathy",
+      "B": "Pruritus",
+      "C": "Ascites",
+      "D": "Jaundice"
+    },
+    "correctAnswer": "C",
+    "rationale": "Portal hypertension is a key complication of cirrhosis, resulting from increased resistance to blood flow through the scarred liver tissue. As pressure builds in the portal venous system, fluid leaks into the peritoneal cavity, leading to ascites.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a patient with cirrhosis who is scheduled for a paracentesis. Which of the following actions should be prioritized before and after the procedure?",
+    "options": {
+      "A": "Administer a high-sodium diet to prevent fluid shifts",
+      "B": "Measure abdominal girth and obtain baseline weight",
+      "C": "Insert a urinary catheter to monitor renal output",
+      "D": "Position the patient flat on their back for the procedure"
+    },
+    "correctAnswer": "B",
+    "rationale": "Measuring abdominal girth and weight provides the most critical baseline data and post-procedure assessment data to evaluate the procedure's effectiveness and monitor for fluid shifts.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is providing dietary teaching to a client with hepatitis. Which statement by the client indicates understanding of the teaching?",
+    "options": {
+      "A": "“I will eat large, high-fat meals to gain weight.”",
+      "B": "“I’ll eat small, frequent meals high in carbohydrates.”",
+      "C": "“I’ll avoid carbohydrates and eat more protein.”",
+      "D": "“I’ll limit my fluid intake to prevent swelling.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Hepatitis requires a diet that is easily metabolized by the damaged liver. Small, frequent meals high in carbohydrates are preferred, as carbohydrates are the easiest nutrient for the liver to process for energy, while high-fat meals are avoided.",
+    "section": "GI/Hepatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which finding in a client with acute pancreatitis should make the nurse suspect acute respiratory distress syndrome (ARDS)?",
+    "options": {
+      "A": "Pain increases after eating",
+      "B": "Respiratory rate 34/min with decreasing SpO₂",
+      "C": "Blood glucose 130 mg/dL",
+      "D": "Slight abdominal distention"
+    },
+    "correctAnswer": "B",
+    "rationale": "Systemic inflammation from pancreatitis can increase pulmonary capillary permeability, causing pulmonary edema and hypoxemia. A high respiratory rate (34/min) with decreasing SpO₂ is a clear sign of severe gas exchange impairment, which is characteristic of ARDS.",
+    "section": "GI/ARDS",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with cirrhosis reports pale, clay-colored stools. The nurse recognizes this occurs because:",
+    "options": {
+      "A": "The spleen stops producing bilirubin",
+      "B": "The liver cannot excrete bilirubin into bile",
+      "C": "Red blood cells are not being destroyed",
+      "D": "Too much iron is being absorbed"
+    },
+    "correctAnswer": "B",
+    "rationale": "The characteristic pale, clay-colored stool (acholic stool) occurs because the damaged liver and/or bile duct obstruction prevents bilirubin from entering the small intestine. Bilirubin is the pigment that normally colors stool brown.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a client who is at risk for Acute Respiratory Distress Syndrome (ARDS) due to severe pneumonia. The nurse notes the client is exhibiting signs of increased work of breathing, including tachypnea and mild cyanosis. Which assessment finding is most likely, based on the early pathophysiology of ARDS?",
+    "options": {
+      "A": "Loud, wet crackles and coarse rhonchi on lung auscultation.",
+      "B": "No abnormal lung sounds heard on auscultation.",
+      "C": "Bradypnea and a sudden drop in blood pressure.",
+      "D": "High-pitched inspiratory stridor upon inhalation."
+    },
+    "correctAnswer": "B",
+    "rationale": "In the early, acute onset of ARDS, the initial edema occurs primarily in the interstitial spaces, not the airways. Therefore, significant signs of respiratory distress (dyspnea, tachypnea) may occur without the sound of crackles or rhonchi on auscultation.",
+    "section": "ARDS Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is reviewing the implementation guidelines for prone positioning in a mechanically ventilated client with moderate to severe Acute Respiratory Distress Syndrome (ARDS). Which of the following statements regarding the expected outcomes and procedure for this intervention are supported by current evidence? (Select all that apply)",
+    "options": {
+      "A": "Prone positioning has been shown to reduce overall client mortality.",
+      "B": "The position should be maintained for a duration of at least 12 hours a day.",
+      "C": "It is typically performed on patients who are being ventilated at a high tidal volume.",
+      "D": "The primary goal of the intervention is to prevent facial pressure injuries.",
+      "E": "Automated turning equipment is proven to reduce ICU mortality compared to manual turning."
+    },
+    "correctAnswer": [
+      "A",
+      "B"
+    ],
+    "rationale": "Prone positioning has been shown to reduce mortality in patients with moderate to severe ARDS (A). To achieve the maximum therapeutic effect of redistributing perfusion and ventilation, it is usually recommended to maintain this position for at least 12 hours a day (B).",
+    "section": "ARDS Management",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client is diagnosed with a pulmonary embolism. Which nursing action should the nurse perform first?",
+    "options": {
+      "A": "Prepare the client for a chest X-ray",
+      "B": "Apply oxygen via nasal cannula",
+      "C": "Place the client in Trendelenburg position",
+      "D": "Start an IV line for medications"
+    },
+    "correctAnswer": "B",
+    "rationale": "According to the ABC priority framework, maintaining adequate gas exchange is the immediate priority. The nurse should apply supplemental oxygen (B) first to correct hypoxemia caused by the PE.",
+    "section": "PE/Prioritization",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a client with ARDS who is receiving mechanical ventilation. Which finding requires immediate intervention?",
+    "options": {
+      "A": "Oxygen saturation of 97%",
+      "B": "Fine crackles in both lung bases",
+      "C": "PaO₂ 48 mmHg on 100% oxygen",
+      "D": "Respiratory rate of 21 breaths/min"
+    },
+    "correctAnswer": "C",
+    "rationale": "A PaO₂ of 48 mmHg despite 100% oxygen (refractory hypoxemia) is a hallmark of severe ARDS and indicates a life-threatening failure of oxygenation, requiring immediate intervention and provider notification.",
+    "section": "ARDS Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which medication would be given to slow the blood flow into the portal vein in the treatment of Esophageal Varices?",
+    "options": {
+      "A": "Aspirin",
+      "B": "Warfarin",
+      "C": "Somatostatin",
+      "D": "Metoprolol"
+    },
+    "correctAnswer": "C",
+    "rationale": "Somatostatin (and its analog octreotide) is a vasoactive medication that reduces splanchnic blood flow and portal pressure, effectively controlling acute bleeding from esophageal varices.",
+    "section": "GI/Varices",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is preparing a client for a liver biopsy. Which pre‑procedure instruction is most important to emphasize?",
+    "options": {
+      "A": "Avoid aspirin or other anticoagulants for several days",
+      "B": "Drink a full glass of water just before the procedure",
+      "C": "Take your morning insulin dose as usual",
+      "D": "Encourage high‑protein meal before the procedure"
+    },
+    "correctAnswer": "A",
+    "rationale": "A liver biopsy carries a high risk of bleeding due to the liver's role in clotting factor production. Therefore, the most important pre-procedure instruction is to avoid anticoagulants (Aspirin, Warfarin, etc.) for several days to minimize hemorrhage risk.",
+    "section": "GI/Procedures",
+    "type": "mc"
+  },
+  {
+    "questionText": "In acute pancreatitis, what is the primary pathophysiologic mechanism that leads to autodigestion of the pancreas?",
+    "options": {
+      "A": "Obstruction of the common bile duct",
+      "B": "Premature activation of pancreatic enzymes within the pancreas",
+      "C": "Autoimmune destruction of acinar cells",
+      "D": "Viral inflammation of the pancreatic duct"
+    },
+    "correctAnswer": "B",
+    "rationale": "Acute pancreatitis is primarily caused by the premature activation of digestive enzymes (especially trypsin) *within* the pancreas. These activated enzymes then begin to digest the pancreatic tissue itself, leading to inflammation and cellular damage (autodigestion).",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a client with a flail chest following a motor vehicle accident. Which of the following findings should the nurse expect?",
+    "options": {
+      "A": "Symmetrical chest expansion during inspiration",
+      "B": "Paradoxical chest wall movement",
+      "C": "Tracheal deviation toward the affected side",
+      "D": "Diminished breath sounds on the unaffected side"
+    },
+    "correctAnswer": "B",
+    "rationale": "Paradoxical chest wall movement (the flail segment moves inward during inspiration and outward during expiration) is the hallmark sign of flail chest, indicating an unstable chest wall segment.",
+    "section": "Chest Trauma",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is caring for a client on mechanical ventilation who begins to show signs of respiratory distress. Which of the following actions should the nurse take? (Select all that apply.)",
+    "options": {
+      "A": "Assess the client’s airway and oxygen saturation",
+      "B": "Silence the ventilator alarm without checking the cause",
+      "C": "Manually ventilate the client with a resuscitation bag if needed",
+      "D": "Check for kinks or disconnections in the ventilator tubing",
+      "E": "Increase the ventilator rate independently"
+    },
+    "correctAnswer": [
+      "A",
+      "C",
+      "D"
+    ],
+    "rationale": "If a ventilated client shows signs of distress, the nurse must prioritize assessment (A), checking the equipment (D), and securing the airway by manually ventilating (C) if the machine malfunction cannot be quickly resolved. Nurses should not silence alarms or change ventilator settings without orders.",
+    "section": "Ventilator Management",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse educator is orienting a student nurse at the unit, which statements indicate a proper understanding of the role of chest tubes (SATA):",
+    "options": {
+      "A": "Restore negative pressure in the thorax",
+      "B": "eliminate the risk of infection",
+      "C": "Promote cardiac function",
+      "D": "Restore normal negative intra-pleural space",
+      "E": "Provide an alterative space for gas exchange"
+    },
+    "correctAnswer": [
+      "A",
+      "C",
+      "D"
+    ],
+    "rationale": "The primary role of a chest tube is to drain fluid/air and restore the negative pressure within the pleural space (A, D), which is essential for normal lung expansion. By relieving pressure and improving lung function, chest tubes secondarily promote better venous return and cardiac function (C).",
+    "section": "Chest Tubes",
+    "type": "sata"
+  },
+  {
+    "questionText": "The nurse educator was conducting a refresher course on the managment of collection devices, what statements by the nurses indicates futher needs for reinforcement:",
+    "options": {
+      "A": "The device must be kept below of the insertion site",
+      "B": "Pain is an expected when on a chest tube.",
+      "C": "Monitoring the tubing must be done and documented once a shift",
+      "D": "It is important to assess the equipment and its patency."
+    },
+    "correctAnswer": "C",
+    "rationale": "Monitoring tubing patency and the chest tube system must be done and documented much more frequently than once per shift (C) – typically every one to four hours or per facility policy and whenever assessing the patient.",
+    "section": "Chest Tubes",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a client who sustained blunt chest trauma after a motor vehicle accident. The client has shortness of breath, absent breath sounds on the left side, tracheal deviation to the right, and distended neck veins. Which condition should the nurse suspect?",
+    "options": {
+      "A": "Simple pneumothorax",
+      "B": "Tension pneumothorax",
+      "C": "Hemothorax",
+      "D": "Pulmonary contusion"
+    },
+    "correctAnswer": "B",
+    "rationale": "The combination of absent breath sounds on one side, tracheal deviation (late sign), and distended neck veins are hallmark signs of a tension pneumothorax, a life-threatening emergency caused by trapped air compressing the lung and shifting mediastinal structures.",
+    "section": "Chest Trauma",
+    "type": "mc"
+  },
+  {
+    "questionText": "When caring for a patient on mechanical ventilation, the nurse should monitor for signs of ___________, such as restlessness, low oxygen saturation, and use of accessory muscles, which may indicate ventilator malfunction or patient-ventilator asynchrony.",
+    "options": {
+      "A": "Hypercarbia",
+      "B": "Hypoxemia",
+      "C": "Alkalosis",
+      "D": "Pneumothorax"
+    },
+    "correctAnswer": "B",
+    "rationale": "Restlessness, low oxygen saturation (SpO2), and increased respiratory effort are classic signs of hypoxemia, which occurs when the ventilator fails to deliver adequate oxygen or when the patient’s oxygen demand exceeds ventilator support.",
+    "section": "Ventilator Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse suspects a pulmonary embolism. What should the nurse do first?",
+    "options": {
+      "A": "Obtain a sputum culture",
+      "B": "Notify the provider and apply oxygen",
+      "C": "Start chest physiotherapy",
+      "D": "Encourage ambulation"
+    },
+    "correctAnswer": "B",
+    "rationale": "Hypoxia is life-threatening. The priority is to maintain adequate gas exchange by applying oxygen (B) and then immediately notifying the provider for definitive diagnostic and treatment orders.",
+    "section": "PE/Prioritization",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which clinical manifestation best indicates hypoxemia?",
+    "options": {
+      "A": "Bradycardia",
+      "B": "Restlessness and confusion",
+      "C": "Polyuria",
+      "D": "Hypotension"
+    },
+    "correctAnswer": "B",
+    "rationale": "Restlessness and confusion (B) are the classic early neurological signs of low oxygen levels (hypoxemia) due to cerebral hypoxia.",
+    "section": "Respiratory Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A gray-blue discoloration around the umbilicus is known as which clinical sign?",
+    "options": {
+      "A": "Turner’s sign",
+      "B": "Cullen’s sign",
+      "C": "Chvostek’s sign",
+      "D": "Trousseau’s sign"
+    },
+    "correctAnswer": "B",
+    "rationale": "Cullen's sign is a bluish discoloration around the umbilicus associated with intra-abdominal bleeding, often seen in severe acute pancreatitis.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which diagnostic procedure provides the most definitive confirmation of pancreatic cancer?",
+    "options": {
+      "A": "Abdominal ultrasound",
+      "B": "CT scan",
+      "C": "MRI",
+      "D": "ERCP"
+    },
+    "correctAnswer": "D",
+    "rationale": "Endoscopic retrograde cholangiopancreatography (ERCP) allows for direct visualization of the pancreatic and biliary ducts and enables tissue biopsy, which provides the most definitive confirmation of pancreatic cancer.",
+    "section": "GI/Procedures",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with a flail chest following a motor vehicle accident is experiencing increasing respiratory distress. Which assessment finding should the nurse report to the healthcare provider immediately?",
+    "options": {
+      "A": "Paradoxical chest wall movement",
+      "B": "Diminished breath sounds on one side",
+      "C": "Respiratory rate of 24 breaths/minute",
+      "D": "Pain at the site of injury"
+    },
+    "correctAnswer": "B",
+    "rationale": "Diminished or absent breath sounds on one side of the chest may indicate a pneumothorax or hemothorax, which are serious complications of blunt trauma that impair gas exchange and require immediate intervention.",
+    "section": "Chest Trauma",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is caring for a patient receiving mechanical ventilation. Which of the following findings indicate ventilator-associated complications that require immediate nursing intervention? (Select all that apply).",
+    "options": {
+      "A": "Sudden drop in oxygen saturation",
+      "B": "Increased secretions with a change in sputum color",
+      "C": "Crackles heard on lung auscultation",
+      "D": "Slight anxiety and restlessness",
+      "E": "Symmetrical chest expansion",
+      "F": "Development of subcutaneous emphysema"
+    },
+    "correctAnswer": [
+      "A",
+      "B",
+      "C",
+      "F"
+    ],
+    "rationale": "A sudden drop in SpO2 (A) indicates a critical oxygenation problem. Increased secretions/color change (B) and crackles (C) suggest VAP/pulmonary edema. Subcutaneous emphysema (F) suggests barotrauma. E is a normal finding; D is non-specific.",
+    "section": "Ventilator Care",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for an older adult who suddenly leaks large amounts of urine after feeling a strong urge to void but cannot make it to the bathroom in time. The nurse identifies this as which type of incontinence?",
+    "options": {
+      "A": "Overflow incontinence",
+      "B": "Functional incontinence",
+      "C": "Stress incontinence",
+      "D": "Urge incontinence"
+    },
+    "correctAnswer": "D",
+    "rationale": "Urge incontinence (overactive bladder) is characterized by a sudden, strong, overwhelming urge to urinate (urgency) followed by involuntary urine loss (incontinence) because the person cannot suppress the detrusor muscle contraction in time.",
+    "section": "Elimination",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a patient with Acute Respiratory Distress Syndrome (ARDS) who is receiving mechanical ventilation. The healthcare provider increases the positive end-expiratory pressure (PEEP) from 5 cm H₂O to 10 cm H₂O. Which of the following findings indicates a potential complication of this change?",
+    "options": {
+      "A": "Decreased blood pressure",
+      "B": "Increased oxygen saturation",
+      "C": "Decreased respiratory rate",
+      "D": "Increased urine output"
+    },
+    "correctAnswer": "A",
+    "rationale": "Increasing PEEP significantly increases intrathoracic pressure. This pressure reduces venous return to the heart, leading to decreased cardiac output and the potential complication of systemic hypotension (decreased blood pressure).",
+    "section": "ARDS/Ventilation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing an arterial blood gas (ABG) for a patient with acute respiratory failure (ARF). The results show: pH: 7.29, PaCO₂: 55 mm Hg, HCO₃⁻: 24 mEq/L. Which condition do these results indicate?",
+    "options": {
+      "A": "Metabolic acidosis",
+      "B": "Respiratory acidosis",
+      "C": "Metabolic alkalosis",
+      "D": "Respiratory alkalosis"
+    },
+    "correctAnswer": "B",
+    "rationale": "The low pH (acidosis) and elevated PaCO₂ (respiratory component) indicate uncompensated respiratory acidosis. The normal bicarbonate level confirms the acute nature of the condition.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with acute pancreatitis reports severe, constant epigastric pain radiating to the back. The abdomen is distended and tender to palpation. Which nursing action should be performed first?",
+    "options": {
+      "A": "Administer the prescribed IV morphine for pain relief",
+      "B": "Maintain NPO status and start the prescribed IV fluids",
+      "C": "Apply a heating pad to the abdomen for comfort",
+      "D": "Encourage the client to ambulate to relieve gas pains"
+    },
+    "correctAnswer": "B",
+    "rationale": "The priority for acute pancreatitis is pancreatic rest, achieved by maintaining NPO status to prevent enzyme secretion, and aggressive IV fluid resuscitation (B) to prevent hypovolemic shock (due to fluid third-spacing).",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is providing education to nursing students on the causes of metabolic alkalosis. Which of the following responses made by the nursing students indicate correct understanding of the teaching? (Select all that apply).",
+    "options": {
+      "A": "Excessive ingestion of oral antacids",
+      "B": "Prolonged vomiting",
+      "C": "Nasogastric suctioning",
+      "D": "Excessive diarrhea",
+      "E": "Certain diuretics"
+    },
+    "correctAnswer": [
+      "A",
+      "B",
+      "C",
+      "E"
+    ],
+    "rationale": "Metabolic alkalosis results from either loss of acid (vomiting, NG suctioning, diuretics) or gain of base (antacids). Excessive diarrhea causes metabolic acidosis.",
+    "section": "Acid-Base Balance",
+    "type": "sata"
+  },
+  {
+    "questionText": "A patient arrives at the emergency department with sudden onset of dyspnea, crackles on auscultation, a feeling of impending doom, hemoptysis, tachypnea, and tachycardia. The nurse also notes the presence of an S3 heart sound. Which condition should the nurse suspect?",
+    "options": {
+      "A": "Left-sided heart failure",
+      "B": "Myocardial infarction",
+      "C": "Pulmonary embolism",
+      "D": "Pneumonia"
+    },
+    "correctAnswer": "C",
+    "rationale": "The sudden onset of severe dyspnea, tachycardia, a feeling of impending doom, and hemoptysis is the classic presentation of a massive Pulmonary Embolism (PE) due to impaired gas exchange and sudden strain on the right heart.",
+    "section": "PE/Respiratory",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient's arterial blood gas (ABG) results are as follows: pH: 7.30, PaCO₂: 55 mmHg, HCO₃⁻: 24 mEq/L. Which acid-base imbalance does this patient most likely have?",
+    "options": {
+      "A": "Respiratory acidosis",
+      "B": "Metabolic acidosis",
+      "C": "Respiratory alkalosis",
+      "D": "Metabolic alkalosis"
+    },
+    "correctAnswer": "A",
+    "rationale": "The low pH (acidosis) and elevated PaCO₂ (respiratory component) indicate uncompensated respiratory acidosis. The HCO₃⁻ is normal, meaning no metabolic compensation has occurred.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is preparing to collect an arterial blood gas (ABG) sample from a client. Which of the following actions should the nurse take? (Select all that apply.)",
+    "options": {
+      "A": "Use a heparinized syringe for sample collection",
+      "B": "Apply direct pressure to the puncture site for at least 1 minute",
+      "C": "Maintain surgical asepsis during the procedure",
+      "D": "Transport the specimen immediately on ice",
+      "E": "Apply pressure for at least 20 minutes if the client is receiving anticoagulant therapy"
+    },
+    "correctAnswer": [
+      "A",
+      "C",
+      "D",
+      "E"
+    ],
+    "rationale": "ABG specimens require a heparinized syringe (A) to prevent clotting, surgical asepsis (C) to prevent infection, and immediate transport on ice (D) to preserve accuracy. Pressure must be held for at least 5 minutes in a healthy client, and much longer (20+ minutes) if the client is on anticoagulants (E).",
+    "section": "ABG Procedures",
+    "type": "sata"
+  },
+  {
+    "questionText": "Which order might raise concern for a patient with ARF?",
+    "options": {
+      "A": "Oxygen via Venturi mask",
+      "B": "Morphine 4 mg IV for anxiety",
+      "C": "Continuous pulse oximetry",
+      "D": "ABG monitoring"
+    },
+    "correctAnswer": "B",
+    "rationale": "Opioids like morphine are central nervous system depressants that can cause respiratory depression and worsen acute respiratory failure (ARF). They must be used cautiously or questioned, especially when ordered for anxiety.",
+    "section": "ARDS/Medication",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which diagnostic test result supports that that the patient may have a possible pulmonary embolism?",
+    "options": {
+      "A": "Elevated D-dimer level",
+      "B": "Decreased white blood cell count",
+      "C": "Increased bicarbonate level",
+      "D": "Decreased serum potassium"
+    },
+    "correctAnswer": "A",
+    "rationale": "An elevated D-dimer level indicates the presence of fibrin degradation products resulting from a blood clot being broken down. While not definitive, a high D-dimer strongly supports the suspicion of PE.",
+    "section": "PE/Labs",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a client with cirrhosis. Which finding requires immediate nursing action?",
+    "options": {
+      "A": "Yellow discoloration of the skin",
+      "B": "Petechiae and bruising on the arms",
+      "C": "Distended abdomen with taut skin",
+      "D": "Hematemesis (vomiting blood)"
+    },
+    "correctAnswer": "D",
+    "rationale": "Hematemesis (vomiting blood) indicates possible bleeding from ruptured esophageal varices, a life-threatening complication of portal hypertension that requires rapid intervention to prevent hypovolemic shock (Airway priority).",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a patient who is suspected to be experiencing an acid-base disturbance. Which of the following signs or symptoms would support the patient's condition of acidosis? (Select all that apply).",
+    "options": {
+      "A": "Hypotension",
+      "B": "Anxiety",
+      "C": "Paresthesias",
+      "D": "Hyperreflexia",
+      "E": "Warm skin"
+    },
+    "correctAnswer": [
+      "A",
+      "E"
+    ],
+    "rationale": "Acidosis generally leads to vasodilation (warm skin) and cardiovascular depression (hypotension). Alkalosis is associated with neurological irritability (anxiety, paresthesias, hyperreflexia).",
+    "section": "Acid-Base Balance",
+    "type": "sata"
+  },
+  {
+    "questionText": "Which patient is at the highest risk for developing ARDS?",
+    "options": {
+      "A": "A 47-year-old smoker who had a recent upper respiratory infection",
+      "B": "A 55-year-old on supplemental oxygen after a cardiopulmonary bypass",
+      "C": "A 65-year-old with mild pancreatitis",
+      "D": "A 62-year-old who aspirated acidic gastric contents after a seizure"
+    },
+    "correctAnswer": "D",
+    "rationale": "Aspiration of acidic gastric contents (D) causes direct, severe, chemical injury to the alveolar-capillary membrane, making it a critical and immediate risk factor for ARDS.",
+    "section": "ARDS Risk Factors",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with end-stage cirrhosis and portal hypertension is undergoing a paracentesis to manage ascites. Which nursing actions are essential for pre- and post-procedure care? (Select all that apply).",
+    "options": {
+      "A": "Monitor for allergic reaction during an Albumin IV infusion, if administered.",
+      "B": "Measure and record the patient's weight and abdominal girth.",
+      "C": "Administer Flumazenil as a reversal agent immediately following the procedure.",
+      "D": "Measure and record intake and output (I&O).",
+      "E": "Monitor vital signs (VS) every 15 minutes for 2 hours post-procedure."
+    },
+    "correctAnswer": [
+      "A",
+      "B",
+      "D",
+      "E"
+    ],
+    "rationale": "Essential care includes monitoring vital signs for hypotension/shock (E), fluid balance (I&O, weight/girth - B, D), and monitoring for complications like allergy if Albumin is given (A). Flumazenil (C) is a benzodiazepine reversal agent.",
+    "section": "GI/Procedures",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse is caring for a patient admitted with acute pancreatitis. Which intervention should the nurse implement first to promote pancreatic rest?",
+    "options": {
+      "A": "Administer IV fluids at 125 mL/hr",
+      "B": "Keep the patient NPO and insert an NG tube",
+      "C": "Give scheduled acetaminophen for pain",
+      "D": "Encourage ambulation"
+    },
+    "correctAnswer": "B",
+    "rationale": "Pancreatic rest is achieved by keeping the patient NPO to prevent the secretion of digestive enzymes and using NG suction (B) to reduce gastric distention, preventing further autodigestion and inflammation.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with cirrhosis is prescribed lactulose. Which nursing evaluation best indicates the medication is effective?",
+    "options": {
+      "A": "Increased bowel sounds and decreased abdominal distention",
+      "B": "Improved level of consciousness and orientation",
+      "C": "Decreased bilirubin levels",
+      "D": "Decreased ascites volume"
+    },
+    "correctAnswer": "B",
+    "rationale": "Lactulose is given for hepatic encephalopathy to reduce serum ammonia levels. The most accurate indicator of its effectiveness is the patient's improved neurological status (level of consciousness and orientation).",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with ARDS has ABG results: pH 7.30, PaCO₂ 50 mm Hg, PaO₂ 55 mm Hg. What does this indicate?",
+    "options": {
+      "A": "Respiratory alkalosis",
+      "B": "Metabolic acidosis",
+      "C": "Respiratory acidosis with hypoxemia",
+      "D": "Metabolic alkalosis"
+    },
+    "correctAnswer": "C",
+    "rationale": "Low pH (acidosis) and high PaCO₂ (respiratory component) indicate respiratory acidosis. Low PaO₂ (hypoxemia) is a common, often refractory, finding in ARDS.",
+    "section": "ABG Interpretation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A post-op patient becomes short of breath, anxious, and O₂ sat drops to 84%. What should the nurse do first?",
+    "options": {
+      "A": "Notify the provider",
+      "B": "Give pain meds",
+      "C": "Apply oxygen",
+      "D": "Get a chest X-ray"
+    },
+    "correctAnswer": "C",
+    "rationale": "Per the ABC priority framework, the nurse must address hypoxemia immediately. The first action is to apply supplemental oxygen (C) to stabilize the patient's saturation before moving to further assessment or notification.",
+    "section": "Respiratory/Prioritization",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which finding in a client with acute pancreatitis should make the nurse suspect acute respiratory distress syndrome (ARDS)?",
+    "options": {
+      "A": "Pain increases after eating",
+      "B": "Respiratory rate 34/min with decreasing SpO₂",
+      "C": "Blood glucose 130 mg/dL",
+      "D": "Slight abdominal distention"
+    },
+    "correctAnswer": "B",
+    "rationale": "Systemic inflammation from pancreatitis causes pulmonary capillary permeability, leading to pulmonary edema. A high respiratory rate (34/min) with decreasing SpO₂ indicates severe gas exchange impairment consistent with ARDS.",
+    "section": "GI/ARDS",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with cirrhosis reports pale, clay-colored stools. The nurse recognizes this occurs because:",
+    "options": {
+      "A": "The spleen stops producing bilirubin",
+      "B": "The liver cannot excrete bilirubin into bile",
+      "C": "Red blood cells are not being destroyed",
+      "D": "Too much iron is being absorbed"
+    },
+    "correctAnswer": "B",
+    "rationale": "The characteristic pale, clay-colored stool occurs because the damaged liver and/or bile duct obstruction prevents bilirubin (the pigment that colors stool brown) from entering the intestine.",
+    "section": "GI/Cirrhosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is assessing a client who is at risk for Acute Respiratory Distress Syndrome (ARDS) due to severe pneumonia. The nurse notes the client is exhibiting signs of increased work of breathing, including tachypnea and mild cyanosis. Which assessment finding is most likely, based on the early pathophysiology of ARDS?",
+    "options": {
+      "A": "Loud, wet crackles and coarse rhonchi on lung auscultation.",
+      "B": "No abnormal lung sounds heard on auscultation.",
+      "C": "Bradypnea and a sudden drop in blood pressure.",
+      "D": "High-pitched inspiratory stridor upon inhalation."
+    },
+    "correctAnswer": "B",
+    "rationale": "In the early, acute phase of ARDS, the initial edema is interstitial, not yet within the larger airways. Therefore, significant signs of respiratory distress (dyspnea, tachypnea) may occur without the sound of crackles or rhonchi on auscultation.",
+    "section": "ARDS Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with ARDS is restless and has a PaO₂ of 55 mmHg on 100% FiO₂. What is the nurse’s priority action?",
+    "options": {
+      "A": "Increase ventilator rate",
+      "B": "Notify the provider immediately",
+      "C": "Reassure the patient",
+      "D": "Administer a sedative"
+    },
+    "correctAnswer": "B",
+    "rationale": "A PaO₂ of 55 mmHg on 100% FiO₂ indicates refractory hypoxemia, a critical, life-threatening failure of oxygenation. The priority is to notify the provider immediately to initiate advanced interventions (e.g., prone positioning, paralytics).",
+    "section": "ARDS Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which position do patients with Pancreatitis find helpful to relieve Acute pain in the abdomen?",
+    "options": {
+      "A": "Tripod",
+      "B": "Fetal",
+      "C": "Prone",
+      "D": "Sitting upright and leaning forward"
+    },
+    "correctAnswer": "D",
+    "rationale": "The severe pain of acute pancreatitis is often relieved by positions that reduce tension on the inflamed abdomen and retroperitoneal structures. Sitting upright and leaning forward (D), or assuming a fetal position, is typically most comfortable.",
+    "section": "GI/Pancreatitis",
+    "type": "mc"
+  },
+  {
+    "questionText": "TRUE OR FALSE: Vigorous bubbling within the water-seal chamber is NORMAL for a patient with pneumothorax",
+    "options": {
+      "A": "True",
+      "B": "False"
+    },
+    "correctAnswer": "B",
+    "rationale": "False. Vigorous bubbling is NOT normal and indicates a persistent air leak somewhere in the system or the patient. Gentle bubbling is expected when air is actively leaving the pleural space.",
+    "section": "Chest Tubes",
+    "type": "mc"
+  },
+  {
+    "questionText": "Your patient is given a chest tube, where should the drainage system be placed?",
+    "options": {
+      "A": "Above the pt's heart",
+      "B": "Below the patient's bed similarly to a foley catheter bag",
+      "C": "Allow the patient to hold it for comfort",
+      "D": "Outside of the room"
+    },
+    "correctAnswer": "B",
+    "rationale": "The chest tube drainage system must be kept below the level of the chest (below the patient's bed) to allow gravity to assist in fluid and air drainage from the pleural cavity.",
+    "section": "Chest Tubes",
+    "type": "mc"
+  }
+        ];
+
+        let currentQuestionIndex = 0;
+        let shuffledQuizData = [];
+        let userAnswers = [];
+        let flaggedQuestions = Array(quizData.length).fill(false);
+        let timeLeft = 7200; // 2 hours in seconds
+        let timerInterval;
+
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const header = document.getElementById('header');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const navQuestionsContainer = document.getElementById('nav-questions');
+        const questionContainer = document.getElementById('question-container');
+        const reviewScreen = document.getElementById('review-screen');
+        const reviewQuestionsContainer = document.getElementById('review-questions');
+        const nextBtn = document.getElementById('next-btn');
+        const previousBtn = document.getElementById('previous-btn');
+        const submitExamBtn = document.getElementById('submit-exam-btn');
+        const endReviewBtn = document.getElementById('end-review-btn');
+        const timerDisplay = document.getElementById('timer');
+        const questionCounter = document.getElementById('question-counter');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const gradeScreen = document.getElementById('grade-screen');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- Core Functions ---
+
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Starts the 2-hour exam timer.
+         */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the timer display with the remaining time in HH:MM:SS format.
+         */
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            if (timerDisplay) {
+                timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        /**
+         * Renders the current question and its options.
+         */
+        function renderQuestion() {
+            if (currentQuestionIndex >= shuffledQuizData.length) {
+                submitExam();
+                return;
+            }
+
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (questionContainer) {
+                questionContainer.innerHTML = '';
+                const questionHtml = document.createElement('div');
+                questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm flex flex-col h-full';
+
+                questionHtml.innerHTML = `
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
+                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                                ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4 text-sm font-medium text-gray-500">
+                        <span class="mr-2">^</span> Which is the correct answer?
+                    </div>
+                    <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
+                    <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
+                    <div id="options-container" class="space-y-4 flex-1"></div>
+                `;
+                
+                const optionsContainer = questionHtml.querySelector('#options-container');
+
+                const optionLetters = Object.keys(questionData.options);
+                optionLetters.forEach(letter => {
+                    const optionText = questionData.options[letter];
+                    const isMultipleChoice = questionData.type === 'mc';
+                    const inputType = isMultipleChoice ? 'radio' : 'checkbox';
+                    const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'flex items-center space-x-2';
+                    optionDiv.innerHTML = `
+                        <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${isMultipleChoice ? 'radio-btn' : 'check-btn'}">
+                        <label for="option-${letter}" class="option-label">
+                            <span class="option-letter">${letter}</span>
+                            <span class="flex-1">${optionText}</span>
+                            <button class="strikethrough-btn p-1 rounded-full hover:bg-gray-100 transition" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.822a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.577-3.01-9.964-7.822z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </label>
+                    `;
+                    optionsContainer.appendChild(optionDiv);
+                });
+
+                questionContainer.appendChild(questionHtml);
+            }
+            
+            // Add event listeners for strike-through
+            document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent label click
+                    const label = e.target.closest('label');
+                    const textSpan = label.querySelector('span:nth-child(2)');
+                    textSpan.classList.toggle('strikethrough');
+                });
+            });
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', () => {
+                    flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+                    flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    updateNavigationSidebar();
+                });
+            }
+
+            // Restore previous answer selection
+            if (userAnswers[currentQuestionIndex]) {
+                const savedAnswers = userAnswers[currentQuestionIndex];
+                if (Array.isArray(savedAnswers)) {
+                    savedAnswers.forEach(answer => {
+                        const input = document.getElementById(`option-${answer}`);
+                        if (input) input.checked = true;
+                    });
+                }
+            }
+
+            updateNavigationSidebar();
+            updateQuestionCounter();
+            updateButtonStates();
+        }
+
+        /**
+         * Updates the left navigation sidebar with current question status.
+         */
+        function updateNavigationSidebar() {
+            if (navQuestionsContainer) {
+                navQuestionsContainer.innerHTML = '';
+                shuffledQuizData.forEach((_, i) => {
+                    const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                    const navItem = document.createElement('div');
+                    navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                    navItem.textContent = i + 1;
+                    navItem.onclick = () => {
+                        saveUserAnswer();
+                        currentQuestionIndex = i;
+                        renderQuestion();
+                    };
+                    navQuestionsContainer.appendChild(navItem);
+                });
+            }
+        }
+
+        /**
+         * Updates the question counter in the footer.
+         */
+        function updateQuestionCounter() {
+            if (questionCounter) {
+                questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
+            }
+        }
+
+        /**
+         * Manages the enabled/disabled/visible state of footer buttons.
+         */
+        function updateButtonStates() {
+            if (previousBtn) {
+                if (currentQuestionIndex === 0) {
+                    previousBtn.disabled = true;
+                    previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
+                } else {
+                    previousBtn.disabled = false;
+                    previousBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+                }
+            }
+
+            if (nextBtn && submitExamBtn) {
+                if (currentQuestionIndex === shuffledQuizData.length - 1) {
+                    nextBtn.classList.add('hidden');
+                    submitExamBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitExamBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        /**
+         * Collects user's answer(s) for the current question.
+         */
+        function saveUserAnswer() {
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (!questionData) return;
+            let selectedAnswers = [];
+            if (questionData.type === 'mc') {
+                const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
+                if (selectedRadio) {
+                    selectedAnswers.push(selectedRadio.value);
+                }
+            } else if (questionData.type === 'sata') {
+                const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
+                selectedCheckboxes.forEach(checkbox => {
+                    selectedAnswers.push(checkbox.value);
+                });
+            }
+            userAnswers[currentQuestionIndex] = selectedAnswers;
+        }
+
+        /**
+         * Renders the review screen with missed questions.
+         */
+        function renderReviewScreen() {
+            if (mainContent) mainContent.classList.add('hidden');
+            if (reviewScreen) reviewScreen.classList.remove('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+
+            if (!reviewQuestionsContainer) return;
+            reviewQuestionsContainer.innerHTML = '';
+            
+            const missedQuestions = [];
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let isCorrect = false;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    isCorrect = userAnswer[0] === correctAnswer;
+                } else if (question.type === 'sata') {
+                    const correctSet = new Set(question.correctAnswer);
+                    const userSet = new Set(userAnswer);
+                    isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
+                }
+
+                if (!isCorrect) {
+                    missedQuestions.push({ question, index });
+                }
+            });
+
+            if (missedQuestions.length === 0) {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
+            } else {
+                missedQuestions.forEach(({ question, index }) => {
+                    const userAnswer = userAnswers[index] || [];
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-box';
+                    let optionsHtml = '';
+
+                    Object.keys(question.options).forEach(letter => {
+                        const isUserSelected = userAnswer.includes(letter);
+                        let correctAnswers = question.correctAnswer;
+                        if (!Array.isArray(correctAnswers)) {
+                            correctAnswers = [correctAnswers];
+                        }
+                        const isCorrectAnswer = correctAnswers.includes(letter);
+                        
+                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
+                        if (isCorrectAnswer) {
+                            optionClasses += ' correct-answer';
+                        }
+                        if (isUserSelected && !isCorrectAnswer) {
+                            optionClasses += ' incorrect-answer';
+                        }
+
+                        optionsHtml += `
+                            <div class="${optionClasses}">
+                                <span class="option-letter bg-gray-300 rounded-full">${letter}</span>
+                                <span>${question.options[letter]}</span>
+                            </div>
+                        `;
+                    });
+
+                    reviewItem.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
+                        <div class="space-y-2 mb-4">
+                            ${optionsHtml}
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-lg">
+                            <h4 class="font-semibold text-lg">Rationale:</h4>
+                            <p class="text-gray-700">${question.rationale}</p>
+                        </div>
+                    `;
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+            }
+        }
+
+        /**
+         * Calculates the final grade based on user answers.
+         * @returns {number} The final grade percentage.
+         */
+        function calculateGrade() {
+            let totalScore = 0;
+            const totalQuestions = shuffledQuizData.length;
+
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let questionScore = 0;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    if (userAnswer[0] === correctAnswer) {
+                        questionScore = 1;
+                    }
+                } else if (question.type === 'sata') {
+                    const correctAnswers = new Set(question.correctAnswer);
+                    const userSelections = new Set(userAnswer);
+                    
+                    const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
+
+                    if (!hasIncorrect && userSelections.size > 0) {
+                        questionScore = userSelections.size / correctAnswers.size;
+                    }
+                }
+                totalScore += questionScore;
+            });
+
+            return Math.round((totalScore / totalQuestions) * 100);
+        }
+        
+        /**
+         * Handles the end of the exam review, showing a submission animation and grade.
+         */
+        function handleFinalSubmit() {
+            if (reviewScreen) reviewScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Calculating Grade...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                const finalGrade = calculateGrade();
+                if (finalGradeDisplay) finalGradeDisplay.textContent = `${finalGrade}%`;
+                if (gradeScreen) gradeScreen.classList.remove('hidden');
+            }, 2000); // 2-second animation
+        }
+
+        /**
+         * Submits the exam, stops the timer, and shows the review screen.
+         */
+        function submitExam() {
+            clearInterval(timerInterval);
+            saveUserAnswer();
+            renderReviewScreen();
+        }
+
+        /**
+         * Starts the quiz after the initial start screen.
+         */
+        function startQuiz() {
+            if (startScreen) startScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            document.querySelector('body').style.overflow = 'hidden';
+
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Starting Exam...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                if (header) header.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (footer) footer.classList.remove('hidden');
+                document.querySelector('body').style.overflow = '';
+                
+                shuffleArray(quizData);
+                shuffledQuizData = quizData.slice(0, 85);
+                userAnswers = Array(shuffledQuizData.length).fill([]);
+                startTimer();
+                renderQuestion();
+            }, 2000); // 2-second animation
+        }
+
+        // --- Event Listeners ---
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                saveUserAnswer();
+                if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+        }
+        
+        if (previousBtn) {
+            previousBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    saveUserAnswer();
+                    currentQuestionIndex--;
+                    renderQuestion();
+                }
+            });
+        }
+
+        if (submitExamBtn) {
+            submitExamBtn.addEventListener('click', submitExam);
+        }
+        
+        if (endReviewBtn) {
+            endReviewBtn.addEventListener('click', handleFinalSubmit);
+        }
+        
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', startQuiz);
+        }
+
+    </script>
+
+</body>
+</html>
