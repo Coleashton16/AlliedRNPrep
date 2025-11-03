@@ -84,8 +84,8 @@
     <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4">
         <div class="w-full max-w-md">
             <div class="text-center mb-8">
-                 <h1 class="text-4xl font-extrabold text-blue-700">AlliedRNPrep</h1>
-                 <p class="text-gray-600 mt-2">Secure Portal for Nursing Students</p>
+                <h1 class="text-4xl font-extrabold text-blue-700">AlliedRNPrep</h1>
+                <p class="text-gray-600 mt-2">Secure Portal for Nursing Students</p>
             </div>
             <div class="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100">
                 <!-- Login/Signup Toggle -->
@@ -128,7 +128,7 @@
                     </div>
                 </form>
                 <!-- Message Area -->
-                 <p id="auth-message" class="mt-4 text-center text-sm font-medium min-h-[20px]"></p>
+                <p id="auth-message" class="mt-4 text-center text-sm font-medium min-h-[20px]"></p>
             </div>
         </div>
     </div>
@@ -147,7 +147,8 @@
     </div>
 
     <!-- Main Application Content (Initially Hidden) -->
-    <div id="app-content" class="hidden">
+    <!-- FIX 1: Added min-h-screen for layout stability after login -->
+    <div id="app-content" class="hidden min-h-screen">
         <!-- Header Section -->
         <header class="bg-white shadow-lg py-4 relative z-10">
             <div class="container mx-auto px-4 flex justify-between items-center">
@@ -158,6 +159,12 @@
                     <ul class="flex items-center space-x-8">
                         <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
                         <li><a href="About.html" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
+                        <!-- FIX 2: Added the new AlliedEMSPrep link -->
+                        <li>
+                            <a href="/AlliedEMSPrep/index.html" class="text-green-700 hover:text-green-600 font-bold transition duration-300 rounded-md px-4 py-2 hover:bg-green-50 border border-green-300">
+                                AlliedEMSPrep
+                            </a>
+                        </li>
                         <li><a href="#contact-us" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Contact</a></li>
                         <!-- New "Join Classroom" button -->
                         <li>
@@ -175,7 +182,8 @@
         </header>
 
         <!-- Hero Section -->
-        <section class="relative bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-24 md:py-36 overflow-hidden">
+        <!-- FIX 1: Added min-h-[50vh] for hero section stability -->
+        <section class="relative bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
             <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
             <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
             <div class="container mx-auto px-4 text-center relative z-10">
@@ -578,3 +586,4 @@
     </script>
 </body>
 </html>
+
