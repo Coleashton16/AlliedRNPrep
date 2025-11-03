@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - AlliedEMSPrep</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom style for the main app to be hidden */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- 
+      LOGIN MODAL
+      This is shown by default and hidden by JavaScript when the user is logged in.
+    -->
+    <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75">
+        <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl mx-4">
+            <div class="text-center">
+                <!-- Brand Logo/Name -->
+                <h2 class="text-3xl font-bold text-blue-700">AlliedEMSPrep</h2>
+                <p class="text-gray-600 mt-2">Powered by <span class="font-semibold text-blue-600">AlliedRNPrep</span></p>
+                <p class="text-gray-500 mt-4">Please sign in to access your study materials.</p>
+            </div>
+
+            <!-- Error Message Box -->
+            <div id="auth-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative my-4" role="alert">
+                <span class="block sm:inline" id="auth-error-message"></span>
+            </div>
+            
+            <!-- Loading Indicator for Initial Auth -->
+            <div id="loading-indicator" class="text-center mt-6 text-gray-500">
+                <svg class="animate-spin h-5 w-5 mr-3 inline text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Initializing Authentication...
+            </div>
+
+
+            <!-- Login/Signup Form -->
+            <form id="auth-form" class="mt-6 hidden">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <div class="mt-1">
+                        <input type="email" id="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <div class="mt-1">
+                        <input type="password" id="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 mt-6">
+                    <button type="button" id="login-button" class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Sign In
+                    </button>
+                    <button type="button" id="signup-button" class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Sign Up
+                    </button>
+                </div>
+            </form>
+
+            <!-- Separator -->
+            <div id="separator-block" class="relative my-6 hidden">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+            </div>
+
+            <!-- Google Sign-in -->
+            <div id="google-signin-block" class="hidden">
+                <button type="button" id="google-signin-button" class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+                    Sign in with Google
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+      MAIN APP CONTENT
+      This is hidden by default and shown by JavaScript when the user is logged in.
+    -->
+    <div id="app-content" class="hidden">
+        
+        <!-- Header -->
+        <header class="bg-white shadow-md">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Brand -->
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold text-blue-700">AlliedEMSPrep</span>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" id="nav-dashboard" class="inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium text-gray-900">Dashboard</a>
+                        <a href="https://alliedrnprep.org" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
+                            AlliedRNPrep Home
+                            <!-- External link icon -->
+                            <svg class="w-4 h-4 ml-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+                    </div>
+                    
+                    <!-- Sign Out Button -->
+                    <div class="ml-4 flex items-center">
+                        <span id="user-email" class="text-gray-600 text-sm mr-4"></span>
+                        <button id="signout-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+            
+            <!-- Dashboard View -->
+            <section id="dashboard-view">
+                <h1 class="text-3xl font-bold text-gray-900">Welcome, EMS Student!</h1>
+                <p class="mt-2 text-lg text-gray-600">Your journey to certification starts here. Access your study materials below.</p>
+
+                <!-- Dashboard Cards -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Card 1: Practice Quizzes (CLICKABLE) -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:-translate-y-1">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-500 p-3 rounded-lg">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                </div>
+                                <h3 class="ml-4 text-xl font-semibold text-gray-800">Practice Quizzes</h3>
+                            </div>
+                            <p class="mt-4 text-gray-600">Test your knowledge with NREMT-style questions. Focus on key areas like Airway, Cardiology, and Trauma.</p>
+                            <a href="#" id="start-quiz-link" class="mt-6 inline-block text-blue-600 font-medium hover:text-blue-800">Start Quiz &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Video Library (Placeholder) -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:-translate-y-1">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-green-500 p-3 rounded-lg">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <h3 class="ml-4 text-xl font-semibold text-gray-800">Video Library</h3>
+                            </div>
+                            <p class="mt-4 text-gray-600">Watch expert-led videos on critical skills, patient assessment, and complex topics.</p>
+                            <a href="#" class="mt-6 inline-block text-green-600 font-medium hover:text-green-800">Browse Videos &rarr;</a>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Study Guides (Placeholder) -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:-translate-y-1">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-yellow-500 p-3 rounded-lg">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13.5M8.25 6.253l-3 3m3-3l3 3m-3.75 6.253l-3 3m3-3l3 3M15.75 6.253l-3 3m3-3l3 3m-3.75 6.253l-3 3m3-3l3 3"></path></svg>
+                            </div>
+                                <h3 class="ml-4 text-xl font-semibold text-gray-800">Study Guides & Flashcards</h3>
+                            </div>
+                            <p class="mt-4 text-gray-600">Review key concepts, drug cards, and assessment algorithms with our comprehensive guides.</p>
+                            <a href="#" class="mt-6 inline-block text-yellow-600 font-medium hover:text-yellow-800">View Guides &rarr;</a>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            
+            <!-- Quiz View (Initially hidden) -->
+            <section id="quiz-view" class="hidden">
+                <button id="back-to-dashboard" class="text-blue-600 font-medium mb-4 flex items-center hover:text-blue-800 transition-colors">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back to Dashboard
+                </button>
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+                    <h2 id="quiz-header" class="text-2xl font-bold text-gray-900 mb-6">EMS Practice Quiz</h2>
+                    
+                    <!-- Quiz Area (Question and Options) -->
+                    <div id="quiz-area">
+                        <!-- Question Number/Progress -->
+                        <p class="text-sm text-blue-600 font-semibold mb-6" id="quiz-progress">Question 0 of 0 | Topic: General</p>
+
+                        <!-- Question Text -->
+                        <div id="question-text" class="text-xl font-medium text-gray-800 mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <!-- Question content will be inserted here -->
+                        </div>
+
+                        <!-- Options/Answers -->
+                        <div id="options-container" class="space-y-4">
+                            <!-- Buttons for options will be inserted here -->
+                        </div>
+
+                        <!-- Feedback/Next Button -->
+                        <div id="feedback-area" class="mt-8 pt-4 border-t border-gray-200 hidden">
+                            <p id="feedback-message" class="font-semibold text-lg"></p>
+                            <button id="next-question-button" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                                Next Question
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Area -->
+                    <div id="results-area" class="hidden text-center py-10">
+                        <h2 class="text-4xl font-extrabold text-blue-700 mb-4">Quiz Complete!</h2>
+                        <p class="text-xl text-gray-700 mb-6">You scored <span id="final-score" class="text-green-600 font-bold"></span> out of <span id="total-questions" class="font-bold"></span> questions.</p>
+                        <button id="retake-quiz-button" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors mr-3">
+                            Retake Quiz
+                        </button>
+                        <button id="results-dashboard-button" class="px-6 py-3 border border-gray-300 text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors">
+                            Back to Dashboard
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Firebase Initialization and Auth Logic -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword,
+            signInWithPopup,
+            GoogleAuthProvider,
+            signOut,
+            signInWithCustomToken,
+            signInAnonymously
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Configuration (Using user-provided configuration) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj6SkqR0iNxNTRMA3x7qske9cmZ6pwpV8",
+            authDomain: "vsrep-92201.firebaseapp.com",
+            projectId: "vsrep-92201",
+            storageBucket: "vsrep-92201.firebasestorage.app", // REDO: Updated to user's exact value
+            messagingSenderId: "833328760520",
+            appId: "1:833328760520:web:c25191e71a3ae31a55c7fd",
+            measurementId: "G-WQKB2E7CLH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        setLogLevel('Debug'); // Shows detailed logs in your browser console
+
+        let currentUserId = null;
+
+        // --- UI Elements (Auth/Global) ---
+        const loginModal = document.getElementById('login-modal');
+        const appContent = document.getElementById('app-content');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('login-button');
+        const signupButton = document.getElementById('signup-button');
+        const signoutButton = document.getElementById('signout-button');
+        const userEmailSpan = document.getElementById('user-email');
+        const authError = document.getElementById('auth-error');
+        const authErrorMessage = document.getElementById('auth-error-message');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const authForm = document.getElementById('auth-form');
+        const separatorBlock = document.getElementById('separator-block');
+        const googleSigninBlock = document.getElementById('google-signin-block');
+
+        // --- UI Elements (Quiz/View Management) ---
+        const dashboardView = document.getElementById('dashboard-view');
+        const quizView = document.getElementById('quiz-view');
+        const startQuizLink = document.getElementById('start-quiz-link');
+        const backToDashboardButton = document.getElementById('back-to-dashboard');
+        const quizProgress = document.getElementById('quiz-progress');
+        const questionTextElement = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextQuestionButton = document.getElementById('next-question-button');
+        const quizArea = document.getElementById('quiz-area');
+        const resultsArea = document.getElementById('results-area');
+        const finalScore = document.getElementById('final-score');
+        const totalQuestions = document.getElementById('total-questions');
+        const retakeQuizButton = document.getElementById('retake-quiz-button');
+        const resultsDashboardButton = document.getElementById('results-dashboard-button');
+        const googleSigninButton = document.getElementById('google-signin-button'); // Re-declared for scope
+
+
+        // --- Helper Function to Show Errors ---
+        function showAuthError(message) {
+            authErrorMessage.textContent = message;
+            authError.classList.remove('hidden');
+        }
+
+        // --- Helper Function to Hide Errors ---
+        function hideAuthError() {
+            authErrorMessage.textContent = '';
+            authError.classList.add('hidden');
+        }
+
+        // --- Helper Function to show Auth Form ---
+        function showAuthForm() {
+            loadingIndicator.classList.add('hidden');
+            authForm.classList.remove('hidden');
+            separatorBlock.classList.remove('hidden');
+            googleSigninBlock.classList.remove('hidden');
+        }
+        
+        // --- View Management ---
+
+        /** Hides all main content sections and shows the specified one. */
+        function renderView(viewId) {
+            dashboardView.classList.add('hidden');
+            quizView.classList.add('hidden');
+            
+            // Highlight the correct navigation link
+            const navDashboard = document.getElementById('nav-dashboard');
+            if(navDashboard) {
+                if (viewId === 'dashboard-view') {
+                    navDashboard.classList.add('border-blue-500', 'text-gray-900');
+                    navDashboard.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    navDashboard.classList.remove('border-blue-500', 'text-gray-900');
+                    navDashboard.classList.add('border-transparent', 'text-gray-500');
+                }
+            }
+
+
+            // Attempt to show the requested view
+            const viewElement = document.getElementById(viewId);
+            if (viewElement) {
+                viewElement.classList.remove('hidden');
+            }
+        }
+
+        // --- Quiz State and Data ---
+        const quizQuestions = [
+            {
+                question: "A 45-year-old male is choking but is conscious and coughing forcefully. What is the most appropriate initial action?",
+                options: ["Perform abdominal thrusts.", "Encourage him to cough.", "Perform five back blows.", "Begin CPR immediately."],
+                answerIndex: 1, // Encourage him to cough.
+                topic: "Airway Management"
+            },
+            {
+                question: "Which cardiac rhythm is characterized by a rapid, disorganized, and chaotic electrical activity with no recognizable QRS complexes?",
+                options: ["Ventricular Tachycardia (V-Tach)", "Asystole", "Ventricular Fibrillation (V-Fib)", "Pulseless Electrical Activity (PEA)"],
+                answerIndex: 2, // Ventricular Fibrillation (V-Fib)
+                topic: "Cardiology"
+            },
+            {
+                question: "What is the primary sign of decompensated shock in an adult?",
+                options: ["Increased heart rate.", "Decreased blood pressure.", "Pale, cool, clammy skin.", "Increased respiratory rate."],
+                answerIndex: 1, // Decreased blood pressure.
+                topic: "Trauma/Shock"
+            },
+            {
+                question: "The rule of nines is used in adult patients to estimate the percentage of total body surface area (TBSA) affected by:",
+                options: ["Frostbite.", "Internal bleeding.", "Burns.", "Stroke."],
+                answerIndex: 2, // Burns
+                topic: "Trauma"
+            },
+            {
+                question: "During patient assessment, what does the 'P' in the SAMPLE history mnemonic stand for?",
+                options: ["Pain", "Pulse", "Past Medical History", "Pre-existing conditions"],
+                answerIndex: 2, // Past Medical History
+                topic: "Patient Assessment"
+            }
+        ];
+
+        let currentQuiz = [...quizQuestions]; // Use a copy
+        let currentQuestionIndex = 0;
+        let score = 0;
+        
+        // --- Quiz Logic ---
+
+        function startQuiz() {
+            // Reset state
+            currentQuestionIndex = 0;
+            score = 0;
+            currentQuiz = [...quizQuestions]; // You can add shuffling here later if desired
+            
+            // Reset UI visibility
+            quizArea.classList.remove('hidden');
+            resultsArea.classList.add('hidden');
+            hideAuthError();
+            
+            renderQuestion();
+            renderView('quiz-view');
+        }
+
+        function renderQuestion() {
+            feedbackArea.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            
+            if (currentQuestionIndex >= currentQuiz.length) {
+                showResults();
+                return;
+            }
+
+            const questionData = currentQuiz[currentQuestionIndex];
+            
+            // Update progress
+            quizProgress.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuiz.length} | Topic: ${questionData.topic}`;
+            
+            // Update question text
+            questionTextElement.textContent = questionData.question;
+            
+            // Render options
+            questionData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add(
+                    'w-full', 'p-4', 'text-left', 'border', 'border-gray-300', 
+                    'rounded-lg', 'shadow-sm', 'bg-white', 'hover:bg-blue-50', 
+                    'focus:outline-none', 'transition-colors'
+                );
+                // Bind a function to handle the click that passes the button element itself
+                button.onclick = () => handleAnswer(index, questionData.answerIndex, button);
+                optionsContainer.appendChild(button);
+            });
+
+            // Ensure next button text is correct
+            nextQuestionButton.textContent = (currentQuestionIndex === currentQuiz.length - 1) ? "View Results" : "Next Question";
+        }
+
+        function handleAnswer(selectedIndex, correctAnswerIndex, selectedButton) {
+            // Disable all option buttons after selection
+            [...optionsContainer.children].forEach(btn => {
+                btn.disabled = true;
+            });
+
+            // Check answer
+            const isCorrect = selectedIndex === correctAnswerIndex;
+            if (isCorrect) {
+                score++;
+                feedbackMessage.textContent = 'Correct! That is a crucial EMS concept.';
+                feedbackMessage.classList.remove('text-red-600');
+                feedbackMessage.classList.add('text-green-600');
+                selectedButton.classList.remove('hover:bg-blue-50', 'bg-white');
+                selectedButton.classList.add('bg-green-100', 'border-green-500', 'ring-2', 'ring-green-300');
+            } else {
+                feedbackMessage.textContent = `Incorrect. The correct answer was: ${currentQuiz[currentQuestionIndex].options[correctAnswerIndex]}`;
+                feedbackMessage.classList.remove('text-green-600');
+                feedbackMessage.classList.add('text-red-600');
+                
+                selectedButton.classList.remove('hover:bg-blue-50', 'bg-white');
+                selectedButton.classList.add('bg-red-100', 'border-red-500', 'ring-2', 'ring-red-300');
+                
+                // Highlight the correct answer
+                const correctButton = optionsContainer.children[correctAnswerIndex];
+                correctButton.classList.add('bg-green-200', 'border-green-600', 'ring-2', 'ring-green-400', 'opacity-75');
+            }
+
+            feedbackArea.classList.remove('hidden');
+        }
+
+        function showResults() {
+            quizArea.classList.add('hidden');
+            resultsArea.classList.remove('hidden');
+            
+            finalScore.textContent = score;
+            totalQuestions.textContent = currentQuiz.length;
+        }
+
+        // --- Auth State Listener ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                console.log('User signed in:', user.uid, user.email || '(Anonymous/Custom Token)');
+                currentUserId = user.uid;
+                userEmailSpan.textContent = user.email || `User ID: ${user.uid.substring(0, 8)}...`;
+                
+                // Hide login modal and show app content, starting at the dashboard
+                loginModal.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                renderView('dashboard-view');
+            } else {
+                // User is signed out
+                console.log('User signed out.');
+                currentUserId = null;
+                userEmailSpan.textContent = '';
+
+                // Show login modal and hide app
+                loginModal.classList.remove('hidden');
+                appContent.classList.add('hidden');
+                
+                // Ensure auth form is visible if we are showing the modal
+                showAuthForm(); 
+            }
+        });
+        
+        // --- Mandatory Canvas Auth Flow (Run Immediately) ---
+        (async () => {
+            const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+            try {
+                if (token) {
+                    console.log("Canvas Auth: Signing in with custom token...");
+                    await signInWithCustomToken(auth, token);
+                } else {
+                    console.log("Canvas Auth: Signing in anonymously (no custom token found)...");
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Canvas Auth: Initial sign-in failed:", error);
+                showAuthForm(); 
+            }
+        })();
+        
+        // --- Event Listeners (Authentication) ---
+
+        // Sign Up with Email
+        signupButton.addEventListener('click', async () => {
+            hideAuthError();
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            if (!email || !password) { showAuthError('Please enter both email and password.'); return; }
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error('Sign up error:', error.message);
+                showAuthError(error.message);
+            }
+        });
+
+        // Sign In with Email
+        loginButton.addEventListener('click', async () => {
+            hideAuthError();
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            if (!email || !password) { showAuthError('Please enter both email and password.'); return; }
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error('Login error:', error.message);
+                showAuthError(error.message);
+            }
+        });
+
+        // Sign In with Google 
+        if(googleSigninButton) {
+            googleSigninButton.addEventListener('click', async () => {
+                hideAuthError();
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (error) {
+                    console.error('Google sign-in error:', error.message);
+                    showAuthError(error.message);
+                }
+            });
+        }
+
+        // Sign Out
+        signoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Sign out error:', error.message);
+            }
+        });
+        
+        // --- Event Listeners (Quiz Navigation) ---
+        startQuizLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            startQuiz();
+        });
+
+        backToDashboardButton.addEventListener('click', () => {
+            renderView('dashboard-view');
+        });
+
+        nextQuestionButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            renderQuestion();
+        });
+
+        retakeQuizButton.addEventListener('click', startQuiz);
+
+        resultsDashboardButton.addEventListener('click', () => {
+            renderView('dashboard-view');
+        });
+
+        // Navigation link for Dashboard (in header)
+        document.getElementById('nav-dashboard').addEventListener('click', (e) => {
+            e.preventDefault();
+            renderView('dashboard-view');
+        });
+
+    </script>
+
+</body>
+</html>
