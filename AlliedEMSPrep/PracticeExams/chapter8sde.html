@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acid-Base and Critical Care Diagnostic</title>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Configure Tailwind to use Inter font and custom colors -->
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+'primary-blue': '#1D4ED8',
+'secondary-gray': '#F3F4F6',
+'correct-green': '#10B981',
+'incorrect-red': '#EF4444',
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+}
+}
+}
+</script>
+<style>
+/* Custom styles for professional look */
+body {
+background-color: #f7f9fb;
+font-family: 'Inter', sans-serif;
+}
+.shadow-custom {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+/* Custom focus styles for accessibility and design */
+input:checked + label {
+border-color: #1D4ED8;
+background-color: #EFF6FF;
+}
+.option-label {
+transition: all 0.2s;
+cursor: pointer;
+}
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+<div id="app-container" class="max-w-4xl mx-auto">
+<!-- Header -->
+<header class="text-center mb-8">
+<h1 class="text-4xl font-extrabold text-primary-blue mb-2">Acid-Base and Critical Care Diagnostic</h1>
+<p class="text-lg text-gray-600">Testing Understanding: Fluid/Electrolytes, GI, and Respiratory Emergencies</p>
+</header>
+
+<!-- Quiz Container -->
+<div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+<!-- Content will be injected here (Start Screen, Question, or Results) -->
+</div>
+
+<!-- Hidden Loading Spinner -->
+<div id="loading" class="hidden text-center mt-8">
+<svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+<p class="text-gray-500 mt-2">Processing...</p>
+</div>
+
+</div>
+
+<script>
+// --- 1. Question Data (New Set) ---
+const rawQuestions = [
+{
+questionText: "A patient is found unresponsive in a burning building. Which emergency move should you prioritize?",
+options: {
+A: "Blanket drag",
+B: "Short backboard extrication",
+C: "Direct ground lift",
+D: "Stair chair carry"
+},
+correctAnswer: "A",
+rationale: "Blanket or clothes drag is fastest for removing an unresponsive patient from immediate danger in fire.",
+section: "Emergency Moves",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which factors must be assessed before attempting to lift a bariatric patient?",
+options: {
+A: "Team strength and number",
+B: "Type of lift/moving equipment",
+C: "Patient's medical needs",
+D: "Weight limit of stretcher"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All must be considered to ensure patient and provider safety.",
+section: "Bariatrics/Lifting Safety",
+type: "sata"
+},
+{
+questionText: "Which body mechanics principle prevents back injury during patient lifting?",
+options: {
+A: "Keep feet close together",
+B: "Use back muscles to lift",
+C: "Lift with straight back and bend at hips/knees",
+D: "Twist while lifting"
+},
+correctAnswer: "C",
+rationale: "Straight back, bending at knees/hips protects spine.",
+section: "Body Mechanics",
+type: "mc"
+},
+{
+questionText: "A patient on the second floor requires urgent extrication for cardiac arrest. Which device and method combination is optimum?",
+options: {
+A: "Stair chair rapidly with two-person carry",
+B: "Long backboard vertical lift",
+C: "Sheet drag and multiple team members",
+D: "Wheeled stretcher brought up the stairs"
+},
+correctAnswer: "C",
+rationale: "Sheet drag enables team carry, reduces risk of dropping.",
+section: "Team Movement/Urgent Moves",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Before attempting a lift with a combative patient, what should EMTs evaluate?",
+options: {
+A: "Medical restraint needs",
+B: "Scene safety",
+C: "Ability to control extremities",
+D: "Number of providers available"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All factors crucial in preventing injury to patient or crew.",
+section: "Restraint/Scene Safety",
+type: "sata"
+},
+{
+questionText: "What type of move is indicated if a patient is blocking access to another critical patient in a multi-casualty scene?",
+options: {
+A: "Nonurgent move",
+B: "Emergency move",
+C: "Stair chair carry",
+D: "Direct ground lift"
+},
+correctAnswer: "B",
+rationale: "Remove the obstructing patient rapidly; further assessment after danger is mitigated.",
+section: "Multi-Patient/Casualty Triage",
+type: "mc"
+},
+{
+questionText: "Which team member is responsible for giving the preparatory command before lifting?",
+options: {
+A: "Team leader",
+B: "Junior EMT",
+C: "Bystander",
+D: "Receiving nurse"
+},
+correctAnswer: "A",
+rationale: "Team leader ensures coordination and safety.",
+section: "Teamwork/Commands",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What signs might indicate a need for urgent move?",
+options: {
+A: "Hazardous environment",
+B: "Imminent airway compromise",
+C: "Rapid patient deterioration",
+D: "Entrapment with unstable structure"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All can require rapid patient movement for survival.",
+section: "Urgent vs. Nonurgent Moves",
+type: "sata"
+},
+{
+questionText: "A conscious, stable trauma patient must be moved from a vehicle but complains of severe hip pain. What move is preferred?",
+options: {
+A: "Rapid extrication",
+B: "Nonurgent move with long backboard",
+C: "Blanket drag",
+D: "Direct carry to stretcher"
+},
+correctAnswer: "B",
+rationale: "Protect suspected fracture; use nonurgent, spinal precautions.",
+section: "Orthopedic Injuries/Spinal Care",
+type: "mc"
+},
+{
+questionText: "What is the primary risk of moving a geriatric patient too quickly?",
+options: {
+A: "Dislocate artificial joints",
+B: "Break fragile skin",
+C: "Increase fall risk",
+D: "All of the above"
+},
+correctAnswer: "D",
+rationale: "All risks are elevated due to frailty, comorbidities.",
+section: "Geriatric Safety",
+type: "mc"
+},
+{
+questionText: "Which specialized equipment is necessary to safely move a patient >350 lbs from a bedroom to hospital ambulance?",
+options: {
+A: "Standard long backboard",
+B: "Bariatric stretcher and reinforce team",
+C: "Wheelchair and sheet drag",
+D: "Portable ventilator"
+},
+correctAnswer: "B",
+rationale: "Bariatric stretcher built for heavy loads; large team needed for safety.",
+section: "Equipment/Bariatric Moves",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What potential injuries can result from improper technique during log rolling?",
+options: {
+A: "Spinal cord injury",
+B: "Shoulder dislocation",
+C: "Crew back strain",
+D: "Patient rib fracture"
+},
+correctAnswer: ["A","C","D"],
+rationale: "Poor rolling can harm patient or team; shoulders rarely dislocated.",
+section: "Logrolling/Techniques",
+type: "sata"
+},
+{
+questionText: "When using a stair chair for patient descent, what is the most critical safety consideration?",
+options: {
+A: "Patient body position",
+B: "Securing seatbelt/restraints",
+C: "Communicating before every step",
+D: "Team leader at the feet"
+},
+correctAnswer: "C",
+rationale: "Clear communication prevents falls, ensures timing.",
+section: "Stair Chair/Team Technique",
+type: "mc"
+},
+{
+questionText: "What move is indicated for a pediatric patient with suspected spinal trauma found in a hallway?",
+options: {
+A: "Direct ground lift",
+B: "Nonurgent backboard move with cervical collar",
+C: "Rapid blanket drag",
+D: "Chair carry"
+},
+correctAnswer: "B",
+rationale: "Maintain spinal alignment, use appropriate child-sized equipment.",
+section: "Pediatric Spinal Management",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which scenarios require high-level team lifting coordination?",
+options: {
+A: "Narrow hallway egress",
+B: "Moving obese patient",
+C: "Transporting agitated patient with possible restraints",
+D: "Inclined stair descent"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All require advanced coordination for patient and crew safety.",
+section: "Team Coordination",
+type: "sata"
+},
+{
+questionText: "What risk arises if a backboard is used on a lightweight, combative patient without straps?",
+options: {
+A: "Injury from sliding/falling",
+B: "Better comfort",
+C: "Improved airway control",
+D: "Reduced spinal stability risk"
+},
+correctAnswer: "A",
+rationale: "Straps are essential for securing the patient.",
+section: "Equipment Application/Risk",
+type: "mc"
+},
+{
+questionText: "During a mass casualty incident, which triage outcome can impact the order and method of patient movement?",
+options: {
+A: "Red tag, unstable airway",
+B: "Green tag, ambulatory",
+C: "Blue tag, non-survivable injuries",
+D: "Yellow tag, stable fractures"
+},
+correctAnswer: "A",
+rationale: "Most urgent/critical are moved first with priority technique.",
+section: "Mass Casualty Triage/Movement",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What are risks of moving geriatric patients with osteoporosis using a standard scoop stretcher?",
+options: {
+A: "Rib fractures",
+B: "Skin tears",
+C: "Hip dislocation",
+D: "Spinal compression"
+},
+correctAnswer: ["A","B","D"],
+rationale: "Osteoporosis increases bone and skin fragility.",
+section: "Geriatrics/Technique Risks",
+type: "sata"
+},
+{
+questionText: "Which device best immobilizes and moves a patient with bilateral femur fractures?",
+options: {
+A: "Long backboard and traction splints",
+B: "Sheet drag to ambulance",
+C: "Stair chair",
+D: "Short board only"
+},
+correctAnswer: "A",
+rationale: "Long backboard + traction splints stabilize fractures for transport.",
+section: "Orthopedic Trauma/Devices",
+type: "mc"
+},
+{
+questionText: "A combative psychiatric patient must be transported down two flights of stairs. Which team consideration is paramount?",
+options: {
+A: "Advanced restraint and extra personnel",
+B: "Single EMT lift",
+C: "Minimize verbal explanation",
+D: "Patient decision for descent"
+},
+correctAnswer: "A",
+rationale: "Aggression needs restraint and team support on stairs.",
+section: "Psychiatric/Restraints/Moving",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which assessment findings mandate emergency move?",
+options: {
+A: "Imminent structural collapse",
+B: "Rapid airway obstruction",
+C: "Uncontrolled hemorrhage",
+D: "Cardiac arrest requiring ALS care outside scene"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "Any immediately life-threatening scenario or scene hazards.",
+section: "Emergency Move Assessment",
+type: "sata"
+},
+{
+questionText: "When transporting a morbidly obese COPD patient, why is semi-Fowler’s position preferred?",
+options: {
+A: "Reduces airway compromise and increases oxygenation",
+B: "Improves spinal stabilization",
+C: "Minimizes risk of aspiration",
+D: "Speeds up stretcher movement"
+},
+correctAnswer: "A",
+rationale: "Airway and breathing improve seated/angled position.",
+section: "Positioning/Medical Rationale",
+type: "mc"
+},
+{
+questionText: "During a multi-agency rescue, what key protocol prevents unsafe lifting?",
+options: {
+A: "Unified command clear commands",
+B: "Lifting with fewer team members",
+C: "Silent lifting and moving",
+D: "Random team composition"
+},
+correctAnswer: "A",
+rationale: "Unified command fosters communication for safe lifting.",
+section: "Interagency Technique",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which mechanical devices reduce the risk of musculoskeletal injuries to EMTs?",
+options: {
+A: "Portable lift assist",
+B: "Bariatric stretcher",
+C: "Electric stair chair",
+D: "Manual sheet drag"
+},
+correctAnswer: ["A","B","C"],
+rationale: "Manual sheet drag increases musculoskeletal risk; others reduce it.",
+section: "Equipment/Provider Safety",
+type: "sata"
+},
+{
+questionText: "Why does lifting with elbows flexed and arms close to body decrease injury risk?",
+options: {
+A: "Reduces moment arm strain and spine load",
+B: "Improves grip speed",
+C: "Decreases team communication",
+D: "None of the above"
+},
+correctAnswer: "A",
+rationale: "Arms close and flexed decrease lever force on spine.",
+section: "Body Mechanics/Physics",
+type: "mc"
+},
+{
+questionText: "An unresponsive patient in cardiac arrest must be extricated from a bathtub. What is the best rapid move?",
+options: {
+A: "Clothes or blanket drag",
+B: "Stair chair carry",
+C: "Long backboard slide",
+D: "Sheet drag with four personnel"
+},
+correctAnswer: "A",
+rationale: "Drag is fastest for unresponsive patient in tight area.",
+section: "Confined Space/Emergency Moves",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which patient types have highest risk for skin tears during moves?",
+options: {
+A: "Aging adults",
+B: "Burn victims",
+C: "Long-term steroid users",
+D: "Children"
+},
+correctAnswer: ["A","B","C"],
+rationale: "Older, burn-injured, and steroid-dependent patients have fragile skin.",
+section: "Patient Assessment/Skin Risk",
+type: "sata"
+},
+{
+questionText: "During stair descent with loaded stair chair, which provider is at greatest risk for injury?",
+options: {
+A: "Provider at feet (navigates steps)",
+B: "Provider at head",
+C: "Patient in chair",
+D: "Bystander opening doors"
+},
+correctAnswer: "A",
+rationale: "Stair navigation with gravity strain is highest at feet.",
+section: "Team Technique/Risk",
+type: "mc"
+},
+{
+questionText: "Which principle should NOT be compromised during team lifting?",
+options: {
+A: "Communication",
+B: "Lifting simultaneously",
+C: "Alignment of patient’s body axis",
+D: "Speed over technique"
+},
+correctAnswer: "D",
+rationale: "Speed increases risk; technique, communication, and alignment are paramount.",
+section: "Team Coordination/Technique",
+type: "mc"
+},
+{
+questionText: "During a vehicle extrication, which lifting strategy is most appropriate for a non-ambulatory patient with suspected pelvis fracture?",
+options: {
+A: "Rapid extrication with long backboard",
+B: "Direct carry to stretcher",
+C: "Short backboard then vertical lift",
+D: "Sheet drag only"
+},
+correctAnswer: "A",
+rationale: "Long backboard allows full spine/pelvis stabilization for transport.",
+section: "Extrication/Orthopedic Trauma",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What post-move actions must EMTs document for every lift involving patient restraint?",
+options: {
+A: "Patient condition after movement",
+B: "Time and team members present",
+C: "Type of restraint used and justification",
+D: "Any adverse events during move"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "Documentation is crucial for legal and quality assurance.",
+section: "Documentation/Restraint",
+type: "sata"
+},
+{
+questionText: "A paraplegic patient needs transfer from wheelchair to ambulance cot. What lift is least likely to cause skin or pressure injuries?",
+options: {
+A: "Two-person seat carry with patient assist as able",
+B: "Sheet drag from wheelchair",
+C: "Emergency drag",
+D: "One-person lift only"
+},
+correctAnswer: "A",
+rationale: "Seat carry with assist reduces shearing and pressure",
+section: "Wheelchair Transfer/Skin Safety",
+type: "mc"
+},
+{
+questionText: "Which patient scenario is MOST appropriate for a scoop stretcher?",
+options: {
+A: "Hip fracture without spinal compromise",
+B: "Unresponsive patient with cardiac arrest",
+C: "Mid-femur amputation",
+D: "Suspected cervical spine injury"
+},
+correctAnswer: "A",
+rationale: "Scoop stretcher best for isolated hip/pelvis injuries, not spine or cardiac arrest.",
+section: "Equipment/Selection",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which common errors increase risk when moving a patient in rain on a slick sidewalk?",
+options: {
+A: "Hurried movements",
+B: "Improper footwear",
+C: "Uneven weight distribution among team",
+D: "Ommission of communication signals"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All errors elevate fall risk or strain in hazardous conditions.",
+section: "Environmental Risk/Technique",
+type: "sata"
+},
+{
+questionText: "What EMS device is designed for rapid transport over rough terrain?",
+options: {
+A: "Flexible (Stokes) basket stretcher",
+B: "Long backboard",
+C: "Powered ambulance cot",
+D: "Short board only"
+},
+correctAnswer: "A",
+rationale: "Stokes basket allows rescue on rough ground or confined space.",
+section: "Specialized Equipment/Rough Terrain",
+type: "mc"
+},
+{
+questionText: "A patient’s shirt is used for an emergency drag, but fabric tears halfway through the move. What is the best immediate step?",
+options: {
+A: "Stop and reattempt with another drag method (blanket, sheet)",
+B: "Continue pulling regardless of tears",
+C: "Switch to rapid carry",
+D: "Call for supervisor approval"
+},
+correctAnswer: "A",
+rationale: "Torn shirt fails; switch material for safety.",
+section: "Emergency Moves/Contingency",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What may result if a patient is left unrestrained on a moving ambulance cot?",
+options: {
+A: "Falls from cot",
+B: "Injury during sudden stops/turns",
+C: "Patient ejection in collision",
+D: "Unrestricted movement to IV pole"
+},
+correctAnswer: ["A","B","C"],
+rationale: "Unrestrained equals high risk for trauma in transport.",
+section: "Transport Safety/Restraints",
+type: "sata"
+},
+{
+questionText: "During transfer of a patient with spinal precautions, at what point should head stabilization be released?",
+options: {
+A: "Only after all straps and blocks are secured",
+B: "Immediately upon board placement",
+C: "When patient requests",
+D: "Head stabilization is not needed"
+},
+correctAnswer: "A",
+rationale: "Release only after immobilization is fully accomplished.",
+section: "Spinal Precautions/Technique",
+type: "mc"
+},
+{
+questionText: "A patient with abdominal pain and syncope is recovered from a bathtub. During extrication, what move is safest?",
+options: {
+A: "Log roll onto blanket then drag",
+B: "Direct carry to stretcher",
+C: "Stair chair",
+D: "Vertical lift"
+},
+correctAnswer: "A",
+rationale: "Log roll onto blanket best minimizes further injury/risk.",
+section: "Confined Space/Emergency Moves",
+type: "mc"
+},
+{
+questionText: "Which lifting position maximizes the safety for both patient and crew during a two-person seat carry?",
+options: {
+A: "Providers at patient’s sides, bent knees, upright back",
+B: "Providers at head and feet, knees straight",
+C: "Both standing behind patient",
+D: "One provider only"
+},
+correctAnswer: "A",
+rationale: "Bent knees/upright back aligns spine and control.",
+section: "Seat Carry/Body Mechanics",
+type: "mc"
+},
+{
+questionText: "Select all that apply: On a snowy incline, which movement strategies best minimize slip and fall risk for patient transfers?",
+options: {
+A: "Use cleated boots for all team members",
+B: "Maintain three points of contact at all times",
+C: "Slow, coordinated movement and verbal cues",
+D: "Avoid running or sudden changes of direction"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All methods reduce fall/injury hazard on slippery slopes.",
+section: "Environmental Safety/Moves",
+type: "sata"
+},
+{
+questionText: "If two crew members have different heights, who should be positioned at patient’s head during a carry?",
+options: {
+A: "The taller team member",
+B: "The shorter team member",
+C: "Neither matters",
+D: "Patient’s preference"
+},
+correctAnswer: "A",
+rationale: "Taller member at head aligns center of gravity and lift angle.",
+section: "Team Technique/Anatomy",
+type: "mc"
+},
+{
+questionText: "Patient is moved with nonurgent ground lift. What should be checked immediately after movement?",
+options: {
+A: "Neurological status and comfort",
+B: "Crew member fatigue only",
+C: "EMS unit fuel status",
+D: "Restraint release"
+},
+correctAnswer: "A",
+rationale: "Assess patient after any movement for change or injury.",
+section: "Post-Move Monitoring",
+type: "mc"
+},
+{
+questionText: "Which scenario best warrants urgent move over nonurgent move?",
+options: {
+A: "Rapidly deteriorating vital signs with unstable scene",
+B: "Patient’s request to be moved",
+C: "Well-lit, safe environment",
+D: "Long history with no acute symptoms"
+},
+correctAnswer: "A",
+rationale: "Urgent = clinical or environmental change requiring immediate action.",
+section: "Urgent Move Criteria",
+type: "mc"
+}
+
+];
+
+// --- 2. State Management ---
+const state = {
+questions: [], // Shuffled questions will be stored here
+currentQuestionIndex: 0,
+score: 0,
+userAnswers: [],
+quizStarted: false,
+currentSataSelection: new Set(),
+questionStartTime: null,
+initialSelection: null,
+};
+
+const quizContainer = document.getElementById('quiz-container');
+
+// --- 3. Core Logic Functions ---
+
+// Fisher-Yates (Knuth) Shuffle Algorithm
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function startQuiz() {
+state.quizStarted = true;
+state.currentQuestionIndex = 0;
+state.score = 0;
+state.userAnswers = [];
+state.currentSataSelection = new Set();
+state.questionStartTime = null;
+state.initialSelection = null;
+
+// SHUFFLE QUESTIONS HERE
+state.questions = shuffleArray([...rawQuestions]);
+
+render();
+}
+
+function checkAnswer(question, userSelection) {
+const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+// Check if every correct answer was selected AND nothing incorrect was selected
+const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+return isCorrect;
+}
+
+function submitAnswer() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+let userSelection = [];
+let finalSelectionForComparison = '';
+
+// --- 1. Get User Selection and Check Validity ---
+if (currentQuestion.type === 'mc') {
+const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+if (!checkedRadio) {
+showMessage("Please select one option before submitting.", 'warning');
+return;
+}
+userSelection = checkedRadio.value;
+finalSelectionForComparison = userSelection;
+} else if (currentQuestion.type === 'sata') {
+userSelection = Array.from(state.currentSataSelection).sort();
+if (userSelection.length === 0) {
+showMessage("Please select at least one option before submitting.", 'warning');
+return;
+}
+finalSelectionForComparison = userSelection.join(',');
+}
+
+// --- 2. Calculate Risk Metrics ---
+const timeSpentMs = Date.now() - state.questionStartTime;
+const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+// Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+let answerWasChanged = false;
+// Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+answerWasChanged = true;
+}
+
+// Time Risk Logic
+let timeRisk = 0;
+const fastThreshold = 10; // seconds: High risk for rushing
+const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+let timeRiskText = 'Normal Time (Risk +0)';
+
+if (timeSpentSeconds < fastThreshold) {
+timeRisk = 2;
+timeRiskText = 'Fast Answer (Risk +2)';
+} else if (timeSpentSeconds > slowThreshold) {
+timeRisk = 1;
+timeRiskText = 'Slow Answer (Risk +1)';
+}
+
+// Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+const changeRisk = answerWasChanged ? 3 : 0;
+const totalRiskScore = changeRisk + timeRisk;
+
+const isCorrect = checkAnswer(currentQuestion, userSelection);
+if (isCorrect) {
+state.score++;
+}
+
+// --- 3. Record the Answer and Metrics ---
+state.userAnswers.push({
+...currentQuestion,
+userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+isCorrect: isCorrect,
+timeSpent: timeSpentSeconds,
+answerWasChanged: answerWasChanged,
+riskScore: totalRiskScore,
+timeRiskText: timeRiskText,
+});
+
+// Show neutral message to trigger the visual delay/button disable without revealing correctness
+showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+// Move to the next question after a slight delay for user feedback
+setTimeout(() => {
+state.currentQuestionIndex++;
+state.currentSataSelection.clear(); // Reset SATA selection
+render();
+hideMessage();
+}, 1200);
+}
+
+// --- 4. Rendering Functions (Views) ---
+
+function render() {
+if (!state.quizStarted) {
+renderStartScreen();
+} else if (state.currentQuestionIndex < state.questions.length) {
+renderQuestion();
+} else {
+renderResults();
+}
+}
+
+function renderStartScreen() {
+quizContainer.innerHTML = `
+<div class="text-center py-10">
+<h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
+<p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${rawQuestions.length} randomized critical thinking questions covering **Acid-Base, GI (Cirrhosis/Pancreatitis), and Respiratory** care. You must answer each question to proceed, and there is no option to go back.</p>
+<p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+<button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+Start Exam Now
+</button>
+<p class="mt-6 text-sm text-red-500 font-medium">Warning: Questions are randomized and there is no backward navigation allowed once started.</p>
+</div>
+`;
+}
+
+function renderQuestion() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+const qNum = state.currentQuestionIndex + 1;
+const total = state.questions.length;
+const isSATA = currentQuestion.type === 'sata';
+
+// NEW: Risk Tracking Setup
+state.questionStartTime = Date.now();
+state.initialSelection = null;
+
+let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+const inputType = isSATA ? 'checkbox' : 'radio';
+const inputName = 'option';
+const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+return `
+<div class="mb-3">
+<input
+type="${inputType}"
+id="option-${key}"
+name="${inputName}"
+value="${key}"
+class="hidden peer"
+${isChecked ? 'checked' : ''}
+onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+/>
+<label
+for="option-${key}"
+class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+>
+<span class="font-bold text-primary-blue mr-3">${key}:</span>
+${text}
+</label>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="mb-6 border-b pb-4">
+<p class="text-sm font-semibold text-primary-blue mb-1">
+Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+</p>
+<h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+<p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+</div>
+
+<form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+<div class="options-container mb-8">
+${optionsHtml}
+</div>
+
+<div id="message-box" class="mb-4 hidden"></div>
+
+<div class="flex justify-end">
+<button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+Submit & Next
+</button>
+</div>
+</form>
+`;
+}
+
+function handleOptionChange(input, key, type) {
+let currentSelectionString;
+
+if (type === 'sata') {
+if (input.checked) {
+state.currentSataSelection.add(key);
+} else {
+state.currentSataSelection.delete(key);
+}
+// Use a sorted comma-separated string for reliable comparison
+currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+} else { // mc
+currentSelectionString = key;
+}
+
+// Capture initial selection only once on the first actual selection (non-empty)
+if (state.initialSelection === null && currentSelectionString !== '') {
+state.initialSelection = currentSelectionString;
+}
+}
+
+function renderResults() {
+const total = state.questions.length;
+const correctCount = state.score;
+const percentage = Math.round((correctCount / total) * 100);
+const isPassing = percentage >= 75; // Standard passing score
+
+const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+let resultsDetailHtml = state.userAnswers.map((item, index) => {
+const isCorrect = item.isCorrect;
+
+// NEW: Risk Highlighting Logic
+const isHighRiskIncorrect = !isCorrect && item.riskScore > 2;
+
+// Adjust result class based on high risk and incorrect status
+let resultClass = '';
+let riskText = '';
+if (isCorrect) {
+resultClass = 'bg-green-50 border-correct-green';
+} else if (isHighRiskIncorrect) {
+resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+} else {
+resultClass = 'bg-red-50 border-incorrect-red';
+}
+
+const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+return `
+<div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+<div class="flex justify-between items-start mb-3">
+<h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+<div class="flex items-center space-x-4">
+${resultIcon}
+${riskText}
+</div>
+</div>
+
+<!-- NEW: Risk Metrics Display -->
+<div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+<p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+<p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+<p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+<p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+</div>
+<!-- END NEW: Risk Metrics Display -->
+
+<p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+<p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+<div class="bg-white p-4 rounded-md border border-gray-200">
+<h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+<p class="text-gray-600 text-sm">${item.rationale}</p>
+</div>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="text-center py-8">
+<div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+${statusText}
+</div>
+<h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+<p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+<button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+Restart Exam
+</button>
+</div>
+
+<div class="mt-8 pt-6 border-t border-gray-200">
+<h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+<p class="text-sm text-gray-600 mb-6">Review questions flagged as <strong class="text-red-700">🚨 HIGH RISK INCORRECT</strong> first, as these indicate areas where you were both incorrect and uncertain/rushing.</p>
+${resultsDetailHtml}
+</div>
+`;
+}
+
+// --- 5. Utility Functions ---
+
+function showMessage(text, type) {
+const messageBox = document.getElementById('message-box');
+let bgColor, borderColor;
+
+if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+bgColor = 'bg-blue-100';
+borderColor = 'border-primary-blue';
+} else if (type === 'error') {
+bgColor = 'bg-incorrect-red/10';
+borderColor = 'border-incorrect-red';
+} else { // 'warning' for incomplete selection
+bgColor = 'bg-yellow-100';
+borderColor = 'border-yellow-400';
+}
+
+messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+messageBox.textContent = text;
+messageBox.style.display = 'block';
+
+// Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+if (type !== 'warning') {
+document.querySelector('button[type="submit"]').style.display = 'none';
+}
+}
+
+function hideMessage() {
+const messageBox = document.getElementById('message-box');
+messageBox.style.display = 'none';
+// Show the submit button again
+const submitButton = document.querySelector('button[type="submit"]');
+if(submitButton) submitButton.style.display = 'inline-flex';
+}
+
+
+// --- 6. Initialization ---
+window.onload = function() {
+render();
+};
+
+// Expose functions globally for HTML event handlers
+window.startQuiz = startQuiz;
+window.submitAnswer = submitAnswer;
+window.handleOptionChange = handleOptionChange;
+</script>
+</body>
+</html>
