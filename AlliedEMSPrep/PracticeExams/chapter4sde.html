@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMT Chapter 4 Review SDE (Student Diagnostic Exam)</title>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Configure Tailwind to use Inter font and custom colors -->
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+'primary-blue': '#1D4ED8',
+'secondary-gray': '#F3F4F6',
+'correct-green': '#10B981',
+'incorrect-red': '#EF4444',
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+}
+}
+}
+</script>
+<style>
+/* Custom styles for professional look */
+body {
+background-color: #f7f9fb;
+font-family: 'Inter', sans-serif;
+}
+.shadow-custom {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+/* Custom focus styles for accessibility and design */
+input:checked + label {
+border-color: #1D4ED8;
+background-color: #EFF6FF;
+}
+.option-label {
+transition: all 0.2s;
+cursor: pointer;
+}
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+<div id="app-container" class="max-w-4xl mx-auto">
+<!-- Header -->
+<header class="text-center mb-8">
+<h1 class="text-4xl font-extrabold text-primary-blue mb-2">Emergency Medical Technician CH4 SDE</h1>
+<p class="text-lg text-gray-600">Testing Understanding: Chapter 4 (Health Privacy / Law)</p>
+</header>
+
+<!-- Quiz Container -->
+<div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+<!-- Content will be injected here (Start Screen, Question, or Results) -->
+</div>
+
+<!-- Hidden Loading Spinner -->
+<div id="loading" class="hidden text-center mt-8">
+<svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+<p class="text-gray-500 mt-2">Processing...</p>
+</div>
+
+</div>
+
+<script>
+// --- 1. Question Data (New Set) ---
+const rawQuestions = [
+{
+questionText: "What is the PRIMARY purpose of therapeutic communication with a patient?",
+options: {
+A: "To gather billing details",
+B: "To build trust and accurate information exchange",
+C: "To demonstrate medical authority",
+D: "To speed up transport"
+},
+correctAnswer: "B",
+rationale: "Therapeutic communication builds trust and helps EMTs get correct information to provide care.",
+section: "Therapeutic Communication",
+type: "mc"
+},
+{
+questionText: "When communicating with a hearing-impaired patient, which should you do?",
+options: {
+A: "Speak louder",
+B: "Face the patient and use simple language",
+C: "Rely on written communication only",
+D: "Ignore the impairment"
+},
+correctAnswer: "B",
+rationale: "Facing the patient and using clear, simple language increases understanding.",
+section: "Special Populations",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What elements are required in an effective patient care report (PCR)?",
+options: {
+A: "Times of events",
+B: "Treatments given",
+C: "Patient's insurance policy number",
+D: "Objective observations"
+},
+correctAnswer: ["A", "B", "D"],
+rationale: "PCRs must be accurate, complete and only contain relevant, objective info and treatment times.",
+section: "Documentation",
+type: "sata"
+},
+{
+questionText: "Which patient would require special confidentiality during radio communication?",
+options: {
+A: "Pediatric patient",
+B: "Any patient with recognizable details",
+C: "Elderly patient",
+D: "A trauma patient"
+},
+correctAnswer: "B",
+rationale: "Never transmit identifiable info over radio; preserve confidentiality for all patients.",
+section: "Communication Protocols",
+type: "mc"
+},
+{
+questionText: "What is the FIRST step after a patient refuses care?",
+options: {
+A: "Have them sign a refusal form",
+B: "Transport them anyway",
+C: "Call medical direction",
+D: "Explain risks and confirm understanding"
+},
+correctAnswer: "D",
+rationale: "Explain the risks so the patient is making an informed refusal.",
+section: "Refusal of Care",
+type: "mc"
+},
+{
+questionText: "Closed-ended questions are best for:",
+options: {
+A: "Gathering quick, specific details",
+B: "Building rapport",
+C: "Discussing medical history in detail",
+D: "Talking to family members"
+},
+correctAnswer: "A",
+rationale: "Closed-ended questions quickly yield yes/no or short answers in assessment.",
+section: "Interviewing Techniques",
+type: "mc"
+},
+{
+questionText: "Which is considered poor documentation on a PCR?",
+options: {
+A: "Subjective opinions on patient character",
+B: "Objective vital signs",
+C: "Chronological order",
+D: "Corrections initialed"
+},
+correctAnswer: "A",
+rationale: "Subjective, judgmental statements compromise professionalism and legality.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "A legally valid correction on a written PCR should:",
+options: {
+A: "Be erased and replaced",
+B: "Be crossed out with a single line, then initialed",
+C: "Go uncorrected",
+D: "Be hidden with white-out"
+},
+correctAnswer: "B",
+rationale: "This preserves the documentation trail for legal purposes.",
+section: "Documentation Errors",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Good verbal communication skills for EMTs include:",
+options: {
+A: "Calm tone",
+B: "Medical jargon",
+C: "Active listening",
+D: "Eye contact"
+},
+correctAnswer: ["A", "C", "D"],
+rationale: "Calm tone, eye contact, and listening reassure patients and foster trust.",
+section: "Therapeutic Communication",
+type: "sata"
+},
+{
+questionText: "Who is responsible for transfer of care documentation?",
+options: {
+A: "Any hospital staff",
+B: "The EMT handing off the patient",
+C: "Hospital security",
+D: "Transport supervisor"
+},
+correctAnswer: "B",
+rationale: "The EMT giving the handoff must document patient transfer.",
+section: "Transfer of Care",
+type: "mc"
+},
+{
+questionText: "Which of the following is appropriate to document in the PCR narrative?",
+options: {
+A: "Direct quotes from patient",
+B: "Personal judgments",
+C: "Unverified information",
+D: "Emotions of EMT"
+},
+correctAnswer: "A",
+rationale: "Direct quotes help clarify what patient said, without adding opinion or emotion.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "In cultural communication, what is ethnocentrism?",
+options: {
+A: "Accepting all cultural practices",
+B: "Believing one's own culture is superior",
+C: "Using only medical terminology",
+D: "Ignoring language barriers"
+},
+correctAnswer: "B",
+rationale: "Ethnocentrism impedes unbiased, effective communication with diverse patients.",
+section: "Cultural Competence",
+type: "mc"
+},
+{
+questionText: "If you must speak with a patient who does not speak English, the best method is to:",
+options: {
+A: "Use gestures only",
+B: "Find a certified interpreter",
+C: "Speak louder",
+D: "Ask family to translate"
+},
+correctAnswer: "B",
+rationale: "Professional interpreters ensure accuracy and patient understanding.",
+section: "Special Populations",
+type: "mc"
+},
+{
+questionText: "Which element improves accuracy in electronic patient care reports (ePCR)?",
+options: {
+A: "Selective omission",
+B: "Mandatory data fields",
+C: "Unrestricted access",
+D: "Free narrative only"
+},
+correctAnswer: "B",
+rationale: "Mandatory fields ensure important data are not missed.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "Multiplex EMS radio systems allow for:",
+options: {
+A: "Voice only",
+B: "Simultaneous voice and data",
+C: "Only local communication",
+D: "Cell phone use"
+},
+correctAnswer: "B",
+rationale: "Multiplex radios send voice and patient data (ex: ECG) together.",
+section: "Communications Technology",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which situations require special incident reporting?",
+options: {
+A: "Suspected child abuse",
+B: "Suspected elder neglect",
+C: "Routine minor injury",
+D: "Animal bite"
+},
+correctAnswer: ["A", "B", "D"],
+rationale: "Mandated reporting includes abuse, neglect, and animal bites.",
+section: "Special Situations",
+type: "sata"
+},
+{
+questionText: "The handover report to hospital staff should be:",
+options: {
+A: "Brief and incomplete",
+B: "Complete and organized",
+C: "Omitted if patient is stable",
+D: "Only given if hospital asks"
+},
+correctAnswer: "B",
+rationale: "Transfer must include all relevant patient info for continuity.",
+section: "Transfer of Care",
+type: "mc"
+},
+{
+questionText: "In EMS legal documentation, medical necessity can be shown by documenting:",
+options: {
+A: "Reason for ambulance transport",
+B: "Patient's feelings",
+C: "Approximate time of events",
+D: "Insurance details"
+},
+correctAnswer: "A",
+rationale: "Justifying ambulance transport protects EMTs and ensures reimbursement.",
+section: "Medical Legal Documentation",
+type: "mc"
+},
+{
+questionText: "When might you use closed-loop communication?",
+options: {
+A: "Giving medication orders",
+B: "Discussing weather",
+C: "Casual chatter",
+D: "Patient refusal"
+},
+correctAnswer: "A",
+rationale: "Closed-loop (repeat-back) ensures orders are correctly understood.",
+section: "Communication Technique",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Documentation errors can be minimized by:",
+options: {
+A: "Reviewing PCR for completeness",
+B: "Documenting before shift ends",
+C: "Using vague statements",
+D: "Prompt correction of errors"
+},
+correctAnswer: ["A", "B", "D"],
+rationale: "Timely, detailed documentation prevents confusion and error.",
+section: "Documentation",
+type: "sata"
+},
+{
+questionText: "Why should EMS providers avoid medical jargon when communicating with patients?",
+options: {
+A: "It may increase patient anxiety",
+B: "It ensures family members know all terms",
+C: "It speeds up assessment",
+D: "It is required by protocol"
+},
+correctAnswer: "A",
+rationale: "Jargon confuses patients and makes communication less effective.",
+section: "Therapeutic Communication",
+type: "mc"
+},
+{
+questionText: "When requesting medical direction via radio, which is essential?",
+options: {
+A: "Patient's full name",
+B: "Treatment and key findings",
+C: "Social security number",
+D: "Insurance info"
+},
+correctAnswer: "B",
+rationale: "Never transmit patient identifiers; only give medical data required for care.",
+section: "Communication Protocol",
+type: "mc"
+},
+{
+questionText: "What should you do if a patient refuses transport but is potentially not competent to make the decision?",
+options: {
+A: "Document refusal and leave",
+B: "Transport anyway",
+C: "Contact medical direction for guidance",
+D: "Wait for law enforcement"
+},
+correctAnswer: "C",
+rationale: "When capacity is in doubt, consult medical control for medical/legal protection.",
+section: "Refusal of Care",
+type: "mc"
+},
+{
+questionText: "How should errors in ePCRs be corrected?",
+options: {
+A: "Re-submit with corrected info",
+B: "Delete the entire report",
+C: "Hide error from supervisors",
+D: "Ignore error if minor"
+},
+correctAnswer: "A",
+rationale: "Electronic reports are corrected by resubmission, maintaining accuracy.",
+section: "Documentation Errors",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which factors affect effective communication with geriatric patients?",
+options: {
+A: "Hearing loss",
+B: "Cognitive impairment",
+C: "Cultural differences",
+D: "Use of medical jargon"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Age, cognition, and cultural background are key barriers.",
+section: "Special Populations",
+type: "sata"
+},
+{
+questionText: "What is cultural imposition?",
+options: {
+A: "Accepting all patient beliefs",
+B: "Imposing one's beliefs on patients",
+C: "Using family for translation",
+D: "Ignoring cultural cues"
+},
+correctAnswer: "B",
+rationale: "Imposing your beliefs damages patient trust and care quality.",
+section: "Cultural Competence",
+type: "mc"
+},
+{
+questionText: "Which is appropriate to include in the PCR?",
+options: {
+A: "Objective observations",
+B: "Unverified rumors",
+C: "Assumptions about drug use",
+D: "Omitted details"
+},
+correctAnswer: "A",
+rationale: "PCR must be factual to be defensible in court.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "Which type of report should be filed for suspected domestic violence?",
+options: {
+A: "Routine PCR only",
+B: "PCR and special incident report",
+C: "No report needed",
+D: "Medical billing report"
+},
+correctAnswer: "B",
+rationale: "Domestic abuse requires both clinical and mandated legal documentation.",
+section: "Special Situations",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Communication barriers may occur due to:",
+options: {
+A: "Language differences",
+B: "Impairment from drugs or alcohol",
+C: "Environmental distractions",
+D: "EMT cultural competence"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Barriers arise from patient, provider, or environment; competence minimizes but does not create barriers.",
+section: "Communication Barriers",
+type: "sata"
+},
+{
+questionText: "What should be documented when a patient refuses care?",
+options: {
+A: "Advice given",
+B: "Patient's mental status",
+C: "Witness to refusal",
+D: "Previous addresses"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Documenting advice, capacity, and witness protects provider legally.",
+section: "Refusal of Care",
+type: "sata"
+},
+{
+questionText: "Which device allows simultaneous transmission of voice and ECG?",
+options: {
+A: "Simplex radio",
+B: "Multiplex radio",
+C: "Cell phone",
+D: "Walkie-talkie"
+},
+correctAnswer: "B",
+rationale: "Multiplex radios transmit both voice and patient data.",
+section: "Communications Technology",
+type: "mc"
+},
+{
+questionText: "How can EMTs maintain patient confidentiality?",
+options: {
+A: "Never share info outside the medical team",
+B: "Only use initials on PCR",
+C: "Disclose info to family",
+D: "Leave records unattended"
+},
+correctAnswer: "A",
+rationale: "Info may only be shared for treatment purposes.",
+section: "Legal Documentation",
+type: "mc"
+},
+{
+questionText: "When relaying information to hospital staff, EMTs should:",
+options: {
+A: "Include personal opinions",
+B: "Give concise, relevant details about condition and care",
+C: "Give unverified information",
+D: "Report all patient's previous visits"
+},
+correctAnswer: "B",
+rationale: "Only clinically relevant, factual info should be reported.",
+section: "Handover Communication",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Objective reporting in PCR includes:",
+options: {
+A: "Vital signs",
+B: "Observations made by EMT",
+C: "Patient statements in quotation marks",
+D: "EMT beliefs about diagnosis"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Objective data, observations, and direct statements qualify.",
+section: "Documentation",
+type: "sata"
+},
+{
+questionText: "If you suspect child abuse, you must:",
+options: {
+A: "Investigate yourself",
+B: "Report to proper authorities",
+C: "Ignore unless confirmed",
+D: "Document with vague terms"
+},
+correctAnswer: "B",
+rationale: "Mandated reporting is a legal and ethical obligation.",
+section: "Special Situations",
+type: "mc"
+},
+{
+questionText: "A clear handoff report should include:",
+options: {
+A: "Timeline and treatment summary",
+B: "Personal notes",
+C: "Unrelated history",
+D: "Confidential billing info"
+},
+correctAnswer: "A",
+rationale: "Handoff should summarize chief complaint, history, and care for continuity.",
+section: "Transfer of Care",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Reducing communication errors during radio transmission involves:",
+options: {
+A: "Speak slowly and clearly",
+B: "Use repeat-back (closed-loop)",
+C: "Transmit full name and address",
+D: "Only report clinical data"
+},
+correctAnswer: ["A", "B", "D"],
+rationale: "Clear, precise, clinical voice reporting prevents miscommunication.",
+section: "Communications Protocol",
+type: "sata"
+},
+{
+questionText: "What is key to EMT legal defense when documentation is questioned?",
+options: {
+A: "PCR is accurate and complete",
+B: "PCR is written by supervisors",
+C: "PCR includes jokes and personal comments",
+D: "PCR uses abbreviations only"
+},
+correctAnswer: "A",
+rationale: "Complete, timely, objective PCR is most defensible in court.",
+section: "Legal Documentation",
+type: "mc"
+},
+{
+questionText: "Who regulates confidentiality standards in EMS documentation?",
+options: {
+A: "EMT instructors",
+B: "HIPAA regulations",
+C: "Transport supervisors",
+D: "Hospital administration"
+},
+correctAnswer: "B",
+rationale: "HIPAA governs all patient confidentiality practices in healthcare.",
+section: "Legal Documentation",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Essential components of a verbal report include:",
+options: {
+A: "Chief complaint",
+B: "Vital signs",
+C: "Treatment given",
+D: "EMT's opinion on outcome"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Report chief complaint, vital signs, and treatments for effective handoff.",
+section: "Handover Communication",
+type: "sata"
+},
+{
+questionText: "If an EMT omits important information in the PCR, what are the potential consequences?",
+options: {
+A: "Loss of reimbursement",
+B: "Legal liability",
+C: "Medical errors by later providers",
+D: "All of the above"
+},
+correctAnswer: "D",
+rationale: "Errors from omissions can cause care, legal, and billing problems.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "Select all that apply: EMTs should avoid what in written documentation?",
+options: {
+A: "Abbreviations unless standard",
+B: "Subjective statements",
+C: "Unverified observations",
+D: "Timely completion"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Avoid nonstandard abbreviations, opinion, and rumors for professionalism.",
+section: "Documentation",
+type: "sata"
+},
+{
+questionText: "Which situation requires notification of law enforcement?",
+options: {
+A: "Suspected homicide",
+B: "Patient with a broken arm",
+C: "Minor cuts",
+D: "Routine chest pain"
+},
+correctAnswer: "A",
+rationale: "EMS must notify police for potential crime scenes.",
+section: "Special Situations",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Effective communication with pediatric patients involves:",
+options: {
+A: "Simple language",
+B: "Involve parents",
+C: "Use medical terms",
+D: "Avoid eye contact"
+},
+correctAnswer: ["A", "B"],
+rationale: "Simple, clear language and parents help child understanding/trust.",
+section: "Special Populations",
+type: "sata"
+},
+{
+questionText: "What does SOAP stand for in PCR documentation?",
+options: {
+A: "Subjective, Objective, Assessment, Plan",
+B: "Symptoms, Options, Assessment, Planning",
+C: "Safety, Operations, Assessment, Protocol",
+D: "None of the above"
+},
+correctAnswer: "A",
+rationale: "SOAP documents findings and care chronologically.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "Select all that apply: When signing a PCR, EMTs should:",
+options: {
+A: "Print and sign name",
+B: "Date and time report",
+C: "Include agency number",
+D: "Include personal phone"
+},
+correctAnswer: ["A", "B"],
+rationale: "Sign, print and date for legal validity.",
+section: "Documentation",
+type: "sata"
+},
+{
+questionText: "Which is an example of objective documentation?",
+options: {
+A: "Patient appeared drunk",
+B: "Patient stated 'I'm dizzy'",
+C: "EMT feels patient is exaggerating",
+D: "Patient was angry"
+},
+correctAnswer: "B",
+rationale: "Direct quotations represent factual statements.",
+section: "Documentation",
+type: "mc"
+},
+{
+questionText: "Select all that apply: EMTs must report which infectious diseases?",
+options: {
+A: "Tuberculosis",
+B: "HIV/AIDS",
+C: "Influenza",
+D: "Any communicable disease"
+},
+correctAnswer: ["A", "B", "D"],
+rationale: "Reportable diseases vary by jurisdiction but include TB, HIV/AIDs, and any highly communicable conditions.",
+section: "Special Situations",
+type: "sata"
+}
+
+];
+
+// --- 2. State Management ---
+const state = {
+questions: [], // Shuffled questions will be stored here
+currentQuestionIndex: 0,
+score: 0,
+userAnswers: [],
+quizStarted: false,
+currentSataSelection: new Set(),
+questionStartTime: null,
+initialSelection: null,
+};
+
+const quizContainer = document.getElementById('quiz-container');
+
+// --- 3. Core Logic Functions ---
+
+// Fisher-Yates (Knuth) Shuffle Algorithm
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function startQuiz() {
+state.quizStarted = true;
+state.currentQuestionIndex = 0;
+state.score = 0;
+state.userAnswers = [];
+state.currentSataSelection = new Set();
+state.questionStartTime = null;
+state.initialSelection = null;
+
+// SHUFFLE QUESTIONS HERE
+state.questions = shuffleArray([...rawQuestions]);
+
+render();
+}
+
+function checkAnswer(question, userSelection) {
+const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+// Check if every correct answer was selected AND nothing incorrect was selected
+const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+return isCorrect;
+}
+
+function submitAnswer() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+let userSelection = [];
+let finalSelectionForComparison = '';
+
+// --- 1. Get User Selection and Check Validity ---
+if (currentQuestion.type === 'mc') {
+const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+if (!checkedRadio) {
+showMessage("Please select one option before submitting.", 'warning');
+return;
+}
+userSelection = checkedRadio.value;
+finalSelectionForComparison = userSelection;
+} else if (currentQuestion.type === 'sata') {
+userSelection = Array.from(state.currentSataSelection).sort();
+if (userSelection.length === 0) {
+showMessage("Please select at least one option before submitting.", 'warning');
+return;
+}
+finalSelectionForComparison = userSelection.join(',');
+}
+
+// --- 2. Calculate Risk Metrics ---
+const timeSpentMs = Date.now() - state.questionStartTime;
+const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+// Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+let answerWasChanged = false;
+// Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+answerWasChanged = true;
+}
+
+// Time Risk Logic
+let timeRisk = 0;
+const fastThreshold = 10; // seconds: High risk for rushing
+const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+let timeRiskText = 'Normal Time (Risk +0)';
+
+if (timeSpentSeconds < fastThreshold) {
+timeRisk = 2;
+timeRiskText = 'Fast Answer (Risk +2)';
+} else if (timeSpentSeconds > slowThreshold) {
+timeRisk = 1;
+timeRiskText = 'Slow Answer (Risk +1)';
+}
+
+// Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+const changeRisk = answerWasChanged ? 3 : 0;
+const totalRiskScore = changeRisk + timeRisk;
+
+const isCorrect = checkAnswer(currentQuestion, userSelection);
+if (isCorrect) {
+state.score++;
+}
+
+// --- 3. Record the Answer and Metrics ---
+state.userAnswers.push({
+...currentQuestion,
+userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+isCorrect: isCorrect,
+timeSpent: timeSpentSeconds,
+answerWasChanged: answerWasChanged,
+riskScore: totalRiskScore,
+timeRiskText: timeRiskText,
+});
+
+// Show neutral message to trigger the visual delay/button disable without revealing correctness
+showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+// Move to the next question after a slight delay for user feedback
+setTimeout(() => {
+state.currentQuestionIndex++;
+state.currentSataSelection.clear(); // Reset SATA selection
+render();
+hideMessage();
+}, 1200);
+}
+
+// --- 4. Rendering Functions (Views) ---
+
+function render() {
+if (!state.quizStarted) {
+renderStartScreen();
+} else if (state.currentQuestionIndex < state.questions.length) {
+renderQuestion();
+} else {
+renderResults();
+}
+}
+
+function renderStartScreen() {
+quizContainer.innerHTML = `
+<div class="text-center py-10">
+<h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
+<p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${rawQuestions.length} randomized critical thinking questions covering **Acid-Base, GI (Cirrhosis/Pancreatitis), and Respiratory** care. You must answer each question to proceed, and there is no option to go back.</p>
+<p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+<button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+Start Exam Now
+</button>
+<p class="mt-6 text-sm text-red-500 font-medium">Warning: Questions are randomized and there is no backward navigation allowed once started.</p>
+</div>
+`;
+}
+
+function renderQuestion() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+const qNum = state.currentQuestionIndex + 1;
+const total = state.questions.length;
+const isSATA = currentQuestion.type === 'sata';
+
+// NEW: Risk Tracking Setup
+state.questionStartTime = Date.now();
+state.initialSelection = null;
+
+let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+const inputType = isSATA ? 'checkbox' : 'radio';
+const inputName = 'option';
+const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+return `
+<div class="mb-3">
+<input
+type="${inputType}"
+id="option-${key}"
+name="${inputName}"
+value="${key}"
+class="hidden peer"
+${isChecked ? 'checked' : ''}
+onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+/>
+<label
+for="option-${key}"
+class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+>
+<span class="font-bold text-primary-blue mr-3">${key}:</span>
+${text}
+</label>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="mb-6 border-b pb-4">
+<p class="text-sm font-semibold text-primary-blue mb-1">
+Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+</p>
+<h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+<p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+</div>
+
+<form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+<div class="options-container mb-8">
+${optionsHtml}
+</div>
+
+<div id="message-box" class="mb-4 hidden"></div>
+
+<div class="flex justify-end">
+<button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+Submit & Next
+</button>
+</div>
+</form>
+`;
+}
+
+function handleOptionChange(input, key, type) {
+let currentSelectionString;
+
+if (type === 'sata') {
+if (input.checked) {
+state.currentSataSelection.add(key);
+} else {
+state.currentSataSelection.delete(key);
+}
+// Use a sorted comma-separated string for reliable comparison
+currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+} else { // mc
+currentSelectionString = key;
+}
+
+// Capture initial selection only once on the first actual selection (non-empty)
+if (state.initialSelection === null && currentSelectionString !== '') {
+state.initialSelection = currentSelectionString;
+}
+}
+
+function renderResults() {
+const total = state.questions.length;
+const correctCount = state.score;
+const percentage = Math.round((correctCount / total) * 100);
+const isPassing = percentage >= 75; // Standard passing score
+
+const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+let resultsDetailHtml = state.userAnswers.map((item, index) => {
+const isCorrect = item.isCorrect;
+
+// NEW: Risk Highlighting Logic
+const isHighRiskIncorrect = !isCorrect && item.riskScore > 2;
+
+// Adjust result class based on high risk and incorrect status
+let resultClass = '';
+let riskText = '';
+if (isCorrect) {
+resultClass = 'bg-green-50 border-correct-green';
+} else if (isHighRiskIncorrect) {
+resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+} else {
+resultClass = 'bg-red-50 border-incorrect-red';
+}
+
+const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+return `
+<div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+<div class="flex justify-between items-start mb-3">
+<h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+<div class="flex items-center space-x-4">
+${resultIcon}
+${riskText}
+</div>
+</div>
+
+<!-- NEW: Risk Metrics Display -->
+<div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+<p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+<p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+<p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+<p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+</div>
+<!-- END NEW: Risk Metrics Display -->
+
+<p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+<p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+<div class="bg-white p-4 rounded-md border border-gray-200">
+<h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+<p class="text-gray-600 text-sm">${item.rationale}</p>
+</div>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="text-center py-8">
+<div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+${statusText}
+</div>
+<h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+<p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+<button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+Restart Exam
+</button>
+</div>
+
+<div class="mt-8 pt-6 border-t border-gray-200">
+<h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+<p class="text-sm text-gray-600 mb-6">Review questions flagged as <strong class="text-red-700">🚨 HIGH RISK INCORRECT</strong> first, as these indicate areas where you were both incorrect and uncertain/rushing.</p>
+${resultsDetailHtml}
+</div>
+`;
+}
+
+// --- 5. Utility Functions ---
+
+function showMessage(text, type) {
+const messageBox = document.getElementById('message-box');
+let bgColor, borderColor;
+
+if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+bgColor = 'bg-blue-100';
+borderColor = 'border-primary-blue';
+} else if (type === 'error') {
+bgColor = 'bg-incorrect-red/10';
+borderColor = 'border-incorrect-red';
+} else { // 'warning' for incomplete selection
+bgColor = 'bg-yellow-100';
+borderColor = 'border-yellow-400';
+}
+
+messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+messageBox.textContent = text;
+messageBox.style.display = 'block';
+
+// Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+if (type !== 'warning') {
+document.querySelector('button[type="submit"]').style.display = 'none';
+}
+}
+
+function hideMessage() {
+const messageBox = document.getElementById('message-box');
+messageBox.style.display = 'none';
+// Show the submit button again
+const submitButton = document.querySelector('button[type="submit"]');
+if(submitButton) submitButton.style.display = 'inline-flex';
+}
+
+
+// --- 6. Initialization ---
+window.onload = function() {
+render();
+};
+
+// Expose functions globally for HTML event handlers
+window.startQuiz = startQuiz;
+window.submitAnswer = submitAnswer;
+window.handleOptionChange = handleOptionChange;
+</script>
+</body>
+</html>
