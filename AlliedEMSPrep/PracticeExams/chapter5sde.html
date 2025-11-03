@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMT Chapter 5 SDE</title>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Configure Tailwind to use Inter font and custom colors -->
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+'primary-blue': '#1D4ED8',
+'secondary-gray': '#F3F4F6',
+'correct-green': '#10B981',
+'incorrect-red': '#EF4444',
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+}
+}
+}
+</script>
+<style>
+/* Custom styles for professional look */
+body {
+background-color: #f7f9fb;
+font-family: 'Inter', sans-serif;
+}
+.shadow-custom {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+/* Custom focus styles for accessibility and design */
+input:checked + label {
+border-color: #1D4ED8;
+background-color: #EFF6FF;
+}
+.option-label {
+transition: all 0.2s;
+cursor: pointer;
+}
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+<div id="app-container" class="max-w-4xl mx-auto">
+<!-- Header -->
+<header class="text-center mb-8">
+<h1 class="text-4xl font-extrabold text-primary-blue mb-2">Emergency Medical Technician CH5 SDE</h1>
+<p class="text-lg text-gray-600">Testing Understanding: Medical Terminology and clinical application</p>
+</header>
+
+<!-- Quiz Container -->
+<div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+<!-- Content will be injected here (Start Screen, Question, or Results) -->
+</div>
+
+<!-- Hidden Loading Spinner -->
+<div id="loading" class="hidden text-center mt-8">
+<svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+<p class="text-gray-500 mt-2">Processing...</p>
+</div>
+
+</div>
+
+<script>
+// --- 1. Question Data (New Set) ---
+const rawQuestions = [
+{
+questionText: "A trauma patient presents with 'bilateral radius fractures distal to the elbow.' Where are these fractures located?",
+options: {
+A: "Both forearms, farther down from the elbow",
+B: "Both upper arms near the shoulder",
+C: "One forearm and one thigh",
+D: "Both shins"
+},
+correctAnswer: "A",
+rationale: "'Bilateral' = both; 'radius' = forearm; 'distal to the elbow' = beyond, in forearm.",
+section: "Complex Anatomical Terminology",
+type: "mc"
+},
+{
+questionText: "Select all that apply: A PCR uses 'MS' as an abbreviation. What are the risks?",
+options: {
+A: "May be read as morphine sulfate",
+B: "May be read as multiple sclerosis",
+C: "Could be misinterpreted as magnesium sulfate",
+D: "Is universally safe"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "'MS' is ambiguous and error-prone; not universally safe.",
+section: "Abbreviation Safety",
+type: "sata"
+},
+{
+questionText: "The term 'paroxysmal supraventricular tachycardia' indicates an arrhythmia originating where?",
+options: {
+A: "Above the ventricles, typically in the atria",
+B: "In the ventricles",
+C: "At the sinoatrial node only",
+D: "In the Purkinje fibers"
+},
+correctAnswer: "A",
+rationale: "'Supraventricular' = above ventricles; 'paroxysmal' = sudden onset.",
+section: "ECG/Arrhythmias",
+type: "mc"
+},
+{
+questionText: "A patient with 'polyneuropathy' should be assessed for deficits where?",
+options: {
+A: "One specific nerve",
+B: "Multiple peripheral nerves",
+C: "The spinal cord only",
+D: "Cranial nerves only"
+},
+correctAnswer: "B",
+rationale: "'Poly-' = many, 'neuropathy' = nerve disorder.",
+section: "Nervous System Terms",
+type: "mc"
+},
+{
+questionText: "Which suffix indicates abnormal tissue formation?",
+options: {
+A: "-lysis",
+B: "-plasty",
+C: "-plasia",
+D: "-pathy"
+},
+correctAnswer: "C",
+rationale: "'-plasia' = abnormal growth or formation.",
+section: "Suffixes (Tissue Changes)",
+type: "mc"
+},
+{
+questionText: "A patient with pain in the 'hypogastric region' is experiencing discomfort where?",
+options: {
+A: "Upper right abdomen",
+B: "Below the navel, lower abdomen",
+C: "Upper left quadrant",
+D: "Epigastric region"
+},
+correctAnswer: "B",
+rationale: "'Hypogastric' is below the stomach, near pubic area.",
+section: "Abdominal Anatomy",
+type: "mc"
+},
+{
+questionText: "A trauma patient is described as 'diaphoretic, supine, tachycardic.' What should you expect?",
+options: {
+A: "Sweating, lying on back, rapid pulse",
+B: "Clammy, sitting upright, slow heart rate",
+C: "Pale, standing, regular pulse",
+D: "Shivering, prone, irregular rhythm"
+},
+correctAnswer: "A",
+rationale: "Diaphoretic = sweating, supine = back, tachycardic = fast pulse.",
+section: "Combined Clinical Terms",
+type: "mc"
+},
+{
+questionText: "Select all that apply: A PCR lists 'hypercapnia, tachypnea, and cyanosis.' What physiologic derangements may be present?",
+options: {
+A: "CO2 retention",
+B: "Impaired ventilation",
+C: "Hypoxia",
+D: "Respiratory alkalosis"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "All three indicate ventilatory failure, not alkalosis.",
+section: "Respiratory/Terminology Application",
+type: "sata"
+},
+{
+questionText: "What does 'polycythemia' signify?",
+options: {
+A: "Low white cell count",
+B: "Excess red blood cells",
+C: "Low platelet count",
+D: "Blood volume loss"
+},
+correctAnswer: "B",
+rationale: "'Poly-' = many; 'cyte' = cell; 'hemia' = blood.",
+section: "Word Roots/Pathology",
+type: "mc"
+},
+{
+questionText: "Which suffix covers the process of hardening body tissues?",
+options: {
+A: "-sclerosis",
+B: "-lysis",
+C: "-itis",
+D: "-oma"
+},
+correctAnswer: "A",
+rationale: "'-sclerosis' = hardening (e.g., arteriosclerosis).",
+section: "Suffix/Pathology",
+type: "mc"
+},
+{
+questionText: "Documentation of 'bradycardia' and 'hypoxia' implies which probable symptoms?",
+options: {
+A: "Slow pulse, blue skin, confusion",
+B: "Fast pulse, pale skin, alert",
+C: "Strong pulse, normal color, alert",
+D: "Slow pulse, pink skin, normal mentation"
+},
+correctAnswer: "A",
+rationale: "Low heart rate + poor O2 yields cyanosis and mental changes.",
+section: "Clinical Synthesis",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which prefixes predict a negative clinical outcome?",
+options: {
+A: "'A-' (without)",
+B: "'An-' (lack of)",
+C: "'Hypo-' (deficiency)",
+D: "'Epi-' (upon)"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "'A-', 'An-', and 'Hypo-' indicate absence/deficiency.",
+section: "Terminology Application",
+type: "sata"
+},
+{
+questionText: "The root 'myel-' in 'osteomyelitis' refers to which body structure?",
+options: {
+A: "Bone marrow",
+B: "Muscle",
+C: "Spinal cord",
+D: "Cartilage"
+},
+correctAnswer: "A",
+rationale: "'Myel-' = marrow.",
+section: "Complex Word Roots",
+type: "mc"
+},
+{
+questionText: "Why must a patient with suspected 'ischemic limb pain' be monitored closely?",
+options: {
+A: "Pain signals excessive blood flow",
+B: "Ischemia increases risk for tissue necrosis",
+C: "Pain is unimportant for perfusion",
+D: "Limb ischemia resolves without intervention"
+},
+correctAnswer: "B",
+rationale: "Ischemia = poor blood flow leading to necrosis.",
+section: "Term Synthesis/Reasoning",
+type: "mc"
+},
+{
+questionText: "A burn described as 'circumferential eschar' carries what risk?",
+options: {
+A: "Compartment syndrome and impaired circulation",
+B: "Simple first-degree burn",
+C: "Improved healing rate",
+D: "No clinical consequence"
+},
+correctAnswer: "A",
+rationale: "Circumferential eschar reduces circulation, can require emergent intervention.",
+section: "Clinical Terminology",
+type: "mc"
+},
+{
+questionText: "What does the medical abbreviation 'QID' mean—and why is it considered a documentation risk?",
+options: {
+A: "Four times daily; can be confused with QD",
+B: "Once per day; safe to use",
+C: "As needed; never misread",
+D: "No risk in EMS documentation"
+},
+correctAnswer: "A",
+rationale: "QID/QD are often mistaken, unsafe for clinical orders.",
+section: "Abbreviation Risk",
+type: "mc"
+},
+{
+questionText: "A patient found in 'prone position' with possible spinal injury requires which first step?",
+options: {
+A: "Immobilize in position",
+B: "Logroll carefully to supine",
+C: "Sit upright for assessment",
+D: "Move immediately to standing"
+},
+correctAnswer: "B",
+rationale: "Logroll to supine for spinal precautions.",
+section: "Patient Position/Application",
+type: "mc"
+},
+{
+questionText: "In scene handoff, reporting 'anterolateral thoracic contusion' indicates what location of trauma?",
+options: {
+A: "Front and side of chest",
+B: "Back of head",
+C: "Inner aspect of thigh",
+D: "Posterior chest wall"
+},
+correctAnswer: "A",
+rationale: "Antero- = front; lateral = side.",
+section: "Complex Location Synthesis",
+type: "mc"
+},
+{
+questionText: "A patient with both 'hepatomegaly' and 'splenomegaly' should be evaluated for which possible underlying causes?",
+options: {
+A: "Congestive heart failure, liver disease, infection",
+B: "Simple dehydration",
+C: "Appendicitis only",
+D: "Migraine headaches"
+},
+correctAnswer: "A",
+rationale: "Both enlargement of liver and spleen may occur with CHF, infection, or systemic illness.",
+section: "Organ Pathology Reasoning",
+type: "mc"
+},
+{
+questionText: "A laceration described as 'proximal to the wrist, transverse orientation' would be found where?",
+options: {
+A: "Near the elbow, running across the forearm",
+B: "On the palm",
+C: "Below the wrist toward the fingers",
+D: "On the upper arm near the shoulder"
+},
+correctAnswer: "A",
+rationale: "'Proximal' = closer to trunk; 'transverse' = runs crosswise.",
+section: "Complex Anatomy/Application",
+type: "mc"
+},
+{
+questionText: "Select all that apply: In a patient with 'tachycardia and arrhythmia,' which possible symptoms may be present?",
+options: {
+A: "Palpitations",
+B: "Dizziness",
+C: "Syncope",
+D: "Hypothermia"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Rapid, irregular heart rhythm can cause palpitations, dizziness, and fainting.",
+section: "Clinical Reasoning/Cardiac",
+type: "sata"
+},
+{
+questionText: "Using the term 'anterior cruciate ligament' (ACL), what is the anatomical location?",
+options: {
+A: "Front of the knee",
+B: "Back of the ankle",
+C: "Medial elbow",
+D: "Base of the spine"
+},
+correctAnswer: "A",
+rationale: "'Anterior' = front; 'cruciate ligament' = major ligament of knee joint.",
+section: "Anatomical Landmarks",
+type: "mc"
+},
+{
+questionText: "Which of the following is a likely complication if a patient develops 'pneumoperitoneum' after blunt abdominal trauma?",
+options: {
+A: "Free air in the abdomen due to bowel perforation",
+B: "Fluid in pleural space",
+C: "Liver swelling",
+D: "Gallstones"
+},
+correctAnswer: "A",
+rationale: "Pneumoperitoneum means air in abdomen, often from perforated organ.",
+section: "Pathology Terminology",
+type: "mc"
+},
+{
+questionText: "A 'Trendelenburg position' is used to treat what clinical condition?",
+options: {
+A: "Hypotension or shock",
+B: "Severe hypertension",
+C: "Nasal fractures",
+D: "Hyperthermia"
+},
+correctAnswer: "A",
+rationale: "Trendelenburg (feet up, head down) improves venous return during shock.",
+section: "Patient Position/Clinical Usage",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which conditions would be documented with the suffix '-itis'?",
+options: {
+A: "Appendicitis",
+B: "Bronchitis",
+C: "Hepatitis",
+D: "Arthritis"
+},
+correctAnswer: ["A", "B", "C", "D"],
+rationale: "All mean inflammation of specific organ/tissue.",
+section: "Suffix Application",
+type: "sata"
+},
+{
+questionText: "A chart describes 'abduction' of the right upper extremity. What does this mean?",
+options: {
+A: "Movement away from midline",
+B: "Movement toward midline",
+C: "Flexing the elbow",
+D: "Rotating the wrist"
+},
+correctAnswer: "A",
+rationale: "Abduction = away from midline.",
+section: "Movement Terminology",
+type: "mc"
+},
+{
+questionText: "Patient’s documentation includes 'cardiomegaly, hypotension.' What is most likely occurring?",
+options: {
+A: "Enlarged heart and low blood pressure; concern for cardiac failure",
+B: "Small heart and high blood pressure",
+C: "Normal heart size with hypertension",
+D: "Enlarged spleen with normal blood pressure"
+},
+correctAnswer: "A",
+rationale: "Megaly = enlargement, hypotension = low BP; suggests heart failure.",
+section: "Term Synthesis/Cardiac",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which directional terms mean 'toward the back'?",
+options: {
+A: "Posterior",
+B: "Dorsal",
+C: "Inferior",
+D: "Ventral"
+},
+correctAnswer: ["A", "B"],
+rationale: "Posterior and dorsal both mean toward the back of body.",
+section: "Directional Terminology",
+type: "sata"
+},
+{
+questionText: "In the term 'tachypnea,' what is the expected respiratory presentation?",
+options: {
+A: "Rapid, shallow breathing",
+B: "Slow, deep breathing",
+C: "Irregular choking",
+D: "Absent breathing"
+},
+correctAnswer: "A",
+rationale: "Tachy- = fast, -pnea = breathing.",
+section: "Respiratory Assessment",
+type: "mc"
+},
+{
+questionText: "A wound described as 'superficial abrasion, medial forearm' would be located:",
+options: {
+A: "On the skin, inner aspect of forearm",
+B: "Deep muscle tissue, outer forearm",
+C: "Skin layer, upper arm",
+D: "Bone surface, hand"
+},
+correctAnswer: "A",
+rationale: "'Superficial' = surface; 'medial' = inner side, near midline.",
+section: "Combined Location Terminology",
+type: "mc"
+},
+{
+questionText: "The root 'pulmon-' is used in which body system?",
+options: {
+A: "Respiratory (lungs)",
+B: "Digestive (stomach)",
+C: "Endocrine",
+D: "Musculoskeletal"
+},
+correctAnswer: "A",
+rationale: "'Pulmon-' always refers to lungs.",
+section: "Root/Systems",
+type: "mc"
+},
+{
+questionText: "Why is 'anuria' a critical finding in dehydration?",
+options: {
+A: "No urine output; possible renal failure",
+B: "Excessive urine loss",
+C: "Confusion only",
+D: "Fever"
+},
+correctAnswer: "A",
+rationale: "'An-' = without; '-uria' = urine.",
+section: "Clinical Findings Terminology",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which motion terms involve movement at a joint?",
+options: {
+A: "Flexion",
+B: "Extension",
+C: "Rotation",
+D: "Supination"
+},
+correctAnswer: ["A", "B", "C", "D"],
+rationale: "All listed are movements joints can perform.",
+section: "Joint/Bone Movement",
+type: "sata"
+},
+{
+questionText: "In trauma care, why is 'cyanosis' a concerning finding?",
+options: {
+A: "Indicates poor oxygenation/perfusion",
+B: "Reflects excessive sweating",
+C: "Normal in shock",
+D: "Only occurs with fever"
+},
+correctAnswer: "A",
+rationale: "Cyanosis = blue skin, poor oxygen supply.",
+section: "Clinical Application/Terminology",
+type: "mc"
+},
+{
+questionText: "'Ischemia' in a patient’s limb refers to what underlying physiological issue?",
+options: {
+A: "Reduced blood supply",
+B: "Infection",
+C: "Excess fluid accumulation",
+D: "Improved circulation"
+},
+correctAnswer: "A",
+rationale: "Ischemia = lack of blood flow.",
+section: "Clinical Reasoning",
+type: "mc"
+},
+{
+questionText: "Abnormal accumulation of fluid in the lungs is described as:",
+options: {
+A: "Pulmonary edema",
+B: "Pneumothorax",
+C: "Pleural effusion",
+D: "Ascites"
+},
+correctAnswer: "A",
+rationale: "'Edema' = fluid accumulation; 'pulmonary' = lungs.",
+section: "Pathology/Assessment",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which anatomical prefixes signal location?",
+options: {
+A: "epi- (upon)",
+B: "sub- (below)",
+C: "inter- (between)",
+D: "anti- (against)"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Anti- = against, not location.",
+section: "Prefix Application",
+type: "sata"
+},
+{
+questionText: "In pediatric assessment, what does 'febrile seizure' mean?",
+options: {
+A: "Seizure caused by fever",
+B: "Seizure caused by toxins",
+C: "Seizure with normal temperature",
+D: "Chronic epilepsy"
+},
+correctAnswer: "A",
+rationale: "Febrile = fever-caused.",
+section: "Combined Terms/Reasoning",
+type: "mc"
+},
+{
+questionText: "A wound described as 'inferior to the zygomatic arch' is located where?",
+options: {
+A: "Below the cheekbone",
+B: "Above the knee",
+C: "On the chin",
+D: "At the base of the skull"
+},
+correctAnswer: "A",
+rationale: "Zygomatic arch = cheekbone; inferior = below.",
+section: "Facial Anatomy Application",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which clinical terms, when documented, would indicate abnormal blood sugar levels?",
+options: {
+A: "Hyperglycemia",
+B: "Hypoglycemia",
+C: "Euglycemia",
+D: "Polycythemia"
+},
+correctAnswer: ["A", "B"],
+rationale: "'Hyperglycemia' = high blood sugar; 'hypoglycemia' = low. Euglycemia = normal; polycythemia = unrelated.",
+section: "Endocrinology/Chronic Disease",
+type: "sata"
+},
+{
+questionText: "'Osteoarthritis' describes which types of tissue involvement?",
+options: {
+A: "Bone and joint",
+B: "Muscle and tendon",
+C: "Skin and fat",
+D: "Nerve and cartilage"
+},
+correctAnswer: "A",
+rationale: "'Osteo-' = bone, 'arthr-' = joint, '-itis' = inflammation.",
+section: "Term Synthesis/Chronic Disease",
+type: "mc"
+},
+{
+questionText: "A wound described as 'transverse laceration, distal to patella' should be found at:",
+options: {
+A: "Crosswise cut below the kneecap",
+B: "Vertical cut above elbow",
+C: "Deep puncture to thigh",
+D: "Shallow scrape on finger"
+},
+correctAnswer: "A",
+rationale: "'Transverse' = crosswise, 'distal to patella' = below kneecap.",
+section: "Combined Directional Terms",
+type: "mc"
+},
+{
+questionText: "What is the clinical significance of the abbreviation SOB in documentation?",
+options: {
+A: "Shortness of breath",
+B: "Severe onset bleeding",
+C: "Shoulder or back pain",
+D: "None; not standard"
+},
+correctAnswer: "A",
+rationale: "SOB is widely used for 'shortness of breath'.",
+section: "Abbreviation Application/Respiratory",
+type: "mc"
+},
+{
+questionText: "A patient is found in 'Trendelenburg position'. What clinical condition is this used for?",
+options: {
+A: "Shock/hypotension",
+B: "Arthritis",
+C: "Fevers",
+D: "Migraines"
+},
+correctAnswer: "A",
+rationale: "Trendelenburg improves perfusion for shock.",
+section: "Patient Position/Clinical Use",
+type: "mc"
+},
+{
+questionText: "What does 'polycythemia' signify?",
+options: {
+A: "Elevated red blood cell count",
+B: "Low white cell count",
+C: "High blood sugar",
+D: "Severe dehydration"
+},
+correctAnswer: "A",
+rationale: "'Poly-' = many; 'cyte' = cell; 'hemia' = blood.",
+section: "Hematology/Term Synthesis",
+type: "mc"
+},
+{
+questionText: "Which movement terms describe actions at a synovial joint?",
+options: {
+A: "Flexion",
+B: "Extension",
+C: "Abduction",
+D: "Rotation"
+},
+correctAnswer: ["A", "B", "C", "D"],
+rationale: "All these actions may occur in synovial joints.",
+section: "Joint/Motion Terminology",
+type: "sata"
+},
+{
+questionText: "Documented finding of 'cyanosis' in trauma implies what pathology?",
+options: {
+A: "Poor oxygenation and perfusion",
+B: "Excessive bleeding",
+C: "Heat stroke",
+D: "Improved ventilation"
+},
+correctAnswer: "A",
+rationale: "Cyanosis = blue discoloration from hypoxia.",
+section: "Clinical Findings/Terminology",
+type: "mc"
+},
+{
+questionText: "'Hepatotoxicity' after chemical exposure means damage to which organ?",
+options: {
+A: "Liver",
+B: "Kidney",
+C: "Heart",
+D: "Brain"
+},
+correctAnswer: "A",
+rationale: "'Hepato-' = liver, '-toxicity' = damage.",
+section: "Toxicology/Term Synthesis",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which prefixes signal anatomical location?",
+options: {
+A: "epi-",
+B: "sub-",
+C: "inter-",
+D: "anti-"
+},
+correctAnswer: ["A", "B", "C"],
+rationale: "Epi- upon, sub- below, inter- between; anti- means against.",
+section: "Prefix Application/Anatomy",
+type: "sata"
+}
+];
+
+// --- 2. State Management ---
+const state = {
+questions: [], // Shuffled questions will be stored here
+currentQuestionIndex: 0,
+score: 0,
+userAnswers: [],
+quizStarted: false,
+currentSataSelection: new Set(),
+questionStartTime: null,
+initialSelection: null,
+};
+
+const quizContainer = document.getElementById('quiz-container');
+
+// --- 3. Core Logic Functions ---
+
+// Fisher-Yates (Knuth) Shuffle Algorithm
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function startQuiz() {
+state.quizStarted = true;
+state.currentQuestionIndex = 0;
+state.score = 0;
+state.userAnswers = [];
+state.currentSataSelection = new Set();
+state.questionStartTime = null;
+state.initialSelection = null;
+
+// SHUFFLE QUESTIONS HERE
+state.questions = shuffleArray([...rawQuestions]);
+
+render();
+}
+
+function checkAnswer(question, userSelection) {
+const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+// Check if every correct answer was selected AND nothing incorrect was selected
+const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+return isCorrect;
+}
+
+function submitAnswer() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+let userSelection = [];
+let finalSelectionForComparison = '';
+
+// --- 1. Get User Selection and Check Validity ---
+if (currentQuestion.type === 'mc') {
+const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+if (!checkedRadio) {
+showMessage("Please select one option before submitting.", 'warning');
+return;
+}
+userSelection = checkedRadio.value;
+finalSelectionForComparison = userSelection;
+} else if (currentQuestion.type === 'sata') {
+userSelection = Array.from(state.currentSataSelection).sort();
+if (userSelection.length === 0) {
+showMessage("Please select at least one option before submitting.", 'warning');
+return;
+}
+finalSelectionForComparison = userSelection.join(',');
+}
+
+// --- 2. Calculate Risk Metrics ---
+const timeSpentMs = Date.now() - state.questionStartTime;
+const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+// Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+let answerWasChanged = false;
+// Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+answerWasChanged = true;
+}
+
+// Time Risk Logic
+let timeRisk = 0;
+const fastThreshold = 10; // seconds: High risk for rushing
+const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+let timeRiskText = 'Normal Time (Risk +0)';
+
+if (timeSpentSeconds < fastThreshold) {
+timeRisk = 2;
+timeRiskText = 'Fast Answer (Risk +2)';
+} else if (timeSpentSeconds > slowThreshold) {
+timeRisk = 1;
+timeRiskText = 'Slow Answer (Risk +1)';
+}
+
+// Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+const changeRisk = answerWasChanged ? 3 : 0;
+const totalRiskScore = changeRisk + timeRisk;
+
+const isCorrect = checkAnswer(currentQuestion, userSelection);
+if (isCorrect) {
+state.score++;
+}
+
+// --- 3. Record the Answer and Metrics ---
+state.userAnswers.push({
+...currentQuestion,
+userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+isCorrect: isCorrect,
+timeSpent: timeSpentSeconds,
+answerWasChanged: answerWasChanged,
+riskScore: totalRiskScore,
+timeRiskText: timeRiskText,
+});
+
+// Show neutral message to trigger the visual delay/button disable without revealing correctness
+showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+// Move to the next question after a slight delay for user feedback
+setTimeout(() => {
+state.currentQuestionIndex++;
+state.currentSataSelection.clear(); // Reset SATA selection
+render();
+hideMessage();
+}, 1200);
+}
+
+// --- 4. Rendering Functions (Views) ---
+
+function render() {
+if (!state.quizStarted) {
+renderStartScreen();
+} else if (state.currentQuestionIndex < state.questions.length) {
+renderQuestion();
+} else {
+renderResults();
+}
+}
+
+function renderStartScreen() {
+quizContainer.innerHTML = `
+<div class="text-center py-10">
+<h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
+<p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${rawQuestions.length} randomized critical thinking questions covering **Acid-Base, GI (Cirrhosis/Pancreatitis), and Respiratory** care. You must answer each question to proceed, and there is no option to go back.</p>
+<p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+<button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+Start Exam Now
+</button>
+<p class="mt-6 text-sm text-red-500 font-medium">Warning: Questions are randomized and there is no backward navigation allowed once started.</p>
+</div>
+`;
+}
+
+function renderQuestion() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+const qNum = state.currentQuestionIndex + 1;
+const total = state.questions.length;
+const isSATA = currentQuestion.type === 'sata';
+
+// NEW: Risk Tracking Setup
+state.questionStartTime = Date.now();
+state.initialSelection = null;
+
+let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+const inputType = isSATA ? 'checkbox' : 'radio';
+const inputName = 'option';
+const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+return `
+<div class="mb-3">
+<input
+type="${inputType}"
+id="option-${key}"
+name="${inputName}"
+value="${key}"
+class="hidden peer"
+${isChecked ? 'checked' : ''}
+onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+/>
+<label
+for="option-${key}"
+class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+>
+<span class="font-bold text-primary-blue mr-3">${key}:</span>
+${text}
+</label>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="mb-6 border-b pb-4">
+<p class="text-sm font-semibold text-primary-blue mb-1">
+Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+</p>
+<h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+<p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+</div>
+
+<form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+<div class="options-container mb-8">
+${optionsHtml}
+</div>
+
+<div id="message-box" class="mb-4 hidden"></div>
+
+<div class="flex justify-end">
+<button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+Submit & Next
+</button>
+</div>
+</form>
+`;
+}
+
+function handleOptionChange(input, key, type) {
+let currentSelectionString;
+
+if (type === 'sata') {
+if (input.checked) {
+state.currentSataSelection.add(key);
+} else {
+state.currentSataSelection.delete(key);
+}
+// Use a sorted comma-separated string for reliable comparison
+currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+} else { // mc
+currentSelectionString = key;
+}
+
+// Capture initial selection only once on the first actual selection (non-empty)
+if (state.initialSelection === null && currentSelectionString !== '') {
+state.initialSelection = currentSelectionString;
+}
+}
+
+function renderResults() {
+const total = state.questions.length;
+const correctCount = state.score;
+const percentage = Math.round((correctCount / total) * 100);
+const isPassing = percentage >= 75; // Standard passing score
+
+const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+let resultsDetailHtml = state.userAnswers.map((item, index) => {
+const isCorrect = item.isCorrect;
+
+// NEW: Risk Highlighting Logic
+const isHighRiskIncorrect = !isCorrect && item.riskScore > 2;
+
+// Adjust result class based on high risk and incorrect status
+let resultClass = '';
+let riskText = '';
+if (isCorrect) {
+resultClass = 'bg-green-50 border-correct-green';
+} else if (isHighRiskIncorrect) {
+resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+} else {
+resultClass = 'bg-red-50 border-incorrect-red';
+}
+
+const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+return `
+<div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+<div class="flex justify-between items-start mb-3">
+<h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+<div class="flex items-center space-x-4">
+${resultIcon}
+${riskText}
+</div>
+</div>
+
+<!-- NEW: Risk Metrics Display -->
+<div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+<p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+<p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+<p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+<p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+</div>
+<!-- END NEW: Risk Metrics Display -->
+
+<p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+<p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+<div class="bg-white p-4 rounded-md border border-gray-200">
+<h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+<p class="text-gray-600 text-sm">${item.rationale}</p>
+</div>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="text-center py-8">
+<div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+${statusText}
+</div>
+<h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+<p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+<button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+Restart Exam
+</button>
+</div>
+
+<div class="mt-8 pt-6 border-t border-gray-200">
+<h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+<p class="text-sm text-gray-600 mb-6">Review questions flagged as <strong class="text-red-700">🚨 HIGH RISK INCORRECT</strong> first, as these indicate areas where you were both incorrect and uncertain/rushing.</p>
+${resultsDetailHtml}
+</div>
+`;
+}
+
+// --- 5. Utility Functions ---
+
+function showMessage(text, type) {
+const messageBox = document.getElementById('message-box');
+let bgColor, borderColor;
+
+if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+bgColor = 'bg-blue-100';
+borderColor = 'border-primary-blue';
+} else if (type === 'error') {
+bgColor = 'bg-incorrect-red/10';
+borderColor = 'border-incorrect-red';
+} else { // 'warning' for incomplete selection
+bgColor = 'bg-yellow-100';
+borderColor = 'border-yellow-400';
+}
+
+messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+messageBox.textContent = text;
+messageBox.style.display = 'block';
+
+// Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+if (type !== 'warning') {
+document.querySelector('button[type="submit"]').style.display = 'none';
+}
+}
+
+function hideMessage() {
+const messageBox = document.getElementById('message-box');
+messageBox.style.display = 'none';
+// Show the submit button again
+const submitButton = document.querySelector('button[type="submit"]');
+if(submitButton) submitButton.style.display = 'inline-flex';
+}
+
+
+// --- 6. Initialization ---
+window.onload = function() {
+render();
+};
+
+// Expose functions globally for HTML event handlers
+window.startQuiz = startQuiz;
+window.submitAnswer = submitAnswer;
+window.handleOptionChange = handleOptionChange;
+</script>
+</body>
+</html>
