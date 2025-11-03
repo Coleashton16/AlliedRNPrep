@@ -733,8 +733,11 @@ state.currentSataSelection = new Set();
 state.questionStartTime = null;
 state.initialSelection = null;
 
-// SHUFFLE QUESTIONS HERE
-state.questions = shuffleArray([...rawQuestions]);
+// NEW LOGIC: Shuffle and select 25 random questions
+const desiredCount = 25;
+const shuffledQuestions = shuffleArray([...rawQuestions]);
+// Slice the first 'desiredCount' (25) questions. If rawQuestions is shorter, it takes all of them.
+state.questions = shuffledQuestions.slice(0, desiredCount);
 
 render();
 }
@@ -843,10 +846,13 @@ renderResults();
 }
 
 function renderStartScreen() {
+// Determine the number of questions that will be used for the current session
+const questionCount = Math.min(25, rawQuestions.length);
+
 quizContainer.innerHTML = `
 <div class="text-center py-10">
-<h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
-<p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${rawQuestions.length} randomized critical thinking questions covering **Acid-Base, GI (Cirrhosis/Pancreatitis), and Respiratory** care. You must answer each question to proceed, and there is no option to go back.</p>
+<h2 class="text-3xl font-bold text-gray-800 mb-4">EMT Chapter 4 Diagnostic Exam</h2>
+<p class="text-gray-600 mb-8 max-w-md mx-auto">This diagnostic exam will randomly select **${questionCount} critical questions** from the question bank on **EMT Chapter 4: Health Privacy / Law and Communication**. The selection changes every time you start, providing a unique diagnostic experience.</p>
 <p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
 <button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
 Start Exam Now
