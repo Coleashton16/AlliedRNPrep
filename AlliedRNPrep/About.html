@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - AlliedRNPrep</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS for animations and blob effect */
+        @keyframes fadeInFromBottom {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInFromBottom 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-sans antialiased text-gray-800">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-lg py-4 relative z-20">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-extrabold text-blue-700 rounded-lg p-2 hover:bg-blue-50 transition duration-300 transform hover:scale-105">
+                AlliedRNPrep
+            </a>
+            <nav>
+                <ul class="flex items-center space-x-8">
+                    <li><a href="index.html" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
+                    <li><a href="about.html" class="text-blue-600 bg-blue-50 font-semibold transition duration-300 rounded-md px-4 py-2">About Us</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Contact</a></li>
+                    <li id="auth-nav-link">
+                         <a href="index.html" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-bold transform hover:scale-105">Login</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- About Us Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-20 md:py-28 overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-in-up">
+                Our Story
+            </h1>
+            <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-95 animate-fade-in-up animation-delay-300">
+                Born from a student's perspective, AlliedRNPrep is dedicated to making the path through nursing school clearer and more manageable for everyone.
+            </p>
+        </div>
+    </section>
+
+    <!-- Our Mission Section -->
+    <section class="py-20 md:py-28 bg-white">
+        <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div class="animate-fade-in-up">
+                <h2 class="text-4xl md:text-5xl font-bold text-blue-800 mb-6">Our Mission</h2>
+                <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                    AlliedRNPrep was founded on a simple yet powerful idea: to provide nursing students with the supplementary resources they actually need, curated from the perspective of someone who has walked the same path. We understand the challenges, the late-night study sessions, and the complexities of the curriculum.
+                </p>
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    Our mission is to bridge the gap between textbook knowledge and practical application, offering clear, concise, and relevant study aids that support your core education and build your confidence for exams, clinicals, and the NCLEX.
+                </p>
+            </div>
+            <div class="animate-fade-in-up animation-delay-300">
+                <img src="https://placehold.co/600x400/3b82f6/ffffff?text=Our+Team" alt="A diverse group of nursing students collaborating" class="rounded-2xl shadow-xl w-full">
+            </div>
+        </div>
+    </section>
+
+    <!-- Meet the Founder Section -->
+    <section class="bg-gray-50 py-20 md:py-28">
+        <div class="container mx-auto px-4 text-center max-w-4xl">
+            <img src="profileimage.png" alt="Founder of AlliedRNPrep, Cole Ashton" class="mx-auto rounded-full mb-6 shadow-lg w-[150px] h-[150px] object-cover">
+            <h2 class="text-4xl md:text-5xl font-bold text-blue-800 mb-4 animate-fade-in-up">
+                Meet the Founder
+            </h2>
+            <div class="text-lg leading-relaxed text-gray-700 space-y-4 animate-fade-in-up animation-delay-300 text-left">
+                <p>
+                    My name is <strong>Cole Ashton</strong>, and I am the founder of AlliedRNPrep. As a dedicated nursing student, I experienced firsthand the challenges of balancing rigorous coursework with the financial strain of accessing quality study resources. Frustrated by the high costs and limited availability of comprehensive study tools, I was motivated to create a solution that would benefit myself and fellow nursing students.
+                </p>
+                <p>
+                    With a passion for education and a commitment to student success, I developed AlliedRNPrep to provide high-quality, targeted supplemental study materials tailored specifically for nursing students. My goal is to bridge the gap between expensive, often inaccessible resources and the need for reliable, effective study aids that promote mastery of essential nursing concepts.
+                </p>
+                <p>
+                    At AlliedRNPrep, I strive to deliver content that is accurate, practical, and easy to understand, helping students to confidently prepare for exams and clinical assessments. I believe that every nursing student deserves access to affordable and comprehensive resources to support their academic journey and future professional endeavors.
+                </p>
+                <p>
+                    Thank you for visiting AlliedRNPrep. I am dedicated to supporting your success and look forward to being a part of your path toward becoming a skilled and compassionate nurse.
+                </p>
+            </div>
+             <p class="text-gray-800 font-semibold mt-8 animate-fade-in-up animation-delay-500">- Cole Ashton, Founder of AlliedRNPrep</p>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="bg-blue-700 text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Enhance Your Nursing Studies?</h2>
+            <p class="text-lg md:text-xl mb-10 opacity-90">Join other nursing students who use AlliedRNPrep for their academic support.</p>
+            <a href="index.html" class="bg-white text-blue-700 px-8 py-4 rounded-full text-lg font-bold shadow-xl hover:bg-gray-100 transform hover:scale-105 transition duration-300 ease-in-out">
+                Explore Resources
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-900 text-gray-300 py-10">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <p class="text-sm mb-4 md:mb-0">&copy; <script>document.write(new Date().getFullYear())</script> AlliedRNPrep. All rights reserved.</p>
+            <div class="flex justify-center space-x-8">
+                <a href="#" class="hover:text-white text-sm transition duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-white text-sm transition duration-300">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

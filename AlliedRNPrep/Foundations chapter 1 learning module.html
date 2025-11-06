@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursing Foundations: Your First Steps</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration to use the Inter font.
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                    },
+                },
+            },
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- React and Library Setup ---
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // --- Mock Authentication Setup for Standalone Demo ---
+        // In a real application, you'd replace this with actual authentication (e.g., Firebase Auth).
+        const mockAuth = {
+            onAuthStateChanged: (callback) => {
+                // Simulates a user being logged in after a short delay
+                setTimeout(() => callback({ uid: 'nursing-student-user' }), 100);
+                return () => {}; // Cleanup function
+            },
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'nursing-student-user' } }),
+        };
+
+        // --- Content & Data Structure for the Learning Modules ---
+        // This object holds all the learning content, structured into modules and steps.
+        const contentData = {
+            'what-is-nursing': {
+                title: 'What is Nursing? Your New Profession!',
+                color: 'from-sky-500 to-cyan-400',
+                description: 'Discover what nursing truly means, its core values, and the many hats nurses wear every day.',
+                steps: [
+                    { id: 'nursing-definition', title: 'Defining Nursing: More Than Just a Job', type: 'text', content: `Nursing is a unique and rewarding profession focused on caring for people throughout their lives. It combines the <span class="font-bold">art of caring</span> with <span class="font-bold">scientific knowledge and skills</span>.
+                        <br><br>Here's how some major nursing organizations define it:
+                        <ul>
+                            <li><span class="font-bold">Florence Nightingale (1860):</span> The founder of modern nursing, she believed nursing's role was to "put the patient in the best condition for nature to act upon him." Simple, yet profound!</li>
+                            <li><span class="font-bold">American Nurses Association (ANA) (2021):</span> Nursing is about protecting, promoting, and optimizing health; preventing illness and injury; helping people heal; and easing suffering. It involves diagnosing and treating human responses to health problems, and advocating for individuals, families, groups, and communities.</li>
+                            <li><span class="font-bold">International Council of Nurses (ICN) (2021):</span> Nursing includes independent and team-based care for people of all ages, whether sick or well, in all settings. It covers promoting health, preventing illness, and caring for the ill, disabled, and dying. Nurses also advocate, promote a safe environment, do research, help shape health policy, and manage patient care.</li>
+                        </ul>
+                        Nursing is a <span class="font-bold">holistic</span> profession, meaning it looks at the whole person – their physical, mental, emotional, spiritual, and social well-being. This is different from medicine, which often focuses on a specific illness or diagnosis. Nurses use their broad education to promote overall wellness and health maintenance, always involving the patient and their family, and working with the whole healthcare team.` },
+                    { id: 'roles-of-nurse', title: 'Your Many Roles as a Nurse', type: 'text', content: `Nurses wear many hats! Each day, you'll find yourself performing various roles to provide the best care. These roles all aim to promote health, prevent illness, and ease suffering.
+                        <br><br>Key roles include:
+                        <ul>
+                            <li><span class="font-bold">Care Provider:</span> Your primary job! You'll use critical thinking to decide what to do, hands-on skills to perform tasks, communication skills to talk with patients and families, and ethical/legal understanding to stay within your professional boundaries. You'll use the <span class="font-bold">nursing process</span> (assess, diagnose, plan, implement, evaluate) to guide your care.</li>
+                            <li><span class="font-bold">Educator:</span> You'll teach patients about their medications, procedures, and how to stay healthy. This is super important for <span class="font-bold">discharge planning</span> so patients can care for themselves at home. You need to make sure information is easy to understand (this is called <span class="font-bold">health literacy</span>).</li>
+                            <li><span class="font-bold">Advocate:</span> You speak up for your patients! You'll help them understand information, respect their decisions (even if different from your own), and communicate their wishes to other healthcare providers. This is especially important when patients can't speak for themselves.</li>
+                            <li><span class="font-bold">Leader:</span> You'll guide and inspire others, working towards common goals in patient care. This involves good communication, problem-solving, and motivating your team.</li>
+                            <li><span class="font-bold">Change Agent:</span> Nurses can bring about positive changes! This might mean helping patients change unhealthy habits, or working with your team or even lawmakers to improve healthcare.</li>
+                            <li><span class="font-bold">Manager:</span> You'll organize and coordinate all the care and treatments for your patients, making sure everything runs smoothly and efficiently. You might even manage a whole unit!</li>
+                            <li><span class="font-bold">Researcher:</span> Even if you don't do formal research, nurses use <span class="font-bold">evidence-based practice (EBP)</span>. This means using the best available research evidence, along with your clinical judgment and patient preferences, to make decisions about care. You'll constantly be looking for the best ways to do things!</li>
+                            <li><span class="font-bold">Collaborator:</span> You'll work closely with doctors, LPNs, nursing assistants (UAP), social workers, therapists, and other healthcare team members to provide high-quality care. Teamwork is essential!</li>
+                            <li><span class="font-bold">Delegator:</span> You'll learn to assign certain tasks to other qualified healthcare personnel, like UAP or LPNs. But remember, you (the RN) are always ultimately responsible for supervising the care and ensuring it's done safely and correctly.</li>
+                        </ul>
+                        All these roles are connected and help you provide comprehensive care every day.` },
+                    { id: 'what-is-nursing-quiz', title: 'Quiz: What is Nursing?', type: 'quiz',
+                        questions: [
+                            { question: "Which nursing role involves interpreting information for patients and respecting their decisions, even if they differ from your own?", options: ["Educator", "Leader", "Advocate", "Manager"], correctAnswer: "Advocate" },
+                            { question: "What is the primary process nurses use to assess patient data, plan care, implement interventions, and evaluate outcomes?", options: ["Medical Diagnosis", "Nursing Process", "Treatment Protocol", "Health Assessment"], correctAnswer: "Nursing Process" },
+                            { question: "When a nurse uses the best available research evidence combined with their clinical judgment and patient values, they are practicing:", options: ["Traditional Nursing", "Intuitive Care", "Evidence-Based Practice (EBP)", "Autonomous Practice"], correctAnswer: "Evidence-Based Practice (EBP)" }
+                        ]
+                    }
+                ]
+            },
+            'nursing-history': {
+                title: 'Nursing\'s Journey: A Look Back in Time',
+                color: 'from-green-500 to-lime-400',
+                description: 'Explore the fascinating history of nursing and the key figures who shaped it.',
+                steps: [
+                    { id: 'pioneers-of-nursing', title: 'Pioneers Who Shaped Nursing', type: 'text', content: `Nursing has a rich history, evolving from religious and military services in the Middle Ages. Here are some of the most influential figures:
+                        <ul>
+                            <li><span class="font-bold">Florence Nightingale (1860):</span> The "Lady with the Lamp" and founder of modern nursing. She improved sanitation during the Crimean War, drastically reducing death rates. She established nursing as a respected profession for women, separate from medicine, and emphasized education for nurses.
+                                <br><em>(Image: Florence Nightingale)</em></li>
+                            <li><span class="font-bold">Dorothea Dix (Civil War):</span> Head of the U.S. Sanitary Commission, a precursor to the Army Nurse Corps.</li>
+                            <li><span class="font-bold">Clara Barton (Civil War):</span> Practiced nursing during the Civil War and founded the American Red Cross.
+                                <br><em>(Image: Clara Barton)</em></li>
+                            <li><span class="font-bold">Linda Richards (1873):</span> America's first professionally trained nurse.</li>
+                            <li><span class="font-bold">Lenah Higbee (1918):</span> Superintendent of the U.S. Navy Nurse Corps, awarded the Navy Cross.
+                                <br><em>(Image: Lenah Higbee)</em></li>
+                        </ul>
+                        After World War II, advancements in science and technology led to specialized critical care units and a greater need for highly skilled nurses. Health promotion also became a bigger focus, leading to the development of roles like Nurse Practitioners (NPs).` },
+                    { id: 'nursing-history-quiz', title: 'Quiz: Nursing History', type: 'quiz',
+                        questions: [
+                            { question: "Who is considered the founder of modern nursing and emphasized sanitation and education?", options: ["Clara Barton", "Dorothea Dix", "Florence Nightingale", "Linda Richards"], correctAnswer: "Florence Nightingale" },
+                            { question: "Which nurse founded the American Red Cross?", options: ["Florence Nightingale", "Clara Barton", "Lenah Higbee", "Dorothea Dix"], correctAnswer: "Clara Barton" }
+                        ]
+                    }
+                ]
+            },
+            'nursing-theories': {
+                title: 'Theories: Your Compass in Nursing Practice',
+                color: 'from-purple-500 to-pink-500',
+                description: 'Understand the foundational nursing theories and other important theories that guide how nurses think and act.',
+                steps: [
+                    { id: 'understanding-theories', title: 'Understanding Nursing Theories: The Basics', type: 'text', content: `Nursing isn't just about doing; it's about thinking and understanding! <span class="font-bold">Nursing theories</span> help establish nursing as a scientific field (a <span class="font-bold">discipline</span>) by providing a framework for our practice.
+                        <br><br>Here are some key terms:
+                        <ul>
+                            <li><span class="font-bold">Metaparadigm:</span> The big picture concepts of nursing. It always includes: <span class="font-bold">human beings (person)</span>, <span class="font-bold">environment</span>, <span class="font-bold">health</span>, and <span class="font-bold">nursing</span>.</li>
+                            <li><span class="font-bold">Philosophy:</span> A statement about the beliefs and values of nursing. It guides how we think about health and care.</li>
+                            <li><span class="font-bold">Conceptual Framework/Model:</span> A collection of related ideas that gives direction for nursing practice, research, and education. It helps us approach the nursing process in a logical way.</li>
+                            <li><span class="font-bold">Nursing Theory:</span> A group of ideas that can be tested in practice. Theories can be:
+                                <ul>
+                                    <li><span class="font-bold">Grand Theory:</span> A very broad and abstract framework for nursing practice.</li>
+                                    <li><span class="font-bold">Middle-Range Theory:</span> More specific and focused on a particular condition or group of people. These directly guide your day-to-day practice!</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        Nursing theories help us ask new questions and constantly improve patient care.` },
+                    { id: 'key-nursing-theorists', title: 'Key Nursing Theorists You\'ll Meet', type: 'text', content: `Many brilliant nurses have developed theories to help us understand our profession better. Here are a few you'll hear about:
+                        <ul>
+                            <li><span class="font-bold">Florence Nightingale (Environmental Theory):</span> Focused on how the environment (clean air, water, hygiene, light, comfort) affects a patient's health and recovery.</li>
+                            <li><span class="font-bold">Hildegard Peplau (Theory of Interpersonal Relations):</span> Emphasized the relationship between the nurse and patient, and how they work together through different phases to achieve health goals.</li>
+                            <li><span class="font-bold">Virginia Henderson (Humane and Holistic Care):</span> Defined nursing as assisting individuals to gain independence in activities contributing to health. Her 14 basic needs are based on Maslow's hierarchy.</li>
+                            <li><span class="font-bold">Dorothea Orem (Self-Care Deficit Theory):</span> Believed nursing helps patients meet their own self-care needs when they can't do it themselves. The goal is to increase patient independence.</li>
+                            <li><span class="font-bold">Jean Watson (Human Caring Theory):</span> Focused on the importance of caring in nursing, emphasizing dignity, wholeness, and healing through a compassionate nurse-patient relationship.</li>
+                        </ul>
+                        Each theory gives us a different lens through which to view nursing and patient care.` },
+                    { id: 'non-nursing-theories', title: 'Important Non-Nursing Theories', type: 'text', content: `Nursing also draws knowledge from other fields. These "non-nursing" theories help us understand patients and healthcare better:
+                        <ul>
+                            <li><span class="font-bold">Maslow’s Hierarchy of Needs:</span> A pyramid showing human needs, from basic physiological needs (food, water, oxygen) at the bottom, up to safety, love, self-esteem, and finally <span class="font-bold">self-actualization</span> (reaching your full potential). Nurses use this to prioritize patient care.
+                                <br><em>(Image: Maslow's Hierarchy of Needs)</em></li>
+                            <li><span class="font-bold">Erikson’s Psychosocial Theory:</span> Explains how individuals develop and learn about their world through different life stages. Nurses use this to understand patients' developmental needs.</li>
+                            <li><span class="font-bold">Lewin’s Change Theory:</span> Describes change as a three-step process:
+                                <ol>
+                                    <li><span class="font-bold">Unfreezing:</span> Getting ready for change, overcoming old habits.</li>
+                                    <li><span class="font-bold">Moving (Change):</span> The actual transition period where new things are tried.</li>
+                                    <li><span class="font-bold">Refreezing:</span> The new way of doing things becomes the norm.</li>
+                                </ol>
+                                Nurses use this when trying to implement new practices or help patients change behaviors.</li>
+                            <li><span class="font-bold">Paul’s Critical Thinking Theory:</span> Defines critical thinking as a disciplined process of analyzing, applying, and evaluating information to guide actions. Nurses use this to make sound clinical judgments.</li>
+                            <li><span class="font-bold">Rosenstock’s Health Belief Model:</span> Helps nurses understand why patients might or might not follow health advice. It looks at a person's perception of:
+                                <ul>
+                                    <li>Their risk of getting a condition.</li>
+                                    <li>How serious the condition is.</li>
+                                    <li>Barriers that might stop them from adopting healthy behaviors.</li>
+                                    <li>Benefits of adopting healthy behaviors.</li>
+                                </ul>
+                                This is super useful for patient education!
+                                <br><em>(Image: Rosenstock's Health Belief Model)</em></li>
+                        </ul>` },
+                    { id: 'nursing-theories-quiz', title: 'Quiz: Theories in Practice', type: 'quiz',
+                        questions: [
+                            { question: "Which theory emphasizes the importance of basic needs like oxygen, food, and rest before higher-level needs?", options: ["Erikson’s Psychosocial Theory", "Lewin’s Change Theory", "Maslow’s Hierarchy of Needs", "Rosenstock’s Health Belief Model"], correctAnswer: "Maslow’s Hierarchy of Needs" },
+                            { question: "According to Lewin's Change Theory, what is the first step in the process of change?", options: ["Moving", "Refreezing", "Unfreezing", "Evaluating"], correctAnswer: "Unfreezing" },
+                            { question: "The four main concepts of nursing's metaparadigm are:", options: ["Doctor, Hospital, Illness, Treatment", "Person, Environment, Health, Nursing", "Medication, Diagnosis, Surgery, Recovery", "Family, Community, Policy, Research"], correctAnswer: "Person, Environment, Health, Nursing" }
+                        ]
+                    }
+                ]
+            },
+            'professional-nurse': {
+                title: 'Becoming a Professional Nurse: Standards & Ethics',
+                color: 'from-blue-400 to-indigo-600',
+                description: 'Understand what makes nursing a true profession, the rules that guide your practice, and your journey from student to expert.',
+                steps: [
+                    { id: 'criteria-of-profession', title: 'What Makes Nursing a Profession?', type: 'text', content: `Nursing is definitely a <span class="font-bold">profession</span>! This means it's an occupation requiring specialized knowledge and training. Here are the key characteristics that define nursing as a profession:
+                        <ul>
+                            <li><span class="font-bold">Altruism:</span> Nurses are motivated by public service and helping others, not just personal gain. It's truly a calling!</li>
+                            <li><span class="font-bold">Body of Knowledge and Research:</span> Nursing has its own unique set of theoretical knowledge, skills, and values, constantly growing through research. This is why <span class="font-bold">Evidence-Based Practice (EBP)</span> is so important!</li>
+                            <li><span class="font-bold">Accountability:</span> Nurses are responsible for their actions and omissions. This means taking ownership of your care, good or bad, and is crucial for patient safety and trust.</li>
+                            <li><span class="font-bold">Higher Education:</span> Nursing requires specific education, usually from colleges or universities. This foundation allows for lifelong learning and advanced roles.</li>
+                            <li><span class="font-bold">Autonomy:</span> Nurses have the ability to make independent decisions within their scope of practice and are responsible for the outcomes. You'll learn to think critically and act independently!</li>
+                            <li><span class="font-bold">Code of Ethics:</span> These are the moral principles that guide a nurse's behavior and decisions. Organizations like the ANA and ICN have clear codes of ethics to ensure ethical practice.</li>
+                            <li><span class="font-bold">Professional Organization:</span> Nurses have professional organizations (like the ANA) that support high standards, advocate for the profession, and provide resources.</li>
+                            <li><span class="font-bold">Licensure:</span> To practice nursing, you must pass a standardized exam (like the NCLEX-RN) and obtain a legal license. This ensures you meet minimum safety and competency requirements.</li>
+                            <li><span class="font-bold">Diversity:</span> Nursing respects human rights and provides care that is respectful of all individuals, regardless of age, color, culture, gender, or social status. <span class="font-bold">Cultural competence</span> is key to providing care that respects patients' beliefs and needs.</li>
+                        </ul>` },
+                    { id: 'practice-guidelines', title: 'Your Practice Guidelines: Standards and Laws', type: 'text', content: `As a nurse, your practice is guided by clear rules and laws to ensure safe and quality care.
+                        <br><br>
+                        <span class="font-bold">Standards of Professional Nursing Practice (ANA):</span> These are like your rulebook for excellent care, with two main parts:
+                        <ul>
+                            <li><span class="font-bold">Standards of Practice:</span> These describe the steps of the <span class="font-bold">nursing process</span> you'll follow:
+                                <ul>
+                                    <li><span class="font-bold">Assessment:</span> Gathering information about the patient.</li>
+                                    <li><span class="font-bold">Diagnosis:</span> Identifying patient problems.</li>
+                                    <li><span class="font-bold">Outcomes Identification:</span> Setting goals for the patient.</li>
+                                    <li><span class="font-bold">Planning:</span> Creating a care plan.</li>
+                                    <li><span class="font-bold">Implementation:</span> Carrying out the plan.</li>
+                                    <li><span class="font-bold">Evaluation:</span> Checking if the plan worked and updating it.</li>
+                                </ul>
+                            </li>
+                            <li><span class="font-bold">Standards of Professional Performance:</span> These describe how you should act as a professional, covering things like ethics, communication, collaboration, leadership, education, and quality improvement.</li>
+                        </ul>
+                        <span class="font-bold">Nurse Practice Acts:</span> These are <span class="font-bold">state laws</span> that define the <span class="font-bold">legal boundaries (scope of practice)</span> of nursing in each state. You must know your state's Nurse Practice Act to practice safely and legally. They also set criteria for licensure.
+                        <br><br>
+                        <span class="font-bold">Ethical Behaviors:</span> Beyond laws, your practice is guided by ethics. Key ethical concepts include:
+                        <ul>
+                            <li><span class="font-bold">Accountability:</span> Taking responsibility for your actions.</li>
+                            <li><span class="font-bold">Advocacy:</span> Speaking up for your patient.</li>
+                            <li><span class="font-bold">Autonomy:</span> Making independent decisions within your role.</li>
+                            <li><span class="font-bold">Beneficence:</span> Acting in the patient's best interest.</li>
+                            <li><span class="font-bold">Confidentiality:</span> Protecting patient information.</li>
+                            <li><span class="font-bold">Fidelity:</span> Keeping promises.</li>
+                            <li><span class="font-bold">Justice:</span> Treating others fairly and equally.</li>
+                            <li><span class="font-bold">Nonmaleficence:</span> Doing no harm.</li>
+                            <li><span class="font-bold">Veracity:</span> Being truthful.</li>
+                        </ul>
+                        These concepts help you make good decisions in your daily practice.` },
+                    { id: 'socialization-transformation', title: 'Your Nursing Journey: Socialization & Transformation', type: 'text', content: `Becoming a nurse isn't just about learning facts; it's about a deep personal and professional change called <span class="font-bold">socialization</span> and <span class="font-bold">transformation</span>.
+                        <br><br>
+                        <span class="font-bold">Socialization</span> is the process of learning the theory, skills, attitudes, and values needed to become a nurse. It starts in nursing school and continues throughout your career.
+                        <br><br>
+                        <span class="font-bold">Transformation</span> is about developing the ability to truly understand complex patient situations and prioritize what's most important.
+                        <br><br>
+                        <span class="font-bold">Benner's Novice to Expert Model:</span> This model describes how nurses gain proficiency:
+                        <ul>
+                            <li><span class="font-bold">Novice:</span> A beginner, like a new nursing student, who follows rules rigidly.</li>
+                            <li><span class="font-bold">Advanced Beginner:</span> Can start to see patterns but still needs guidance. You'll reach this level by the end of nursing school.</li>
+                            <li><span class="font-bold">Competent:</span> After about 2-3 years of experience, you can organize and prioritize care effectively.</li>
+                            <li><span class="font-bold">Proficient:</span> You see situations as a whole and can anticipate outcomes.</li>
+                            <li><span class="font-bold">Expert:</span> You have an intuitive grasp of situations and can perform fluidly.</li>
+                        </ul>
+                        <br><em>(Image: Benner's Novice to Expert Model)</em>
+                        <br><br>
+                        Nursing education programs (like those accredited by AACN and NLN) have <span class="font-bold">core competencies</span> that guide your learning, ensuring you develop the necessary skills and professional identity at each stage of your education.` },
+                    { id: 'professional-nurse-quiz', title: 'Quiz: Professional Nursing', type: 'quiz',
+                        questions: [
+                            { question: "Which characteristic of a profession involves accepting responsibility for your actions and omissions?", options: ["Autonomy", "Altruism", "Accountability", "Licensure"], correctAnswer: "Accountability" },
+                            { question: "State laws that define the legal boundaries of nursing practice are called:", options: ["ANA Standards of Practice", "Code of Ethics", "Nurse Practice Acts", "Professional Guidelines"], correctAnswer: "Nurse Practice Acts" },
+                            { question: "According to Benner's Novice to Expert Model, what level of proficiency does a new nursing student typically start at?", options: ["Competent", "Advanced Beginner", "Novice", "Proficient"], correctAnswer: "Novice" },
+                            { question: "When a nurse protects a patient's personal information, they are upholding which ethical concept?", options: ["Beneficence", "Veracity", "Confidentiality", "Justice"], correctAnswer: "Confidentiality" }
+                        ]
+                    }
+                ]
+            },
+            'nursing-career-paths': {
+                title: 'Your Nursing Career: Paths and Possibilities',
+                color: 'from-blue-600 to-indigo-800',
+                description: 'Explore the different educational paths, advanced roles, certifications, and professional organizations available to nurses.',
+                steps: [
+                    { id: 'educational-paths', title: 'Educational Paths: From LPN to Doctorate', type: 'text', content: `Nursing offers many educational routes to fit your goals!
+                        <br><br>
+                        <ul>
+                            <li><span class="font-bold">Licensed Practical Nurse (LPN) / Licensed Vocational Nurse (LVN):</span>
+                                <ul>
+                                    <li>Typically 12-18 month programs.</li>
+                                    <li>Must pass the NCLEX-PN exam.</li>
+                                    <li>Work under the supervision of an RN. Can collect data, but generally don't perform full assessments requiring decision-making or initiate care plans. They can often administer medications (with some exceptions like certain IV meds, depending on the state).</li>
+                                </ul>
+                            </li>
+                            <li><span class="font-bold">Registered Nurse (RN):</span> To become an RN, you must graduate from an accredited nursing school and pass the NCLEX-RN exam.
+                                <ul>
+                                    <li><span class="font-bold">Associate Degree in Nursing (ADN):</span> Usually 2-year programs, often in community colleges. Focus on core nursing concepts.</li>
+                                    <li><span class="font-bold">Diploma Programs:</span> Hospital-based, typically 3-year programs combining classroom and clinical learning. These are less common now.</li>
+                                    <li><span class="font-bold">Bachelor of Science in Nursing (BSN):</span> University-based, 4-year programs. Provide a broader foundation in nursing theory, sciences, humanities, and research. Often required for management or specialized roles.</li>
+                                </ul>
+                            </li>
+                            <li><span class="font-bold">Master of Science in Nursing (MSN):</span> Allows for advanced practice specialization.
+                                <ul>
+                                    <li><span class="font-bold">Advanced Practice Registered Nurse (APRN):</span> RNs with a minimum of a master's degree and advanced clinical requirements. They provide direct patient care in expanded roles.
+                                        <ul>
+                                            <li><span class="font-bold">Certified Nurse Midwife (CNM):</span> Provides gynecologic and low-risk obstetric care, attends births.</li>
+                                            <li><span class="font-bold">Nurse Practitioner (NP):</span> Provides primary and preventive care, can diagnose, treat, and often prescribe medications independently. Can specialize (e.g., pediatrics, gerontology).</li>
+                                            <li><span class="font-bold">Clinical Nurse Specialist (CNS):</span> Works in hospitals, clinics, etc., managing health problems, often in consultation, research, or education.</li>
+                                            <li><span class="font-bold">Certified Registered Nurse Anesthetist (CRNA):</span> Administers anesthesia. This is one of the oldest advanced nursing specialties.</li>
+                                        </ul>
+                                    </li>
+                                    <li><span class="font-bold">Other Advanced Roles:</span> Clinical Nurse Leader (CNL), Nurse Educator, Nurse Researcher, Nurse Administrator, Nurse Informatics Specialist. These roles may not always involve direct patient care.</li>
+                                </ul>
+                            </li>
+                            <li><span class="font-bold">Doctoral Degrees (PhD & DNP):</span>
+                                <ul>
+                                    <li><span class="font-bold">Doctor of Philosophy (PhD):</span> Focuses on research, teaching, and administration to advance nursing science.</li>
+                                    <li><span class="font-bold">Doctor of Nursing Practice (DNP):</span> A practice-focused doctorate for advanced clinical roles, leadership, or education.</li>
+                                </ul>
+                            </li>
+                        </ul>` },
+                    { id: 'certifications-organizations', title: 'Certifications & Professional Organizations', type: 'text', content: `Beyond your initial license, there are ways to specialize and grow in nursing!
+                        <br><br>
+                        <span class="font-bold">Certifications:</span>
+                        <ul>
+                            <li>While <span class="font-bold">licensure</span> (passing NCLEX) shows you meet minimum safe practice, <span class="font-bold">certification</span> shows excellence in a specific area of nursing.</li>
+                            <li>You can get certified in specialties like critical care, emergency nursing, oncology, and many more.</li>
+                            <li>Each certification has specific work experience, education, and exam requirements, and you need to maintain them with continuing education.</li>
+                            <li>The American Nurses Credentialing Center (ANCC) is a major body that awards certifications and recognizes hospitals for nursing excellence (Magnet Recognition).</li>
+                        </ul>
+                        <span class="font-bold">Professional Organizations:</span>
+                        <ul>
+                            <li>Joining a professional organization is a great way to stay current, network, and have a voice in the profession.</li>
+                            <li>Examples include:
+                                <ul>
+                                    <li><span class="font-bold">American Nurses Association (ANA):</span> The main professional organization for all RNs.</li>
+                                    <li><span class="font-bold">National League for Nursing (NLN):</span> Focuses on nursing education.</li>
+                                    <li><span class="font-bold">International Council of Nurses (ICN):</span> A global organization for nurses.</li>
+                                    <li><span class="font-bold">Sigma Theta Tau International Honor Society of Nursing:</span> An honor society for nursing students and nurses.</li>
+                                    <li><span class="font-bold">National Student Nurses’ Association (NSNA):</span> Great for nursing students to get involved early!</li>
+                                </ul>
+                            </li>
+                            <li>There are also over 80 <span class="font-bold">specialty organizations</span> for specific areas like critical care, emergency, school nursing, and oncology.</li>
+                        </ul>` },
+                    { id: 'career-paths-quiz', title: 'Quiz: Your Nursing Career', type: 'quiz',
+                        questions: [
+                            { question: "Which nursing credential typically involves a 12-18 month program and practices under the supervision of an RN?", options: ["BSN", "APRN", "LPN/LVN", "DNP"], correctAnswer: "LPN/LVN" },
+                            { question: "What does certification in nursing primarily demonstrate?", options: ["Minimum safe practice", "Excellence in a specialty", "Legal right to practice", "Ability to prescribe medication"], correctAnswer: "Excellence in a specialty" },
+                            { question: "Which advanced practice registered nurse (APRN) role often provides primary and preventive health care services and can prescribe medication independently?", options: ["Certified Nurse Midwife (CNM)", "Clinical Nurse Specialist (CNS)", "Certified Registered Nurse Anesthetist (CRNA)", "Nurse Practitioner (NP)"], correctAnswer: "Nurse Practitioner (NP)" },
+                            { question: "Which organization is the main professional organization for all Registered Nurses in the United States?", options: ["National League for Nursing (NLN)", "International Council of Nurses (ICN)", "American Nurses Association (ANA)", "National Student Nurses’ Association (NSNA)"], correctAnswer: "American Nurses Association (ANA)" }
+                        ]
+                    }
+                ]
+            },
+            'future-of-nursing': {
+                title: 'The Future of Nursing: Challenges & Innovations',
+                color: 'from-orange-500 to-red-400',
+                description: 'Look ahead at the evolving landscape of nursing, including workforce needs and patient safety initiatives.',
+                steps: [
+                    { id: 'aging-population-shortage', title: 'Global Aging & the Nursing Shortage', type: 'text', content: `The world is changing, and so is healthcare!
+                        <br><br>
+                        <span class="font-bold">Aging Population:</span> People are living longer and healthier lives! By 2050, it's projected that 1 in 6 people globally will be over age 65 (up from 1 in 11 in 2019). This means a much larger elderly population needing care.
+                        <br><em>(Image: The growing population of older adults)</em>
+                        <br><br>
+                        <span class="font-bold">The Nursing Shortage:</span> This growing elderly population, combined with an aging nursing workforce (nurses retiring), is creating a significant <span class="font-bold">nursing shortage</span>.
+                        <ul>
+                            <li>The World Health Organization (WHO) estimates a global shortage of over 4 million healthcare workers, with an additional 18 million needed worldwide.</li>
+                            <li>In the U.S., the nursing shortage is projected to be around <span class="font-bold">569,240 by 2030</span>.</li>
+                            <li>Nursing schools are struggling to accept more students due to a lack of faculty and clinical sites.</li>
+                        </ul>
+                        This shortage means more stress for nurses and can impact patient care. The <span class="font-bold">Enhanced Nurse Licensure Compact (eNLC)</span> helps by allowing nurses in over 35 states to have a multi-state license, making it easier to work where nurses are most needed, including telehealth across state lines.` },
+                    { id: 'quality-safety-initiatives', title: 'Quality & Safety: Keeping Patients Safe', type: 'text', content: `Patient safety is a top priority in healthcare! Several initiatives guide nurses in providing safe and high-quality care:
+                        <br><br>
+                        <span class="font-bold">Quality and Safety Education for Nurses (QSEN):</span> This program identified six core competencies for all nurses:
+                        <ul>
+                            <li><span class="font-bold">Patient-Centered Care:</span> Focusing on the patient's preferences, values, and needs.</li>
+                            <li><span class="font-bold">Teamwork and Collaboration:</span> Working effectively with other healthcare professionals.</li>
+                            <li><span class="font-bold">Evidence-Based Practice (EBP):</span> Using the best research to guide care.</li>
+                            <li><span class="font-bold">Quality Improvement:</span> Continuously looking for ways to improve processes and outcomes.</li>
+                            <li><span class="font-bold">Safety:</span> Minimizing risks and preventing harm.</li>
+                            <li><span class="font-bold">Informatics:</span> Using technology and information effectively.</li>
+                        </ul>
+                        <span class="font-bold">National Patient Safety Goals (The Joint Commission - TJC):</span> TJC is an organization that accredits healthcare facilities. Since 2003, they've set annual goals to improve patient safety in hospitals. Examples include:
+                        <ul>
+                            <li>Improving patient identification (e.g., using two identifiers).</li>
+                            <li>Improving communication among caregivers.</li>
+                            <li>Improving medication safety.</li>
+                            <li>Reducing healthcare-associated infections.</li>
+                        </ul>
+                        These goals are constantly reviewed and updated as new safety concerns arise.` },
+                    { id: 'future-nursing-report', title: 'The Future of Nursing: Charting Health Equity', type: 'text', content: `A major report, "The Future of Nursing 2020–2030: Charting a Path to Achieve Health Equity," outlines key directions for nursing in the U.S.:
+                        <ul>
+                            <li><span class="font-bold">Addressing Health Challenges:</span> Nurses will be key in tackling issues like an aging population, unequal access to care, mental health problems, structural racism, high maternal mortality and morbidity, and health disparities among different groups.</li>
+                            <li><span class="font-bold">Building a Diverse Workforce:</span> Ensuring the nursing workforce reflects the diverse patient population to provide culturally competent and fair care.</li>
+                            <li><span class="font-bold">Removing Barriers:</span> Allowing nurses to practice to the full extent of their education and training, removing outdated restrictions.</li>
+                            <li><span class="font-bold">Crisis Preparedness:</span> Creating systems that allow nurses to quickly go where they're needed during emergencies or disasters.</li>
+                            <li><span class="font-bold">Health Equity in Education:</span> Integrating the concept of fairness in health into all nursing education.</li>
+                            <li><span class="font-bold">Preventive & Person-Centered Care:</span> Shifting focus towards preventing illness and tailoring care to each individual.</li>
+                            <li><span class="font-bold">Nurse Well-being:</span> Emphasizing self-care and well-being for nurses themselves.</li>
+                        </ul>
+                        This report provides a roadmap for nurses to lead in creating a healthier, more equitable future.` },
+                    { id: 'future-of-nursing-quiz', title: 'Quiz: The Future of Nursing', type: 'quiz',
+                        questions: [
+                            { question: "Which initiative identified six core competencies for nurses, including patient-centered care, teamwork, and safety?", options: ["ANA Standards of Practice", "National Patient Safety Goals", "QSEN", "Nurse Practice Acts"], correctAnswer: "QSEN" },
+                            { question: "A major factor contributing to the nursing shortage is:", options: ["Decreasing elderly population", "Too many nursing school graduates", "An aging nursing workforce", "Increased job satisfaction"], correctAnswer: "An aging nursing workforce" },
+                            { question: "The 'Future of Nursing 2020–2030' report emphasizes which key concept?", options: ["Increased administrative roles", "Charting a path to achieve health equity", "Focus on acute care only", "Reducing nursing education requirements"], correctAnswer: "Charting a path to achieve health equity" }
+                        ]
+                    }
+                ]
+            },
+            'chapter-review': {
+                title: 'Chapter Review & Critical Thinking',
+                color: 'from-gray-700 to-gray-900',
+                description: 'Integrate your knowledge and practice critical thinking with a case study and NCLEX-style review questions.',
+                steps: [
+                    { id: 'critical-thinking-case-study', title: 'Critical Thinking Case Study: John the RN', type: 'case_study', case: {
+                        scenario: `John, a registered nurse (RN), arrives for work on the day shift on an acute care medical unit and receives a patient assignment for the shift. The assignment includes care of five medical patients. After receiving the night shift report, John makes rounds on the five patients, assesses each patient, lists patient problems, sets patient goals, and plans care for all five patients for the day. During the shift, John administers intravenous (IV) medications, ensures that oral medications are administered by the licensed practical nurse (LPN), instructs the unlicensed assistive personnel (UAP) to bathe two of the patients who need assistance, assists a patient with ambulation, provides discharge education on a new medication, evaluates and updates the plan of care for each patient, and notifies the primary care providers (PCPs) of critically abnormal blood work results for two patients.
+                        <br><br>One patient’s friend comes to visit and stops John in the hallway to ask detailed questions about the patient’s condition. John states that patient information is protected and cannot be shared without the consent of the patient.
+                        <br><br>At a recent continuing education conference, John learned about new research concerning administering intramuscular (IM) medication in the deltoid muscle. Current evidence shows that aspirating the syringe after the needle is inserted into the muscle before administering the medication is no longer recommended. He remembers this new information while preparing to give a patient an IM immunization before discharge.
+                        <br><br>John believes that self-care maintains wholeness. He meets patients’ self-care needs by helping, guiding, teaching, supporting, or providing the environment to promote self-care abilities.`,
+                        question: `Let's analyze John's actions and relate them to what you've learned in this chapter. Think about these questions, and then click "Reveal Explanation" to see the answers.
+                        <br><br>
+                        1. Which roles of the nurse are exhibited by John, and when are they displayed?
+                        <br>
+                        2. Which nursing theorist do John’s beliefs about self-care parallel?
+                        <br>
+                        3. Which of the ANA Standards of Professional Nursing Practice is John exhibiting during the shift?
+                        <br>
+                        4. Which ethical concepts is John exhibiting during the shift?`,
+                        options: ["Click 'Reveal Explanation' to discuss these questions."], // Placeholder for the button
+                        correctAnswer: ["This is a discussion-based case study, not multiple choice."], // Placeholder to satisfy structure
+                        explanation: `This is a multi-part, open-ended case study designed for critical thinking and discussion. Here are the rationales for each question based on Chapter 1 content:
+                        <br><br>
+                        <span class="font-bold">1. Which roles of the nurse are exhibited by John, and when are they displayed?</span>
+                        <br>
+                        <ul>
+                            <li><span class="font-bold">Care Provider:</span> When he assesses each patient, lists problems, sets goals, plans care, administers medications, assists with ambulation, and evaluates/updates the plan of care. This is his primary role.</li>
+                            <li><span class="font-bold">Manager:</span> When he plans care for all five patients, ensures oral meds are given by the LPN, and coordinates activities like bathing by the UAP. He's managing patient care activities.</li>
+                            <li><span class="font-bold">Delegator:</span> When he instructs the UAP to bathe patients and ensures the LPN administers oral medications. He's entrusting tasks to other personnel.</li>
+                            <li><span class="font-bold">Educator:</span> When he provides discharge education on a new medication.</li>
+                            <li><span class="font-bold">Collaborator:</span> When he notifies PCPs of abnormal blood work results and works with the LPN and UAP. He's working with other team members towards a common goal.</li>
+                            <li><span class="font-bold">Researcher (via EBP):</span> When he remembers new research about IM medication administration and applies it to practice. This shows he's incorporating <span class="font-bold">Evidence-Based Practice (EBP)</span>.</li>
+                        </ul>
+                        <br>
+                        <span class="font-bold">2. Which nursing theorist do John’s beliefs about self-care parallel?</span>
+                        <br>
+                        John's belief that "self-care maintains wholeness" and that he "meets patients’ self-care needs by helping, guiding, teaching, supporting, or providing the environment to promote self-care abilities" directly parallels <span class="font-bold">Dorothea Orem's Self-Care Deficit Theory of Nursing</span>. Orem's theory focuses on helping patients meet their self-care needs and increasing their independence.
+                        <br><br>
+                        <span class="font-bold">3. Which of the ANA Standards of Professional Nursing Practice is John exhibiting during the shift?</span>
+                        <br>
+                        John is exhibiting several <span class="font-bold">ANA Standards of Practice</span> (related to the nursing process) and <span class="font-bold">Standards of Professional Performance</span>:
+                        <ul>
+                            <li><span class="font-bold">Assessment:</span> When he "assesses each patient."</li>
+                            <li><span class="font-bold">Diagnosis (or problem identification):</span> When he "lists patient problems."</li>
+                            <li><span class="font-bold">Outcomes Identification (or goal setting):</span> When he "sets patient goals."</li>
+                            <li><span class="font-bold">Planning:</span> When he "plans care for all five patients."</li>
+                            <li><span class="font-bold">Implementation:</span> When he "administers intravenous (IV) medications," "assists a patient with ambulation," and "provides discharge education."</li>
+                            <li><span class="font-bold">Evaluation:</span> When he "evaluates and updates the plan of care for each patient."</li>
+                            <li><span class="font-bold">Collaboration:</span> When he works with the LPN, UAP, and PCPs.</li>
+                            <li><span class="font-bold">Education:</span> When he provides discharge education.</li>
+                            <li><span class="font-bold">Quality of Practice (related to EBP):</span> When he applies new research about IM injections.</li>
+                        </ul>
+                        <br>
+                        <span class="font-bold">4. Which ethical concepts is John exhibiting during the shift?</span>
+                        <br>
+                        <ul>
+                            <li><span class="font-bold">Confidentiality:</span> When he tells the patient's friend that "patient information is protected and cannot be shared without the consent of the patient." This is a direct application of patient privacy and confidentiality.</li>
+                            <li><span class="font-bold">Accountability:</span> While not explicitly stated as an error, his continuous assessment, planning, and communication imply accountability for patient care. If he were to make an error, reporting it would be a clear sign of accountability.</li>
+                            <li><span class="font-bold">Beneficence:</span> His overall actions of providing care, administering medications, educating, and collaborating are all aimed at acting in the best interest of the patient.</li>
+                            <li><span class="font-bold">Nonmaleficence:</span> By applying the latest research (EBP) regarding IM injections, he is ensuring he does no harm by following the most current, safest practice.</li>
+                        </ul>`
+                    }},
+                    { id: 'nclex-review-quiz', title: 'NCLEX-Style Review Questions', type: 'quiz',
+                        questions: [
+                            { question: "A nurse supports a patient’s decision to decline more cancer treatment and to be cared for by a hospice team, even though the nurse personally thinks the patient should seek more treatment. The nurse is practicing which nursing role?", options: ["Advocacy", "Change agent", "Leader", "Collaborator"], correctAnswer: "Advocacy" },
+                            { question: "A profession has specific characteristics. In regard to how nursing meets these characteristics, which criteria are consistent and standardized processes? (Select all that apply.)", options: ["Code of ethics", "Licensing", "Body of knowledge", "Educational preparation", "Altruism"], correctAnswer: ["Code of ethics", "Licensing", "Body of knowledge", "Educational preparation", "Altruism"] },
+                            { question: "What specific aspect of a profession does the development of theories provide?", options: ["Altruism", "Body of knowledge", "Autonomy", "Accountability"], correctAnswer: "Body of knowledge" },
+                            { question: "Health care workers are discussing a diverse group of patients respectfully and are being responsive to the health beliefs and practices of these patients. What important aspect of nursing professional practice are they exhibiting?", options: ["Autonomy", "Accountability", "Cultural competence", "Autocratic leadership"], correctAnswer: "Cultural competence" },
+                            { question: "A nurse makes a medication error, immediately assesses the patient, and reports the error to the nurse manager and the primary care provider (PCP). Which characteristic of a professional is the nurse demonstrating?", options: ["Autonomy", "Collaboration", "Accountability", "Altruism"], correctAnswer: "Accountability" },
+                            { question: "Which are included in the ANA Standards of Professional Nursing Practice? (Select all that apply.)", options: ["Standards of professional performance", "Code of ethics", "Standards of practice", "Legal scope of practice", "Licensure requirements"], correctAnswer: ["Standards of professional performance", "Standards of practice"] },
+                            { question: "Which core competency of advanced practice registered nurse (APRN) is a nurse educator exhibiting when counseling a student nurse on the unit in therapeutic communication techniques?", options: ["Leadership", "Ethical decision-making", "Direct clinical practice", "Expert coaching"], correctAnswer: "Expert coaching" },
+                            { question: "Which statements describe a component discussed in nursing theories? (Select all that apply.)", options: ["Optimal functioning of the patient", "Interaction with components of the environment", "The conceptual makeup of the administration of the hospital", "The illness and health concept", "Safety aspect of medication administration"], correctAnswer: ["Optimal functioning of the patient", "Interaction with components of the environment", "The illness and health concept"] },
+                            { question: "Which factors affect the nursing shortage? (Select all that apply.)", options: ["Aging faculty", "Increasing elderly population", "Job satisfaction due to adequate number of nurses", "Aging nursing workforce", "Greater autonomy for nurses"], correctAnswer: ["Aging faculty", "Increasing elderly population", "Aging nursing workforce"] },
+                            { question: "A nurse has performed a physical examination of the patient and reviewed the laboratory results and diagnostics on the patient’s chart. The nurse is performing which specific nursing function?", options: ["Diagnosis", "Assessment", "Education", "Advocacy"], correctAnswer: "Assessment" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // The pre-assessment quiz data now includes questions for all new modules.
+        const preAssessmentQuizData = [
+            // Questions for Module: What is Nursing?
+            { moduleId: 'what-is-nursing', question: "Which nursing role involves interpreting information for patients and respecting their decisions, even if they differ from your own?", options: ["Educator", "Leader", "Advocate", "Manager"], correctAnswer: "Advocate" },
+            { moduleId: 'what-is-nursing', question: "What is the primary process nurses use to assess patient data, plan care, implement interventions, and evaluate outcomes?", options: ["Medical Diagnosis", "Nursing Process", "Treatment Protocol", "Health Assessment"], correctAnswer: "Nursing Process" },
+            { moduleId: 'what-is-nursing', question: "When a nurse uses the best available research evidence combined with their clinical judgment and patient values, they are practicing:", options: ["Traditional Nursing", "Intuitive Care", "Evidence-Based Practice (EBP)", "Autonomous Practice"], correctAnswer: "Evidence-Based Practice (EBP)" },
+
+            // Questions for Module: Nursing's Journey: A Look Back in Time
+            { moduleId: 'nursing-history', question: "Who is considered the founder of modern nursing and emphasized sanitation and education?", options: ["Clara Barton", "Dorothea Dix", "Florence Nightingale", "Linda Richards"], correctAnswer: "Florence Nightingale" },
+            { moduleId: 'nursing-history', question: "Which nurse founded the American Red Cross?", options: ["Florence Nightingale", "Clara Barton", "Lenah Higbee", "Dorothea Dix"], correctAnswer: "Clara Barton" },
+
+            // Questions for Module: Theories: Your Compass in Nursing Practice
+            { moduleId: 'nursing-theories', question: "Which theory emphasizes the importance of basic needs like oxygen, food, and rest before higher-level needs?", options: ["Erikson’s Psychosocial Theory", "Lewin’s Change Theory", "Maslow’s Hierarchy of Needs", "Rosenstock’s Health Belief Model"], correctAnswer: "Maslow’s Hierarchy of Needs" },
+            { moduleId: 'nursing-theories', question: "According to Lewin's Change Theory, what is the first step in the process of change?", options: ["Moving", "Refreezing", "Unfreezing", "Evaluating"], correctAnswer: "Unfreezing" },
+            { moduleId: 'nursing-theories', question: "The four main concepts of nursing's metaparadigm are:", options: ["Doctor, Hospital, Illness, Treatment", "Person, Environment, Health, Nursing", "Medication, Diagnosis, Surgery, Recovery", "Family, Community, Policy, Research"], correctAnswer: "Person, Environment, Health, Nursing" },
+
+            // Questions for Module: Becoming a Professional Nurse: Standards & Ethics
+            { moduleId: 'professional-nurse', question: "Which characteristic of a profession involves accepting responsibility for your actions and omissions?", options: ["Autonomy", "Altruism", "Accountability", "Licensure"], correctAnswer: "Accountability" },
+            { moduleId: 'professional-nurse', question: "State laws that define the legal boundaries of nursing practice are called:", options: ["ANA Standards of Practice", "Code of Ethics", "Nurse Practice Acts", "Professional Guidelines"], correctAnswer: "Nurse Practice Acts" },
+            { moduleId: 'professional-nurse', question: "According to Benner's Novice to Expert Model, what level of proficiency does a new nursing student typically start at?", options: ["Competent", "Advanced Beginner", "Novice", "Proficient"], correctAnswer: "Novice" },
+            { moduleId: 'professional-nurse', question: "When a nurse protects a patient's personal information, they are upholding which ethical concept?", options: ["Beneficence", "Veracity", "Confidentiality", "Justice"], correctAnswer: "Confidentiality" },
+
+            // Questions for Module: Your Nursing Career: Paths and Possibilities
+            { moduleId: 'nursing-career-paths', question: "Which nursing credential typically involves a 12-18 month program and practices under the supervision of an RN?", options: ["BSN", "APRN", "LPN/LVN", "DNP"], correctAnswer: "LPN/LVN" },
+            { moduleId: 'nursing-career-paths', question: "What does certification in nursing primarily demonstrate?", options: ["Minimum safe practice", "Excellence in a specialty", "Legal right to practice", "Ability to prescribe medication"], correctAnswer: "Excellence in a specialty" },
+            { moduleId: 'nursing-career-paths', question: "Which advanced practice registered nurse (APRN) role often provides primary and preventive health care services and can prescribe medication independently?", options: ["Certified Nurse Midwife (CNM)", "Clinical Nurse Specialist (CNS)", "Certified Registered Nurse Anesthetist (CRNA)", "Nurse Practitioner (NP)"], correctAnswer: "Nurse Practitioner (NP)" },
+            { moduleId: 'nursing-career-paths', question: "Which organization is the main professional organization for all Registered Nurses in the United States?", options: ["National League for Nursing (NLN)", "International Council of Nurses (ICN)", "American Nurses Association (ANA)", "National Student Nurses’ Association (NSNA)"], correctAnswer: "American Nurses Association (ANA)" },
+
+            // Questions for Module: The Future of Nursing: Challenges & Innovations
+            { moduleId: 'future-of-nursing', question: "Which initiative identified six core competencies for nurses, including patient-centered care, teamwork, and safety?", options: ["ANA Standards of Practice", "National Patient Safety Goals", "QSEN", "Nurse Practice Acts"], correctAnswer: "QSEN" },
+            { moduleId: 'future-of-nursing', question: "A major factor contributing to the nursing shortage is:", options: ["Decreasing elderly population", "Too many nursing school graduates", "An aging nursing workforce", "Increased job satisfaction"], correctAnswer: "An aging nursing workforce" },
+            { moduleId: 'future-of-nursing', question: "The 'Future of Nursing 2020–2030' report emphasizes which key concept?", options: ["Increased administrative roles", "Charting a path to achieve health equity", "Focus on acute care only", "Reducing nursing education requirements"], correctAnswer: "Charting a path to achieve health equity" },
+
+            // Questions for Chapter Review & Critical Thinking (these are the general review questions)
+            { moduleId: 'chapter-review', question: "A nurse supports a patient’s decision to decline more cancer treatment and to be cared for by a hospice team, even though the nurse personally thinks the patient should seek more treatment. The nurse is practicing which nursing role?", options: ["Advocacy", "Change agent", "Leader", "Collaborator"], correctAnswer: "Advocacy" },
+            { moduleId: 'chapter-review', question: "A profession has specific characteristics. In regard to how nursing meets these characteristics, which criteria are consistent and standardized processes? (Select all that apply.)", options: ["Code of ethics", "Licensing", "Body of knowledge", "Educational preparation", "Altruism"], correctAnswer: ["Code of ethics", "Licensing", "Body of knowledge", "Educational preparation", "Altruism"] },
+            { moduleId: 'chapter-review', question: "What specific aspect of a profession does the development of theories provide?", options: ["Altruism", "Body of knowledge", "Autonomy", "Accountability"], correctAnswer: "Body of knowledge" },
+            { moduleId: 'chapter-review', question: "Health care workers are discussing a diverse group of patients respectfully and are being responsive to the health beliefs and practices of these patients. What important aspect of nursing professional practice are they exhibiting?", options: ["Autonomy", "Accountability", "Cultural competence", "Autocratic leadership"], correctAnswer: "Cultural competence" },
+            { moduleId: 'chapter-review', question: "A nurse makes a medication error, immediately assesses the patient, and reports the error to the nurse manager and the primary care provider (PCP). Which characteristic of a professional is the nurse demonstrating?", options: ["Autonomy", "Collaboration", "Accountability", "Altruism"], correctAnswer: "Accountability" },
+            { moduleId: 'chapter-review', question: "Which are included in the ANA Standards of Professional Nursing Practice? (Select all that apply.)", options: ["Standards of professional performance", "Code of ethics", "Standards of practice", "Legal scope of practice", "Licensure requirements"], correctAnswer: ["Standards of professional performance", "Standards of practice"] },
+            { moduleId: 'chapter-review', question: "Which core competency of advanced practice registered nurse (APRN) is a nurse educator exhibiting when counseling a student nurse on the unit in therapeutic communication techniques?", options: ["Leadership", "Ethical decision-making", "Direct clinical practice", "Expert coaching"], correctAnswer: "Expert coaching" },
+            { moduleId: 'chapter-review', question: "Which statements describe a component discussed in nursing theories? (Select all that apply.)", options: ["Optimal functioning of the patient", "Interaction with components of the environment", "The conceptual makeup of the administration of the hospital", "The illness and health concept", "Safety aspect of medication administration"], correctAnswer: ["Optimal functioning of the patient", "Interaction with components of the environment", "The illness and health concept"] },
+            { moduleId: 'chapter-review', question: "Which factors affect the nursing shortage? (Select all that apply.)", options: ["Aging faculty", "Increasing elderly population", "Job satisfaction due to adequate number of nurses", "Aging nursing workforce", "Greater autonomy for nurses"], correctAnswer: ["Aging faculty", "Increasing elderly population", "Aging nursing workforce"] },
+            { question: "A nurse has performed a physical examination of the patient and reviewed the laboratory results and diagnostics on the patient’s chart. The nurse is performing which specific nursing function?", options: ["Diagnosis", "Assessment", "Education", "Advocacy"], correctAnswer: "Assessment" }
+        ];
+
+        // --- Helper Functions ---
+        // A utility function to conditionally join CSS class names.
+        const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+
+        // --- Child Components ---
+
+        /**
+         * Quiz component for interactive multiple-choice questions.
+         * Users answer questions and receive immediate feedback.
+         */
+        const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [selectedOption, setSelectedOption] = useState([]);
+            const [feedback, setFeedback] = useState(null);
+            const [answers, setAnswers] = useState([]);
+
+            const currentQuestion = questions[currentQuestionIndex];
+
+            // Handles selecting an option for single or multiple-choice questions.
+            const handleOptionSelect = (option) => {
+                if (feedback && !isPreAssessment) return; // Prevent changing answer after submission in regular quizzes
+
+                if (Array.isArray(currentQuestion.correctAnswer)) {
+                    // For multiple-choice questions, toggle selection
+                    setSelectedOption(prevSelected => {
+                        if (prevSelected.includes(option)) {
+                            return prevSelected.filter(item => item !== option);
+                        } else {
+                            return [...prevSelected, option];
+                        }
+                    });
+                } else {
+                    // For single-choice questions, set the selected option directly
+                    setSelectedOption(option);
+                }
+            };
+
+            // Handles moving to the next question in a pre-assessment quiz.
+            const handlePreAssessmentNext = () => {
+                // Ensure an option is selected before proceeding
+                if (selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)) return;
+                
+                // Determine if the selected answer(s) are correct
+                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
+                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
+                    : selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                
+                // Store the answer
+                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                setAnswers(updatedAnswers);
+
+                // Move to the next question or complete the assessment
+                if (currentQuestionIndex < questions.length - 1) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption([]); // Reset selected option for the next question
+                    setFeedback(null); // Clear feedback
+                } else {
+                    onComplete(updatedAnswers); // Call onComplete when all questions are done
+                }
+            };
+            
+            // Handles submitting an answer in a regular quiz (shows feedback).
+            const handleRegularQuizSubmit = () => {
+                // Ensure an option is selected before submitting
+                if (selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)) return;
+                
+                // Check if the answer is correct
+                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
+                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
+                    : selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                
+                setFeedback(isCorrect ? 'correct' : 'incorrect'); // Set feedback
+            };
+
+            // Handles moving to the next question after feedback in a regular quiz.
+            const handleRegularQuizNext = () => {
+                // Determine correctness to save the answer before moving on
+                const isCorrect = Array.isArray(currentQuestion.correctAnswer)
+                    ? currentQuestion.correctAnswer.every(ans => selectedOption.includes(ans)) && selectedOption.length === currentQuestion.correctAnswer.length
+                    : selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                const finalAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    setAnswers(finalAnswers); // Update answers array
+                    setCurrentQuestionIndex(currentQuestionIndex + 1); // Move to next question
+                    setSelectedOption([]); // Reset selected option
+                    setFeedback(null); // Clear feedback
+                } else {
+                    // Calculate final score and complete the quiz
+                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    onComplete({ score: finalScore, total: questions.length });
+                }
+            };
+
+            return (
+                <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Quiz: {currentQuestionIndex + 1} of {questions.length}</h4>
+                    <p className="font-semibold text-gray-700 mb-3">{currentQuestion.question}</p>
+                    <div className="space-y-2">
+                        {currentQuestion.options.map((option, index) => {
+                            // Determine if the option is selected by the user
+                            const isSelected = Array.isArray(selectedOption) ? selectedOption.includes(option) : selectedOption === option;
+                            // Determine if the option is one of the correct answers
+                            const isCorrectOption = Array.isArray(currentQuestion.correctAnswer)
+                                ? currentQuestion.correctAnswer.includes(option)
+                                : option.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                            let optionClass = 'bg-white hover:bg-gray-100 border-gray-200';
+
+                            // Apply styling based on feedback (for regular quizzes)
+                            if (feedback && !isPreAssessment) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800'; // Correct option
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800'; // Incorrectly selected option
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800'; // Currently selected option (before feedback)
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => handleOptionSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {/* Display check/cross icon based on feedback */}
+                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : <span className="text-red-600 mr-2">✗</span>
+                                        )}
+                                        <span className="flex-1">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-4 text-center">
+                        {isPreAssessment ? (
+                               <button
+                                   onClick={handlePreAssessmentNext}
+                                   disabled={selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)}
+                                   className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                               >
+                                   {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                               </button>
+                        ) : (
+                            <>
+                            {!feedback ? (
+                                // Show submit button if no feedback is displayed yet
+                                <button
+                                    onClick={handleRegularQuizSubmit}
+                                    disabled={selectedOption === null || (Array.isArray(selectedOption) && selectedOption.length === 0)}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Submit Answer
+                                </button>
+                            ) : (
+                                // Show next button after feedback is displayed
+                                <button
+                                    onClick={handleRegularQuizNext}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    Next Question
+                                </button>
+                            )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        /**
+         * PreAssessmentQuiz component to handle the initial diagnostic quiz.
+         * Displays quiz questions and then results, allowing users to "test out" of modules.
+         */
+        const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+            const [results, setResults] = useState(null);
+
+            // Callback when the quiz is completed, calculates module completion based on performance.
+            const handleQuizComplete = (finalAnswers) => {
+                const moduleResults = {};
+                finalAnswers.forEach(answer => {
+                    const { moduleId } = answer.question;
+                    if (!moduleResults[moduleId]) {
+                        moduleResults[moduleId] = { correct: 0, total: 0 };
+                    }
+                    if (answer.isCorrect) {
+                        moduleResults[moduleId].correct++;
+                    }
+                    moduleResults[moduleId].total++;
+                });
+
+                const completedModules = [];
+                for (const moduleId in moduleResults) {
+                    // A module is considered "completed" if all its pre-assessment questions were answered correctly.
+                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+                        completedModules.push(moduleId);
+                    }
+                }
+                // Set the overall results for display and call the parent's onComplete.
+                setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+                onComplete(completedModules);
+            };
+
+            // Display results screen after quiz completion
+            if (results) {
+                return (
+                    <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
+                            <p className="text-lg text-gray-600 mb-6">
+                                You correctly answered {results.correct} out of {results.total} questions.
+                            </p>
+                            {results.completedModules.length > 0 ? (
+                                <>
+                                    <p className="text-green-600 font-semibold mb-4">You've tested out of the following modules:</p>
+                                    <ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-lg">
+                                        {results.completedModules.map(id => <li key={id}>{contentData[id].title}</li>)}
+                                    </ul>
+                                </>
+                            ) : (
+                                <p className="text-yellow-600 font-semibold mb-6">You haven't tested out of any modules. You can proceed to the main modules for learning.</p>
+                            )}
+                            <button
+                                onClick={onExit}
+                                className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                            >
+                                Return to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Display the quiz itself
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
+                        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Diagnostic Quiz</h2>
+                        <Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+                    </div>
+                </div>
+            );
+        };
+
+
+        /**
+         * Dashboard component to display the available learning modules.
+         * It allows users to select a module to start learning.
+         * Shows progress for each module using a circular progress bar and status.
+         */
+        const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+            let totalCompletedSteps = 0;
+            let totalPossibleSteps = 0;
+            let totalQuizCorrect = 0;
+            let totalQuizQuestions = 0;
+
+            // Calculate overall progress across all modules
+            Object.entries(contentData).forEach(([moduleId, module]) => {
+                totalPossibleSteps += module.steps.length;
+                const moduleProgress = progress[moduleId] || {};
+                
+                Object.values(moduleProgress).forEach(stepProgress => {
+                    if (stepProgress.completed) {
+                        totalCompletedSteps++;
+                    }
+                    if (stepProgress.score !== undefined) {
+                        totalQuizCorrect += stepProgress.score;
+                    }
+                });
+
+                // Also count total possible quiz questions for overall performance
+                module.steps.forEach(step => {
+                    if (step.type === 'quiz') {
+                        totalQuizQuestions += step.questions.length;
+                    }
+                });
+            });
+
+
+            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+            return (
+                <div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+                    <div className="w-full">
+                        <header className="mb-8 text-center">
+                            <div className="flex items-center justify-center gap-3 mb-2">
+                                <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">NF</span>
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Nursing Foundations Module</h1>
+                                <span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
+                            </div>
+                            <p className="text-lg text-gray-500 max-w-2xl mx-auto">Your essential guide to the nursing profession, theories, and practice standards for new students.</p>
+                        </header>
+
+                        <div className="mb-8 text-center">
+                            <button
+                                onClick={onStartPreAssessment}
+                                className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+                            >
+                                <div className="text-xl">Skip Ahead: Take Diagnostic Quiz</div>
+                                <div className="text-sm font-normal">Test your knowledge and potentially skip modules.</div>
+                            </button>
+                        </div>
+
+                        <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 w-full">
+                           <div className="flex justify-between items-center mb-3">
+                             <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+                             <button 
+                                 onClick={onResetProgress}
+                                 className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2"
+                             >
+                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                     <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" />
+                                 </svg>
+                                 Reset Progress
+                             </button>
+                           </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4">
+                                <div
+                                    className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+                                    style={{ width: `${overallPercentage}%` }}
+                                ></div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-left text-sm text-gray-600 mt-2">
+                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+                                </p>
+                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                            {Object.entries(contentData).map(([id, module]) => {
+                                const moduleProgress = progress[id] || {};
+                                const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+                                const totalSteps = module.steps.length;
+                                const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+                                let statusText = "Not Started";
+                                let statusColor = "text-gray-500";
+                                if (completedCount === totalSteps) {
+                                    statusText = "Completed";
+                                    statusColor = "text-green-600";
+                                } else if (completedCount > 0) {
+                                    statusText = "In Progress";
+                                    statusColor = "text-yellow-600";
+                                }
+
+                                const quizStep = module.steps.find(step => step.type === 'quiz');
+                                const quizProgress = quizStep ? moduleProgress[quizStep.id] : null;
+
+                                return (
+                                    <div
+                                        key={id}
+                                        onClick={() => onSelectModule(id)}
+                                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-10 h-10 flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0")}>
+                                                {module.title.split(' ').map(word => word.charAt(0)).join('')}
+                                            </div>
+                                            <div className="relative w-12 h-12 flex-shrink-0">
+                                                <svg className="w-full h-full" viewBox="0 0 36 36">
+                                                    <path
+                                                        className="text-gray-200"
+                                                        d="M18 2.0845
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                    />
+                                                    <path
+                                                        className="text-indigo-500"
+                                                        d="M18 2.0845
+                                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                        strokeDasharray={`${percentage}, 100`}
+                                                        strokeLinecap="round"
+                                                        transform="rotate(-90 18 18)"
+                                                    />
+                                                </svg>
+                                                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
+                                        <p className="text-gray-500 text-sm mb-2 h-10">{module.description}</p>
+                                        <div className="mt-auto">
+                                            <p className={cn("text-sm font-semibold", statusColor)}>{statusText}</p>
+                                            {quizProgress && quizProgress.score !== undefined && (
+                                                <p className="text-sm text-gray-600 mt-1">Quiz Score: {quizProgress.score} / {quizStep.questions.length}</p>
+                                            )}
+                                            <div className="flex items-center justify-end text-sm font-medium text-indigo-600 group-hover:text-indigo-700 mt-2">
+                                                Start Learning <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        /**
+         * CaseStudy component for a critical thinking challenge.
+         * Presents a scenario and open-ended questions for discussion.
+         */
+        const CaseStudy = ({ caseData, onComplete }) => {
+            const [showExplanation, setShowExplanation] = useState(false);
+
+            // Marks the step as complete when the explanation is revealed.
+            const handleRevealExplanation = () => {
+                setShowExplanation(true);
+                onComplete(); // Mark the step as complete
+            };
+
+            return (
+                <div className="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Critical Thinking Case Study</h4>
+                    <p className="bg-blue-100 text-blue-800 p-3 rounded-md mb-4 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+                    <p className="font-semibold text-gray-700 mb-3" dangerouslySetInnerHTML={{ __html: caseData.question }}></p>
+                    
+                    {!showExplanation && (
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={handleRevealExplanation}
+                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                            >
+                                Reveal Explanation
+                            </button>
+                        </div>
+                    )}
+
+                    {showExplanation && (
+                        <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500 animate-fade-in">
+                            <h5 class="font-bold text-indigo-800">Explanation</h5>
+                            <p class="text-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        
+        /**
+         * StaticContentStep component for displaying basic text content.
+         * Automatically marks itself as complete upon rendering.
+         */
+        const StaticContentStep = ({ step, onComplete }) => {
+            useEffect(() => {
+                onComplete(); // Mark step as complete as soon as it's viewed
+            }, []);
+
+            return (
+                <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50 rounded-lg shadow-inner space-y-4" dangerouslySetInnerHTML={{ __html: step.content }}>
+                </div>
+            );
+        };
+
+        /**
+         * CompletionModal component displayed when a module is completed.
+         */
+        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+                        <h3 className="text-2xl font-bold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+                        <p className="text-gray-700 mb-6">You've successfully completed all steps in this module. Great job!</p>
+                        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
+                            >
+                                Back to Dashboard
+                            </button>
+                            {hasNextModule && (
+                                <button
+                                    onClick={onNextModule}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    Continue to Next Module
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /**
+         * LearningModule component to manage steps within the selected module.
+         * Handles navigation, displays current step content, and manages module completion.
+         */
+        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+            const [activeStep, setActiveStep] = useState(0);
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+            // Callback to update progress for a specific step.
+            const handleStepComplete = useCallback((stepId, data = {}) => {
+                onProgressUpdate(module.id, stepId, { completed: true, ...data });
+            }, [onProgressUpdate, module.id]);
+
+            // Get current module's progress
+            const moduleProgress = progress[module.id] || {};
+            
+            // Check if all steps in the current module are completed.
+            const allStepsCompletedInModule = module.steps.every(step =>
+                moduleProgress[step.id] && moduleProgress[step.id].completed
+            );
+
+            // Handles moving to the next step or opening the completion modal.
+            const handleNextStep = () => {
+                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
+                    setIsCompletionModalOpen(true); // Open completion modal if last step and all steps are done
+                } else if (activeStep < module.steps.length - 1) {
+                    setActiveStep(activeStep + 1); // Move to next step
+                }
+            };
+
+            // Handles moving to the previous step.
+            const handlePrevStep = () => {
+                if (activeStep > 0) {
+                    setActiveStep(activeStep - 1);
+                }
+            };
+            
+            // Basic error handling if module or steps data is missing.
+            if (!module || !module.steps) {
+                console.error("LearningModule received invalid module prop:", module);
+                return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Loading module...</div>;
+            }
+
+            const currentStep = module.steps[activeStep];
+            
+            // Renders the appropriate component based on the step type.
+            const renderStepContent = (step) => {
+                if (!step) return <p>Please select a step.</p>;
+
+                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+                switch (step.type) {
+                    case 'text':
+                        return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study':
+                        return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz':
+                        return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    default:
+                        return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+                }
+            };
+
+            // Handles closing the completion modal and returning to the dashboard.
+            const handleModalClose = () => {
+                setIsCompletionModalOpen(false);
+                onBack();
+            };
+
+            // Handles closing the completion modal and navigating to the next module.
+            const handleModalNextModule = () => {
+                setIsCompletionModalOpen(false);
+                onNextModule();
+            };
+
+
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+                    <header className="bg-white shadow-md p-4 flex items-center justify-between z-30 flex-shrink-0">
+                        <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                            <span className="hidden sm:inline">Dashboard</span>
+                        </button>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-bold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+                        </div>
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                    </header>
+                    {/* Overlay for mobile sidebar */}
+                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+                    <div className="flex flex-1 overflow-hidden">
+                        <aside className={cn(
+                            "bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full' // Toggle sidebar visibility
+                        )}>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700 px-3">Module Steps</h3>
+                            <nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+                                {module.steps.map((step, index) => (
+                                    <button
+                                        key={step.id}
+                                        onClick={() => {
+                                            setActiveStep(index); // Set active step
+                                            setIsSidebarOpen(false); // Close sidebar on selection (mobile)
+                                        }}
+                                        className={cn(
+                                            'w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors',
+                                            activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700'
+                                        )}
+                                    >
+                                        <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                                            {/* Display completion icon or dot */}
+                                            {moduleProgress[step.id]?.completed ? (
+                                                <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                            ) : (
+                                                <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+                                            )}
+                                        </div>
+                                        <span className="flex-1 text-sm">{step.title}</span>
+                                    </button>
+                                ))}
+                            </nav>
+                        </aside>
+
+                        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                            <div className="max-w-5xl mx-auto">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentStep.title}</h3>
+                                {renderStepContent(currentStep)}
+
+                                <div className="flex justify-between mt-8">
+                                    <button
+                                        onClick={handlePrevStep}
+                                        disabled={activeStep === 0}
+                                        className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                    >
+                                        Previous
+                                    </button>
+
+                                    <button
+                                        onClick={handleNextStep}
+                                        // Disable next button if it's the last step and not all steps are completed
+                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+                                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+                                    >
+                                        {activeStep === module.steps.length - 1 ? 'Finish Module' : 'Next'}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                    {/* Module Completion Modal */}
+                    <CompletionModal
+                        isOpen={isCompletionModalOpen}
+                        onClose={handleModalClose}
+                        onNextModule={handleModalNextModule}
+                        hasNextModule={hasNextModule}
+                    />
+                </div>
+            );
+        };
+        
+        /**
+         * The root component of the Nursing Foundations learning application.
+         * Manages overall app state, authentication, progress, and renders main views.
+         */
+        function App() {
+            const [currentModuleId, setCurrentModuleId] = useState(null);
+            const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+            const [userId, setUserId] = useState(null);
+            const [progress, setProgress] = useState({});
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            // Effect for mock authentication and setting user ID.
+            useEffect(() => {
+                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+                    if (user) setUserId(user.uid);
+                    setIsAuthReady(true); // Mark authentication as ready
+                });
+                return () => unsubscribe(); // Cleanup on unmount
+            }, []);
+
+            // Effect to load saved progress from localStorage when auth is ready and userId is available.
+            useEffect(() => {
+                if (!isAuthReady || !userId) return;
+                const storedProgress = localStorage.getItem(`nursing-foundations-progress-${userId}`);
+                if (storedProgress) {
+                    try {
+                        setProgress(JSON.parse(storedProgress));
+                    } catch (e) {
+                        console.error("Failed to parse stored progress, resetting.", e);
+                        setProgress({}); // Reset if parsing fails
+                    }
+                }
+            }, [isAuthReady, userId]);
+
+            // Callback to update and save progress for a specific step in a module.
+            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+                if (!isAuthReady || !userId) return; // Ensure auth is ready before updating
+
+                setProgress(currentProgress => {
+                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+                    const newStepProgress = { ...currentStepProgress, ...data };
+
+                    // Only update if there's an actual change to prevent unnecessary localStorage writes
+                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+                        return currentProgress;
+                    }
+
+                    const newProgress = {
+                        ...currentProgress,
+                        [moduleId]: {
+                            ...(currentProgress[moduleId] || {}),
+                            [stepId]: newStepProgress
+                        }
+                    };
+
+                    localStorage.setItem(`nursing-foundations-progress-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [isAuthReady, userId]);
+
+            // Callback when the pre-assessment quiz is completed.
+            // Marks entire modules as completed if the user tested out.
+            const handlePreAssessmentComplete = (completedModuleIds) => {
+                const newProgress = { ...progress };
+                completedModuleIds.forEach(moduleId => {
+                    const module = contentData[moduleId];
+                    if (module) {
+                        newProgress[moduleId] = {};
+                        module.steps.forEach(step => {
+                            newProgress[moduleId][step.id] = { completed: true }; // Mark all steps in tested-out modules as complete
+                        });
+                    }
+                });
+                setProgress(newProgress);
+                localStorage.setItem(`nursing-foundations-progress-${userId}`, JSON.stringify(newProgress));
+            };
+            
+            // Resets all user progress.
+            const handleResetProgress = useCallback(() => {
+                if (!isAuthReady || !userId) return;
+                setProgress({});
+                localStorage.removeItem(`nursing-foundations-progress-${userId}`);
+            }, [isAuthReady, userId]);
+
+            // Navigates to the next module in the sequence.
+            const handleNextModule = useCallback(() => {
+                const moduleIds = Object.keys(contentData);
+                const currentIndex = moduleIds.indexOf(currentModuleId);
+                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+                    setCurrentModuleId(moduleIds[currentIndex + 1]);
+                } else {
+                    setCurrentModuleId(null); // Go back to dashboard if no next module
+                }
+            }, [currentModuleId]);
+
+            // Determine the currently selected module object.
+            const selectedModule = currentModuleId && contentData[currentModuleId]
+                                                 ? { ...contentData[currentModuleId], id: currentModuleId }
+                                                 : null;
+
+            // Check if there's a next module available for the completion modal.
+            const moduleIds = Object.keys(contentData);
+            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+
+            return (
+                <div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+                    {isPreAssessmentActive ? (
+                        // Show pre-assessment quiz
+                        <PreAssessmentQuiz 
+                            onComplete={handlePreAssessmentComplete} 
+                            onExit={() => setIsPreAssessmentActive(false)}
+                        />
+                    ) : selectedModule ? (
+                        // Show selected learning module
+                        <LearningModule
+                            key={selectedModule.id} // Key ensures component re-mounts when module changes
+                            module={selectedModule}
+                            onBack={() => setCurrentModuleId(null)}
+                            progress={progress}
+                            onProgressUpdate={handleProgressUpdate}
+                            onNextModule={handleNextModule}
+                            hasNextModule={hasNextModule}
+                        />
+                    ) : (
+                        // Show dashboard
+                        <Dashboard 
+                            onSelectModule={setCurrentModuleId} 
+                            progress={progress} 
+                            onResetProgress={handleResetProgress}
+                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // --- Render the App into the DOM ---
+        // This is the entry point for the React application.
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
