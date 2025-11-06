@@ -49,7 +49,7 @@
         .password-toggle-icon:hover {
             color: #374151; /* gray-700 */
         }
-        /* Style for custom modal */
+        /* Style for custom modal - Note: Modal CSS kept for general structure, but no longer used in HTML body */
         .modal {
             display: none;
             position: fixed;
@@ -133,21 +133,9 @@
         </div>
     </div>
 
-    <!-- Custom Modal for Classroom Code Input -->
-    <div id="classroom-modal" class="modal">
-        <div class="modal-content text-center">
-            <h3 class="text-2xl font-bold mb-4 text-blue-800">Join a Classroom</h3>
-            <p id="modal-message" class="text-red-500 mb-4 text-sm min-h-[20px]"></p>
-            <input type="text" id="classroom-code-input" placeholder="Enter classroom code" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition mb-4">
-            <div class="flex justify-center space-x-4">
-                <button id="join-classroom-btn" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">Join</button>
-                <button id="cancel-classroom-btn" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition duration-300">Cancel</button>
-            </div>
-        </div>
-    </div>
+    <!-- Removed Custom Modal for Classroom Code Input -->
 
     <!-- Main Application Content (Initially Hidden) -->
-    <!-- FIX 1: Added min-h-screen for layout stability after login -->
     <div id="app-content" class="hidden min-h-screen">
         <!-- Header Section -->
         <header class="bg-white shadow-lg py-4 relative z-10">
@@ -159,19 +147,6 @@
                     <ul class="flex items-center space-x-8">
                         <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
                         <li><a href="About.html" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
-                        <!-- FIX 2: Added the new AlliedEMSPrep link -->
-                        <li>
-                            <a href="/AlliedEMSPrep/index.html" class="text-green-700 hover:text-green-600 font-bold transition duration-300 rounded-md px-4 py-2 hover:bg-green-50 border border-green-300">
-                                AlliedEMSPrep
-                            </a>
-                        </li>
-                        <li><a href="#contact-us" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Contact</a></li>
-                        <!-- New "Join Classroom" button -->
-                        <li>
-                            <button id="open-classroom-modal-btn" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">
-                                Join Classroom
-                            </button>
-                        </li>
                         <li id="logout-button-container" class="hidden">
                             <span id="welcome-user-name" class="text-gray-600 mr-4"></span>
                             <button id="logout-button" class="bg-red-500 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-red-600 transition duration-300 font-bold transform hover:scale-105">Logout</button>
@@ -182,7 +157,6 @@
         </header>
 
         <!-- Hero Section -->
-        <!-- FIX 1: Added min-h-[50vh] for hero section stability -->
         <section class="relative bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
             <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
             <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
@@ -242,51 +216,7 @@
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Preparation aids for leadership, management, community health, and NCLEX study strategies.</p>
                         <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
                     </div>
-                    <!-- New "Ians Classroom" Card (initially hidden) -->
-                    <div id="ians-classroom-card" class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 text-center border border-gray-100 hover:border-blue-300 group hidden">
-                        <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                            <i class="fa-solid fa-graduation-cap text-5xl"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Ians Classroom</h3>
-                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Access to Ian's private study resources and exclusive materials for your cohort.</p>
-                        <a href="iansclassroom.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Us Section -->
-        <section id="contact-us" class="py-20 md:py-32 bg-gray-50 relative z-10">
-            <div class="container mx-auto px-4 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-800 animate-fade-in-up">
-                    Get in Touch
-                </h2>
-                <p class="text-lg text-gray-700 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animation-delay-300">
-                    We're here to assist you with any questions about our resources or technical support.
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8">
-                    <!-- Tech Support Card -->
-                    <div class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition duration-500 ease-in-out border border-gray-100 w-full sm:w-1/2 lg:w-1/3 animate-fade-in-up animation-delay-500">
-                        <div class="text-blue-600 text-5xl mb-4">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-3 text-blue-800">Tech Support</h3>
-                        <p class="text-gray-600 mb-4">Need technical assistance with the platform?</p>
-                        <a href="tel:3213516278" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-full text-xl font-bold shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">
-                            Call: 321-351-6278
-                        </a>
-                    </div>
-                    <!-- General Inquiries Card -->
-                    <div class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition duration-500 ease-in-out border border-gray-100 w-full sm:w-1/2 lg:w-1/3 animate-fade-in-up animation-delay-800">
-                        <div class="text-green-600 text-5xl mb-4">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-3 text-blue-800">General Inquiries</h3>
-                        <p class="text-gray-600 mb-4">For general questions or feedback.</p>
-                        <a href="mailto:alliedrnprep@email.com" class="inline-block bg-green-600 text-white px-8 py-4 rounded-full text-xl font-bold shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105">
-                            Email Us
-                        </a>
-                    </div>
+                    <!-- Removed "Ians Classroom" Card -->
                 </div>
             </div>
         </section>
@@ -350,28 +280,10 @@
         const showSignupButton = document.getElementById('show-signup');
         const confirmPasswordGroup = document.getElementById('confirm-password-group');
         const welcomeUserName = document.getElementById('welcome-user-name');
-        const iansClassroomCard = document.getElementById('ians-classroom-card');
-        const classroomModal = document.getElementById('classroom-modal');
-        const openModalBtn = document.getElementById('open-classroom-modal-btn');
-        const joinBtn = document.getElementById('join-classroom-btn');
-        const cancelBtn = document.getElementById('cancel-classroom-btn');
-        const classroomCodeInput = document.getElementById('classroom-code-input');
-        const modalMessage = document.getElementById('modal-message');
 
         let isLoginMode = true;
-        const correctClassroomCode = 's76tu5hjeo';
 
         // --- UI Helper Functions ---
-
-        /**
-         * Displays a custom modal message.
-         * @param {string} message - The message to display.
-         * @param {boolean} isSuccess - True for a success message, false for an error.
-         */
-        function displayModalMessage(message, isSuccess = false) {
-            modalMessage.textContent = message;
-            modalMessage.style.color = isSuccess ? '#16a34a' : '#dc2626'; // green-600 or red-600
-        }
 
         /**
          * Toggles the authentication form between login and signup modes.
@@ -431,22 +343,11 @@
                     welcomeUserName.textContent = `Welcome!`;
                 }
 
-                // Check localStorage for the classroom flag
-                if (localStorage.getItem('hasIansClassroom') === 'true') {
-                    iansClassroomCard.classList.remove('hidden');
-                    iansClassroomCard.classList.add('flex', 'flex-col');
-                } else {
-                    iansClassroomCard.classList.add('hidden');
-                    iansClassroomCard.classList.remove('flex', 'flex-col');
-                }
-
             } else {
                 authContainer.classList.remove('hidden');
                 appContent.classList.add('hidden');
                 logoutButtonContainer.classList.add('hidden');
                 welcomeUserName.textContent = '';
-                iansClassroomCard.classList.add('hidden');
-                iansClassroomCard.classList.remove('flex', 'flex-col');
             }
         }
 
@@ -549,41 +450,7 @@
             setAuthMode('login');
         });
 
-        // --- Classroom Modal Logic ---
-        openModalBtn.addEventListener('click', () => {
-            classroomModal.style.display = 'flex';
-            classroomCodeInput.value = '';
-            displayModalMessage('');
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            classroomModal.style.display = 'none';
-        });
-
-        joinBtn.addEventListener('click', async () => {
-            const code = classroomCodeInput.value.trim();
-            if (code === correctClassroomCode) {
-                displayModalMessage('Joining classroom...', true);
-                
-                // Save the flag to localStorage
-                localStorage.setItem('hasIansClassroom', 'true');
-                
-                // Hide the modal and update the UI
-                classroomModal.style.display = 'none';
-                updateUI(auth.currentUser);
-
-            } else {
-                displayModalMessage('Incorrect classroom code. Please try again.', false);
-            }
-        });
-
-        // Close modal if user clicks outside of it
-        window.addEventListener('click', (e) => {
-            if (e.target === classroomModal) {
-                classroomModal.style.display = 'none';
-            }
-        });
+        // Removed all Classroom Modal Logic here
     </script>
 </body>
 </html>
-
