@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 10 Student Diagnostic Exam SDE</title>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Configure Tailwind to use Inter font and custom colors -->
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+'primary-blue': '#1D4ED8',
+'secondary-gray': '#F3F4F6',
+'correct-green': '#10B981',
+'incorrect-red': '#EF4444',
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+}
+}
+}
+</script>
+<style>
+/* Custom styles for professional look */
+body {
+background-color: #f7f9fb;
+font-family: 'Inter', sans-serif;
+}
+.shadow-custom {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+/* Custom focus styles for accessibility and design */
+input:checked + label {
+border-color: #1D4ED8;
+background-color: #EFF6FF;
+}
+.option-label {
+transition: all 0.2s;
+cursor: pointer;
+}
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+<div id="app-container" class="max-w-4xl mx-auto">
+<!-- Header -->
+<header class="text-center mb-8">
+<h1 class="text-4xl font-extrabold text-primary-blue mb-2">Emergency Medical Technician Chapter 10</h1>
+<p class="text-lg text-gray-600">Testing Understanding: Chapter 10</p>
+</header>
+
+<!-- Quiz Container -->
+<div id="quiz-container" class="bg-white p-6 md:p-10 rounded-xl shadow-custom border border-gray-100">
+<!-- Content will be injected here (Start Screen, Question, or Results) -->
+</div>
+
+<!-- Hidden Loading Spinner -->
+<div id="loading" class="hidden text-center mt-8">
+<svg class="animate-spin h-8 w-8 text-primary-blue mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+<p class="text-gray-500 mt-2">Processing...</p>
+</div>
+
+</div>
+
+<script>
+// --- 1. Question Data (New Set) ---
+const rawQuestions = [
+{
+questionText: "A 56-year-old COPD patient is found with cyanosis and shallow respirations. Which initial intervention is most appropriate?",
+options: {
+A: "Bag-valve mask ventilations with O2",
+B: "Non-rebreather mask at 15 L/min",
+C: "Nasal cannula at 2 L/min",
+D: "Hyperventilation with 100% O2"
+},
+correctAnswer: "A",
+rationale: "Shallow/poor breathing means inadequate ventilation, requiring BVM support.",
+section: "Initial Airway Management",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What findings must be present to confirm adequate spontaneous breathing?",
+options: {
+A: "Normal skin color",
+B: "Equal bilateral breath sounds",
+C: "Stable respiratory rate",
+D: "Patient speaking in full sentences"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All signs indicate good ventilation and oxygenation.",
+section: "Breathing Assessment",
+type: "sata"
+},
+{
+questionText: "You respond to a pediatric choking victim. What is the best immediate airway intervention?",
+options: {
+A: "Back blows or abdominal thrusts",
+B: "Nasopharyngeal airway placement",
+C: "Blind finger sweep",
+D: "Supplying oxygen via NRB"
+},
+correctAnswer: "A",
+rationale: "Choking relief maneuvers clear the airway.",
+section: "Child Airway Emergency",
+type: "mc"
+},
+{
+questionText: "Which device provides the highest delivered concentration of oxygen when properly fitted?",
+options: {
+A: "Nasal cannula",
+B: "Simple face mask",
+C: "Non-rebreather mask",
+D: "Venturi mask"
+},
+correctAnswer: "C",
+rationale: "NRB with reservoir delivers up to 90-100% O2.",
+section: "Oxygen Delivery Devices",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which signs indicate partial airway obstruction?",
+options: {
+A: "Stridor",
+B: "Hoarseness",
+C: "Drooling",
+D: "Retractions"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All are signs of compromised airway.",
+section: "Airway Obstruction",
+type: "sata"
+},
+{
+questionText: "During suctioning, what is the maximum time you should suction an adult patient’s airway?",
+options: {
+A: "5 seconds",
+B: "10 seconds",
+C: "20 seconds",
+D: "30 seconds"
+},
+correctAnswer: "B",
+rationale: "Limit to 10 seconds to prevent hypoxia.",
+section: "Suctioning Technique",
+type: "mc"
+},
+{
+questionText: "A patient has snoring respirations and cannot maintain airway. What maneuver is contraindicated with suspected cervical spine injury?",
+options: {
+A: "Jaw-thrust maneuver",
+B: "Head tilt–chin lift",
+C: "Use of OPA",
+D: "Use of NPA"
+},
+correctAnswer: "B",
+rationale: "Head tilt–chin lift risks spinal movement.",
+section: "Airway Opening Maneuvers",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What risks are increased with aggressive bag-valve mask ventilation?",
+options: {
+A: "Gastric distention",
+B: "Vomiting and aspiration",
+C: "Barotrauma",
+D: "Reduced cardiac output"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All are complications of overventilation.",
+section: "Positive Pressure Risks",
+type: "sata"
+},
+{
+questionText: "In a patient with a tracheostomy tube and respiratory distress, what should you do FIRST?",
+options: {
+A: "Suction the tracheostomy tube",
+B: "Replace the tube",
+C: "Initiate CPR",
+D: "Remove the tube and ventilate"
+},
+correctAnswer: "A",
+rationale: "Obstruction is common; suction before other interventions.",
+section: "Artificial Airway Management",
+type: "mc"
+},
+{
+questionText: "Which end-tidal CO2 value most reliably confirms successful ET tube placement?",
+options: {
+A: "<10 mmHg",
+B: "20-50 mmHg",
+C: "0 mmHg",
+D: ">60 mmHg"
+},
+correctAnswer: "B",
+rationale: "20–50 mmHg confirms ventilation and tube placement.",
+section: "Airway Confirmation",
+type: "mc"
+},
+{
+questionText: "An unconscious trauma patient is found with gurgling respirations and facial bleeding. Which sequence is correct for airway management?",
+options: {
+A: "High-flow O2, then suction, then airway adjunct",
+B: "Suction, then airway adjunct, then high-flow O2",
+C: "OPA first, then suction, then ventilate",
+D: "Immediate CPR, then suction"
+},
+correctAnswer: "B",
+rationale: "Clear secretions before adjuncts or oxygen.",
+section: "Airway Management/Trauma",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which airway adjuncts are contraindicated in conscious patients?",
+options: {
+A: "Nasopharyngeal airway",
+B: "Oropharyngeal airway",
+C: "King LT airway",
+D: "OPA in postictal head injury"
+},
+correctAnswer: ["B","C","D"],
+rationale: "OPA and supraglottic are only for non-gag/conscious patients.",
+section: "Airway Adjuncts",
+type: "sata"
+},
+{
+questionText: "Patient with facial trauma and hypoxia requires what prioritized intervention?",
+options: {
+A: "Non-rebreather mask",
+B: "Bag-valve mask with airway adjunct and suction",
+C: "Blind nasal intubation",
+D: "Cricothyrotomy"
+},
+correctAnswer: "B",
+rationale: "BVM with adjunct and suction addresses trauma/hypoxia.",
+section: "Facial Trauma/Airway",
+type: "mc"
+},
+{
+questionText: "Which of the following increases risk for airway obstruction in children?",
+options: {
+A: "Large tongue",
+B: "Small nares",
+C: "Loose teeth",
+D: "Short trachea"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All anatomical differences in kids increase obstruction risk.",
+section: "Pediatric Airway",
+type: "sata"
+},
+{
+questionText: "During CPR, how often should you reassess airway and breathing?",
+options: {
+A: "After 2 minutes/5 cycles of CPR",
+B: "Every cycle",
+C: "Only after ROSC",
+D: "After every 30 compressions"
+},
+correctAnswer: "A",
+rationale: "Reassess after each cycle/pause.",
+section: "CPR/Airway",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which are potential signs of poor ventilation from an incorrectly sized BVM?",
+options: {
+A: "Minimal chest rise",
+B: "Abdominal distention",
+C: "Decreased oxygen saturation",
+D: "Hyperventilation"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All can result from wrong size or technique.",
+section: "Ventilation/Equipment",
+type: "sata"
+},
+{
+questionText: "When using a NPA, what should you do if the adjunct meets resistance?",
+options: {
+A: "Continue force",
+B: "Switch nostrils and reattempt",
+C: "Lubricate more and retry same nostril",
+D: "Leave airway unsupported"
+},
+correctAnswer: "B",
+rationale: "Do not force; try other nostril.",
+section: "Airway Adjunct Technique",
+type: "mc"
+},
+{
+questionText: "Which patient group is at highest risk for hypoxia with prolonged suctioning?",
+options: {
+A: "Infants",
+B: "Adults",
+C: "Geriatrics",
+D: "All equal"
+},
+correctAnswer: "A",
+rationale: "Infants have minimal reserve and desaturate rapidly.",
+section: "Suctioning/Pediatrics",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which problems may arise with mouth-to-mask ventilation using poor technique?",
+options: {
+A: "Inadequate seal",
+B: "Insufficient chest rise",
+C: "Decreased oxygenation",
+D: "Increase in aspiration risk"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All are common technique errors.",
+section: "Mouth-to-Mask Risks",
+type: "sata"
+},
+{
+questionText: "In a hypoxic patient with facial burns, which ventilation method is preferred?",
+options: {
+A: "BVM with airway adjunct and assistance",
+B: "Face mask alone",
+C: "Oral airway only",
+D: "Passive oxygenation"
+},
+correctAnswer: "A",
+rationale: "Burns require BVM and adjuncts for airway protection.",
+section: "Burns/Airway",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which factors can lead to unsuccessful airway device placement?",
+options: {
+A: "Improper sizing",
+B: "Lack of lubrication",
+C: "Poor positioning",
+D: "Obstructions"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "Any can block or impede safe placement.",
+section: "Device Placement/Failure",
+type: "sata"
+},
+{
+questionText: "For a patient with airway swelling due to anaphylaxis, what is the immediate EMT action?",
+options: {
+A: "Epinephrine administration and BVM support",
+B: "Rapid non-rebreather mask",
+C: "Suctioning only",
+D: "Needle cricothyrotomy"
+},
+correctAnswer: "A",
+rationale: "Open airway with epinephrine and ventilation.",
+section: "Allergic Reaction/Airway",
+type: "mc"
+},
+{
+questionText: "Which device can deliver high-flow oxygen with relatively low risk of CO2 retention in COPD?",
+options: {
+A: "Venturi mask",
+B: "Nasal cannula",
+C: "Non-rebreather mask",
+D: "Simple mask"
+},
+correctAnswer: "A",
+rationale: "Venturi allows precise O2 titration.",
+section: "COPD/Oxygen Devices",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What can improve airway patency in a supine, unconscious, non-trauma adult?",
+options: {
+A: "Head tilt–chin lift",
+B: "OPA",
+C: "Jaw-thrust maneuver",
+D: "Suction if secretions present"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All of these may open and maintain the airway.",
+section: "Non-Trauma Airway Management",
+type: "sata"
+},
+{
+questionText: "Which airway sign should prompt immediate rapid intervention in a pediatric patient?",
+options: {
+A: "Drooling and unable to swallow",
+B: "Dry mouth",
+C: "Normal skin color",
+D: "Pursed-lip breathing"
+},
+correctAnswer: "A",
+rationale: "Drooling/unable to swallow = severe obstruction.",
+section: "Pediatric Airway Emergency",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which ventilation errors may occur when two-person BVM technique is not used in cardiac arrest?",
+options: {
+A: "Air leak/loss of seal",
+B: "Reduced tidal volume",
+C: "Gastric inflation",
+D: "Hypoventilation"
+},
+correctAnswer: ["A","B","D"],
+rationale: "One-person methods often cause leak/low volume; two-person reduces risk.",
+section: "Resuscitation/Ventilation",
+type: "sata"
+},
+{
+questionText: "How does pulse oximetry guide airway and ventilation management?",
+options: {
+A: "It monitors oxygen saturation",
+B: "It directly measures PaCO2",
+C: "It replaces capnography",
+D: "Unhelpful for ventilation"
+},
+correctAnswer: "A",
+rationale: "Oximetry = O2 sat monitor; not the same as CO2 or ventilation.",
+section: "Monitoring/Guidance",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which complications may arise from improper nasopharyngeal airway placement?",
+options: {
+A: "Epistaxis",
+B: "Tissue trauma",
+C: "Inadequate ventilation",
+D: "Obstruction by kinking"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All are risks with poor NPA technique.",
+section: "Airway Adjunct/Complications",
+type: "sata"
+},
+{
+questionText: "For patients with stoma, which airway device should be used for ventilation?",
+options: {
+A: "Pediatric-size BVM over stoma",
+B: "Standard adult mask only",
+C: "Oral airway",
+D: "Nasal cannula in stoma"
+},
+correctAnswer: "A",
+rationale: "Stoma ventilation needs properly sized BVM at opening.",
+section: "Artificial Airway Adaptation",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which findings signify upper airway obstruction in an adult trauma patient?",
+options: {
+A: "Stridor",
+B: "Unable to speak",
+C: "Use of accessory muscles",
+D: "Retractions above clavicle"
+},
+correctAnswer: ["A","B","D"],
+rationale: "Stridor and retractions indicate upper airway blockage; inability to speak = severe obstruction; accessory muscles = work of breathing, not specific to upper airway.",
+section: "Airway Assessment/Obstruction",
+type: "sata"
+},
+{
+questionText: "Why is inserting an OPA contraindicated in a conscious patient?",
+options: {
+A: "Risk of vomiting/aspiration",
+B: "Induces gag reflex",
+C: "May obstruct airway further",
+D: "All of the above"
+},
+correctAnswer: "D",
+rationale: "OPA is only for unconscious/no gag; otherwise risk vomiting, spasm, further obstruction.",
+section: "Airway Adjuncts/Contraindications",
+type: "mc"
+},
+{
+questionText: "A drowning victim is found apneic but with a weak carotid pulse. What is the priority airway/ventilation intervention?",
+options: {
+A: "Bag-valve mask ventilation with O2",
+B: "Non-rebreather mask O2 only",
+C: "Immediate intubation attempt",
+D: "Chest compressions only"
+},
+correctAnswer: "A",
+rationale: "Must ventilate; O2 mask isn't enough and compressions aren't yet indicated.",
+section: "Special Environments/Drowning",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What errors may occur with prolonged high-flow O2 use in COPD patients?",
+options: {
+A: "O2-induced hypoventilation",
+B: "CO2 retention",
+C: "Drying of mucous membranes",
+D: "Decreased respiratory drive"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "COPD patients can have all these risks with excessive O2.",
+section: "COPD/Oxygen Therapy",
+type: "sata"
+},
+{
+questionText: "What is the significance of pulse oximetry dropping rapidly after airway obstruction?",
+options: {
+A: "Body oxygen level falling, risk hypoxia",
+B: "PaCO2 rising",
+C: "Ventilation is improved",
+D: "No clinical significance"
+},
+correctAnswer: "A",
+rationale: "Pulse ox reveals falling O2 content from blocked airway.",
+section: "Monitoring Oxygenation",
+type: "mc"
+},
+{
+questionText: "In pediatric patient with severe croup, which airway sign is classic?",
+options: {
+A: "Inspiratory stridor",
+B: "Hyperresonant breath sounds",
+C: "Expiratory wheeze",
+D: "Clear breath sounds"
+},
+correctAnswer: "A",
+rationale: "Stridor (high-pitch, inspiratory) is classic for upper airway croup.",
+section: "Pediatric Airway/Illness",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which steps are most critical while preparing for intubation in a head injury patient?",
+options: {
+A: "Inline neck stabilization",
+B: "Preoxygenation",
+C: "Suction available",
+D: "Monitor for rapid ICP change"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All are vital to airway, breathing, and neuro safety.",
+section: "Head Injury/Intubation",
+type: "sata"
+},
+{
+questionText: "Why must airway devices be sized properly for each patient?",
+options: {
+A: "Oversized devices can occlude airway",
+B: "Undersized devices may not protect airway",
+C: "Improves ventilation and oxygenation",
+D: "All of the above"
+},
+correctAnswer: "D",
+rationale: "Proper sizing is critical for effectiveness/safety.",
+section: "Sizing/Device Safety",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which are appropriate indications for NPA over OPA?",
+options: {
+A: "Patient has gag reflex",
+B: "Oral trauma",
+C: "Unresponsive with no gag",
+D: "Conscious patient needing airway support"
+},
+correctAnswer: ["A","B","D"],
+rationale: "NPA for gag reflex or oral trauma, not for unconscious no gag (use OPA).",
+section: "Airway Adjunct Selection",
+type: "sata"
+},
+{
+questionText: "A patient ventilated with BVM is not improving. Pulse ox is 75%. What should you check first?",
+options: {
+A: "Mask seal and airway patency",
+B: "Increase oxygen flow",
+C: "Change to non-rebreather",
+D: "Start chest compressions"
+},
+correctAnswer: "A",
+rationale: "Poor oxygenation often due to mask/airway issue.",
+section: "Troubleshooting/Airway",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which monitoring methods confirm adequate ventilation?",
+options: {
+A: "Bilateral breath sounds",
+B: "Chest rise",
+C: "Capnography waveform",
+D: "Pulse oximetry shows >94%"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All indicate proper ventilation.",
+section: "Ventilation Confirmation",
+type: "sata"
+},
+{
+questionText: "In a patient suspected of aspiration, which sign most strongly suggests airway involvement?",
+options: {
+A: "Coughing and increased secretions",
+B: "Bradycardia only",
+C: "Peripheral edema",
+D: "Clear airway sounds"
+},
+correctAnswer: "A",
+rationale: "Aspiration presents with cough and fluid in airway.",
+section: "Aspiration/Airway",
+type: "mc"
+},
+{
+questionText: "Bag-valve mask ventilation is LEAST effective if the following is present:",
+options: {
+A: "Unresponsive patient",
+B: "Full dentures"
+,
+C: "Significant mask leak",
+D: "Two-person technique"
+},
+correctAnswer: "C",
+rationale: "Mask leak causes loss of delivered volume.",
+section: "BVM/Complications",
+type: "mc"
+},
+{
+questionText: "Select all that apply: Which signs may indicate hypoventilation during assisted ventilation?",
+options: {
+A: "Decreased LOC",
+B: "Diminished breath sounds",
+C: "Cyanosis",
+D: "Absent capnography waveform"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "All reflect poor ventilation and oxygenation.",
+section: "Ventilation Assessment",
+type: "sata"
+},
+{
+questionText: "A patient with trismus cannot open their mouth but needs airway support. Which device is most appropriate?",
+options: {
+A: "Nasopharyngeal airway",
+B: "Oral airway",
+C: "King LT",
+D: "Intubation"
+},
+correctAnswer: "A",
+rationale: "NPA fits without opening mouth.",
+section: "Special Cases/Airway",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What precautions should be taken with endotracheal suctioning?",
+options: {
+A: "Preoxygenation",
+B: "Limit duration (~10 sec)",
+C: "Monitor cardiac rhythm",
+D: "Sterile technique"
+},
+correctAnswer: ["A","B","C","D"],
+rationale: "Each step improves safety and prevents hypoxia/arrhythmia.",
+section: "Suctioning/ETT",
+type: "sata"
+},
+{
+questionText: "Pulse oximetry is unreliable in all EXCEPT which scenario?",
+options: {
+A: "Severe hypoperfusion",
+B: "CO poisoning",
+C: "Patient trembling",
+D: "Stable, optimally perfused, healthy patient"
+},
+correctAnswer: "D",
+rationale: "Unreliable in low perfusion, motion, abnormal hemoglobin.",
+section: "Pulse Ox Reliability",
+type: "mc"
+},
+{
+questionText: "Select all that apply: What steps optimize mask seal in BVM ventilation?",
+options: {
+A: "E-C hand technique",
+B: "Two-person method",
+C: "Mouth extended/jaw open",
+D: "Downward head pressure"
+},
+correctAnswer: ["A","B","C"],
+rationale: "E-C, mouth open, two-person improve seal; downward pressure impairs.",
+section: "Mask Seal/Technique",
+type: "sata"
+},
+{
+questionText: "When is it appropriate to use a pediatric BVM on an adult patient?",
+options: {
+A: "Never; volume delivered inadequate",
+B: "For conscious patient only",
+C: "Upon crew decision in cardiac arrest",
+D: "If adult device unavailable"
+},
+correctAnswer: "A",
+rationale: "Pediatric BVM volume is too low for adults.",
+section: "Equipment Mismatch",
+type: "mc"
+}
+
+];
+
+// --- 2. State Management ---
+const state = {
+questions: [], // Shuffled questions will be stored here
+currentQuestionIndex: 0,
+score: 0,
+userAnswers: [],
+quizStarted: false,
+currentSataSelection: new Set(),
+questionStartTime: null,
+initialSelection: null,
+};
+
+const quizContainer = document.getElementById('quiz-container');
+
+// --- 3. Core Logic Functions ---
+
+// Fisher-Yates (Knuth) Shuffle Algorithm
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function startQuiz() {
+state.quizStarted = true;
+state.currentQuestionIndex = 0;
+state.score = 0;
+state.userAnswers = [];
+state.currentSataSelection = new Set();
+state.questionStartTime = null;
+state.initialSelection = null;
+
+// SHUFFLE QUESTIONS HERE
+state.questions = shuffleArray([...rawQuestions]);
+
+render();
+}
+
+function checkAnswer(question, userSelection) {
+const correct = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+const selected = Array.isArray(userSelection) ? userSelection.sort() : [userSelection];
+
+// Check if every correct answer was selected AND nothing incorrect was selected
+const isCorrect = correct.length === selected.length && correct.every(val => selected.includes(val));
+
+return isCorrect;
+}
+
+function submitAnswer() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+let userSelection = [];
+let finalSelectionForComparison = '';
+
+// --- 1. Get User Selection and Check Validity ---
+if (currentQuestion.type === 'mc') {
+const checkedRadio = quizContainer.querySelector('input[name="option"]:checked');
+if (!checkedRadio) {
+showMessage("Please select one option before submitting.", 'warning');
+return;
+}
+userSelection = checkedRadio.value;
+finalSelectionForComparison = userSelection;
+} else if (currentQuestion.type === 'sata') {
+userSelection = Array.from(state.currentSataSelection).sort();
+if (userSelection.length === 0) {
+showMessage("Please select at least one option before submitting.", 'warning');
+return;
+}
+finalSelectionForComparison = userSelection.join(',');
+}
+
+// --- 2. Calculate Risk Metrics ---
+const timeSpentMs = Date.now() - state.questionStartTime;
+const timeSpentSeconds = Math.round(timeSpentMs / 1000);
+
+// Answer Change Risk: Check if the final selection is DIFFERENT from the initial selection
+let answerWasChanged = false;
+// Only compare if an initial selection was actually recorded (i.e., user interacted) and is different from the final
+if (state.initialSelection !== null && state.initialSelection !== finalSelectionForComparison) {
+answerWasChanged = true;
+}
+
+// Time Risk Logic
+let timeRisk = 0;
+const fastThreshold = 10; // seconds: High risk for rushing
+const slowThreshold = 90; // seconds: Moderate risk for dwelling
+
+let timeRiskText = 'Normal Time (Risk +0)';
+
+if (timeSpentSeconds < fastThreshold) {
+timeRisk = 2;
+timeRiskText = 'Fast Answer (Risk +2)';
+} else if (timeSpentSeconds > slowThreshold) {
+timeRisk = 1;
+timeRiskText = 'Slow Answer (Risk +1)';
+}
+
+// Total Risk Score: Change (3) + Time Risk (0, 1, or 2)
+const changeRisk = answerWasChanged ? 3 : 0;
+const totalRiskScore = changeRisk + timeRisk;
+
+const isCorrect = checkAnswer(currentQuestion, userSelection);
+if (isCorrect) {
+state.score++;
+}
+
+// --- 3. Record the Answer and Metrics ---
+state.userAnswers.push({
+...currentQuestion,
+userSelection: currentQuestion.type === 'mc' ? userSelection : userSelection,
+isCorrect: isCorrect,
+timeSpent: timeSpentSeconds,
+answerWasChanged: answerWasChanged,
+riskScore: totalRiskScore,
+timeRiskText: timeRiskText,
+});
+
+// Show neutral message to trigger the visual delay/button disable without revealing correctness
+showMessage("Answer recorded. Moving to next question...", 'neutral');
+
+// Move to the next question after a slight delay for user feedback
+setTimeout(() => {
+state.currentQuestionIndex++;
+state.currentSataSelection.clear(); // Reset SATA selection
+render();
+hideMessage();
+}, 1200);
+}
+
+// --- 4. Rendering Functions (Views) ---
+
+function render() {
+if (!state.quizStarted) {
+renderStartScreen();
+} else if (state.currentQuestionIndex < state.questions.length) {
+renderQuestion();
+} else {
+renderResults();
+}
+}
+
+function renderStartScreen() {
+quizContainer.innerHTML = `
+<div class="text-center py-10">
+<h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to the Clinical Nursing Diagnostic Exam</h2>
+<p class="text-gray-600 mb-8 max-w-md mx-auto">This exam contains ${rawQuestions.length} randomized critical thinking questions covering **Acid-Base, GI (Cirrhosis/Pancreatitis), and Respiratory** care. You must answer each question to proceed, and there is no option to go back.</p>
+<p class="text-md text-primary-blue mb-8 max-w-md mx-auto font-medium">✨ Risk Tracking Enabled: Your time spent and answer changes are being monitored for focused review in the results.</p>
+<button onclick="startQuiz()" class="px-8 py-3 bg-primary-blue text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-[1.02]">
+Start Exam Now
+</button>
+<p class="mt-6 text-sm text-red-500 font-medium">Warning: Questions are randomized and there is no backward navigation allowed once started.</p>
+</div>
+`;
+}
+
+function renderQuestion() {
+const currentQuestion = state.questions[state.currentQuestionIndex];
+const qNum = state.currentQuestionIndex + 1;
+const total = state.questions.length;
+const isSATA = currentQuestion.type === 'sata';
+
+// NEW: Risk Tracking Setup
+state.questionStartTime = Date.now();
+state.initialSelection = null;
+
+let optionsHtml = Object.entries(currentQuestion.options).map(([key, text]) => {
+const inputType = isSATA ? 'checkbox' : 'radio';
+const inputName = 'option';
+const isChecked = isSATA ? state.currentSataSelection.has(key) : false;
+
+return `
+<div class="mb-3">
+<input
+type="${inputType}"
+id="option-${key}"
+name="${inputName}"
+value="${key}"
+class="hidden peer"
+${isChecked ? 'checked' : ''}
+onchange="handleOptionChange(this, '${key}', '${isSATA ? 'sata' : 'mc'}')"
+/>
+<label
+for="option-${key}"
+class="option-label block w-full p-4 border-2 border-gray-200 rounded-lg bg-secondary-gray hover:bg-gray-200 transition duration-150 peer-checked:bg-blue-100 peer-checked:border-primary-blue"
+>
+<span class="font-bold text-primary-blue mr-3">${key}:</span>
+${text}
+</label>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="mb-6 border-b pb-4">
+<p class="text-sm font-semibold text-primary-blue mb-1">
+Question ${qNum} of ${total} | <span class="uppercase">${isSATA ? 'SATA (Select All That Apply)' : 'Multiple Choice'}</span>
+</p>
+<h2 class="text-xl font-semibold text-gray-800 leading-relaxed">${currentQuestion.questionText}</h2>
+<p class="text-sm text-gray-500 mt-2 italic">Section: ${currentQuestion.section}</p>
+</div>
+
+<form id="question-form" onsubmit="event.preventDefault(); submitAnswer();">
+<div class="options-container mb-8">
+${optionsHtml}
+</div>
+
+<div id="message-box" class="mb-4 hidden"></div>
+
+<div class="flex justify-end">
+<button type="submit" class="px-6 py-2 bg-correct-green text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+Submit & Next
+</button>
+</div>
+</form>
+`;
+}
+
+function handleOptionChange(input, key, type) {
+let currentSelectionString;
+
+if (type === 'sata') {
+if (input.checked) {
+state.currentSataSelection.add(key);
+} else {
+state.currentSataSelection.delete(key);
+}
+// Use a sorted comma-separated string for reliable comparison
+currentSelectionString = Array.from(state.currentSataSelection).sort().join(',');
+} else { // mc
+currentSelectionString = key;
+}
+
+// Capture initial selection only once on the first actual selection (non-empty)
+if (state.initialSelection === null && currentSelectionString !== '') {
+state.initialSelection = currentSelectionString;
+}
+}
+
+function renderResults() {
+const total = state.questions.length;
+const correctCount = state.score;
+const percentage = Math.round((correctCount / total) * 100);
+const isPassing = percentage >= 75; // Standard passing score
+
+const statusClass = isPassing ? 'bg-correct-green' : 'bg-incorrect-red';
+const statusText = isPassing ? 'DIAGNOSTIC PASSED' : 'DIAGNOSTIC FAILED';
+
+let resultsDetailHtml = state.userAnswers.map((item, index) => {
+const isCorrect = item.isCorrect;
+
+// NEW: Risk Highlighting Logic
+const isHighRiskIncorrect = !isCorrect && item.riskScore > 2;
+
+// Adjust result class based on high risk and incorrect status
+let resultClass = '';
+let riskText = '';
+if (isCorrect) {
+resultClass = 'bg-green-50 border-correct-green';
+} else if (isHighRiskIncorrect) {
+resultClass = 'bg-red-200 border-4 border-incorrect-red shadow-xl'; // Stand out!
+riskText = '<span class="text-red-700 font-extrabold ml-4">🚨 HIGH RISK INCORRECT</span>';
+} else {
+resultClass = 'bg-red-50 border-incorrect-red';
+}
+
+const resultIcon = isCorrect ? '<span class="text-correct-green font-extrabold text-lg">✓ Correct</span>' : '<span class="text-incorrect-red font-extrabold text-lg">✗ Incorrect</span>';
+
+const userAnswerDisplay = Array.isArray(item.userSelection) ? item.userSelection.join(', ') : item.userSelection;
+const correctAnswerDisplay = Array.isArray(item.correctAnswer) ? item.correctAnswer.join(', ') : item.correctAnswer;
+
+return `
+<div class="p-5 mb-6 rounded-xl border-l-4 ${resultClass} shadow-sm">
+<div class="flex justify-between items-start mb-3">
+<h3 class="text-lg font-bold text-gray-800">Question ${index + 1}: ${item.questionText}</h3>
+<div class="flex items-center space-x-4">
+${resultIcon}
+${riskText}
+</div>
+</div>
+
+<!-- NEW: Risk Metrics Display -->
+<div class="mt-2 p-3 bg-gray-100 rounded-lg text-xs font-mono text-gray-700">
+<p><strong>Time Spent:</strong> ${item.timeSpent} seconds</p>
+<p><strong>Answer Changed:</strong> ${item.answerWasChanged ? 'Yes (Risk +3)' : 'No (Risk +0)'}</p>
+<p><strong>Time Risk:</strong> ${item.timeRiskText}</p>
+<p class="mt-1 font-bold">Total Risk Score: ${item.riskScore} (Max 5)</p>
+</div>
+<!-- END NEW: Risk Metrics Display -->
+
+<p class="text-sm text-gray-700 mb-2 mt-4"><strong>Your Answer:</strong> <span class="font-medium">${userAnswerDisplay || 'No answer selected'}</span></p>
+<p class="text-sm text-gray-700 mb-4"><strong>Correct Answer(s):</strong> <span class="font-medium text-correct-green">${correctAnswerDisplay}</span></p>
+
+<div class="bg-white p-4 rounded-md border border-gray-200">
+<h4 class="font-bold text-primary-blue mb-2">Insightful Rationale:</h4>
+<p class="text-gray-600 text-sm">${item.rationale}</p>
+</div>
+</div>
+`;
+}).join('');
+
+quizContainer.innerHTML = `
+<div class="text-center py-8">
+<div class="inline-block px-6 py-2 rounded-full text-white font-bold text-xl mb-4 ${statusClass}">
+${statusText}
+</div>
+<h2 class="text-4xl font-extrabold text-gray-800 mb-2">Exam Complete!</h2>
+<p class="text-2xl text-gray-700 mb-6">Your Score: <span class="font-bold text-primary-blue">${correctCount} / ${total} (${percentage}%)</span></p>
+<button onclick="startQuiz()" class="px-6 py-3 bg-primary-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+Restart Exam
+</button>
+</div>
+
+<div class="mt-8 pt-6 border-t border-gray-200">
+<h3 class="text-2xl font-bold text-gray-800 mb-4">Detailed Performance Breakdown (Risk Adjusted)</h3>
+<p class="text-sm text-gray-600 mb-6">Review questions flagged as <strong class="text-red-700">🚨 HIGH RISK INCORRECT</strong> first, as these indicate areas where you were both incorrect and uncertain/rushing.</p>
+${resultsDetailHtml}
+</div>
+`;
+}
+
+// --- 5. Utility Functions ---
+
+function showMessage(text, type) {
+const messageBox = document.getElementById('message-box');
+let bgColor, borderColor;
+
+if (type === 'success' || type === 'neutral') { // 'neutral' handles the successful recording and transition
+bgColor = 'bg-blue-100';
+borderColor = 'border-primary-blue';
+} else if (type === 'error') {
+bgColor = 'bg-incorrect-red/10';
+borderColor = 'border-incorrect-red';
+} else { // 'warning' for incomplete selection
+bgColor = 'bg-yellow-100';
+borderColor = 'border-yellow-400';
+}
+
+messageBox.className = `p-3 rounded-lg border-l-4 font-medium text-sm ${bgColor} ${borderColor} text-gray-800`;
+messageBox.textContent = text;
+messageBox.style.display = 'block';
+
+// Only hide the submit button if it's a message indicating processing (success, error, or neutral), not just a warning to select an option
+if (type !== 'warning') {
+document.querySelector('button[type="submit"]').style.display = 'none';
+}
+}
+
+function hideMessage() {
+const messageBox = document.getElementById('message-box');
+messageBox.style.display = 'none';
+// Show the submit button again
+const submitButton = document.querySelector('button[type="submit"]');
+if(submitButton) submitButton.style.display = 'inline-flex';
+}
+
+
+// --- 6. Initialization ---
+window.onload = function() {
+render();
+};
+
+// Expose functions globally for HTML event handlers
+window.startQuiz = startQuiz;
+window.submitAnswer = submitAnswer;
+window.handleOptionChange = handleOptionChange;
+</script>
+</body>
+</html>
