@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMS Certification Simulation</title>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Configure Tailwind for Inter font and basic styling -->
+<script>
+tailwind.config = {
+theme: {
+extend: {
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+colors: {
+primary: '#3b82f6', // blue-500
+secondary: '#10b981', // emerald-500
+danger: '#ef4444', // red-500
+warning: '#f59e0b', // amber-500
+info: '#3b82f6', // Reusing primary for info blue
+}
+}
+}
+}
+</script>
+<style>
+body {
+background-color: #f3f4f6; /* bg-gray-100 */
+font-family: 'Inter', sans-serif;
+}
+.container-card {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.option-label {
+transition: background-color 0.2s, border-color 0.2s;
+cursor: pointer;
+}
+/* Custom styling for correct/incorrect answers in review */
+.correct-answer {
+background-color: #d1fae5; /* green-100 */
+border-color: #10b981; /* secondary */
+}
+.incorrect-answer {
+background-color: #fee2e2; /* red-100 */
+border-color: #ef4444; /* danger */
+}
+.correct-selected {
+background-color: #a7f3d0; /* green-200 */
+}
+.incorrect-selected {
+background-color: #fecaca; /* red-300 */
+}
+</style>
+</head>
+<body class="p-4 sm:p-8">
+
+<div id="app" class="max-w-4xl mx-auto">
+<header class="text-center mb-6">
+<h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800">EMS Certification Simulation: Knowledge Assessment</h1>
+<p class="text-gray-500 mt-1">Simulated High-Yield Examination Module</p>
+</header>
+
+<!-- Quiz Container - Dynamically populated by JS -->
+<div id="quiz-container" class="container-card bg-white rounded-xl p-6 sm:p-8">
+<div id="loading-indicator" class="text-center p-12 text-gray-500">
+Initializing assessment data...
+</div>
+<!-- Content will be rendered here -->
+</div>
+
+</div>
+
+<script type="module">
+// --- FIREBASE AND INITIALIZATION SETUP (MANDATORY BOILERPLATE) ---
+// NOTE: Firestore is not used for static quiz data, but the initialization is required.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// Global variables must be used
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+let db, auth;
+
+async function initializeFirebase() {
+if (firebaseConfig) {
+const app = initializeApp(firebaseConfig);
+db = getFirestore(app);
+auth = getAuth(app);
+
+try {
+if (initialAuthToken) {
+await signInWithCustomToken(auth, initialAuthToken);
+console.log("Firebase signed in with custom token.");
+} else {
+await signInAnonymously(auth);
+console.log("Firebase signed in anonymously.");
+}
+} catch (error) {
+console.error("Firebase Auth Error:", error);
+}
+} else {
+console.warn("Firebase config not available. Running quiz locally.");
+}
+}
+
+initializeFirebase();
+
+// --- QUIZ DATA ---
+// I kept the original question set
+const QUESTIONS = [
+{
+"questionText": "An unresponsive trauma patient is found apneic and pulseless. Which assessment sequence should be performed first?",
+"options": {
+"A": "Assess for decapitation or obvious incompatible injury",
+"B": "Open airway, give two ventilations, then check pulse",
+"C": "Check for scene safety, don BSI/PPE, rapid primary survey",
+"D": "Establish capnography baseline"
+},
+"correctAnswer": "C",
+"rationale": "Scene safety and primary survey must precede hands-on interventions.",
+"section": "Initial Assessment/Scene Management",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which findings make a patient 'high priority' during primary assessment?",
+"options": {
+"A": "Unresponsive to verbal stimuli",
+"B": "Unable to follow commands",
+"C": "Shock uncorrected by O2",
+"D": "Severe pain anywhere"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All are criteria from national EMS priority guidelines.",
+"section": "Priority Patient/Critical Findings",
+"type": "sata"
+},
+{
+"questionText": "A 62-year-old male is confused after a car crash. He has pale, cool skin and a weak radial pulse. Which sign requires IMMEDIATE intervention?",
+"options": {
+"A": "Confusion",
+"B": "Weak radial pulse",
+"C": "Cool, pale skin",
+"D": "All indicate shock and require immediate care"
+},
+"correctAnswer": "D",
+"rationale": "All are indication of shock; intervene urgently.",
+"section": "Shock Recognition",
+"type": "mc"
+},
+{
+"questionText": "During scene size-up, you notice downed live wires. What is your initial step?",
+"options": {
+"A": "Move patient away from wires",
+"B": "Notify dispatch and secure the scene",
+"C": "Continue assessment from distance",
+"D": "Try to contain wires"
+},
+"correctAnswer": "B",
+"rationale": "Scene safety and notification are first priorities.",
+"section": "Scene Size-Up",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which primary assessment findings suggest life-threatening airway compromise?",
+"options": {
+"A": "Gurgling respirations",
+"B": "Stridor and cyanosis",
+"C": "Absent breath sounds",
+"D": "Unresponsive and unable to protect airway"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All are airway emergencies and require immediate action.",
+"section": "Primary Survey/Airway",
+"type": "sata"
+},
+{
+"questionText": "A patient is found responsive, but not oriented to time or place. What is their AVPU status?",
+"options": {
+"A": "Alert",
+"B": "Verbal",
+"C": "Pain",
+"D": "Unresponsive"
+},
+"correctAnswer": "A",
+"rationale": "Alert means any level of consciousness, even if confused.",
+"section": "Mental Status/AVPU",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: What should be done during the 'exposure' portion of a primary survey?",
+"options": {
+"A": "Remove or cut clothing",
+"B": "Look for hidden injuries",
+"C": "Evaluate for medical devices",
+"D": "Assess temperature/environment"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All are part of proper exposure assessment.",
+"section": "Exposure Assessment",
+"type": "sata"
+},
+{
+"questionText": "What is the best method to assess airway patency in a talking patient?",
+"options": {
+"A": "Ask them to cough",
+"B": "Check if they can speak full sentences",
+"C": "Insert an OPA",
+"D": "Inspect uvula visually"
+},
+"correctAnswer": "B",
+"rationale": "Ability to speak full sentences confirms airway patency.",
+"section": "Airway Assessment/Responsive",
+"type": "mc"
+},
+{
+"questionText": "Patient with severe facial trauma is breathing but gurgling. First priority?",
+"options": {
+"A": "High-flow O2",
+"B": "Suctioning airway",
+"C": "Immediate intubation",
+"D": "Insert nasopharyngeal airway"
+},
+"correctAnswer": "B",
+"rationale": "Clear airway before oxygen or advanced airways.",
+"section": "Airway Management/Facial Trauma",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which findings support airway patency during primary assessment?",
+"options": {
+"A": "Talking clearly",
+"B": "No abnormal sounds",
+"C": "Equal chest rise",
+"D": "No visible secretions"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All signs of open, effective airway.",
+"section": "Airway Assessment",
+"type": "sata"
+},
+{
+"questionText": "A trauma patient with altered LOC has rapid, shallow breathing and weak central pulse. What priority classification?",
+"options": {
+"A": "Lowest",
+"B": "High priority—immediate transport and interventions",
+"C": "Monitor on scene",
+"D": "Observe only if pain-free"
+},
+"correctAnswer": "B",
+"rationale": "Altered mental status plus poor ABCs equals high priority.",
+"section": "Priority Assessment/Decision",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which interventions are required in primary survey of a trauma patient found pulseless and apneic after high-speed MVC?",
+"options": {
+"A": "Open airway",
+"B": "Start compressions",
+"C": "Request ALS backup",
+"D": "Apply AED ASAP"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All interventions should be initiated rapidly.",
+"section": "Resuscitation/Primary Survey",
+"type": "sata"
+},
+{
+"questionText": "What best distinguishes a 'focused' secondary exam from a 'rapid trauma' exam?",
+"options": {
+"A": "Focused examines one body system/area only",
+"B": "Rapid is a complete, head-to-toe assessment",
+"C": "Only rapid trauma checks for hidden bleeding",
+"D": "Focused is for critical unstable patients"
+},
+"correctAnswer": "A",
+"rationale": "Focused = single system with isolated complaint.",
+"section": "Secondary Survey/Approach",
+"type": "mc"
+},
+{
+"questionText": "Patient with snoring respirations, no trauma, responds only to pain. Best airway opening maneuver?",
+"options": {
+"A": "Head tilt–chin lift",
+"B": "Jaw-thrust",
+"C": "OPA placement alone",
+"D": "No airway management needed"
+},
+"correctAnswer": "A",
+"rationale": "Snoring indicates obstruction; use head tilt if no trauma.",
+"section": "Airway/Consciousness",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which findings in trauma patient suggest need for immediate rapid transport versus on-scene care?",
+"options": {
+"A": "Absent radial pulses",
+"B": "Uncontrolled severe bleeding",
+"C": "Respiratory rate <10 or >29",
+"D": "GCS below 14"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All are indicators for immediate transport.",
+"section": "Rapid Transport Decision",
+"type": "sata"
+},
+{
+"questionText": "EMS arrives to find multiple patients complaining of headache and dizziness in a poorly ventilated house. First concern?",
+"options": {
+"A": "Mass poisoning/carbon monoxide exposure",
+"B": "Food poisoning",
+"C": "Viral illness",
+"D": "Drug overdose"
+},
+"correctAnswer": "A",
+"rationale": "Multiple similar complaints indoors = CO poisoning.",
+"section": "Environmental/Scene Hazards",
+"type": "mc"
+},
+{
+"questionText": "Which vital sign trend requires reassessment of scene safety?",
+"options": {
+"A": "Sudden drop in all patient’s respiratory rates",
+"B": "Tachycardia improving with O2",
+"C": "Blood pressure stabilizing in all patients",
+"D": "Pupils round and equal"
+},
+"correctAnswer": "A",
+"rationale": "Multiple patient change implies possible ongoing exposure/hazard.",
+"section": "Ongoing Assessment/Scene",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which findings suggest combining medical and trauma assessment approaches?",
+"options": {
+"A": "Heart attack with motor vehicle crash",
+"B": "Diabetic coma after fall",
+"C": "Shortness of breath after gunshot wound",
+"D": "Seizure while playing sports"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All require hybrid assessment and management.",
+"section": "Combined Assessment/Critical Thinking",
+"type": "sata"
+},
+{
+"questionText": "Unresponsive overdose patient has slow, shallow breathing, pinpoint pupils, cool skin. Priority intervention?",
+"options": {
+"A": "Ventilatory support with O2 and rapid transport",
+"B": "On-scene decontamination",
+"C": "5150 mental health hold paperwork",
+"D": "Reassurance only"
+},
+"correctAnswer": "A",
+"rationale": "Support airway, breathing, rapid transport.",
+"section": "Toxicology/Primary Care",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which documentation elements are critical for high-risk refusal situations after assessment?",
+"options": {
+"A": "Mental status exam",
+"B": "Risks explained to patient",
+"C": "Witnessed signature on refusal",
+"D": "Vital signs and exam findings"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All details protect EMS legally and support clinical quality.",
+"section": "Refusal/Documentation",
+"type": "sata"
+},
+{
+"questionText": "A 23-year-old with asthma presents with severe dyspnea, minimal chest rise, tripod positioning, and one-word answers. What is the most ominous sign?",
+"options": {
+"A": "Tripod position",
+"B": "One-word answers",
+"C": "Minimal chest rise",
+"D": "Severe dyspnea"
+},
+"correctAnswer": "C",
+"rationale": "Minimal chest rise suggests failing ventilation and impending respiratory arrest.",
+"section": "Respiratory Assessment",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which findings in a pediatric rapid assessment require immediate airway interventions?",
+"options": {
+"A": "Grunting",
+"B": "Nasal flaring",
+"C": "Head bobbing",
+"D": "Silent chest"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All signs indicate severe airway distress/failure.",
+"section": "Pediatric Assessment",
+"type": "sata"
+},
+{
+"questionText": "Scene size-up reveals forced entry, alcohol, and blood. Patient is combative. What is the highest-priority safety concern?",
+"options": {
+"A": "Personal/crew safety first",
+"B": "Control patient movement",
+"C": "Start vitals immediately",
+"D": "Apply restraints"
+},
+"correctAnswer": "A",
+"rationale": "Scene safety comes before patient care.",
+"section": "Scene Safety/Psychiatric",
+"type": "mc"
+},
+{
+"questionText": "A patient with chest trauma has absent breath sounds on one side and JVD. What is the likely diagnosis and best primary intervention?",
+"options": {
+"A": "Tension pneumothorax, rapid transport and ALS decompression",
+"B": "Asthma, give bronchodilator",
+"C": "Flail chest, stabilize and ventilate",
+"D": "Simple pneumothorax, O2 by NRB"
+},
+"correctAnswer": "A",
+"rationale": "Absent sounds + JVD = tension pneumothorax needs ALS.",
+"section": "Trauma Assessment",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which are essential parts of the secondary assessment for a patient with isolated head trauma and confusion?",
+"options": {
+"A": "Serial GCS",
+"B": "Pupil assessment",
+"C": "Monitor for posturing/seizure",
+"D": "Repeat vital signs"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All provide key neurological data for head injury patients.",
+"section": "Focused Neurological Assessment",
+"type": "sata"
+},
+{
+"questionText": "During history taking, the patient with chest pain says 'this has happened before, but never this bad.' What is the best follow-up question?",
+"options": {
+"A": "What were you doing when it started?",
+"B": "Have you taken any medications for the pain?",
+"C": "Has it resolved on its own before?",
+"D": "Any family history of heart disease?"
+},
+"correctAnswer": "B",
+"rationale": "Determining what has/hasn't worked guides care.",
+"section": "History/Symptom Assessment",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: What vital sign abnormalities suggest compensatory shock during reassessment?",
+"options": {
+"A": "Tachycardia",
+"B": "Tachypnea",
+"C": "Delayed capillary refill",
+"D": "Cool, clammy skin"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All are classic compensatory shock signs.",
+"section": "Shock Physiology/Vitals",
+"type": "sata"
+},
+{
+"questionText": "A diabetic patient is pale, sweating, shaking, and agitated. After confirming hypoglycemia, what is the most important documentation element?",
+"options": {
+"A": "Response to oral glucose",
+"B": "Chief complaint",
+"C": "Time symptoms started",
+"D": "Past medical history"
+},
+"correctAnswer": "A",
+"rationale": "Outcome of intervention affects further care.",
+"section": "Endocrine Assessment/Documentation",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: When reassessing after rapid trauma transport, which changes require immediate intervention?",
+"options": {
+"A": "Drop in GCS by 2 points",
+"B": "Newly irregular pulse",
+"C": "Sudden hypotension",
+"D": "Development of unequal pupils"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "Any acute change post-trauma = emergency.",
+"section": "Serial Reassessment",
+"type": "sata"
+},
+{
+"questionText": "A patient with abdominal pain is tachycardic, normotensive, afebrile, and pale. What is the primary concern?",
+"options": {
+"A": "Early hypovolemic shock",
+"B": "Meningitis",
+"C": "Toxic ingestion",
+"D": "Skin infection"
+},
+"correctAnswer": "A",
+"rationale": "Vitals suggest compensation for hemorrhage.",
+"section": "GI Complaint/VS Analysis",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which require precise documentation to support billing and legal protection after trauma assessment?",
+"options": {
+"A": "Mechanism of injury",
+"B": "Interventions performed",
+"C": "Changes in exam or vitals over time",
+"D": "Patient/family refusal details"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All support accurate, defensible records.",
+"section": "Documentation Standards",
+"type": "sata"
+},
+{
+"questionText": "Elderly patient after a minor fall appears stable, but you note mid-shaft femur tenderness. What is the best reason for rapid transport?",
+"options": {
+"A": "High risk of hidden bleeding and shock",
+"B": "Pain control is only available in ED",
+"C": "Patient anxiety requires hospital care",
+"D": "No concern—observe at home"
+},
+"correctAnswer": "A",
+"rationale": "Elderly at high risk for severe, occult hemorrhage after trauma.",
+"section": "Geriatric Trauma/Transport",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: In a multiple-incident scene, which steps ensure patient identity and assessment accuracy?",
+"options": {
+"A": "Use unique tags/stickers per patient",
+"B": "Sync assessment notes with triage system",
+"C": "Independent reassessment by alternate teams",
+"D": "Verbal confirmation of patient’s name when possible"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All help minimize mix-ups in mass-casualty environments.",
+"section": "Mass Casualty/Patient ID",
+"type": "sata"
+},
+{
+"questionText": "A patient with severe burns develops hoarseness and stridor. What is the highest priority action?",
+"options": {
+"A": "Immediate airway intervention/ALS backup",
+"B": "Pain management",
+"C": "Burn dressing only",
+"D": "Monitor at scene"
+},
+"correctAnswer": "A",
+"rationale": "Impending airway closure is likely; intervene rapidly.",
+"section": "Burns/Airway",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which findings demand ongoing, repeated assessment even during transport?",
+"options": {
+"A": "Decreased LOC",
+"B": "Sudden changes in skin",
+"C": "Newly developed symptoms",
+"D": "Significant mechanism of injury, even if stable"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "Any concerning sign or worrisome MOI = repeated reassessment.",
+"section": "Ongoing/Re-exam",
+"type": "sata"
+},
+{
+"questionText": "Well-appearing adolescent after minor crash begins vomiting and loses consciousness. Most urgent assessment step?",
+"options": {
+"A": "Check and manage airway/breathing",
+"B": "Call for parents' consent",
+"C": "Wait for school nurse",
+"D": "Perform only vitals"
+},
+"correctAnswer": "A",
+"rationale": "Vomiting + LOC = airway/ABC risk; intervene first.",
+"section": "Pediatric/Change in Condition",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which tools are useful for neurologic assessment trends during serial exams?",
+"options": {
+"A": "GCS calculator",
+"B": "Pupilometer",
+"C": "Stroke assessment scales",
+"D": "Serial AVPU/GCS charting"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All help monitor changes.",
+"section": "Neuro Reassessment",
+"type": "sata"
+},
+{
+"questionText": "A middle-aged man collapses while running, shows agonal respirations and weak carotid pulse. What is the appropriate initial EMR/EMT response?",
+"options": {
+"A": "Begin compressions immediately",
+"B": "Open airway and ventilate while preparing AED",
+"C": "Apply oxygen by nasal cannula only",
+"D": "Vital signs, then move to ambulance"
+},
+"correctAnswer": "B",
+"rationale": "Ventilate and prepare AED since agonal respirations indicate arrest or severe compromise.",
+"section": "Cardiac Arrest Approach",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which strategies reduce misassessment risks in multi-patient scenes?",
+"options": {
+"A": "Tag each patient",
+"B": "Assign team member to track symptoms/vitals separately",
+"C": "Verbal handoff at every patient transfer point",
+"D": "Photographically record patient position if protocol allows"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All help avoid mix-up errors.",
+"section": "Mass Casualty/Assessment",
+"type": "sata"
+},
+{
+"questionText": "Elderly man with sudden left-sided weakness and slurred speech is awake but confused. Which assessment is highest priority?",
+"options": {
+"A": "Stroke assessment (FAST/GCS)",
+"B": "Blood pressure",
+"C": "Pain scale",
+"D": "Check medication bottles"
+},
+"correctAnswer": "A",
+"rationale": "Rapid neuro assessment is critical for suspected stroke.",
+"section": "Neuro/Critical Illness",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which environmental clues during scene size-up shape your initial patient approach?",
+"options": {
+"A": "Medicine bottles or inhalers visible",
+"B": "Weapons or hazards present",
+"C": "Multiple phone chargers or wires near patient",
+"D": "Pets or animals interacting near scene"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "All inform risk or likely patient conditions.",
+"section": "Scene Assessment/Environment",
+"type": "sata"
+},
+{
+"questionText": "After primary assessment, you note a trauma victim is pulseless, cool, and mottled. Next step?",
+"options": {
+"A": "Initiate CPR",
+"B": "Bandage all wounds first",
+"C": "Reassess family for main complaint",
+"D": "Wait for ALS arrival"
+},
+"correctAnswer": "A",
+"rationale": "Pulseless = CPR priority.",
+"section": "Resuscitation/ABC",
+"type": "mc"
+},
+{
+"questionText": "Patient with abdominal pain is hypotensive, tachycardic, but alert and oriented. What physical exam finding would push you toward urgent transport?",
+"options": {
+"A": "Rigid abdomen",
+"B": "No tenderness",
+"C": "Soft tissue swelling only",
+"D": "Mild bruising without pain"
+},
+"correctAnswer": "A",
+"rationale": "Rigid abdomen + shock symptoms = surgical emergency.",
+"section": "GI Emergency/Exam",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which answers help confirm that reassessment is complete following a patient’s sudden change in mental status?",
+"options": {
+"A": "Repeat all vital signs",
+"B": "Check history for new events",
+"C": "Re-interview witnesses/family",
+"D": "Document timing and interventions"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "A thorough reassessment includes all steps.",
+"section": "Reassessment Protocol",
+"type": "sata"
+},
+{
+"questionText": "A patient with diabetes, hypertension and seizure is found unresponsive postictally. Which assessment is most critical to perform immediately?",
+"options": {
+"A": "Check blood glucose",
+"B": "Monitor pupil response",
+"C": "Repeat GCS",
+"D": "Complete psychiatric assessment"
+},
+"correctAnswer": "A",
+"rationale": "Blood glucose must be checked after seizure, especially in diabetics.",
+"section": "Post-Seizure Assessment",
+"type": "mc"
+},
+{
+"questionText": "Select all that apply: Which assessment/documentation errors increase risks for adverse outcomes or litigation?",
+"options": {
+"A": "Incomplete exam or missed injuries",
+"B": "Neglecting to document mental status changes",
+"C": "Forgetting to note refusals or witness details",
+"D": "Inaccurate recording of vital signs"
+},
+"correctAnswer": ["A","B","C","D"],
+"rationale": "Each error increases clinical or legal risk.",
+"section": "Quality/Liability",
+"type": "sata"
+},
+{
+"questionText": "Upon handoff to ED, what is the key minimum information that must be verbally communicated?",
+"options": {
+"A": "Chief complaint, primary assessment findings, interventions, response",
+"B": "All medical history",
+"C": "Insurance information",
+"D": "Vehicle details"
+},
+"correctAnswer": "A",
+"rationale": "Handoff should focus on chief complaint, assessment, care, and patient response for continuity.",
+"section": "Transfer of Care/Handoff",
+"type": "mc"
+}
+
+];
+
+// --- SESSION MANAGEMENT & SHUFFLING ---
+const MAX_QUESTIONS = 15;
+let sessionQuestions = [];
+
+function createRandomSession() {
+// 1. Copy and shuffle the entire question bank
+const shuffled = [...QUESTIONS].sort(() => 0.5 - Math.random());
+// 2. Select the first MAX_QUESTIONS for this session
+sessionQuestions = shuffled.slice(0, MAX_QUESTIONS);
+}
+
+// --- QUIZ STATE MANAGEMENT ---
+let state = {
+currentQuestionIndex: 0,
+userAnswers: [],
+isQuizFinished: false,
+showResults: false,
+correctCount: 0,
+incorrectCount: 0,
+sectionAnalysis: {}
+};
+
+const quizContainer = document.getElementById('quiz-container');
+
+// Initial setup for userAnswers structure based on the *session* questions
+function setupState() {
+state.userAnswers = sessionQuestions.map(q => q.type === 'mc' ? null : []);
+}
+
+
+// --- UTILITY FUNCTIONS ---
+function arraysEqual(a, b) {
+if (a.length !== b.length) return false;
+const sortedA = [...a].sort();
+const sortedB = [...b].sort();
+return sortedA.every((val, index) => val === sortedB[index]);
+}
+
+function calculateScore() {
+let correct = 0;
+let incorrect = 0;
+let sectionScores = {}; // { "Section Name": { total: 0, missed: 0 } }
+
+// Iterate over sessionQuestions, not the full bank
+sessionQuestions.forEach((q, index) => {
+const userAnswer = state.userAnswers[index];
+const correctAnswer = q.correctAnswer;
+let isCorrect = false;
+
+// Initialize section tracking
+if (!sectionScores[q.section]) {
+sectionScores[q.section] = { total: 0, missed: 0 };
+}
+sectionScores[q.section].total++;
+
+if (q.type === 'mc') {
+// MC: Check if single selection matches single correct letter
+isCorrect = userAnswer === correctAnswer;
+} else if (q.type === 'sata') {
+// SATA: Check if the arrays of selected letters match the array of correct letters
+isCorrect = arraysEqual(userAnswer, correctAnswer);
+}
+
+if (isCorrect) {
+correct++;
+} else {
+// Count as incorrect/missed for score and section analysis if not correct
+incorrect++;
+sectionScores[q.section].missed++;
+}
+});
+
+state.correctCount = correct;
+state.incorrectCount = incorrect;
+state.sectionAnalysis = sectionScores;
+}
+
+function handleAnswerChange(event, qIndex, qType) {
+const value = event.target.value;
+
+if (qType === 'mc') {
+// MC: Simple assignment
+state.userAnswers[qIndex] = value;
+} else if (qType === 'sata') {
+// SATA: Add or remove the value from the array
+let currentSelections = state.userAnswers[qIndex] || [];
+if (event.target.checked) {
+// Add to array
+currentSelections.push(value);
+} else {
+// Remove from array
+currentSelections = currentSelections.filter(v => v !== value);
+}
+state.userAnswers[qIndex] = currentSelections;
+}
+renderFooter();
+}
+
+function navigate(direction) {
+const sessionLength = sessionQuestions.length;
+if (state.showResults) {
+// In review mode, we navigate through the questions
+state.currentQuestionIndex = Math.max(0, Math.min(sessionLength - 1, state.currentQuestionIndex + direction));
+renderQuestionReview();
+} else {
+// In test mode, move to next/previous question
+state.currentQuestionIndex = Math.max(0, Math.min(sessionLength - 1, state.currentQuestionIndex + direction));
+renderQuestion();
+}
+window.scrollTo(0, 0); // Scroll to top on navigation
+}
+
+function finishQuiz() {
+calculateScore();
+state.isQuizFinished = true;
+state.showResults = true;
+renderExamReport(); // Show the main report first
+window.scrollTo(0, 0);
+}
+
+function startReview() {
+state.showResults = true;
+state.currentQuestionIndex = 0;
+renderQuestionReview(); // Start detailed question review
+}
+
+function restartQuiz() {
+createRandomSession(); // Generate a brand new randomized session
+state = {
+currentQuestionIndex: 0,
+userAnswers: sessionQuestions.map(q => q.type === 'mc' ? null : []), // Reset answers for new session
+isQuizFinished: false,
+showResults: false,
+correctCount: 0,
+incorrectCount: 0,
+sectionAnalysis: {}
+};
+renderPreamble(); // Go back to the preamble screen
+}
+
+// --- RENDER FUNCTIONS ---
+
+function renderFooter() {
+const sessionLength = sessionQuestions.length;
+const isLastQuestion = state.currentQuestionIndex === sessionLength - 1;
+
+let nextButtonContent = isLastQuestion ? 'Submit Assessment' : 'Next Question &rarr;';
+let nextButtonAction = isLastQuestion ? 'finishQuiz()' : 'navigate(1)';
+
+// In review mode, the footer is used for question navigation
+if (state.showResults) {
+nextButtonContent = state.currentQuestionIndex === sessionLength - 1 ? 'Go to Report' : 'Next Question &rarr;';
+nextButtonAction = state.currentQuestionIndex === sessionLength - 1 ? 'renderExamReport()' : 'navigate(1)';
+}
+
+
+const footerHTML = `
+<div class="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t border-gray-200">
+<div class="text-sm text-gray-600 mb-3 sm:mb-0">
+${state.showResults ? 'Reviewing' : 'Question'} ${state.currentQuestionIndex + 1} of ${sessionLength}
+</div>
+<div class="flex space-x-2">
+<button onclick="navigate(-1)" ${state.currentQuestionIndex === 0 ? 'disabled' : ''}
+class="px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 disabled:opacity-50 transition duration-150">
+&larr; Previous
+</button>
+
+<button onclick="window.${nextButtonAction}"
+class="px-4 py-2 bg-primary text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
+${nextButtonContent}
+</button>
+</div>
+</div>
+`;
+
+// Try to find and replace existing footer, otherwise append it
+let existingFooter = document.getElementById('quiz-footer');
+if (existingFooter) {
+existingFooter.innerHTML = footerHTML;
+} else {
+const footerDiv = document.createElement('div');
+footerDiv.id = 'quiz-footer';
+footerDiv.innerHTML = footerHTML;
+quizContainer.appendChild(footerDiv);
+}
+}
+
+function renderQuestion() {
+const q = sessionQuestions[state.currentQuestionIndex];
+const index = state.currentQuestionIndex;
+const currentAnswer = state.userAnswers[index] || (q.type === 'mc' ? null : []);
+
+const questionType = q.type === 'mc' ? 'Multiple Choice (Select One)' : 'Select All That Apply';
+const inputType = q.type === 'mc' ? 'radio' : 'checkbox';
+
+// Generate Options HTML
+const optionsHTML = Object.entries(q.options).map(([key, text]) => {
+const optionId = `q${index}-${key}`;
+
+// Check if the current option is selected
+let isChecked;
+if (q.type === 'mc') {
+isChecked = currentAnswer === key;
+} else {
+isChecked = currentAnswer.includes(key);
+}
+
+return `
+<label for="${optionId}" class="option-label flex items-center p-4 mb-3 border border-gray-200 rounded-lg hover:border-primary/50 transition duration-150 ${isChecked ? 'bg-blue-50 border-primary' : ''}">
+<input type="${inputType}" id="${optionId}" name="question-${index}" value="${key}" ${isChecked ? 'checked' : ''}
+onchange="window.handleAnswerChange(event, ${index}, '${q.type}')"
+class="w-5 h-5 text-primary border-gray-300 focus:ring-primary ${q.type === 'mc' ? 'rounded-full' : 'rounded'}">
+<span class="ml-4 font-medium text-gray-700">
+<span class="font-bold text-lg mr-2">${key}.</span>
+${text}
+</span>
+</label>
+`;
+}).join('');
+
+// Main Content
+const contentHTML = `
+<div class="flex justify-between items-start mb-4">
+<h2 class="text-2xl font-bold text-primary">Question ${index + 1}</h2>
+<span class="px-3 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary">${questionType}</span>
+</div>
+
+<p class="text-lg font-medium text-gray-800 mb-6 border-l-4 border-primary pl-4 py-1">
+${q.questionText}
+</p>
+
+<div class="mb-8">
+<h3 class="text-xl font-semibold text-gray-700 mb-4">Response Selections:</h3>
+${optionsHTML}
+</div>
+`;
+
+quizContainer.innerHTML = contentHTML;
+renderFooter();
+}
+
+function renderQuestionReview() {
+if (!state.isQuizFinished) return;
+
+const q = sessionQuestions[state.currentQuestionIndex];
+const index = state.currentQuestionIndex;
+const userAnswer = state.userAnswers[index] || (q.type === 'mc' ? null : []);
+const correctAnswer = q.correctAnswer;
+
+const isCorrectQ = q.type === 'mc'
+? userAnswer === correctAnswer
+: arraysEqual(userAnswer, correctAnswer);
+
+const questionType = q.type === 'mc' ? 'Multiple Choice' : 'Select All That Apply';
+
+// Generate Review Options HTML
+const optionsHTML = Object.entries(q.options).map(([key, text]) => {
+const isSelected = q.type === 'mc' ? userAnswer === key : (userAnswer && userAnswer.includes(key));
+const isCorrectOption = q.type === 'mc' ? correctAnswer === key : correctAnswer.includes(key);
+
+let optionClass = 'border-gray-200';
+let icon = '';
+
+if (isCorrectOption) {
+optionClass = 'correct-answer border-secondary';
+icon = '<span class="ml-auto text-secondary font-extrabold text-xl">&#10003;</span>'; // Checkmark
+}
+
+if (isSelected && !isCorrectOption) {
+optionClass = 'incorrect-selected border-danger';
+icon = '<span class="ml-auto text-danger font-extrabold text-xl">&#10007;</span>'; // X mark
+} else if (isSelected && isCorrectOption && !isCorrectQ) {
+// Partially correct SATA selection, mark as correct-selected but still show the X on the overall Q
+optionClass = 'correct-selected border-secondary';
+}
+
+return `
+<div class="option-label flex items-center p-4 mb-3 border rounded-lg ${optionClass}">
+<span class="font-bold text-lg w-6">${key}.</span>
+<span class="ml-2 font-medium text-gray-800">${text}</span>
+${icon}
+</div>
+`;
+}).join('');
+
+let reviewStatus;
+if (isCorrectQ) {
+reviewStatus = `<span class="px-3 py-1 text-white font-bold rounded-full bg-secondary">CORRECT</span>`;
+} else {
+reviewStatus = `<span class="px-3 py-1 text-white font-bold rounded-full bg-danger">INCORRECT</span>`;
+}
+
+// Main Content
+const contentHTML = `
+<div class="flex justify-between items-start mb-4">
+<h2 class="text-2xl font-bold text-primary">Reviewing Question ${index + 1}</h2>
+<div class="flex space-x-2 items-center">
+<span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-700">${questionType}</span>
+${reviewStatus}
+</div>
+</div>
+
+<p class="text-lg font-medium text-gray-800 mb-6 border-l-4 border-primary pl-4 py-1">
+${q.questionText}
+</p>
+
+<div class="mb-6">
+<h3 class="text-xl font-semibold text-gray-700 mb-4">Your Selections & Correct Answer:</h3>
+${optionsHTML}
+</div>
+
+<div class="p-4 rounded-lg bg-yellow-50 border-l-4 border-warning">
+<h4 class="font-bold text-warning-800 mb-2">Rationale (${q.section}):</h4>
+<p class="text-yellow-700">${q.rationale}</p>
+</div>
+`;
+
+quizContainer.innerHTML = contentHTML;
+renderFooter(); // Reuse footer for navigation in review mode
+}
+
+function renderExamReport() {
+const totalQuestions = sessionQuestions.length; // Use session length
+const scorePercentage = ((state.correctCount / totalQuestions) * 100).toFixed(1);
+const passFailColor = scorePercentage >= 70 ? 'text-secondary' : 'text-danger';
+const passFailLabel = scorePercentage >= 70 ? 'PASSING' : 'NEEDS IMPROVEMENT';
+const passFailBg = scorePercentage >= 70 ? 'bg-secondary' : 'bg-danger';
+
+// 1. Analyze Weakest Sections
+let sectionScoresArray = [];
+for (const section in state.sectionAnalysis) {
+const data = state.sectionAnalysis[section];
+const accuracy = data.total > 0 ? ((data.total - data.missed) / data.total) : 1;
+sectionScoresArray.push({
+name: section,
+total: data.total,
+missed: data.missed,
+accuracy: accuracy,
+missedRate: data.missed / data.total
+});
+}
+
+// Sort by highest missed rate, then by total number missed
+const weakestSections = sectionScoresArray
+.filter(s => s.missed > 0)
+.sort((a, b) => {
+if (b.missedRate !== a.missedRate) {
+return b.missedRate - a.missedRate;
+}
+return b.missed - a.missed;
+})
+.slice(0, 3); // Get top 3
+
+const studyRecommendationsHTML = weakestSections.length > 0 ? weakestSections.map((s, index) => {
+const improvementText = s.missedRate >= 0.5 ? 'Significant focus required.' : 'Review key concepts.';
+return `
+<li class="p-4 bg-red-50 rounded-lg border-l-4 border-danger flex justify-between items-center mb-3">
+<div>
+<span class="font-bold text-lg text-danger mr-2">#${index + 1} Weakest: ${s.name}</span>
+<p class="text-sm text-gray-600">Missed ${s.missed} of ${s.total} questions (${(s.missedRate * 100).toFixed(0)}% missed). ${improvementText}</p>
+</div>
+<span class="text-xs font-semibold px-3 py-1 rounded-full bg-red-200 text-red-800">${(s.missedRate * 100).toFixed(0)}% Accuracy</span>
+</li>
+`;
+}).join('') : `
+<div class="p-4 bg-secondary/10 text-secondary rounded-lg font-semibold text-center">
+Excellent! No significant weakness detected. Keep reviewing all sections.
+</div>
+`;
+
+const reportHTML = `
+<div class="text-center mb-8">
+<h2 class="text-3xl font-extrabold text-gray-800 mb-2">Formal Assessment Report Card</h2>
+<p class="text-gray-500">Your performance breakdown and study recommendations.</p>
+</div>
+
+<!-- Score Summary -->
+<div class="bg-white p-6 rounded-xl border-4 ${scorePercentage >= 70 ? 'border-secondary' : 'border-danger'} shadow-lg mb-8">
+<div class="flex flex-col sm:flex-row justify-around items-center">
+<div class="mb-4 sm:mb-0">
+<p class="text-7xl font-extrabold ${passFailColor} leading-none">${scorePercentage}</p>
+<p class="text-gray-500 mt-1 text-sm font-semibold">% Score</p>
+</div>
+<div class="text-center mb-4 sm:mb-0">
+<span class="px-4 py-2 text-lg font-bold rounded-full ${passFailBg} text-white shadow-md">${passFailLabel}</span>
+</div>
+<div class="flex space-x-6">
+<div class="text-center">
+<p class="text-3xl font-bold text-secondary">${state.correctCount}</p>
+<p class="text-gray-500 text-sm">Correct</p>
+</div>
+<div class="text-center">
+<p class="text-3xl font-bold text-danger">${state.incorrectCount}</p>
+<p class="text-gray-500 text-sm">Incorrect</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Study Recommendations -->
+<h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Study Focus Areas:</h3>
+<ul class="mb-8 space-y-3">
+${studyRecommendationsHTML}
+</ul>
+
+<!-- Action Buttons -->
+<div class="flex justify-center space-x-4 pt-4 border-t border-gray-200">
+<button onclick="window.startReview()"
+class="px-6 py-3 bg-primary text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
+Detailed Question Review &rarr;
+</button>
+<button onclick="window.restartQuiz()"
+class="px-6 py-3 bg-gray-400 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-500 transition duration-150">
+Start New Simulation
+</button>
+</div>
+`;
+quizContainer.innerHTML = reportHTML;
+// No footer needed for the main report screen.
+}
+
+function renderQuizIntro() {
+const totalQuestions = sessionQuestions.length;
+const startHTML = `
+<div class="text-center p-12">
+<h2 class="text-3xl font-extrabold text-gray-800 mb-4">Assessment Commences</h2>
+<p class="text-gray-600 text-lg mb-8">This simulation contains a randomized set of <strong>${totalQuestions}</strong> questions covering high-yield emergency medical concepts. Successful completion requires thorough knowledge and critical thinking.</p>
+
+<ul class="list-disc list-inside text-left mx-auto max-w-lg mb-10 text-gray-700 space-y-2">
+<li><strong>Duration:</strong> This module is self-paced.</li>
+<li><strong>Format:</strong> Questions include **Multiple Choice (MC)** and **Select All That Apply (SATA)**.</li>
+<li><strong>Grading:</strong> An **Assessment Report Card** will be generated upon submission, detailing performance by core subject area.</li>
+</ul>
+
+<button onclick="window.renderQuestion()"
+class="px-8 py-3 bg-secondary text-white font-bold text-xl rounded-lg shadow-xl hover:bg-emerald-600 transition duration-150 transform hover:scale-105">
+Begin Examination (${totalQuestions} Questions)
+</button>
+</div>
+`;
+quizContainer.innerHTML = startHTML;
+}
+
+
+function renderPreamble() {
+const preambleHTML = `
+<div class="p-4 sm:p-8">
+<h2 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">Examination Preamble and Integrity Statement</h2>
+
+<div class="bg-red-50 border-l-4 border-danger p-4 mb-6 rounded-lg">
+<h3 class="text-xl font-bold text-danger mb-2">Mandatory Disclaimer</h3>
+<p class="text-gray-700 text-sm">This is a simulated knowledge assessment. The results are for self-study and performance evaluation only and do not constitute actual certification or licensure. The format and content are designed to mimic high-stakes testing, but you are responsible for your readiness for any official examination.</p>
+</div>
+
+<h3 class="text-2xl font-bold text-info mb-4">Formal Instructions</h3>
+<ul class="list-disc list-inside text-left space-y-3 text-gray-700">
+<li><strong>Academic Integrity:</strong> Do not consult external resources, textbooks, or web searches during this simulation to maintain the validity of your self-assessment.</li>
+<li><strong>Navigation:</strong> You may navigate freely between questions using the 'Previous' and 'Next' buttons until the exam is submitted.</li>
+<li><strong>Multiple Choice (MC):</strong> Select **only one** answer. Only one option is correct.</li>
+<li><strong>Select All That Apply (SATA):</strong> Select **all** options that correctly apply to the question. Partial credit is not awarded; all correct options must be selected to receive credit for the question.</li>
+<li><strong>Submission:</strong> Once the final question is reached, the 'Next' button will change to 'Submit Assessment'. Submission is final.</li>
+</ul>
+
+<div class="mt-10 flex justify-center">
+<button onclick="window.renderQuizIntro()"
+class="px-10 py-4 bg-primary text-white font-bold text-xl rounded-lg shadow-xl hover:bg-blue-600 transition duration-150 transform hover:scale-105">
+Acknowledge & Proceed to Exam
+</button>
+</div>
+</div>
+`;
+quizContainer.innerHTML = preambleHTML;
+}
+
+
+// Expose functions globally for HTML event handlers
+window.handleAnswerChange = handleAnswerChange;
+window.navigate = navigate;
+window.finishQuiz = finishQuiz;
+window.renderQuestion = renderQuestion;
+window.renderQuestionReview = renderQuestionReview;
+window.renderExamReport = renderExamReport;
+window.startReview = startReview;
+window.restartQuiz = restartQuiz;
+window.renderPreamble = renderPreamble; // New preamble function
+window.renderQuizIntro = renderQuizIntro; // Renamed start screen
+
+// Start the application
+document.addEventListener('DOMContentLoaded', () => {
+document.getElementById('loading-indicator').style.display = 'none';
+// Set up the first randomized session upon load
+createRandomSession();
+// Initialize the state based on the new session
+setupState();
+renderPreamble(); // Start with the formal preamble
+});
+
+</script>
+</body>
+</html>
