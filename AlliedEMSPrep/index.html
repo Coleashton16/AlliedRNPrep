@@ -25,7 +25,7 @@
 
     <!-- 
       LOGIN MODAL
-      This is shown by default and hidden by JavaScript when the user is logged in.
+      This is shown by default if the user is not authenticated.
     -->
     <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75">
         <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl mx-4">
@@ -96,10 +96,43 @@
             </div>
         </div>
     </div>
+    
+    <!-- 
+      ACTIVATION MODAL (HARD STOP)
+      Shown after successful authentication if user has not yet validated the activation code.
+    -->
+    <div id="activation-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 hidden">
+        <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl mx-4 text-center">
+            <h2 class="text-3xl font-bold text-red-700">Access Restricted</h2>
+            <p class="text-gray-600 mt-2">Welcome! As a new EMS student, you must enter a one-time activation code to unlock the full platform access.</p>
+
+            <!-- Activation Error Message Box -->
+            <div id="activation-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative my-4" role="alert">
+                <span class="block sm:inline" id="activation-error-message"></span>
+            </div>
+            
+            <form id="activation-form" class="mt-6">
+                <label for="activation-code-input" class="block text-sm font-medium text-gray-700 text-left">Activation Code</label>
+                <div class="mt-1">
+                    <input type="text" id="activation-code-input" required maxlength="12" class="w-full px-3 py-4 text-xl tracking-widest text-center border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 uppercase" placeholder="ENTER CODE">
+                </div>
+                
+                <button type="submit" id="activate-button" class="w-full inline-flex justify-center py-3 px-4 mt-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                    Activate and Enter Site
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-gray-200 text-sm text-gray-500">
+                <p>If you do not have a code, please contact your course administrator.</p>
+                <p class="text-xs mt-2">Your unique ID (for verification): <span id="user-id-display" class="font-mono text-gray-700 break-all"></span></p>
+                <button id="activation-signout-button" class="text-blue-500 mt-2 hover:text-blue-700">Sign Out</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 
       MAIN APP CONTENT
-      This is hidden by default and shown by JavaScript when the user is logged in.
+      This is hidden by default and shown by JavaScript when the user is logged in and activated.
     -->
     <div id="app-content" class="hidden">
         
@@ -180,7 +213,7 @@
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 bg-yellow-500 p-3 rounded-lg">
                                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13.5M8.25 6.253l-3 3m3-3l3 3m-3.75 6.253l-3 3m3-3l3 3M15.75 6.253l-3 3m3-3l3 3m-3.75 6.253l-3 3m3-3l3 3"></path></svg>
-                            </div>
+                                </div>
                                 <h3 class="ml-4 text-xl font-semibold text-gray-800">Study Guides & Flashcards</h3>
                             </div>
                             <p class="mt-4 text-gray-600">Review key concepts, drug cards, and assessment algorithms with our comprehensive guides.</p>
@@ -244,7 +277,6 @@
     <!-- Firebase Initialization and Auth Logic -->
     <script type="module">
         // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
             onAuthStateChanged, 
@@ -256,14 +288,21 @@
             signInWithCustomToken,
             signInAnonymously
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+
+        // IMPORTANT SECURITY NOTE:
+        // Since you requested no Firestore and only client-side storage, 
+        // the master code must be stored directly in the JavaScript. 
+        // This code is visible to any user by viewing the page source. 
+        // The master code is hardcoded here:
+        const MASTER_ACTIVATION_CODE = "EMSPREP2025"; 
 
         // --- Firebase Configuration (Using user-provided configuration) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBj6SkqR0iNxNTRMA3x7qske9cmZ6pwpV8",
             authDomain: "vsrep-92201.firebaseapp.com",
             projectId: "vsrep-92201",
-            storageBucket: "vsrep-92201.firebasestorage.app", // REDO: Updated to user's exact value
+            storageBucket: "vsrep-92201.firebasestorage.app",
             messagingSenderId: "833328760520",
             appId: "1:833328760520:web:c25191e71a3ae31a55c7fd",
             measurementId: "G-WQKB2E7CLH"
@@ -272,9 +311,7 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-        setLogLevel('Debug'); // Shows detailed logs in your browser console
-
+        
         let currentUserId = null;
 
         // --- UI Elements (Auth/Global) ---
@@ -293,6 +330,15 @@
         const separatorBlock = document.getElementById('separator-block');
         const googleSigninBlock = document.getElementById('google-signin-block');
 
+        // --- UI Elements (Activation Modal) ---
+        const activationModal = document.getElementById('activation-modal');
+        const activationCodeInput = document.getElementById('activation-code-input');
+        const activationForm = document.getElementById('activation-form');
+        const activationError = document.getElementById('activation-error');
+        const activationErrorMessage = document.getElementById('activation-error-message');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const activationSignoutButton = document.getElementById('activation-signout-button');
+        
         // --- UI Elements (Quiz/View Management) ---
         const dashboardView = document.getElementById('dashboard-view');
         const quizView = document.getElementById('quiz-view');
@@ -310,7 +356,7 @@
         const totalQuestions = document.getElementById('total-questions');
         const retakeQuizButton = document.getElementById('retake-quiz-button');
         const resultsDashboardButton = document.getElementById('results-dashboard-button');
-        const googleSigninButton = document.getElementById('google-signin-button'); // Re-declared for scope
+        const googleSigninButton = document.getElementById('google-signin-button');
 
 
         // --- Helper Function to Show Errors ---
@@ -333,6 +379,36 @@
             googleSigninBlock.classList.remove('hidden');
         }
         
+        // --- Activation Logic ---
+        
+        /** Shows the main app content and hides all modals. */
+        function grantFullAccess() {
+            loginModal.classList.add('hidden');
+            activationModal.classList.add('hidden');
+            appContent.classList.remove('hidden');
+            renderView('dashboard-view');
+        }
+        
+        /** Shows the activation prompt, hiding the main login/app content. */
+        function showActivationModal() {
+            loginModal.classList.add('hidden');
+            appContent.classList.add('hidden');
+            activationModal.classList.remove('hidden');
+            // Clear old errors
+            activationError.classList.add('hidden');
+            activationErrorMessage.textContent = '';
+            userIdDisplay.textContent = currentUserId;
+        }
+        
+        /** * Checks localStorage for the activation status.
+         * @param {string} userId - The current user's unique ID.
+         * @returns {boolean} True if activated.
+         */
+        function isUserActivated(userId) {
+            // We check for a flag stored in localStorage unique to the user ID.
+            return localStorage.getItem(`alliedEMS_isActivated_${userId}`) === 'true';
+        }
+
         // --- View Management ---
 
         /** Hides all main content sections and shows the specified one. */
@@ -489,29 +565,31 @@
             totalQuestions.textContent = currentQuiz.length;
         }
 
-        // --- Auth State Listener ---
+        // --- Auth State Listener (Modified to handle activation) ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in
-                console.log('User signed in:', user.uid, user.email || '(Anonymous/Custom Token)');
                 currentUserId = user.uid;
                 userEmailSpan.textContent = user.email || `User ID: ${user.uid.substring(0, 8)}...`;
-                
-                // Hide login modal and show app content, starting at the dashboard
-                loginModal.classList.add('hidden');
-                appContent.classList.remove('hidden');
-                renderView('dashboard-view');
+
+                if (isUserActivated(user.uid)) {
+                    // 1. User is signed in AND activated -> Grant Full Access
+                    console.log('User activated. Granting access.');
+                    grantFullAccess();
+                } else {
+                    // 2. User is signed in but NOT activated -> Show Activation Screen (Hard Stop)
+                    console.log('User signed in but requires activation.');
+                    showActivationModal();
+                }
             } else {
                 // User is signed out
                 console.log('User signed out.');
                 currentUserId = null;
                 userEmailSpan.textContent = '';
 
-                // Show login modal and hide app
+                // Show login modal and hide everything else
                 loginModal.classList.remove('hidden');
+                activationModal.classList.add('hidden');
                 appContent.classList.add('hidden');
-                
-                // Ensure auth form is visible if we are showing the modal
                 showAuthForm(); 
             }
         });
@@ -587,6 +665,34 @@
             }
         });
         
+        // --- Event Listener (Activation Form) ---
+        activationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const enteredCode = activationCodeInput.value.toUpperCase().trim();
+            activationError.classList.add('hidden');
+
+            if (enteredCode === MASTER_ACTIVATION_CODE) {
+                // SUCCESS: Activate user locally and grant access
+                localStorage.setItem(`alliedEMS_isActivated_${currentUserId}`, 'true');
+                grantFullAccess();
+                console.log('Activation successful and status saved locally.');
+            } else {
+                // FAILURE
+                activationErrorMessage.textContent = 'Invalid activation code. Please check with your instructor.';
+                activationError.classList.remove('hidden');
+                activationCodeInput.value = ''; // Clear code input
+            }
+        });
+
+        // Sign Out button inside Activation Modal
+        activationSignoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Sign out error:', error.message);
+            }
+        });
+
         // --- Event Listeners (Quiz Navigation) ---
         startQuizLink.addEventListener('click', (e) => {
             e.preventDefault();
