@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Allied</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Configure Tailwind to use the Inter font family */
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- New Animation: Sophisticated Gradient & Mask Reveal --- */
+        
+        /* Base background for the animation overlay */
+        #animation-overlay {
+            background-color: #1a202c; /* Darker than gray-900, almost black */
+            overflow: hidden; /* Important for containing gradient/mask effects */
+        }
+
+        /* Subtle ambient glow/grid effect */
+        .ambient-effect {
+            position: absolute;
+            inset: 0; /* Cover the whole area */
+            background: 
+                radial-gradient(circle at center, rgba(30, 41, 59, 0.4) 0%, transparent 70%), /* Subtle radial glow */
+                repeating-linear-gradient(0deg, #2d3748 0, #2d3748 1px, transparent 1px, transparent 100%), /* Horizontal lines */
+                repeating-linear-gradient(90deg, #2d3748 0, #2d3748 1px, transparent 1px, transparent 100%); /* Vertical lines */
+            background-size: 100% 100%, 10px 10px, 10px 10px; /* Adjust grid density */
+            opacity: 0;
+            animation: ambientFadeIn 1s ease-out forwards; /* Fade in over 1 second */
+        }
+
+        @keyframes ambientFadeIn {
+            to { opacity: 0.1; } /* Keep it very subtle */
+        }
+
+        /* The 'Allied' text container */
+        .allied-text-container {
+            position: relative; /* For absolute positioning of gradient/mask */
+            display: inline-block; /* To contain the text element */
+            font-size: 6rem; /* Adjusted for better visibility */
+            font-weight: 800; /* Extra bold */
+            letter-spacing: 0.1em; /* Wider tracking */
+            color: transparent; /* Text itself is transparent */
+            background-clip: text; /* Clips background to text shape */
+            -webkit-background-clip: text; /* For webkit browsers */
+            line-height: 1; /* Keep line height tight */
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: textEntrance 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards; /* Starts after ambient, lasts 2.5s */
+        }
+
+        @keyframes textEntrance {
+            0% { opacity: 0; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.01); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* The actual gradient that will move over the text */
+        .allied-text-container::before {
+            content: attr(data-text); /* Use data-text attribute for the actual text */
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #00C6FF, #0072FF, #00C6FF); /* Vibrant blue gradient */
+            background-size: 200% auto; /* Allows gradient to move */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            z-index: 5;
+            animation: gradientShift 4s linear infinite, maskReveal 2s ease-out 1s forwards;
+            -webkit-mask-image: linear-gradient(90deg, transparent, white, transparent); /* Horizontal mask */
+            mask-image: linear-gradient(90deg, transparent, white, transparent);
+            -webkit-mask-size: 0% 100%; /* Start with no mask */
+            mask-size: 0% 100%;
+            -webkit-mask-position: -50% 0; /* Start mask off-center */
+            mask-position: -50% 0;
+            font-size: inherit; /* Inherit font size from parent */
+            font-weight: inherit;
+            letter-spacing: inherit;
+        }
+
+        @keyframes gradientShift {
+            to { background-position: 200% center; } /* Smoothly shifts the gradient */
+        }
+
+        @keyframes maskReveal {
+            0% { -webkit-mask-size: 0% 100%; mask-size: 0% 100%; -webkit-mask-position: -50% 0; mask-position: -50% 0; }
+            50% { -webkit-mask-size: 200% 100%; mask-size: 200% 100%; -webkit-mask-position: 0% 0; mask-position: 0% 0; }
+            100% { -webkit-mask-size: 200% 100%; mask-size: 200% 100%; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+        }
+
+
+        /* The 'RN | EMS' tagline */
+        .tagline-reveal {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInSlide 0.5s ease-out 3.5s forwards; /* Fades in after main text */
+            color: #94a3b8; /* Tailwind slate-400 */
+        }
+
+        @keyframes fadeInSlide {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* General styles for buttons/links to ensure professionalism */
+        .button-rn {
+            background-color: #2563eb; /* Blue-600 */
+            border-bottom-color: #1e3a8a; /* Darker blue */
+            color: white; /* Ensure text color is white/light */
+            text-decoration: none; /* Remove underline from link */
+        }
+        .button-rn:hover {
+            background-color: #1e40af; /* Blue-700 */
+            border-bottom-color: #1c3d82;
+        }
+
+        .button-ems {
+            background-color: #0d9488; /* Teal-600 */
+            border-bottom-color: #0f766e; /* Darker teal */
+            color: white; /* Ensure text color is white/light */
+            text-decoration: none; /* Remove underline from link */
+        }
+        .button-ems:hover {
+            background-color: #0f766e; /* Teal-700 */
+            border-bottom-color: #0c675e;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+
+    <!-- 
+        1. ANIMATION OVERLAY (Visible for 5.5 seconds) 
+    --><div id="animation-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center">
+        
+        <!-- Ambient digital grid effect --><div class="ambient-effect"></div>
+
+        <!-- The main 'Allied' text with gradient and mask reveal --><div class="allied-text-container" data-text="Allied">
+            Allied
+        </div>
+        
+        <!-- The 'RN | EMS' tagline --><div class="mt-6 text-2xl md:text-3xl font-light tagline-reveal tracking-wider">
+            RN | EMS
+        </div>
+    </div>
+
+    <!-- 
+        2. MAIN CONTENT (Hidden initially, revealed after 5.5 seconds) 
+    --><div id="main-content" class="opacity-0 transition-opacity duration-1000 p-8 max-w-3xl w-full">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 text-white tracking-tight">
+                Welcome to <span class="text-sky-400">Allied</span>.
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-300 mb-12">
+                Your future in medicine starts here. We provide rigorous, focused, and up-to-date prep materials for the next generation of healthcare professionals.
+            </p>
+
+            <!-- Buttons Container --><div class="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8 justify-center">
+
+                <!-- RN Link --><a href="/AlliedRNPrep/index.html"
+                    class="group button-rn transition duration-300 ease-in-out inline-block text-center
+                           p-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1
+                           flex-1 min-w-[200px] border-b-4">
+                    <span class="text-3xl font-extrabold block mb-2 group-hover:text-white text-blue-100">RN Prep</span>
+                    <span class="text-sm font-medium text-blue-200">
+                        Nursing Exams & Licensing
+                    </span>
+                </a>
+
+                <!-- EMS Link --><a href="/AlliedEMSPrep/index.html"
+                    class="group button-ems transition duration-300 ease-in-out inline-block text-center
+                           p-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1
+                           flex-1 min-w-[200px] border-b-4">
+                    <span class="text-3xl font-extrabold block mb-2 group-hover:text-white text-teal-100">EMS Prep</span>
+                    <span class="text-sm font-medium text-teal-200">
+                        Paramedic & EMT Certifications
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // UPDATED DURATION: 5500 ms (5.5 seconds)
+        const ANIMATION_DURATION_MS = 5500; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('animation-overlay');
+            const content = document.getElementById('main-content');
+
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                content.style.opacity = '1';
+                setTimeout(() => {
+                    overlay.remove();
+                }, 1000); 
+            }, ANIMATION_DURATION_MS);
+        });
+    </script>
+</body>
+</html>
