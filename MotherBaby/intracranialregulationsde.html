@@ -1,0 +1,1793 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bg-custom-dark {
+            background-color: #1f2937;
+        }
+        .text-custom-dark {
+            color: #1f2937;
+        }
+        .bg-custom-gray {
+            background-color: #e5e7eb;
+        }
+        .text-custom-gray {
+            color: #9ca3af;
+        }
+        .btn-orange {
+            background-color: #f97316;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c;
+        }
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        .nav-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-item.bg-gray-200:hover {
+            background-color: #d1d5db;
+        }
+        .nav-item.answered {
+            background-color: #d1d5db; /* A subdued color for answered questions */
+            color: #374151; /* Darker text for readability */
+        }
+        .nav-item.answered::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Using a box-shadow to simulate a checkmark */
+            box-shadow: 0 0 0 2px #10b981, 
+                        inset 0 0 0 1px white,
+                        inset 2px 2px 0 0 white,
+                        inset -2px 2px 0 0 white;
+            transform: rotate(-45deg);
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered::after {
+            background-color: white;
+            box-shadow: 0 0 0 2px white,
+                        inset 0 0 0 1px #10b981,
+                        inset 2px 2px 0 0 #10b981,
+                        inset -2px 2px 0 0 #10b981;
+        }
+
+        .radio-btn, .check-btn {
+            display: none;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        .option-label .option-letter {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Changed from rounded-0.25rem to fully rounded */
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+        .radio-btn:checked + .option-label,
+        .check-btn:checked + .option-label {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .radio-btn:checked + .option-label .option-letter,
+        .check-btn:checked + .option-label .option-letter {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .review-box {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .loading-animation, .grade-screen, .rationale-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Header - Custom design based on image -->
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
+        <div class="flex items-center space-x-6">
+            <div class="font-bold">ARP</div>
+            <div class="hidden sm:block font-medium">Allied RN Prep</div>
+            <div class="hidden sm:block text-gray-400">Medical Surgical II Unit 1 Exam</div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.957.703l4.084-1.714a.75.75 0 00-.597-1.42l-3.375 1.416V6z" clip-rule="evenodd" />
+                </svg>
+                <span id="timer" class="font-semibold">02:00:00</span>
+            </div>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">EXAM CONTROLS</button>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">TOOL KIT</button>
+        </div>
+    </header>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
+
+    <!-- Main Content Area - Updated to a three-column layout -->
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-20 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
+            <div class="mb-4 text-xs text-gray-500">FILTER ></div>
+            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
+                <!-- Question navigation items will be injected here -->
+            </div>
+        </aside>
+
+        <!-- Question Section -->
+        <main class="flex-1 flex overflow-hidden">
+            <div id="question-container" class="flex-1 p-8 overflow-y-auto flex flex-col justify-between">
+                <!-- Question will be injected here -->
+            </div>
+            
+            <!-- Right Sidebar placeholder -->
+            <div class="hidden md:flex items-center justify-center bg-white border-l border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Screen -->
+    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
+        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <div id="review-questions" class="space-y-8">
+            <!-- Missed questions review will be injected here -->
+        </div>
+        <div class="mt-8 text-center">
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+        </div>
+    </div>
+    
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
+    </div>
+
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 md:w-1/2 mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-custom-dark">Exam Submitted Successfully!</h2>
+            <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+            <div class="text-6xl font-extrabold text-blue-600 mb-8" id="final-grade"></div>
+            <button id="restart-btn" class="px-6 py-3 btn-blue text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+        </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
+            <span id="question-counter">1 OF 11 QUESTIONS</span>
+            <span class="hidden sm:block text-xs">VERSION 5.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition cursor-not-allowed opacity-50">Previous</button>
+            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
+            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data and State ---
+        // NOTE: This quiz data has been truncated to 2 questions for testing.
+        const quizData = [
+ {
+    "questionText": "A 5-year-old child is admitted to the pediatric ICU following a ventriculoperitoneal (VP) shunt revision. Vital signs are T 37.5°C, HR 68 beats/minute, BP 120/70 mmHg, and RR 20 breaths/minute. The nurse notes the child's Glasgow Coma Scale (GCS) score has dropped from 15 to 13, and the left pupil is now sluggish compared to the right. The child has been vomiting frequently.\n\nWhich action is the nurse’s **highest priority** at this time?",
+    "options": {
+      "A": "Administer the ordered PRN antiemetic (ondansetron) and elevate the head of the bed (HOB) to 45 degrees.",
+      "B": "Initiate a peripheral IV infusion of 3% Normal Saline (hypertonic saline) as ordered and notify the neurosurgeon immediately.",
+      "C": "Prepare for intubation and request a STAT head CT scan to assess for hemorrhage or hydrocephalus.",
+      "D": "Suction the nasopharynx to protect the airway from aspiration and check the shunt insertion site for swelling."
+    },
+    "correctAnswer": "B",
+    "rationale": "The signs—**bradycardia** (part of Cushing's response), **GCS drop**, **sluggish unilateral pupil**, and vomiting—indicate acutely increased Intracranial Pressure (ICP) and high risk for herniation. The immediate priority is to *chemically* reduce the cerebral edema and pressure while simultaneously notifying the surgical team. Administering hypertonic saline is the most rapid medical intervention to draw fluid out of the brain tissue.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The parents of a 10-year-old receiving levetiracetam (Keppra) for a new seizure disorder are being educated on side effects and safety.\n\nWhich instructions should the nurse include in the teaching? (Select All That Apply)",
+    "options": {
+      "A": "Monitor your child closely for changes in mood, increased aggression, or thoughts of self-harm.",
+      "B": "Ensure the medication is administered at the same time every day, and never stop it abruptly.",
+      "C": "Your child must avoid sports like swimming and bicycling until the physician approves.",
+      "D": "If a dose is missed, administer the dose immediately, but never double the dose at the next scheduled time.",
+      "E": "If a seizure lasts longer than 5 minutes, administer the prescribed rectal diazepam or nasal midazolam and call 911."
+    },
+    "correctAnswer": "A, B, D, E",
+    "rationale": "These are all standard warnings for antiepileptic drugs (AEDs) covering adherence, prevention of toxicity, management of status epilepticus, and monitoring for the well-known psychiatric side effects associated with levetiracetam (Keppra). Most children with controlled seizures can participate in supervised activities, including swimming, with appropriate safety precautions.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 16-year-old presented to the emergency department after a concussion and was placed on neurological checks every hour. The nurse notes the following change 3 hours after admission:\n\n**Time 1: GCS 15. Pupils 3mm bilaterally, brisk reaction. V/S stable. Reports headache 4/10.**\n**Time 2: GCS 14 (Confused, disoriented to time). Pupils 4mm right, 3mm left, brisk. V/S stable. Reports nausea.**\n\nBased on the change in neurological status, which is the nurse's **priority action**?",
+    "options": {
+      "A": "Continue neuro checks every hour and notify the physician of the change in GCS.",
+      "B": "Restrict fluids and administer PRN antiemetics to prevent vomiting, which increases ICP.",
+      "C": "Increase the Head of the Bed (HOB) to 30 degrees and dim the room lights.",
+      "D": "Assess the patient for signs of posturing and prepare for possible intubation."
+    },
+    "correctAnswer": "A",
+    "rationale": "A drop in GCS, particularly involving confusion or loss of orientation, is the single most critical and sensitive indicator of neurological deterioration after head trauma. Immediate notification of the provider is mandatory so further diagnostics (e.g., CT scan) can be ordered.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 9-month-old infant is admitted with a high fever, extreme irritability, and a positive Kernig sign. Bacterial meningitis is suspected. The nurse performs a lumbar puncture (LP) and is awaiting results.\n\nWhich action demonstrates the nurse’s understanding of infection control specific to this diagnosis?",
+    "options": {
+      "A": "Ensuring the infant is isolated in a negative-pressure room.",
+      "B": "Initiating contact precautions, including gloves and gown, during all care.",
+      "C": "Placing a surgical mask on the infant when transporting for diagnostic imaging.",
+      "D": "Initiating droplet precautions and limiting visitors to essential personnel only."
+    },
+    "correctAnswer": "D",
+    "rationale": "Bacterial meningitis, often caused by *Neisseria meningitidis*, is transmitted via large respiratory droplets. Droplet precautions (mask, private room) must be initiated immediately until the infectious agent is ruled out or appropriate antibiotics have been given for 24 hours.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 14-year-old in DKA is receiving aggressive fluid resuscitation (0.9% NS at 1.5 times maintenance) and insulin. Three hours into treatment, the child suddenly becomes lethargic, reports a severe headache, and the GCS drops from 15 to 12.\n\nThe nurse recognizes these findings as suggestive of cerebral edema. Which change in the client's current orders is the **most appropriate and urgent** intervention?",
+    "options": {
+      "A": "Decrease the insulin infusion rate by 50% and re-check blood glucose.",
+      "B": "Discontinue the current IV fluid and initiate 3% Normal Saline (hypertonic saline).",
+      "C": "Increase the rate of the current 0.9% NS infusion to rapidly correct dehydration.",
+      "D": "Elevate the head of the bed to 90 degrees and administer a PRN benzodiazepine."
+    },
+    "correctAnswer": "B",
+    "rationale": "Cerebral edema during DKA treatment is a life-threatening emergency. The primary treatment is the immediate administration of a hyperosmolar solution (3% NS or Mannitol) to rapidly draw water out of the brain tissue and reduce ICP.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A newborn who underwent surgical closure of a myelomeningocele defect 12 hours ago is returned to the unit.\n\nWhich action by the nurse is **most critical** to reduce the risk of post-operative complications?",
+    "options": {
+      "A": "Maintaining the infant NPO for 24 hours to prevent straining with defecation.",
+      "B": "Monitoring the urinary catheter for output every hour and documenting the specific gravity.",
+      "C": "Assessing the surgical site for CSF leakage and signs of infection.",
+      "D": "Encouraging the parents to hold and cuddle the infant in the supine position for bonding."
+    },
+    "correctAnswer": "C",
+    "rationale": "The two most life-threatening complications post-closure are infection (meningitis) and CSF leakage, which indicates a dural tear. Meticulous monitoring of the site for redness, drainage, and CSF leakage is the priority.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The mother of a 2-year-old who experienced a simple febrile seizure is receiving discharge teaching.\n\nWhich statement by the mother indicates a **need for further teaching**?",
+    "options": {
+      "A": "I will administer acetaminophen or ibuprofen as soon as his temperature starts to rise.",
+      "B": "I understand that a simple febrile seizure usually means he won't develop epilepsy.",
+      "C": "If he has a seizure that lasts more than five minutes, I must call emergency services.",
+      "D": "I should place him on his side on the floor and gently restrain his arms and legs during a seizure."
+    },
+    "correctAnswer": "D",
+    "rationale": "Restraining a seizing child is contraindicated as it can cause musculoskeletal injury. The correct action is to place the child on their side (recovery position) and protect them from nearby objects.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 7-year-old in the neuro ICU has an intracranial pressure (ICP) bolt reading of 18 mmHg. The nurse is turning the child for repositioning. During the turn, the ICP spikes to 28 mmHg, and the child's heart rate drops from 95 to 70 beats/minute.\n\nThe nurse should recognize this response is due to which physiologic mechanism?",
+    "options": {
+      "A": "Systemic hypertension secondary to pain from the turn.",
+      "B": "Autonomic dysfunction related to spinal cord compression.",
+      "C": "Compromise of cerebral blood flow from increased venous pressure.",
+      "D": "Increased intracranial volume due to Valsalva maneuver during movement."
+    },
+    "correctAnswer": "C",
+    "rationale": "Turning/positioning often temporarily increases central venous pressure, which directly impedes cerebral venous drainage, causing a transient but sharp rise in ICP. The bradycardia indicates a dangerous increase in pressure impacting the brainstem (Cushing's reflex).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 6-year-old child with severe spastic cerebral palsy is receiving tube feedings via a Gastrostomy tube (G-tube). The nurse enters the room and finds the child has begun coughing and drooling heavily.\n\nWhat is the nurse’s **most immediate priority**?",
+    "options": {
+      "A": "Check the G-tube placement depth and residual volume.",
+      "B": "Turn the child onto their left side with the head lower than the chest.",
+      "C": "Immediately stop the G-tube feeding and assess the child’s lung sounds.",
+      "D": "Administer the ordered PRN dose of inhaled bronchodilator."
+    },
+    "correctAnswer": "C",
+    "rationale": "Coughing and drooling suggest acute aspiration or significant reflux. The feeding must be stopped immediately to prevent further material from entering the airway. Assessing lung sounds (for adventitious sounds) confirms aspiration severity.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The parents of a 3-month-old infant are preparing for discharge with a new VP shunt.\n\nWhich statement by the nurse reflects an **appropriate** and **essential** component of discharge teaching? (Select All That Apply)",
+    "options": {
+      "A": "Monitor your infant for a high-pitched cry, feeding difficulties, or a sudden increase in head circumference.",
+      "B": "Your infant should be positioned on the operative side for the first two weeks after the procedure.",
+      "C": "Limit the use of car seats for the first month to avoid putting pressure on the valve.",
+      "D": "Call the doctor immediately if your infant develops a fever, even if it’s low-grade.",
+      "E": "If the shunt malfunctions, symptoms will always include a large amount of drainage from the incision site."
+    },
+    "correctAnswer": "A, D",
+    "rationale": "A: These are classic, essential signs of increased ICP/shunt malfunction in an infant. D: Fever is a critical sign of shunt infection, which is a neurosurgical emergency. B: Positioning should be on the **non-operative side** to avoid pressure on the valve.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A nurse notes the external ventricular drain (EVD) system for a 4-year-old is suddenly draining dark red fluid, and the output has increased from 10 mL/hr to 45 mL/hr over 15 minutes. The ICP reading remains stable at 12 mmHg.\n\nWhich action should the nurse prioritize?",
+    "options": {
+      "A": "Document the change and monitor closely, as this is normal post-op drainage.",
+      "B": "Lower the EVD transducer to allow for more rapid drainage and prevent increased ICP.",
+      "C": "Immediately notify the neurosurgeon and anticipate orders for a STAT head CT scan.",
+      "D": "Clamp the EVD and perform a neurological assessment to check for herniation."
+    },
+    "correctAnswer": "C",
+    "rationale": "Dark red, rapidly increasing CSF output suggests intracranial hemorrhage. This is a critical change requiring immediate surgical notification and diagnostic confirmation (CT scan), even if the initial ICP reading is currently stable.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 6-month-old infant is being treated for bacterial meningitis. The nurse notes cool, mottled extremities and a petechial rash spreading rapidly across the trunk and limbs. The blood pressure drops from 85/50 to 70/40 mmHg.\n\nWhich complication should the nurse immediately suspect?",
+    "options": {
+      "A": "Syndrome of Inappropriate Antidiuretic Hormone (SIADH).",
+      "B": "Disseminated Intravascular Coagulation (DIC) and septic shock.",
+      "C": "Vasovagal response due to severe pain.",
+      "D": "Antibiotic-induced anaphylaxis."
+    },
+    "correctAnswer": "B",
+    "rationale": "The rapid progression of circulatory collapse (mottling, hypotension) combined with a widespread petechial/purpuric rash (often characteristic of Meningococcemia) is indicative of overwhelming sepsis leading to DIC, a life-threatening coagulation disorder.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 9-year-old with severe spastic cerebral palsy is prescribed baclofen via an intrathecal pump. The nurse is teaching the parents about potential signs of an **overdose** or adverse reaction. Which finding requires immediate medical attention?",
+    "options": {
+      "A": "Intermittent muscle fasciculations and agitation.",
+      "B": "Severe drowsiness, hypotonia, and respiratory depression.",
+      "C": "Urinary retention and dry mouth.",
+      "D": "Mild elevation in temperature and localized redness around the pump site."
+    },
+    "correctAnswer": "B",
+    "rationale": "Intrathecal baclofen overdose causes severe CNS depression. The hallmark signs are **profound muscle weakness (hypotonia)**, drowsiness/lethargy, and potential **respiratory depression**—a life-threatening emergency.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 2-day-old infant is post-operative for VP shunt placement. What is the correct initial positioning for the infant?",
+    "options": {
+      "A": "Prone position with the head of the bed flat.",
+      "B": "Supine position, flat on the bed, with the head elevated 30 degrees.",
+      "C": "Supine, lying flat, positioned on the non-operative side.",
+      "D": "Semi-Fowler's position to promote drainage."
+    },
+    "correctAnswer": "C",
+    "rationale": "Post-operatively, the infant is initially kept flat or with minimal elevation to prevent overly rapid CSF drainage and to allow time for the child's system to adjust. The infant is positioned on the **non-operative side** to prevent pressure on the incision/valve.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A mother is receiving discharge teaching for her 12-year-old who sustained a mild concussion. Which instructions should the nurse provide? (Select All That Apply)",
+    "options": {
+      "A": "Wake the child every 2 hours tonight to check for confusion or vomiting.",
+      "B": "Allow the child to return to baseball practice tomorrow if symptoms are gone.",
+      "C": "Expect the child to experience persistent headache, fatigue, or difficulty concentrating for several weeks.",
+      "D": "Administer ibuprofen or aspirin for headache relief as needed.",
+      "E": "Avoid screen time (phone, video games) and mentally taxing activities for the next 48 hours."
+    },
+    "correctAnswer": "A, C, E",
+    "rationale": "A: Waking the child is still part of vigilant monitoring for developing hemorrhage/ICP increase. C: These are signs of Post-Concussive Syndrome (PCS) and are common. E: Cognitive and physical rest is the cornerstone of concussion management. NSAIDs (D) are generally avoided initially; acetaminophen is preferred.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 5-year-old with Reye syndrome is admitted with elevated liver enzymes and lethargy. Which nursing intervention is the **priority** goal?",
+    "options": {
+      "A": "Administering lactulose to reduce ammonia levels.",
+      "B": "Controlling cerebral edema and managing intracranial pressure.",
+      "C": "Maintaining strict seizure precautions.",
+      "D": "Preparing the family for the high likelihood of long-term neurological deficits."
+    },
+    "correctAnswer": "B",
+    "rationale": "Reye syndrome causes acute encephalopathy and hepatic dysfunction. Death or severe disability is most commonly a result of uncontrolled, rapidly escalating **cerebral edema** and ICP. Therefore, ICP management is the highest priority goal.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 15-year-old is experiencing tonic-clonic status epilepticus. The physician orders Lorazepam (Ativan) 2 mg IV STAT.\n\nBefore administering the medication, which equipment must the nurse ensure is readily available at the bedside?",
+    "options": {
+      "A": "Intracranial pressure monitoring device.",
+      "B": "Crash cart with defibrillator paddles.",
+      "C": "Suction equipment and bag-valve mask (Ambu bag).",
+      "D": "Continuous electroencephalogram (EEG) monitor."
+    },
+    "correctAnswer": "C",
+    "rationale": "Benzodiazepines (like Lorazepam) can cause respiratory depression and sedation. Furthermore, the seizing patient is at high risk for aspiration and airway obstruction. Therefore, the immediate priority is having equipment to manage the airway, including suction and a manual resuscitation bag.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse is assessing a 2-month-old infant. Which finding is the **most classic and reliable** sign of meningeal irritation in this age group?",
+    "options": {
+      "A": "Nuchal rigidity (stiff neck).",
+      "B": "Positive Brudzinski sign.",
+      "C": "High-pitched, irritable cry and bulging fontanel.",
+      "D": "Photophobia and projectile vomiting."
+    },
+    "correctAnswer": "C",
+    "rationale": "Classic signs like nuchal rigidity and Brudzinski's sign are often absent or unreliable in infants under 18 months. Instead, non-specific signs of increased ICP (bulging fontanel, high-pitched cry, poor feeding, lethargy) are the most critical indicators of meningitis or increased pressure in this population.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A newborn has an unrepaired lumbar myelomeningocele. Which nursing actions are appropriate to include in the plan of care? (Select All That Apply)",
+    "options": {
+      "A": "Place the infant prone with hips slightly flexed.",
+      "B": "Check the buttocks and sacral area frequently for diaper rash.",
+      "C": "Apply a sterile, wet (saline) dressing to the sac.",
+      "D": "Cover the sac with an adhesive barrier dressing to prevent leakage.",
+      "E": "Assess the sac for signs of rupture, leaking, or infection every 2 hours."
+    },
+    "correctAnswer": "A, C, E",
+    "rationale": "A: Prevents pressure on the delicate sac. C: Keeps the sac moist and sterile to protect the exposed neural tissue. E: Critical monitoring for severe complications. B/D: The infant should not wear a diaper or have adhesive dressings on the sac area due to contamination and skin damage risk.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 3-year-old is diagnosed with lead poisoning (serum lead level 65 mcg/dL). Which system assessment requires the nurse’s **most immediate and intensive focus**?",
+    "options": {
+      "A": "Renal function (BUN/Creatinine).",
+      "B": "Musculoskeletal status (growth plate changes).",
+      "C": "Hematological status (anemia/iron deficiency).",
+      "D": "Neurological status (encephalopathy and seizure risk)."
+    },
+    "correctAnswer": "D",
+    "rationale": "Lead levels over 70 mcg/dL constitute a medical emergency due to the high risk of **lead encephalopathy and seizures**. The central nervous system effects are the most dangerous and acute threat to life and long-term prognosis.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 10-year-old child in the ICU has a GCS of 7 (Eyes: 2, Verbal: 2, Motor: 3). Their respiratory rate is 10 breaths/minute and shallow.\n\nWhich order is the nurse's **priority**?",
+    "options": {
+      "A": "Administering Dexamethasone 0.5 mg/kg IV STAT.",
+      "B": "Preparing the child for the insertion of a nasogastric tube.",
+      "C": "Ensuring the endotracheal intubation tray is at the bedside.",
+      "D": "Initiating fluid restriction to 10 mL/kg/day to reduce cerebral edema."
+    },
+    "correctAnswer": "C",
+    "rationale": "A GCS of 8 or less typically indicates the need for definitive airway management (intubation) to protect the airway and ensure adequate ventilation. Since the child's respiratory rate is already low and shallow, securing the airway is the absolute highest priority (ABC principle).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 4-year-old child with spastic quadriplegic CP is admitted. Which interventions should the nurse include in the plan of care to ensure the child’s safety and function? (Select All That Apply)",
+    "options": {
+      "A": "Provide a communication board or device if the child is non-verbal.",
+      "B": "Ensure the child wears a helmet and padding while ambulating due to ataxia.",
+      "C": "Initiate frequent repositioning and skin checks, especially over bony prominences.",
+      "D": "Ensure suction equipment is readily available during all feeding times.",
+      "E": "Administer all oral medications by mixing them with pureed foods."
+    },
+    "correctAnswer": "A, C, D",
+    "rationale": "A: Addressing communication deficits is essential. C: Children with spasticity and limited mobility are at high risk for skin breakdown. D: Dysphagia and aspiration risk are very high in severe CP, making suction readiness a priority during feeding. B: Ataxia is an unsteady gait, not characteristic of spastic quadriplegia.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 6-month-old infant is post-operative following surgical correction of craniosynostosis. Which finding should the nurse report to the provider immediately?",
+    "options": {
+      "A": "Periorbital edema and bruising around the eyes.",
+      "B": "Swelling of the scalp sutures.",
+      "C": "A positive Babinski reflex bilaterally.",
+      "D": "A persistent, clear drainage from the nasal passages."
+    },
+    "correctAnswer": "D",
+    "rationale": "Clear drainage from the nose after neurosurgery, especially if persistent, may indicate a cerebrospinal fluid (CSF) leak (rhinorrhea). This creates a direct pathway for infection (meningitis) and requires immediate intervention. Periorbital swelling is common and expected.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A teacher reports a 6-year-old student frequently stares blankly for 5 to 10 seconds, during which time the student cannot respond to questions and sometimes makes lip-smacking movements. The student then immediately resumes activity with no post-ictal confusion.\n\nThe nurse should suspect which type of seizure activity?",
+    "options": {
+      "A": "Simple partial seizure (Focal motor).",
+      "B": "Absence seizure (Petit mal).",
+      "C": "Tonic-clonic seizure (Grand mal).",
+      "D": "Atonic seizure (Drop attack)."
+    },
+    "correctAnswer": "B",
+    "rationale": "Absence seizures are characterized by a brief loss of consciousness/staring episode (short duration), lack of post-ictal confusion, and occasional automatisms (lip-smacking, eye fluttering).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse reviews the chart of a 4-month-old infant. The Head Circumference (HC) at birth was in the 50th percentile. At 2 months, it was the 75th percentile. At the current visit, it is in the 95th percentile. The anterior fontanel is flat and soft.\n\nThe nurse should prioritize which action?",
+    "options": {
+      "A": "Reassuring the parents that the fontanel is soft, which rules out hydrocephalus.",
+      "B": "Obtaining a more precise measurement and comparing it with parental head size history.",
+      "C": "Notifying the provider immediately about the rapid increase across two percentile lines.",
+      "D": "Documenting the findings and repeating the measurement at the 6-month check-up."
+    },
+    "correctAnswer": "C",
+    "rationale": "A sudden or disproportionate increase in HC crossing two major percentile lines (e.g., from 50th to 95th) is a highly concerning sign of rapidly developing hydrocephalus or an expanding mass, even if the fontanel is currently soft. This requires immediate diagnostic workup.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 14-year-old post-TBI has an ICP of 20 mmHg. Which interventions should the nurse perform to help reduce ICP? (Select All That Apply)",
+    "options": {
+      "A": "Maintain the head and neck in a neutral, midline position.",
+      "B": "Cluster nursing care activities (assessment, turning, bathing) together to minimize disturbances.",
+      "C": "Suction the trachea frequently (every 1 hour) for short durations (less than 10 seconds).",
+      "D": "Maintain a normothermic environment (avoid hyperthermia).",
+      "E": "Administer stool softeners as prescribed."
+    },
+    "correctAnswer": "A, D, E",
+    "rationale": "A: Promotes optimal jugular venous drainage. D: Hyperthermia increases cerebral metabolic rate, which increases ICP. E: Prevents straining (Valsalva maneuver), which spikes ICP. B: Nursing care should be **spaced out**, not clustered. C: Suctioning dramatically increases ICP and should be done only when absolutely necessary.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A nurse is admitting a 7-year-old child with a history of surgically repaired myelomeningocele. The nurse should immediately identify a priority for care related to which life-long risk associated with this condition?",
+    "options": {
+      "A": "Risk for frequent urinary tract infections (UTIs).",
+      "B": "High risk for developing a **latex allergy**.",
+      "C": "Need for bowel and bladder management routines.",
+      "D": "Developmental delays requiring continuous physical therapy."
+    },
+    "correctAnswer": "B",
+    "rationale": "Due to repeated exposure to latex products during multiple surgeries, catheterizations, and medical procedures early in life, children with spina bifida have a dramatically increased risk of developing a severe, life-threatening latex allergy. This requires strict adherence to a latex-free environment.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 4-year-old child suddenly begins convulsing in the hospital playroom, exhibiting bilateral rhythmic jerking and loss of consciousness. The seizure has lasted 3 minutes.\n\nAfter positioning the child safely on their side, which action is the nurse's immediate priority?",
+    "options": {
+      "A": "Obtain a clean-catch urine specimen to check for electrolyte imbalance.",
+      "B": "Attempt to start a peripheral IV line for medication administration.",
+      "C": "Note the exact time the seizure started and assess for effective breathing.",
+      "D": "Place a tongue blade or bite block in the child's mouth to protect the tongue."
+    },
+    "correctAnswer": "C",
+    "rationale": "Timing the seizure is essential for determining when to intervene for status epilepticus (usually after 5 minutes). Assessing breathing is part of the ABCs and takes precedence over attempting IV access while the child is actively seizing. Tongue blades are contraindicated.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "When comparing the signs of shunt malfunction in a 2-month-old infant versus a 2-year-old toddler, the nurse would expect the toddler to exhibit which finding **not** typically seen in the infant?",
+    "options": {
+      "A": "Bulging fontanel.",
+      "B": "Nausea and vomiting.",
+      "C": "Changes in level of consciousness.",
+      "D": "Diplopia (double vision)."
+    },
+    "correctAnswer": "D",
+    "rationale": "Because the toddler's sutures are closed and the fontanels are fused, the space for volume expansion is limited, leading to immediate increases in pressure on the brain structures. Cranial nerve compression (causing diplopia, especially VI nerve palsy) is a classic sign of increased ICP in older children with fixed cranial volume, whereas an infant's head can still expand.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The RN is caring for a 12-year-old with a severe TBI who is stable. Which task is **most appropriate** for the RN to delegate to an experienced Unlicensed Assistive Personnel (UAP)?",
+    "options": {
+      "A": "Assessing pupillary reaction and GCS every hour.",
+      "B": "Reminding the client not to flex the hips past 30 degrees during repositioning.",
+      "C": "Titrating the continuous Nicardipine drip based on blood pressure parameters.",
+      "D": "Performing tracheostomy suctioning every 4 hours."
+    },
+    "correctAnswer": "B",
+    "rationale": "Reminding the patient of positioning restrictions is a maintenance task that reinforces the nurse's teaching and plan of care. It does not require critical assessment or judgment, making it safe to delegate. All other tasks require the advanced skill or assessment of an RN.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 14-year-old TBI patient suddenly develops a BP of 150/55 mmHg, HR 50 beats/minute, and Cheyne-Stokes respirations. The nurse recognizes this as Cushing’s Triad, indicating which physiological state?",
+    "options": {
+      "A": "Systemic hypoperfusion leading to cerebral ischemia.",
+      "B": "Late, severe increase in ICP threatening brainstem herniation.",
+      "C": "Autoregulation failure leading to cerebral vasodilation.",
+      "D": "Electrolyte imbalance causing autonomic instability."
+    },
+    "correctAnswer": "B",
+    "rationale": "Cushing’s Triad (hypertension with widening pulse pressure, bradycardia, and irregular respirations) is a classic, late sign of severely increased ICP requiring immediate, aggressive intervention.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 6-year-old post-craniotomy is on fluid restriction to prevent cerebral edema. Which findings, if noted by the nurse, indicate that the fluid restriction is too aggressive or that the child is becoming dehydrated? (Select All That Apply)",
+    "options": {
+      "A": "Urine specific gravity of 1.035.",
+      "B": "Heart rate of 65 beats/minute.",
+      "C": "Dry mucous membranes and delayed capillary refill.",
+      "D": "Serum sodium level of 130 mEq/L.",
+      "E": "Increased restlessness and irritability."
+    },
+    "correctAnswer": "A, C, E",
+    "rationale": "A high urine specific gravity (A) indicates highly concentrated urine due to dehydration. Dry mucous membranes and delayed capillary refill (C) are classic signs of hypovolemia/dehydration. Restlessness/irritability (E) is a non-specific sign of fluid and electrolyte imbalance. Low serum sodium (D) suggests SIADH (fluid excess).",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 3-month-old infant is admitted with lethargy and a history of fussiness after a reported fall from a chair. Physical assessment reveals increasing OFC and poor tracking. The nurse suspects a subdural hematoma (SDH). Which characteristic of SDH makes it particularly concerning in this age group?",
+    "options": {
+      "A": "The infant's immature liver function makes clotting difficult.",
+      "B": "The large subarachnoid space allows bleeding to accumulate slowly and conceal symptoms.",
+      "C": "The open fontanels prevent the rapid formation of a hematoma.",
+      "D": "The infant's underdeveloped cranial nerves impair early motor function assessment."
+    },
+    "correctAnswer": "B",
+    "rationale": "Due to the relatively large subarachnoid space and compliant skull in infants, a subdural hematoma can grow slowly over days or weeks, causing non-specific signs (poor feeding, subtle behavior change, increasing head size) until the bleeding volume is critically large.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "Prior to shunt placement, a newborn with progressive hydrocephalus is treated with Acetazolamide (Diamox). The nurse should monitor which laboratory value most closely in relation to this medication?",
+    "options": {
+      "A": "White blood cell (WBC) count.",
+      "B": "Platelet count.",
+      "C": "Serum potassium and bicarbonate levels.",
+      "D": "Blood glucose level."
+    },
+    "correctAnswer": "C",
+    "rationale": "Acetazolamide is a carbonic anhydrase inhibitor (diuretic). It can cause hypokalemia and metabolic acidosis (due to bicarbonate excretion). Close monitoring of electrolytes and acid-base status is essential.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 7-year-old is on strict bed rest for bacterial meningitis. Which comfort measure should the nurse prioritize in the plan of care?",
+    "options": {
+      "A": "Clustering care to allow for long periods of uninterrupted rest.",
+      "B": "Elevating the HOB to 45 degrees to reduce meningeal irritation.",
+      "C": "Ensuring the room is dark and quiet with minimal stimulation.",
+      "D": "Providing a gentle neck massage to relieve rigidity."
+    },
+    "correctAnswer": "C",
+    "rationale": "Meningeal irritation causes severe sensitivity to light (photophobia) and sound. A dark, quiet room is the most effective way to reduce neurological stimulation and promote comfort.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The parents of a 10-year-old with spina bifida are receiving education on long-term management. Which topics should the nurse prioritize? (Select All That Apply)",
+    "options": {
+      "A": "Signs of VP shunt malfunction.",
+      "B": "Strict latex avoidance.",
+      "C": "Intermittent straight catheterization (ISC) technique.",
+      "D": "Self-administration of prophylactic antibiotics.",
+      "E": "Importance of folic acid supplementation in adolescence."
+    },
+    "correctAnswer": "A, B, C",
+    "rationale": "A: Most children with myelomeningocele develop hydrocephalus requiring a shunt. B: High risk for latex allergy requires strict avoidance. C: Neurogenic bladder requires ISC to prevent kidney damage and UTIs. D and E are important but not the highest priority for ongoing self-care management.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 16-year-old male is recovering in the post-ictal phase of a generalized tonic-clonic seizure. He is deep-sleeping, breathing heavily, and unresponsive. Which is the nurse's best action?",
+    "options": {
+      "A": "Begin rigorous shaking and shouting to fully arouse the patient.",
+      "B": "Place the patient in a side-lying position and monitor respiratory effort.",
+      "C": "Prepare to administer another dose of benzodiazepine immediately.",
+      "D": "Insert an oral airway to prevent tongue obstruction."
+    },
+    "correctAnswer": "B",
+    "rationale": "The post-ictal phase is characterized by deep sleep and confusion. The priority is safety: side-lying position prevents aspiration due to drooling or vomiting, and continuous monitoring ensures airway patency and adequate gas exchange.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 2-year-old child with severe dysphagia secondary to CP often requires thickened formula and positioning adjustments during feeding. Which finding indicates that the feeding regimen is *ineffective* and places the child at risk?",
+    "options": {
+      "A": "Persistent drooling during the day.",
+      "B": "Frequent episodes of recurrent pneumonia.",
+      "C": "Weight gain of 1 kg over 3 months.",
+      "D": "Elevated muscle tone during mealtimes."
+    },
+    "correctAnswer": "B",
+    "rationale": "Recurrent pneumonia, often termed 'aspiration pneumonia,' is a direct complication of chronic aspiration due to severe dysphagia. This signals a failure of the current feeding regimen to protect the airway and requires immediate evaluation.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 1-year-old post-TBI exhibits decorticate posturing. The nurse interprets this finding as indicative of injury to which area of the brain?",
+    "options": {
+      "A": "Midbrain or pons.",
+      "B": "Cerebellum.",
+      "C": "Hypothalamus.",
+      "D": "Cerebral cortex or pathways above the brainstem."
+    },
+    "correctAnswer": "D",
+    "rationale": "Decorticate posturing (flexion of the arms/hands toward the core, extension of the legs) indicates injury to the corticospinal tracts above the midbrain, typically involving the cerebral cortex.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 5-year-old returns from surgery following a craniotomy for tumor resection. Which type of dressing saturation must the nurse immediately report?",
+    "options": {
+      "A": "Clear, watery drainage.",
+      "B": "Bloody drainage of 10 mL over 8 hours.",
+      "C": "Small amount of serous, yellowish drainage.",
+      "D": "Scant amount of dark, old blood drainage."
+    },
+    "correctAnswer": "A",
+    "rationale": "Clear, watery drainage, especially if it tests positive for glucose, suggests a cerebrospinal fluid (CSF) leak (rhinorrhea). This is a neurosurgical emergency due to the high risk of infection (meningitis).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A school-age child with chronic, untreated hydrocephalus may exhibit which classic eye movement deficit?",
+    "options": {
+      "A": "Nystagmus (involuntary eye movement).",
+      "B": "Oculogyric crisis (upward deviation).",
+      "C": "Downward deviation of the eyes (\"setting sun\" sign).",
+      "D": "Ptosis (droopy eyelid)."
+    },
+    "correctAnswer": "C",
+    "rationale": "The \"setting sun\" sign is caused by pressure on the third cranial nerve and is a classic, though late, sign of increased ICP/hydrocephalus, particularly in infancy/childhood.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 16-year-old is unresponsive after hitting his head playing soccer. In the ED, which finding **rules out** a simple concussion and mandates an immediate head CT?",
+    "options": {
+      "A": "The patient reports a headache upon arrival.",
+      "B": "The patient has a brief, generalized tonic-clonic seizure upon transfer to the bed.",
+      "C": "The patient's left pupil is 6mm and non-reactive, while the right is 3mm and brisk.",
+      "D": "The patient cannot recall the event or the events leading up to it."
+    },
+    "correctAnswer": "C",
+    "rationale": "A fixed, dilated, or unequal pupil (anisocoria) is a sign of herniation and mass effect (e.g., epidural or subdural hematoma) compressing Cranial Nerve III. This is a life-threatening emergency and mandates immediate imaging.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 15-year-old male with a C6 spinal cord injury reports a severe, pounding headache and facial flushing. His blood pressure is 180/100 mmHg. The nurse notes the client is lying in bed with a full urinary drainage bag.\n\nWhich action is the nurse's priority?",
+    "options": {
+      "A": "Administering an immediate-release antihypertensive.",
+      "B": "Placing the client in the Trendelenburg position.",
+      "C": "Checking for and relieving bladder or bowel distention.",
+      "D": "Assessing for signs of pulmonary embolism."
+    },
+    "correctAnswer": "C",
+    "rationale": "This is a classic presentation of Autonomic Dysreflexia (AD), a medical emergency in patients with SCI at T6 or above. The most common cause is a noxious stimulus below the injury (e.g., full bladder or impaction). The priority is to relieve the stimulus before administering medication.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A child on valproic acid (Depakote) for a complex partial seizure disorder is due for routine lab work. Which findings should the nurse immediately report to the physician? (Select All That Apply)",
+    "options": {
+      "A": "Platelet count of 80,000/µL.",
+      "B": "Liver enzyme (ALT/AST) levels elevated three times the normal limit.",
+      "C": "Therapeutic serum valproic acid level of 75 mcg/mL.",
+      "D": "White blood cell (WBC) count of 15,000/µL.",
+      "E": "Sudden onset of persistent nausea and vomiting."
+    },
+    "correctAnswer": "A, B, E",
+    "rationale": "Valproic acid can cause dose-related hepatotoxicity (B) and thrombocytopenia (A). Gastrointestinal distress (E) is a major sign of toxicity. C is a toxic level (Therapeutic range 50-100 mcg/mL, but 75 is still considered high/toxic by many guidelines). D is generally normal.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse is reviewing home care instructions for the parents of a child recovering from an upper respiratory infection. Which statement by the parent indicates effective understanding of Reye syndrome prevention?",
+    "options": {
+      "A": "I will give him children's ibuprofen every 6 hours for fever and muscle aches.",
+      "B": "I know I shouldn't give him any antibiotics unless he has a high fever.",
+      "C": "I will use acetaminophen for fever, and avoid products containing aspirin or salicylates.",
+      "D": "I need to notify the provider if he gets confused after taking his fever reducer."
+    },
+    "correctAnswer": "C",
+    "rationale": "Reye syndrome is strongly associated with the use of aspirin (salicylates) during viral illnesses, particularly influenza and varicella. Acetaminophen is the preferred antipyretic.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 9-month-old infant is 2 days post-op for VP shunt placement. The nurse attempts to feed the infant but notes projectile vomiting and a bulging fontanel. Which action should the nurse take regarding the infant's position?",
+    "options": {
+      "A": "Increase the HOB to 45 degrees to help drain excess CSF.",
+      "B": "Immediately return the infant to a flat, supine position.",
+      "C": "Keep the HOB flat and roll the infant onto the non-operative side.",
+      "D": "Place the infant in a Trendelenburg position."
+    },
+    "correctAnswer": "A",
+    "rationale": "Signs of shunt malfunction (bulging fontanel, vomiting) indicate increased ICP due to inadequate drainage. The appropriate intervention is to gradually raise the HOB to 30-45 degrees to promote CSF drainage via gravity.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 2-year-old is admitted with a spiral fracture of the right femur. The parents state the injury occurred when the child tripped on a rug. The nurse performs a full assessment and notes several bruises in various stages of healing on the trunk. Which action is the nurse's **priority**?",
+    "options": {
+      "A": "Documenting the findings and educating the parents on child-proofing.",
+      "B": "Reporting the findings immediately to Child Protective Services (CPS).",
+      "C": "Placing the child in restraints to prevent further self-injury.",
+      "D": "Questioning the parents more aggressively about the mechanism of injury."
+    },
+    "correctAnswer": "B",
+    "rationale": "The combination of a spiral fracture (indicative of twisting force, typically non-accidental) and a history inconsistent with the injury, plus multiple bruises, mandates the nurse's responsibility as a mandated reporter. Reporting to CPS is the priority.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 10-year-old child presents with high fever, neck stiffness, and severe headache, suggestive of meningitis. Which additional sign would strongly indicate that the inflammation has progressed to **encephalitis**?",
+    "options": {
+      "A": "The development of a petechial rash.",
+      "B": "Sudden onset of auditory hallucinations and personality changes.",
+      "C": "A serum glucose level of 150 mg/dL.",
+      "D": "Reports of extreme sensitivity to light."
+    },
+    "correctAnswer": "B",
+    "rationale": "Encephalitis (inflammation of the brain parenchyma) involves altered mental status, confusion, seizures, hallucinations, and personality changes, which are signs of neuronal damage. Meningitis primarily affects the meninges.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 7-year-old is being discharged after being observed for a mild concussion. The nurse determines the parents understand the need for ongoing monitoring when they verbalize they will return to the ED if the child exhibits which sign?",
+    "options": {
+      "A": "Complaining of a mild headache upon waking in the morning.",
+      "B": "Vomiting three times over 4 hours.",
+      "C": "Difficulty falling asleep tonight.",
+      "D": "Requiring acetaminophen for headache relief every 6 hours."
+    },
+    "correctAnswer": "B",
+    "rationale": "Persistent or projectile vomiting, particularly when associated with lethargy or confusion, is a key sign of increasing ICP and warrants immediate return to the hospital.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 14-year-old athlete is struggling with Post-Concussive Syndrome (PCS) 3 weeks after a head injury, reporting chronic headache and difficulty concentrating in school. Which advice should the nurse give the parents?",
+    "options": {
+      "A": "Your child should remain home until all symptoms completely resolve.",
+      "B": "Encourage physical activity to help blood flow return to the brain.",
+      "C": "Work with the school to implement academic accommodations and a gradual return to learning.",
+      "D": "PCS usually resolves quickly; these symptoms indicate the child is exaggerating."
+    },
+    "correctAnswer": "C",
+    "rationale": "PCS management focuses on **cognitive rest and symptom management**. Academic accommodations (reduced workload, frequent breaks) are essential for a safe and successful return to school.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A child with Cerebral Palsy is at high risk for developing which type of seizure disorder? (Select All That Apply)",
+    "options": {
+      "A": "Simple Partial Seizures.",
+      "B": "Generalized Tonic-Clonic Seizures.",
+      "C": "Absence Seizures.",
+      "D": "Infantile Spasms (West Syndrome).",
+      "E": "Status Epilepticus."
+    },
+    "correctAnswer": "A, B, D, E",
+    "rationale": "Children with CP, particularly those with spastic quadriplegia, often have significant underlying brain injury that increases the risk for nearly all types of seizures, including focal (A), generalized (B), complex epilepsy syndromes like Infantile Spasms (D), and the acute risk of Status Epilepticus (E).",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "In a pediatric patient with severe TBI and suspected diabetes insipidus (DI), the goal of fluid replacement is primarily to prevent which complication?",
+    "options": {
+      "A": "Hypervolemia and pulmonary edema.",
+      "B": "Cerebral edema.",
+      "C": "Severe dehydration and hypernatremia.",
+      "D": "Hypotension and reduced cerebral perfusion pressure (CPP)."
+    },
+    "correctAnswer": "C",
+    "rationale": "DI causes massive fluid loss via the kidneys. The most critical and life-threatening consequence is the rapid, severe dehydration and rising serum sodium (hypernatremia), which causes osmotic fluid shifts and can lead to neuronal damage.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A parent calls the nurse line reporting their child with an intrathecal baclofen pump is suddenly rigid, experiencing increased spasticity, and is restless. The pump was refilled 5 days ago. The nurse recognizes this as a sign of baclofen **withdrawal**. Which action is the nurse's priority?",
+    "options": {
+      "A": "Instruct the parents to increase the child's oral baclofen dosage immediately.",
+      "B": "Tell the parents to bring the child to the ED immediately for pump evaluation and medication replacement.",
+      "C": "Instruct the parents to monitor the child closely for signs of fever and infection at the pump site.",
+      "D": "Reassure the parents this is a common side effect after a refill and will resolve."
+    },
+    "correctAnswer": "B",
+    "rationale": "Baclofen withdrawal (caused by pump malfunction, empty reservoir, or catheter blockage) is a life-threatening emergency presenting as severe spasticity, rigidity, fever, and risk for rhabdomyolysis or status epilepticus. Immediate ED evaluation is mandatory.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A nurse is observing a 1-day-old neonate and notes the infant is exhibiting subtle, recurrent movements: lip-smacking, eye deviation, and slight cycling of the legs. The nurse knows that neonatal seizures are most often **subtle**. The priority nursing action should be to:",
+    "options": {
+      "A": "Restrain the infant and administer a dose of IV Phenobarbital.",
+      "B": "Stimulate the infant (e.g., rub back, gently reposition) to see if the movement stops.",
+      "C": "Cover the infant with a blanket and dim the lights to reduce environmental stimuli.",
+      "D": "Immediately check the infant’s blood glucose level."
+    },
+    "correctAnswer": "D",
+    "rationale": "While the movements are characteristic of subtle neonatal seizures, hypoglycemia is the most common and treatable cause of neonatal seizures. A blood glucose check is the fastest diagnostic intervention and can guide immediate treatment (IV dextrose).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A child with a TBI has an ICP monitor. The nurse observes that the P2 peak on the waveform is consistently higher than the P1 peak. The nurse should interpret this finding as indicative of:",
+    "options": {
+      "A": "Normal ICP tracing.",
+      "B": "Systemic hypotension.",
+      "C": "Decreased intracranial compliance.",
+      "D": "Cerebral vasospasm."
+    },
+    "correctAnswer": "C",
+    "rationale": "A normal ICP waveform has P1 highest, followed by P2. When **P2 is higher than P1**, it is a classic sign of severely decreased intracranial compliance, meaning the brain has little capacity to accommodate any more volume without a sharp rise in pressure.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "Which clinical manifestations are considered **late and ominous** signs of severely increased ICP in a child? (Select All That Apply)",
+    "options": {
+      "A": "Decorticate or decerebrate posturing.",
+      "B": "Complaints of headache and nausea.",
+      "C": "Fixed and dilated pupils.",
+      "D": "Irregular, slow respirations.",
+      "E": "Lethargy and difficulty arousing."
+    },
+    "correctAnswer": "A, C, D",
+    "rationale": "A, C, and D are classic late signs of severe brainstem compression and herniation (Cushing's Triad elements and posturing). B and E are early or general signs of increasing pressure.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse understands that hydrocephalus often develops in children with myelomeningocele due to which physiological process?",
+    "options": {
+      "A": "Increased CSF production by the choroid plexus.",
+      "B": "Arnold-Chiari malformation impeding CSF flow.",
+      "C": "Post-operative inflammation blocking the arachnoid villi.",
+      "D": "Chronic venous stasis in the brain due to low venous pressure."
+    },
+    "correctAnswer": "B",
+    "rationale": "The vast majority of children with myelomeningocele have an associated Type II Arnold-Chiari malformation, where the cerebellum and brainstem descend into the foramen magnum, obstructing CSF flow and causing hydrocephalus.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 5-year-old child with a known seizure disorder is admitted for pneumonia. The nurse ensures which safety measures are in place?",
+    "options": {
+      "A": "Placing padding on the side rails and ensuring suction and oxygen are at the bedside.",
+      "B": "Keeping the child in a high-Fowler's position at all times.",
+      "C": "Inserting a bite block into the mouth for prophylactic airway protection.",
+      "D": "Restricting all visitors to minimize stimulation."
+    },
+    "correctAnswer": "A",
+    "rationale": "Standard seizure precautions include padded side rails, ensuring bed is in lowest position, and having airway equipment (suction/oxygen) readily available.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 10-year-old with a VP shunt presents with low-grade fever, abdominal tenderness, and vomiting. The nurse should recognize these signs as suggestive of infection in which specific area?",
+    "options": {
+      "A": "Ventricular end of the shunt (brain).",
+      "B": "Peritoneal end of the shunt (abdomen).",
+      "C": "Catheter insertion site (scalp).",
+      "D": "Systemic bloodstream infection (sepsis)."
+    },
+    "correctAnswer": "B",
+    "rationale": "Infection at the peritoneal (abdominal) end of the shunt often causes abdominal signs: tenderness, peritonitis, or even a pseudocyst, along with fever. Ventricular infection causes more severe signs of increased ICP.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse is leading a community education session for parents of adolescent athletes. Which topics should be prioritized for concussion prevention? (Select All That Apply)",
+    "options": {
+      "A": "Proper fit and consistent use of protective equipment (helmets, mouth guards).",
+      "B": "Emphasizing immediate reporting of all head impact symptoms.",
+      "C": "Ensuring adequate hydration before, during, and after practice.",
+      "D": "Discouraging participation in high-impact sports like football and hockey.",
+      "E": "Importance of neck and core strength conditioning."
+    },
+    "correctAnswer": "A, B, E",
+    "rationale": "A: Proper equipment reduces impact transmission. B: Crucial for timely diagnosis and preventing Second Impact Syndrome. E: Strong neck muscles help stabilize the head and resist forces that cause rotation/whiplash, which can lead to concussion.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 7-year-old non-verbal child with severe CP relies on eye-gaze communication. Which action best facilitates communication between the nurse and the child?",
+    "options": {
+      "A": "Speaking slowly and loudly into the child's ear.",
+      "B": "Asking open-ended questions to encourage vocalization.",
+      "C": "Utilizing a visual communication board and establishing a yes/no signal.",
+      "D": "Only speaking with the child's parents to obtain information."
+    },
+    "correctAnswer": "C",
+    "rationale": "For a non-verbal child who uses eye-gaze, providing a reliable, low-effort method (like a visual board or clear eye-blink yes/no response) is the most appropriate way to respect autonomy and obtain assessment data.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 12-year-old is 12 hours post-op from a sub-occipital craniectomy for medulloblastoma removal. Which is the nurse's **priority** intervention?",
+    "options": {
+      "A": "Monitoring for signs of diabetes insipidus (DI).",
+      "B": "Keeping the child flat on the non-operative side or supine.",
+      "C": "Assessing for signs of Cerebellar Mutism Syndrome.",
+      "D": "Monitoring for sudden, excessive urinary output."
+    },
+    "correctAnswer": "B",
+    "rationale": "Following a posterior fossa surgery (sub-occipital), the child must be kept in a specific position (flat or low HOB, usually flat/side-lying) to avoid pressure on the surgical site and brainstem, and to prevent tension on the suture line.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 14-year-old with T5 spinal cord injury shows signs of Autonomic Dysreflexia (AD). After positioning the child high, what are the nurse's priority actions? (Select All That Apply)",
+    "options": {
+      "A": "Check for a full bladder and catheterize or irrigate the existing catheter.",
+      "B": "Administer an IV benzodiazepine to treat potential seizure.",
+      "C": "Assess the rectum for impaction and remove stool using anesthetic ointment.",
+      "D": "Check skin folds and clothing for painful stimuli (e.g., tight straps, wrinkles).",
+      "E": "Lower the head of the bed to improve cerebral perfusion."
+    },
+    "correctAnswer": "A, C, D",
+    "rationale": "These actions directly identify and remove the noxious trigger below the level of injury (bladder distension, bowel impaction, or cutaneous stimuli), which is the definitive treatment for AD. Lowering the HOB (E) would worsen the severe hypertension.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "Which finding in a 6-month-old infant is the **earliest and most specific** indicator of hydrocephalus?",
+    "options": {
+      "A": "Nuchal rigidity.",
+      "B": "Rapid increase in occipitofrontal circumference (OFC).",
+      "C": "Hyperactive deep tendon reflexes (DTRs).",
+      "D": "Irritability and high-pitched cry."
+    },
+    "correctAnswer": "B",
+    "rationale": "In infants with open sutures, the accumulation of CSF causes the head to enlarge. Measuring and tracking the OFC is the earliest and most specific objective finding for hydrocephalus.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The CSF analysis of a 3-year-old shows: Cloudy fluid, high white blood cell count (predominantly neutrophils), low glucose, and high protein. The nurse interprets this as consistent with which diagnosis?",
+    "options": {
+      "A": "Viral meningitis.",
+      "B": "Tuberculous meningitis.",
+      "C": "Bacterial meningitis.",
+      "D": "Subdural hematoma."
+    },
+    "correctAnswer": "C",
+    "rationale": "Classic CSF findings for **bacterial** meningitis include: **cloudy fluid**, high **neutrophil** count (PMNs), **low glucose** (bacteria consume it), and **high protein**.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 17-year-old male receiving phenytoin (Dilantin) for epilepsy has a serum level of 25 mcg/mL (Therapeutic range 10-20 mcg/mL). Which clinical sign should the nurse be assessing for that indicates toxicity?",
+    "options": {
+      "A": "Gingival hyperplasia and hair loss.",
+      "B": "Bone marrow suppression.",
+      "C": "Ataxia, nystagmus, and slurred speech.",
+      "D": "Photosensitivity and rash."
+    },
+    "correctAnswer": "C",
+    "rationale": "Signs of acute phenytoin toxicity (serum level > 20 mcg/mL) are primarily neurological, including unsteady gait (ataxia), involuntary eye movements (nystagmus), and cerebellar dysfunction (slurred speech). Gingival hyperplasia (A) is a chronic side effect.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 5-year-old child presents with morning headaches that often cause vomiting and tend to improve after being upright for a while. The nurse suspects a brain tumor, most likely located in the posterior fossa. The morning timing is due to:",
+    "options": {
+      "A": "Increased blood flow to the head during sleep.",
+      "B": "Hormone changes that occur overnight.",
+      "C": "Accumulation of CSF while sleeping in a flat position.",
+      "D": "Hypoglycemia upon waking."
+    },
+    "correctAnswer": "C",
+    "rationale": "Brain tumors, especially posterior fossa tumors, obstruct CSF flow. Lying flat for several hours during sleep allows CSF to accumulate, peaking the ICP (and thus the headache/vomiting) in the morning. Being upright aids gravitational drainage.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse is teaching the parents of a child with spastic CP how to best position the child when sitting. Which instruction is correct?",
+    "options": {
+      "A": "Pad the seat with soft pillows to reduce pressure.",
+      "B": "Ensure the child's knees are locked straight to promote standing reflex.",
+      "C": "Use specialized seating with hip and trunk support to maintain alignment.",
+      "D": "Keep the child's feet dangling to prevent heel pressure."
+    },
+    "correctAnswer": "C",
+    "rationale": "Specialized, firm seating that provides support and prevents scissoring/spastic posturing (hip and trunk support, abduction wedge) is essential to prevent contractures and maintain optimal posture for function.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 10-year-old fell off a swing and is unresponsive but breathing. After ensuring airway patency and cervical spine immobilization, what is the **correct order** for the nurse's neurological assessment?",
+    "options": {
+      "A": "GCS, Pupil response, Vital signs.",
+      "B": "Vital signs, Pupil response, GCS.",
+      "C": "Pupil response, Vital signs, GCS.",
+      "D": "GCS, Vital signs, Pupil response."
+    },
+    "correctAnswer": "B",
+    "rationale": "After ABCs, the assessment should proceed to: **Vitals** (for Cushing's triad), **Pupil response** (for herniation/CN III compression), and then the **GCS** (to establish baseline level of consciousness).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 13-year-old has been seizing continuously for 15 minutes, failing to respond to two doses of benzodiazepines. The physician orders a continuous infusion of a loading dose of fosphenytoin. Before administering this drug, the nurse should ensure:",
+    "options": {
+      "A": "The client is receiving a continuous infusion of 3% Normal Saline.",
+      "B": "Cardiac monitoring is initiated for the duration of the infusion.",
+      "C": "The continuous EEG is temporarily turned off to reduce artifact.",
+      "D": "The fosphenytoin is mixed only with Dextrose 5% in Water (D5W)."
+    },
+    "correctAnswer": "B",
+    "rationale": "Fosphenytoin and Phenytoin (Dilantin) can cause severe cardiovascular adverse effects, including bradycardia and hypotension, requiring continuous cardiac monitoring during the loading phase.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A nurse is teaching the parents of a 3-year-old with CP how to improve oral motor control during feeding. Which instruction is appropriate?",
+    "options": {
+      "A": "Use a spoon to push the food onto the front of the child's tongue.",
+      "B": "Use a soft, rubber-tipped spoon and present food to the side of the tongue.",
+      "C": "Provide all liquids through a sippy cup to prevent aspiration.",
+      "D": "Keep the child's head slightly extended (tilted back) while eating."
+    },
+    "correctAnswer": "B",
+    "rationale": "Feeding to the side of the tongue helps stimulate the swallowing reflex and reduces the tongue-thrust reflex common in CP. A soft spoon prevents oral injury.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 7-year-old is 1 month post-op from a shunt revision. Which signs, if noted by the parents, indicate a **shunt infection** and necessitate an immediate call to the provider? (Select All That Apply)",
+    "options": {
+      "A": "Mild headache and fatigue.",
+      "B": "Fever (T > 38.5°C).",
+      "C": "Redness and tenderness along the shunt track.",
+      "D": "Difficulty with a task they could easily do yesterday.",
+      "E": "Increased appetite and fluid intake."
+    },
+    "correctAnswer": "B, C, D",
+    "rationale": "B and C are local and systemic signs of infection. D (change in neurological status/new onset deficits) can indicate meningitis, ventriculitis, or shunt malfunction secondary to infection.",
+    "type": "sata",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 2-day-old preterm neonate develops irritability, decreased tone, and a rapidly falling hematocrit, indicating an intraventricular hemorrhage (IVH). The nurse's highest priority is:",
+    "options": {
+      "A": "Maintaining the infant in a prone position with the HOB flat.",
+      "B": "Minimizing stimulation and handling (quiet care).",
+      "C": "Rapidly administering packed red blood cells to stabilize HCT.",
+      "D": "Preparing the infant for immediate burr hole placement."
+    },
+    "correctAnswer": "B",
+    "rationale": "Any handling or excessive environmental stimulation dramatically increases cerebral blood flow and pressure in a preterm infant, which can worsen the IVH. Quiet, minimal handling is the priority to stabilize the neuro status.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse monitors a child with severe head trauma closely for signs of Diabetes Insipidus (DI). DI is suspected when the nurse notes:",
+    "options": {
+      "A": "Polyuria and a urine specific gravity of 1.030.",
+      "B": "Oliguria and a serum sodium level of 132 mEq/L.",
+      "C": "Polyuria and a serum sodium level of 155 mEq/L.",
+      "D": "Oliguria and an elevated serum potassium level."
+    },
+    "correctAnswer": "C",
+    "rationale": "DI results from damage to the pituitary gland, causing a lack of ADH. This leads to massive free water loss (**polyuria** with dilute urine) and subsequent dehydration and **hypernatremia** (high serum sodium).",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 5-year-old child is admitted after a near-drowning incident resulting in a period of submersion and cerebral hypoxia. The factor that provides the most favorable long-term neurological prognosis is:",
+    "options": {
+      "A": "The temperature of the water was 30°C (warm).",
+      "B": "The child did not require mechanical ventilation upon arrival.",
+      "C": "The child had only been submerged for 2 minutes.",
+      "D": "The child did not have a witnessed seizure during transport."
+    },
+    "correctAnswer": "C",
+    "rationale": "Duration of cerebral hypoxia is the single most important factor determining neurological outcome in drowning. Less than 5 minutes of submersion offers the best prognosis.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "The nurse is teaching the mother of a 5-year-old with neurogenic bowel about a scheduled bowel program. Which intervention is the most effective element of this program?",
+    "options": {
+      "A": "Increasing fluid intake throughout the day.",
+      "B": "Administering a pediatric suppository at the same time every evening.",
+      "C": "Increasing physical therapy activities to stimulate gut motility.",
+      "D": "Providing a high-fat, low-fiber diet to avoid hard stools."
+    },
+    "correctAnswer": "B",
+    "rationale": "A consistent, scheduled bowel program (using suppositories, enemas, or digital stimulation) helps trigger the defecation reflex and is essential for achieving continence and preventing impaction in neurogenic bowel.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A parent asks the nurse, \"What should I do if my child's Vagus Nerve Stimulator (VNS) goes off repeatedly?\" The child has been using the VNS magnet to stop simple partial seizures. The nurse instructs the parent to:",
+    "options": {
+      "A": "Apply the magnet continuously for 30 minutes to reset the VNS.",
+      "B": "Monitor for signs of severe hoarseness or difficulty breathing.",
+      "C": "Immediately contact the provider as this indicates VNS failure.",
+      "D": "Double the daily oral anticonvulsant dosage."
+    },
+    "correctAnswer": "B",
+    "rationale": "VNS stimulation causes mild side effects like voice changes (hoarseness). Excessive or frequent stimulation can lead to severe coughing, throat pain, or difficulty breathing, which requires turning off the VNS and medical assessment.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 4-year-old with suspected bacterial meningitis has been receiving IV antibiotics for 24 hours. The laboratory report confirms the causative agent is **Group B Streptococcus (GBS)**. The nurse can now take which action?",
+    "options": {
+      "A": "Maintain droplet isolation for another 24 hours.",
+      "B": "Discontinue droplet isolation precautions.",
+      "C": "Change isolation precautions to contact only.",
+      "D": "Delegate the removal of isolation signage to the UAP."
+    },
+    "correctAnswer": "B",
+    "rationale": "Once a definitive diagnosis is made (GBS, which is transmitted vertically, not via droplets) AND the patient has been on appropriate antibiotics for at least 24 hours, droplet precautions are typically discontinued.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A child with catastrophic TBI is being evaluated for brain death. Which assessment is the nurse's responsibility in preparing the child for definitive testing?",
+    "options": {
+      "A": "Warming the child to normothermia (T > 36.5°C).",
+      "B": "Hyperventilating the child to achieve a PaCO2 below 30 mmHg.",
+      "C": "Withholding all cardiac medications for 6 hours.",
+      "D": "Administering a high dose of IV sedation prior to the apnea test."
+    },
+    "correctAnswer": "A",
+    "rationale": "Hypothermia can mimic brain death (by causing coma and loss of reflexes). For a valid brain death examination, including the apnea test, the patient must be normothermic.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  },
+  {
+    "questionText": "A 14-year-old with mild hemiplegic CP is hesitant to attend a mandatory school swimming class. The nurse should address the child's reluctance by:",
+    "options": {
+      "A": "Providing a note excusing the child from all physical education.",
+      "B": "Focusing exclusively on teaching the child how to walk without assistive devices.",
+      "C": "Working with the physical therapist to identify adaptive equipment for the pool and encouraging participation.",
+      "D": "Recommending the child join a club instead of a team sport."
+    },
+    "correctAnswer": "C",
+    "rationale": "Promoting social and physical integration (normalization) is crucial for adolescent development. The nurse should advocate for adaptive equipment and support to allow the child to participate safely, rather than excusing them.",
+    "type": "mc",
+    "section": "Pediatric Intracranial Regulation"
+  }
+   ];
+
+        let currentQuestionIndex = 0;
+        let shuffledQuizData = [];
+        let userAnswers = [];
+        let flaggedQuestions = Array(quizData.length).fill(false);
+        let timeLeft = 7200; // 2 hours in seconds
+        let timerInterval;
+
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const header = document.getElementById('header');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const navQuestionsContainer = document.getElementById('nav-questions');
+        const questionContainer = document.getElementById('question-container');
+        const reviewScreen = document.getElementById('review-screen');
+        const reviewQuestionsContainer = document.getElementById('review-questions');
+        const nextBtn = document.getElementById('next-btn');
+        const previousBtn = document.getElementById('previous-btn');
+        const submitExamBtn = document.getElementById('submit-exam-btn');
+        const endReviewBtn = document.getElementById('end-review-btn');
+        const timerDisplay = document.getElementById('timer');
+        const questionCounter = document.getElementById('question-counter');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const gradeScreen = document.getElementById('grade-screen');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- Core Functions ---
+
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Starts the 2-hour exam timer.
+         */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the timer display with the remaining time in HH:MM:SS format.
+         */
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            if (timerDisplay) {
+                timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        /**
+         * Renders the current question and its options.
+         */
+        function renderQuestion() {
+            if (currentQuestionIndex >= shuffledQuizData.length) {
+                submitExam();
+                return;
+            }
+
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (questionContainer) {
+                questionContainer.innerHTML = '';
+                const questionHtml = document.createElement('div');
+                questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm flex flex-col h-full';
+
+                questionHtml.innerHTML = `
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
+                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                                ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4 text-sm font-medium text-gray-500">
+                        <span class="mr-2">^</span> Which is the correct answer?
+                    </div>
+                    <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
+                    <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
+                    <div id="options-container" class="space-y-4 flex-1"></div>
+                `;
+                
+                const optionsContainer = questionHtml.querySelector('#options-container');
+
+                const optionLetters = Object.keys(questionData.options);
+                optionLetters.forEach(letter => {
+                    const optionText = questionData.options[letter];
+                    const isMultipleChoice = questionData.type === 'mc';
+                    const inputType = isMultipleChoice ? 'radio' : 'checkbox';
+                    const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'flex items-center space-x-2';
+                    optionDiv.innerHTML = `
+                        <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${isMultipleChoice ? 'radio-btn' : 'check-btn'}">
+                        <label for="option-${letter}" class="option-label">
+                            <span class="option-letter">${letter}</span>
+                            <span class="flex-1">${optionText}</span>
+                            <button class="strikethrough-btn p-1 rounded-full hover:bg-gray-100 transition" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.822a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.577-3.01-9.964-7.822z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </label>
+                    `;
+                    optionsContainer.appendChild(optionDiv);
+                });
+
+                questionContainer.appendChild(questionHtml);
+            }
+            
+            // Add event listeners for strike-through
+            document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent label click
+                    const label = e.target.closest('label');
+                    const textSpan = label.querySelector('span:nth-child(2)');
+                    textSpan.classList.toggle('strikethrough');
+                });
+            });
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', () => {
+                    flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+                    flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    updateNavigationSidebar();
+                });
+            }
+
+            // Restore previous answer selection
+            if (userAnswers[currentQuestionIndex]) {
+                const savedAnswers = userAnswers[currentQuestionIndex];
+                if (Array.isArray(savedAnswers)) {
+                    savedAnswers.forEach(answer => {
+                        const input = document.getElementById(`option-${answer}`);
+                        if (input) input.checked = true;
+                    });
+                }
+            }
+
+            updateNavigationSidebar();
+            updateQuestionCounter();
+            updateButtonStates();
+        }
+
+        /**
+         * Updates the left navigation sidebar with current question status.
+         */
+        function updateNavigationSidebar() {
+            if (navQuestionsContainer) {
+                navQuestionsContainer.innerHTML = '';
+                shuffledQuizData.forEach((_, i) => {
+                    const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                    const navItem = document.createElement('div');
+                    navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                    navItem.textContent = i + 1;
+                    navItem.onclick = () => {
+                        saveUserAnswer();
+                        currentQuestionIndex = i;
+                        renderQuestion();
+                    };
+                    navQuestionsContainer.appendChild(navItem);
+                });
+            }
+        }
+
+        /**
+         * Updates the question counter in the footer.
+         */
+        function updateQuestionCounter() {
+            if (questionCounter) {
+                questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
+            }
+        }
+
+        /**
+         * Manages the enabled/disabled/visible state of footer buttons.
+         */
+        function updateButtonStates() {
+            if (previousBtn) {
+                if (currentQuestionIndex === 0) {
+                    previousBtn.disabled = true;
+                    previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
+                } else {
+                    previousBtn.disabled = false;
+                    previousBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+                }
+            }
+
+            if (nextBtn && submitExamBtn) {
+                if (currentQuestionIndex === shuffledQuizData.length - 1) {
+                    nextBtn.classList.add('hidden');
+                    submitExamBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitExamBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        /**
+         * Collects user's answer(s) for the current question.
+         */
+        function saveUserAnswer() {
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (!questionData) return;
+            let selectedAnswers = [];
+            if (questionData.type === 'mc') {
+                const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
+                if (selectedRadio) {
+                    selectedAnswers.push(selectedRadio.value);
+                }
+            } else if (questionData.type === 'sata') {
+                const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
+                selectedCheckboxes.forEach(checkbox => {
+                    selectedAnswers.push(checkbox.value);
+                });
+            }
+            userAnswers[currentQuestionIndex] = selectedAnswers;
+        }
+
+        /**
+         * Renders the review screen with missed questions.
+         */
+        function renderReviewScreen() {
+            if (mainContent) mainContent.classList.add('hidden');
+            if (reviewScreen) reviewScreen.classList.remove('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+
+            if (!reviewQuestionsContainer) return;
+            reviewQuestionsContainer.innerHTML = '';
+            
+            const missedQuestions = [];
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let isCorrect = false;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    isCorrect = userAnswer[0] === correctAnswer;
+                } else if (question.type === 'sata') {
+                    const correctSet = new Set(question.correctAnswer);
+                    const userSet = new Set(userAnswer);
+                    isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
+                }
+
+                if (!isCorrect) {
+                    missedQuestions.push({ question, index });
+                }
+            });
+
+            if (missedQuestions.length === 0) {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
+            } else {
+                missedQuestions.forEach(({ question, index }) => {
+                    const userAnswer = userAnswers[index] || [];
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-box';
+                    let optionsHtml = '';
+
+                    Object.keys(question.options).forEach(letter => {
+                        const isUserSelected = userAnswer.includes(letter);
+                        let correctAnswers = question.correctAnswer;
+                        if (!Array.isArray(correctAnswers)) {
+                            correctAnswers = [correctAnswers];
+                        }
+                        const isCorrectAnswer = correctAnswers.includes(letter);
+                        
+                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
+                        if (isCorrectAnswer) {
+                            optionClasses += ' correct-answer';
+                        }
+                        if (isUserSelected && !isCorrectAnswer) {
+                            optionClasses += ' incorrect-answer';
+                        }
+
+                        optionsHtml += `
+                            <div class="${optionClasses}">
+                                <span class="option-letter bg-gray-300 rounded-full">${letter}</span>
+                                <span>${question.options[letter]}</span>
+                            </div>
+                        `;
+                    });
+
+                    reviewItem.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
+                        <div class="space-y-2 mb-4">
+                            ${optionsHtml}
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-lg">
+                            <h4 class="font-semibold text-lg">Rationale:</h4>
+                            <p class="text-gray-700">${question.rationale}</p>
+                        </div>
+                    `;
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+            }
+        }
+
+        /**
+         * Calculates the final grade based on user answers.
+         * @returns {number} The final grade percentage.
+         */
+        function calculateGrade() {
+            let totalScore = 0;
+            const totalQuestions = shuffledQuizData.length;
+
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let questionScore = 0;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    if (userAnswer[0] === correctAnswer) {
+                        questionScore = 1;
+                    }
+                } else if (question.type === 'sata') {
+                    const correctAnswers = new Set(question.correctAnswer);
+                    const userSelections = new Set(userAnswer);
+                    
+                    const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
+
+                    if (!hasIncorrect && userSelections.size > 0) {
+                        questionScore = userSelections.size / correctAnswers.size;
+                    }
+                }
+                totalScore += questionScore;
+            });
+
+            return Math.round((totalScore / totalQuestions) * 100);
+        }
+        
+        /**
+         * Handles the end of the exam review, showing a submission animation and grade.
+         */
+        function handleFinalSubmit() {
+            if (reviewScreen) reviewScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Calculating Grade...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                const finalGrade = calculateGrade();
+                if (finalGradeDisplay) finalGradeDisplay.textContent = `${finalGrade}%`;
+                if (gradeScreen) gradeScreen.classList.remove('hidden');
+            }, 2000); // 2-second animation
+        }
+
+        /**
+         * Submits the exam, stops the timer, and shows the review screen.
+         */
+        function submitExam() {
+            clearInterval(timerInterval);
+            saveUserAnswer();
+            renderReviewScreen();
+        }
+
+        /**
+         * Starts the quiz after the initial start screen.
+         */
+        function startQuiz() {
+            if (startScreen) startScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            document.querySelector('body').style.overflow = 'hidden';
+
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Starting Exam...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                if (header) header.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (footer) footer.classList.remove('hidden');
+                document.querySelector('body').style.overflow = '';
+                
+                shuffleArray(quizData);
+                shuffledQuizData = quizData.slice(0, 85);
+                userAnswers = Array(shuffledQuizData.length).fill([]);
+                startTimer();
+                renderQuestion();
+            }, 2000); // 2-second animation
+        }
+
+        // --- Event Listeners ---
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                saveUserAnswer();
+                if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+        }
+        
+        if (previousBtn) {
+            previousBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    saveUserAnswer();
+                    currentQuestionIndex--;
+                    renderQuestion();
+                }
+            });
+        }
+
+        if (submitExamBtn) {
+            submitExamBtn.addEventListener('click', submitExam);
+        }
+        
+        if (endReviewBtn) {
+            endReviewBtn.addEventListener('click', handleFinalSubmit);
+        }
+        
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', startQuiz);
+        }
+
+    </script>
+
+</body>
+</html>
