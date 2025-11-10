@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Postpartum Nursing Care Module</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		// Tailwind CSS configuration to use the Inter font and define custom animations.
+		tailwind.config = {
+			theme: {
+				extend: {
+					fontFamily: {
+						sans: ['Inter', 'sans-serif'],
+					},
+					keyframes: {
+						'fade-in': {
+							'0%': { opacity: '0', transform: 'scale(0.95)' },
+							'100%': { opacity: '1', transform: 'scale(1)' },
+						},
+					},
+					animation: {
+						'fade-in': 'fade-in 0.3s ease-out forwards',
+					},
+				},
+			},
+		};
+	</script>
+
+	<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+	<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+	<div id="root"></div>
+
+	<script type="text/babel">
+		// --- React and Library Setup ---
+		const { useState, useEffect, useCallback, useMemo } = React;
+
+		// --- Mock Authentication Setup for Standalone Demo ---
+		const mockAuth = {
+			onAuthStateChanged: (callback) => {
+				setTimeout(() => callback({ uid: 'standalone-postpartum-user' }), 100);
+				return () => {}; 
+			},
+			signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-postpartum-user' } }),
+		};
+
+		// --- Content & Data Structure for the Learning Modules (Postpartum) ---
+		const contentData = {
+			'module-1-pp-phases': {
+				title: 'Module 1: Postpartum Timeline & Puerperium',
+				color: 'from-pink-600 to-red-400',
+				description: 'Define the postpartum period, its stages, and the key retrogressive changes in the reproductive system.',
+				steps: [
+					{ id: 'm1-def', title: 'Postpartum Stages & Definitions', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">The Fourth Trimester: A Time of Rapid Change</p>
+						<p>The postpartum period marks a major psychological and physiological transition for the mother.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Key Definitions:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Puerperium:</strong> The full 6-week period from childbirth until the return of the reproductive organs to their prepregnancy states.</li>
+							<li><strong>Involution:</strong> The retrogressive changes (shrinkage) that return the reproductive organs (especially the uterus) to their prepregnancy size.</li>
+							<li><strong>Subinvolution:</strong> Failure of the uterus to return to its pre-pregnant state. A major risk factor for late Postpartum Hemorrhage (PPH).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Postpartum Stages:</h4>
+						<ol class="list-decimal list-inside ml-4">
+							<li><strong>Immediate Postpartum:</strong> After birth up to 24 hours (Hospital stay focus).</li>
+							<li><strong>Early Postpartum:</strong> 24 hours after birth and lasts 1 week.</li>
+							<li><strong>Late Postpartum:</strong> 1 week after discharge and ends 6 weeks postpartum.</li>
+						</ol>
+					`},
+					{ id: 'm1-repro-changes', title: 'Reproductive System Involution', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">Involution, Lochia, and Afterpains</p>
+						<p>The nurse’s physical assessment focuses heavily on the reproductive organs returning to normal (Involution).</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Uterine Involution:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Immediately after birth, the fundus (top of the uterus) should be firm, midline, and near the umbilicus.</li>
+							<li>The fundus descends approximately <strong>1 finger breadth (1 cm) per day</strong>.</li>
+							<li><strong>Afterpains:</strong> Intermittent uterine contractions (cramps) after birth. They are more painful and pronounced in <strong>multiparas</strong> (due to decreased muscle tone) and during <strong>breastfeeding</strong> (due to Oxytocin release).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Lochia (Post-birth Vaginal Discharge):</h4>
+						<p>The uterine discharge changes color and content over time. Nurses assess color, amount, and odor (for infection).</p>
+						<ol class="list-decimal list-inside ml-4">
+							<li><strong>Lochia Rubra:</strong> Bright red, like heavy menses. Lasts 1-3 days.</li>
+							<li><strong>Lochia Serosa:</strong> Pinkish or brownish. Lasts 4-10 days.</li>
+							<li><strong>Lochia Alba:</strong> Creamy white or yellow. Lasts up to 6 weeks.</li>
+						</ol>
+						<h4 class="text-lg font-bold mt-4 mb-2">Vagina, Cervix, Perineum:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>The cervix is soft and flabby immediately postpartum, regaining form over weeks.</li>
+							<li>The vagina is smooth and swollen but eventually shrinks, though it never fully returns to its nulliparous state.</li>
+							<li>The perineum is swollen. Healing of lacerations/episiotomies takes 4-6 weeks.</li>
+						</ul>
+					`},
+					{ id: 'm1-quiz', title: 'Module 1 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What term describes the failure of the uterus to return to its pre-pregnant state?", options: ["Puerperium", "Involution", "Subinvolution", "Afterpains"], correctAnswer: "Subinvolution" },
+							{ question: "Lochia Rubra is characterized by what appearance, and how long does it typically last?", options: ["Pinkish-brown; 4-10 days", "White/yellow; up to 6 weeks", "Bright red; 1-3 days", "Clear; 1 week"], correctAnswer: "Bright red; 1-3 days" },
+							{ question: "Why are afterpains more intense for multiparous women and during breastfeeding?", options: ["Increased pain tolerance", "Increased Estrogen levels", "Decreased uterine muscle tone and Oxytocin release", "Decreased lochia production"], correctAnswer: "Decreased uterine muscle tone and Oxytocin release" }
+						]
+					}
+				]
+			},
+			'module-2-system-changes': {
+				title: 'Module 2: Cardiovascular & Systemic Changes',
+				color: 'from-blue-600 to-indigo-500',
+				description: 'Explore endocrine shifts, fluid balance, and critical non-reproductive system changes.',
+				steps: [
+					{ id: 'm2-endocrine', title: 'Endocrine, Ovulation & Menses', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">Hormonal Crash and Recovery</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Endocrine Shifts:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Immediately after delivery, <strong>Estrogen and Progesterone levels fall drastically</strong> (a factor in postpartum blues).</li>
+							<li><strong>Prolactin</strong> increases to stimulate milk production (lactation).</li>
+							<li>Placental hormone levels (hPL, hCG) fall rapidly.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Ovulation and Menses:</h4>
+						<p>The return of fertility and menses is highly variable:</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>For <strong>non-breastfeeding</strong> women, menses usually returns in <strong>7 to 9 weeks</strong>.</li>
+							<li>For <strong>breastfeeding</strong> women, menses can be delayed for <strong>3 to 18 months</strong> (due to high Prolactin inhibiting ovarian response).</li>
+						</ul>
+						<p class="font-bold text-red-500 italic mt-2">Nursing Alert: Breastfeeding is <strong>NOT a reliable form of birth control</strong>, especially after 6 months or once supplementation begins.</p>
+					`},
+					{ id: 'm2-cv-gi-neuro', title: 'Cardiovascular, GI, and Neuro Changes', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">Fluid Shifts and Neuro Checks</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Cardiovascular System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Cardiac output returns to its previous level in <strong>6-8 weeks</strong>.</li>
+							<li>The body rapidly eliminates the <strong>20-30% extra fluid volume</strong> carried during pregnancy through:
+								<ul>
+									<li><strong>Diuresis</strong> (excessive urination): Begins within 12 hours.</li>
+									<li><strong>Diaphoresis</strong> (excessive sweating): Especially prominent at night.</li>
+								</ul>
+							</li>
+							<li>Fibrinogen levels remain elevated (hypercoagulable state) for weeks, increasing the risk of <strong>thrombophlebitis</strong> (DVT/PE).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Gastrointestinal (GI) System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Mothers are often <strong>very hungry and thirsty</strong> immediately postpartum.</li>
+							<li><strong>Constipation</strong> is common due to decreased GI motility from progesterone, pain medications, and fear of pain during defecation.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Neurological System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Monitor closely for pre-eclampsia symptoms (headache, blurred vision) that persist or worsen after delivery.</li>
+							<li><strong>Spinal Headache:</strong> Occurs after a spinal/epidural and is caused by CSF leakage. Characterized by a headache that is significantly <strong>worse when sitting up</strong> and relieved when lying flat.</li>
+						</ul>
+					`},
+					{ id: 'm2-quiz', title: 'Module 2 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the primary neuro sign of a Postpartum Spinal Headache?", options: ["Headache relieved by sitting up", "Headache worse when lying flat", "Headache worse when sitting up", "Bilateral visual disturbances"], correctAnswer: "Headache worse when sitting up" },
+							{ question: "The postpartum body eliminates excess fluid volume primarily through what two processes?", options: ["Edema and vomiting", "Diaphoresis and diuresis", "Decreased heart rate and thirst", "Increased blood pressure and hunger"], correctAnswer: "Diaphoresis and diuresis" },
+							{ question: "Which hormone is responsible for stimulating milk production (lactation)?", options: ["Estrogen", "Progesterone", "Oxytocin", "Prolactin"], correctAnswer: "Prolactin" }
+						]
+					}
+				]
+			},
+			'module-3-rubins-adaptation': {
+				title: 'Module 3: Rubin’s Maternal Adjustment Phases',
+				color: 'from-purple-600 to-pink-500',
+				description: 'Identify the three distinct psychosocial phases of maternal role adaptation and appropriate nursing support.',
+				steps: [
+					{ id: 'm3-rubins-phases', title: 'The Three Phases of Adjustment', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">The Psychosocial Transition to Motherhood</p>
+						<p>These phases describe the psychologic changes a woman experiences as she shifts into her new role as a mother. This transition is not always linear.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Rubin's Phases:</h4>
+						<table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
+							<thead class="bg-purple-50">
+								<tr>
+									<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phase</th>
+									<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Occurrence</th>
+									<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Maternal Behaviors</th>
+									<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nursing Support</th>
+								</tr>
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-200">
+								<tr>
+									<td class="px-4 py-2 whitespace-nowrap font-medium text-gray-900"><strong>Dependent: Taking In</strong></td>
+									<td class="px-4 py-2 text-sm text-gray-500">Birth to 24-48 hours</td>
+									<td class="px-4 py-2 text-sm text-gray-500">Focus is on <strong>self and basic needs</strong>. Dependent on others for care & decisions. Relives the birth experience.</td>
+									<td class="px-4 py-2 text-sm text-gray-500">Encourage mothers to describe their labor and birth experience. Meet her immediate physical needs.</td>
+								</tr>
+								<tr>
+									<td class="px-4 py-2 whitespace-nowrap font-medium text-gray-900"><strong>Dependent-Independent: Taking Hold</strong></td>
+									<td class="px-4 py-2 text-sm text-gray-500">24–48 hours after birth, lasts a few days</td>
+									<td class="px-4 py-2 text-sm text-gray-500">Mothers begin to shift focus from themselves to their <strong>newborn's care</strong>. Becomes concerned about her mothering ability.</td>
+									<td class="px-4 py-2 text-sm text-gray-500">Provide support and encouragement. Offer demonstrations and teaching (e.g., breastfeeding, diapering).</td>
+								</tr>
+								<tr>
+									<td class="px-4 py-2 whitespace-nowrap font-medium text-gray-900"><strong>Interdependent: Letting Go</strong></td>
+									<td class="px-4 py-2 text-sm text-gray-500">Begins a few days after birth, lasts several weeks</td>
+									<td class="px-4 py-2 text-sm text-gray-500">Adjusts to new roles as parent, incorporating the baby into the family unit. Often grieves the loss of the pregnant identity.</td>
+									<td class="px-4 py-2 text-sm text-gray-500">Encourage verbalization of feelings and reassure. Provide education on family adjustment.</td>
+								</tr>
+							</tbody>
+						</table>
+					`},
+					{ id: 'm3-terms', title: 'Terminology: Bonding and Adaptation', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">The Parent-Child Bond</p>
+						<p>These terms describe the initial and enduring relationships between the newborn and parents.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Key Parent-Infant Interaction Terms:</h4>
+						<ul class="list-disc list-inside ml-4 space-y-2">
+							<li><strong>Bonding:</strong> Initial attraction felt by parents for their infants (the immediate feeling).</li>
+							<li><strong>Attachment:</strong> The process by which an enduring <strong>bond</strong> is developed through pleasurable, satisfying interactions (a long-term process).</li>
+							<li><strong>Engrossment:</strong> Intense fascination and focus, typically felt between the <strong>father and newborn</strong>.</li>
+							<li><strong>En face:</strong> Position that facilitates direct <strong>eye-to-eye contact</strong> between the parent and newborn (critical for early attachment).</li>
+							<li><strong>Fingertipping:</strong> Initial touch characterized by the parent lightly touching the newborn with the fingertips (often seen in the Taking In phase).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Nursing Interventions for Family Adaptation:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Provide <strong>family-centered care</strong>.</li>
+							<li>Educate parents to <strong>respond to newborn behavioral cues</strong> (crying, fussing) to foster trust and security.</li>
+							<li>Pay attention to siblings (sibling rivalry is common; include the older child in care).</li>
+						</ul>
+					`},
+					{ id: 'm3-quiz', title: 'Module 3 Quiz', type: 'quiz',
+						questions: [
+							{ question: "A mother is asking the nurse to change the baby's diaper and bring her a snack, focusing heavily on her own rest. Which of Rubin's phases is she in?", options: ["Dependent: Taking In", "Dependent-Independent: Taking Hold", "Interdependent: Letting Go", "Attachment"], correctAnswer: "Dependent: Taking In" },
+							{ question: "What term describes the intense fascination often felt between the father and the newborn?", options: ["Attachment", "Bonding", "En face", "Engrossment"], correctAnswer: "Engrossment" },
+							{ question: "In which phase does the mother become concerned about her mothering ability and require teaching?", options: ["Dependent: Taking In", "Dependent-Independent: Taking Hold", "Interdependent: Letting Go", "Puerperium"], correctAnswer: "Dependent-Independent: Taking Hold" }
+						]
+					}
+				]
+			},
+			'module-4-mood-disorders': {
+				title: 'Module 4: Postpartum Mood Disorders',
+				color: 'from-indigo-700 to-purple-600',
+				description: 'Differentiate "Baby Blues" from severe Depression and Psychosis, and understand risk factors.',
+				steps: [
+					{ id: 'm4-blues-dep', title: 'Blues vs. Depression', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">The Spectrum of Postpartum Mood</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">1. Postpartum Blues (Baby Blues):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Prevalence:</strong> Affects up to <strong>85%</strong> of postpartum mothers (and can occur in fathers).</li>
+							<li><strong>Key Symptoms:</strong> Fatigue, insomnia, irritability, tearfulness, and anxiety.</li>
+							<li><strong>Duration:</strong> <strong>Self-resolving</strong> within <strong>10-14 days</strong>. (No intervention beyond reassurance and support is typically needed).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">2. Postpartum Depression (PPD):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Prevalence:</strong> Affects <strong>10% to 15%</strong> of postpartum mothers (and can occur in fathers).</li>
+							<li><strong>Key Symptoms:</strong> Severe mood swings, withdrawing from family/friends, <strong>poor bonding with the newborn</strong>, and intrusive thoughts of <strong>harming self or newborn</strong>.</li>
+							<li><strong>Duration:</strong> Lasts <strong>longer than 2 weeks</strong> and significantly inhibits the mother’s ability to care for herself and the baby. <strong>Requires intervention</strong> (therapy, medication).</li>
+						</ul>
+					`},
+					{ id: 'm4-psychosis', title: 'Psychosis and Adaptation Concerns', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">Postpartum Psychosis: A Medical Emergency</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">3. Postpartum Psychosis:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Prevalence:</strong> Rare (<strong>0.1% to 0.2%</strong>).</li>
+							<li><strong>Key Symptoms:</strong> Paranoia, delusions, severe confusion, hallucinations, attempts to <strong>harm self & newborn</strong>, and obsessive thoughts.</li>
+							<li><strong>Action:</strong> This is a <strong>psychiatric emergency</strong> requiring immediate hospitalization and aggressive treatment to ensure the safety of the mother and infant.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Other Maternal Role Concerns:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Competing Demands:</strong> Feeling guilt over focusing on self versus the newborn. (Nursing support: verbalization, reassurance, stress management education).</li>
+							<li><strong>Body Image:</strong> Unrealistic expectation of immediate weight loss. (Nursing support: Education related to diet, exercise, and normal progression of weight loss).</li>
+						</ul>
+					`},
+					{ id: 'm4-quiz', title: 'Module 4 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Which postpartum mood disorder requires immediate psychiatric intervention due to high risk of harm?", options: ["Postpartum Blues", "Postpartum Depression", "Postpartum Psychosis", "Baby Blues"], correctAnswer: "Postpartum Psychosis" },
+							{ question: "Postpartum Blues typically resolves on its own within what timeframe?", options: ["24 hours", "3 days", "10-14 days", "1 month"], correctAnswer: "10-14 days" },
+							{ question: "A mother is diagnosed with Postpartum Depression if symptoms persist for longer than:", options: ["3 days", "1 week", "2 weeks", "6 weeks"], correctAnswer: "2 weeks" }
+						]
+					}
+				]
+			},
+			'module-5-routine-care': {
+				title: 'Module 5: Routine Postpartum Nursing Care',
+				color: 'from-green-600 to-teal-500',
+				description: 'Implement nursing care for pain, healing (REEDA), and elimination after vaginal and Cesarean deliveries.',
+				steps: [
+					{ id: 'm5-vaginal', title: 'Vaginal Delivery Care & Healing (REEDA)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-green-700">Vaginal Delivery: Comfort and Perineal Healing</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Pain and Healing Interventions:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Pain Management:</strong> NSAIDs (Ibuprofen, Ketorolac) are primary for uterine cramping/perineal pain.</li>
+							<li><strong>Perineal Healing:</strong>
+								<ul>
+									<li><strong>Ice Packs:</strong> Applied for the first <strong>12-24 hours</strong> to reduce swelling and pain.</li>
+									<li><strong>Topical Agents:</strong> Anesthetic sprays (Dermoplast) or topical astringent pads (Tucks/witch hazel).</li>
+									<li><strong>Sitz Bath:</strong> Warm, shallow bath used after 24 hours to promote circulation and healing.</li>
+									<li><strong>Stool Softeners:</strong> Essential to promote soft elimination and reduce strain on healing lacerations/episiotomy.</li>
+								</ul>
+							</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Wound Assessment (REEDA):</h4>
+						<p>REEDA is the mnemonic used to assess the healing of lacerations or episiotomies:</p>
+						<ol class="list-decimal list-inside ml-4 font-bold">
+							<li><strong>R</strong>edness</li>
+							<li><strong>E</strong>dema</li>
+							<li><strong>E</strong>cchymosis (bruising)</li>
+							<li><strong>D</strong>ischarge</li>
+							<li><strong>A</strong>pproximation (how well the wound edges are joined)</li>
+						</ol>
+						<h4 class="text-lg font-bold mt-4 mb-2">Nursing Support:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Perineal Care:</strong> Educate on using a peribottle with warm water after every voiding and bowel movement.</li>
+							<li><strong>Positioning:</strong> Encourage semi-Fowler’s or side-lying position for comfort.</li>
+							<li><strong>Elimination:</strong> Teach <strong>Kegel exercises</strong> (30 times/day) to increase muscle tone in the vaginal and urinary meatal area.</li>
+						</ul>
+					`},
+					{ id: 'm5-cs', title: 'Cesarean Delivery (C/S) Care', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-green-700">Cesarean Delivery: Post-Surgical Priorities</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Post-Surgical Priorities:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Pain Management:</strong> Often involves <strong>PCA (Patient-Controlled Analgesia)</strong>, IV, and then Oral (PO) medications.</li>
+							<li><strong>Respiratory Care:</strong> Deep breathing, coughing, and <strong>Incentive Spirometry</strong> (IS) are crucial to prevent atelectasis/pneumonia. Encourage sitting up and early ambulation.</li>
+							<li><strong>Nutrition & Hydration:</strong> IV fluids initially, then gradual advance to PO fluids and regular diet as tolerated. Antiemetics may be necessary.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Preventing Complications:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Elimination/Gas:</strong> Indwelling catheter (Foley) remains in place for 12-24 hours. Encourage ambulation and discourage:
+								<ul>
+									<li><strong>Avoid Straws:</strong> Increases swallowed air/gas.</li>
+									<li><strong>Avoid Carbonated Drinks:</strong> Increases intestinal gas/discomfort.</li>
+								</ul>
+							</li>
+							<li><strong>Thrombophlebitis Prevention:</strong> Early ambulation, <strong>SCDs (Sequential Compression Devices)</strong>, and compression stockings are vital due to the hypercoagulable state and immobility.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Additional Care Areas:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Breast Care</strong> (engorgement, lactation education).</li>
+							<li><strong>C-Section Incision Care</strong> (REEDA assessment, wound hygiene).</li>
+							<li><strong>Immunizations:</strong> Administer TDaP, MMR, and <strong>Rhogam</strong> (if Rh-negative and baby is Rh-positive).</li>
+						</ul>
+					`},
+					{ id: 'm5-quiz', title: 'Module 5 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the mnemonic used to assess the healing of a perineal wound or C-section incision?", options: ["PPH", "H-O-P", "REEDA", "GCS"], correctAnswer: "REEDA" },
+							{ question: "After a C-section, why should the patient avoid using straws and drinking carbonated beverages?", options: ["To prevent tooth decay", "To avoid stimulating the bowels", "To decrease swallowed air and gas discomfort", "To reduce bleeding"], correctAnswer: "To decrease swallowed air and gas discomfort" },
+							{ question: "What is the purpose of applying ice packs to the perineum in the immediate postpartum period?", options: ["To promote circulation and healing.", "To reduce swelling and pain.", "To reduce bleeding and inflammation.", "To promote uterine involution."], correctAnswer: "To reduce swelling and pain." }
+						]
+					}
+				]
+			},
+			'module-6-high-risk': {
+				title: 'Module 6: High-Risk Complications (PPH & Infection)',
+				color: 'from-red-700 to-orange-600',
+				description: 'Identify the types, causes, and critical nursing interventions for postpartum hemorrhage (PPH) and common infections.',
+				steps: [
+					{ id: 'm6-infections', title: 'High-Risk Infections', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">Identifying Postpartum Infections (Often accompanied by fever)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Common Postpartum Infections:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Endometritis:</strong> Infection of the <strong>lining of the uterus</strong>. Often presents with fever, uterine tenderness, and foul-smelling lochia.</li>
+							<li><strong>Wound Infections:</strong> Occur at the surgical site (C-section incision), genital laceration, or perineal episiotomy. Use <strong>REEDA</strong> to assess.</li>
+							<li><strong>UTIs:</strong> Infection in any part of the urinary system. Common due to catheterization (C-section) or urinary retention.</li>
+							<li><strong>Mastitis:</strong> Inflammation of breast tissue that sometimes involves an infection. Often unilateral, presenting with flu-like symptoms, fever, and a red, painful, warm lump.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Treatment:</h4>
+						<p>Treatment for all infections includes <strong>Antibiotics</strong>, rest, and adequate <strong>hydration</strong>. For mastitis, it’s important to ensure continued emptying of the affected breast (breastfeeding or pumping) unless contraindicated.</p>
+					`},
+					{ id: 'm6-pph-cause', title: 'Postpartum Hemorrhage (PPH) Causes', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">PPH: The Silent Killer</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Definition:</h4>
+						<p>Blood loss > 500 mL after a vaginal birth OR > 1000 mL after a cesarean birth.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">The 4 T’s of PPH Causes:</h4>
+						<p>The majority of PPH cases fall into one of these four categories (PPH can be early or late):</p>
+						<ol class="list-decimal list-inside ml-4 font-bold">
+							<li><strong>Tone (Uterine Atony - 70%):</strong> Failure of the uterus to contract after birth. The most common cause.</li>
+							<li><strong>Tissue:</strong> Retained placenta fragments or membranes preventing the uterus from clamping down (Involution).</li>
+							<li><strong>Trauma:</strong> Lacerations of the cervix, vagina, or perineum that were not repaired. Also includes hematomas.</li>
+							<li><strong>Thrombin:</strong> Pre-existing coagulation disorders (rare).</li>
+						</ol>
+						<h4 class="text-lg font-bold mt-4 mb-2">Other Causes:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Uterine Inversion:</strong> Uterus turns inside out (rare, severe).</li>
+							<li><strong>Subinvolution of the Uterus:</strong> Late PPH cause, failure of the uterus to shrink (related to retained tissue or infection).</li>
+						</ul>
+					`},
+					{ id: 'm6-pph-actions', title: 'PPH: Initial and Other Nursing Actions', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">PPH: The Rapid Response Protocol</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Initial Priority Actions (Rapid Response):</h4>
+						<ol class="list-decimal list-inside ml-4 font-bold">
+							<li><strong>Call for Assistance & Notify MD:</strong> Immediately notify the healthcare provider and call for help/assign roles.</li>
+							<li><strong>Call for PPH Hemorrhage Cart/Med Box.</strong></li>
+							<li><strong>Firm Fundal Massage:</strong> The single most important action to stimulate contraction if the cause is Atony (Tone).</li>
+							<li><strong>Assess EBL (Estimated Blood Loss):</strong> Weigh perineal pads, drapes, and sponges. (1 gram = 1 mL blood loss).</li>
+							<li><strong>IV Access:</strong> Establish or ensure <strong>two large-bore IVs</strong> are patent (for fluids and blood products).</li>
+						</ol>
+						<h4 class="text-lg font-bold mt-4 mb-2">Other Actions (Concurrent Interventions):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Vitals:</strong> Record frequently (Q5 min). Watch for tachycardia and hypotension (late signs of shock).</li>
+							<li><strong>Medications (Uterotonics):</strong> Administer as ordered:
+								<ul>
+									<li><strong>Oxytocin (Pitocin):</strong> First line drug (IV/IM).</li>
+									<li><strong>Misoprostol (Cytotec):</strong> Given rectally.</li>
+									<li><strong>Methylergonovine (Methergine):</strong> <strong>Contraindicated in Hypertension/Pre-eclampsia.</strong></li>
+								</ul>
+							</li>
+							<li><strong>Prepare for Labs:</strong> Coagulation studies, Type & Crossmatch (contact blood bank).</li>
+							<li>Prepare for procedures (Uterine Balloon Tamponade) or moving patient to the OR.</li>
+						</ul>
+					`},
+					{ id: 'm6-case', title: 'Case Study: PPH Management', type: 'case_study', case: {
+						scenario: `A G2P2 patient, 2 hours postpartum after a vaginal delivery, saturates a perineal pad in 10 minutes. Her fundus is soft ("boggy") and displaced to the right. Vitals: BP 90/55, HR 120, R 20. She reports feeling lightheaded.`,
+						question: `What are the immediate, highest priority nursing interventions? (Select all that apply.)`,
+						options: [
+							"Option A: Administer Methylergonovine (Methergine) IM immediately.",
+							"Option B: Perform continuous, firm fundal massage.",
+							"Option C: Elevate the patient's legs and start a rapid IV fluid bolus.",
+							"Option D: Call for PPH assistance/med cart and notify the healthcare provider.",
+							"Option E: Assess the perineum for lacerations/hematoma after the fundus becomes firm.",
+						],
+						correctAnswer: [
+							"Option B: Perform continuous, firm fundal massage.",
+							"Option C: Elevate the patient's legs and start a rapid IV fluid bolus.",
+							"Option D: Call for PPH assistance/med cart and notify the healthcare provider.",
+						],
+						explanation: `<strong>Rationale:</strong> The patient has signs of <strong>Postpartum Hemorrhage (PPH)</strong> caused by <strong>Uterine Atony</strong> (boggy fundus). Her tachycardia and hypotension indicate she is moving into hypovolemic shock.
+						<ul>
+							<li><strong>Option B (Correct):</strong> <strong>Fundal massage</strong> is the critical first physical intervention for atony (Tone) to stimulate uterine contraction.</li>
+							<li><strong>Option C (Correct):</strong> Rapid IV fluid resuscitation (using the two large-bore IVs) and elevating the legs combat hypovolemic shock.</li>
+							<li><strong>Option D (Correct):</strong> Calling for help and initiating the PPH protocol is essential for rapid medication delivery, lab draws, and blood readiness.</li>
+							<li><strong>Option A (Incorrect):</strong> Methergine is often used, but it is <strong>contraindicated if the patient is hypertensive/pre-eclamptic</strong>. Since we do not know her baseline and her BP is low now, Pitocin is safer first-line, and starting Methergine before physician confirmation is risky. Fundal massage and Pitocin (usually running from delivery) are the <strong>fastest</strong> treatments.</li>
+							<li><strong>Option E (Correct but not highest immediate priority):</strong> Assessing for trauma (Trauma) is necessary, but the boggy fundus points to atony first, which requires immediate massage. This action should follow the massage.</li>
+						</ul>`
+					}},
+					{ id: 'm6-quiz', title: 'Module 6 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the most common cause of Postpartum Hemorrhage (PPH)?", options: ["Lacerations (Trauma)", "Uterine Atony (Tone)", "Retained Placenta (Tissue)", "Coagulation Disorder (Thrombin)"], correctAnswer: "Uterine Atony (Tone)" },
+							{ question: "Which PPH uterotonic medication is contraindicated in patients with Hypertension or Pre-eclampsia?", options: ["Oxytocin (Pitocin)", "Misoprostol (Cytotec)", "Methylergonovine (Methergine)", "Dinoprostone"], correctAnswer: "Methylergonovine (Methergine)" },
+							{ question: "An infant being diagnosed with Endometritis means they have an infection of the:", options: ["Fallopian tube", "Perineal laceration", "Lining of the uterus", "Breast tissue"], correctAnswer: "Lining of the uterus" }
+						]
+					}
+				]
+			}
+		};
+
+		// --- Pre-Assessment Quiz Data (3 questions from each of the 6 modules) ---
+		const preAssessmentQuizData = [
+			// Module 1: Postpartum Timeline & Puerperium
+			{ moduleId: 'module-1-pp-phases', question: "What term describes the failure of the uterus to return to its pre-pregnant state?", options: ["Puerperium", "Involution", "Subinvolution", "Afterpains"], correctAnswer: "Subinvolution" },
+			{ moduleId: 'module-1-pp-phases', question: "Lochia Rubra is characterized by what appearance, and how long does it typically last?", options: ["Pinkish-brown; 4-10 days", "White/yellow; up to 6 weeks", "Bright red; 1-3 days", "Clear; 1 week"], correctAnswer: "Bright red; 1-3 days" },
+			{ moduleId: 'module-1-pp-phases', question: "Why are afterpains more intense for multiparous women?", options: ["Increased pain tolerance", "Increased Estrogen levels", "Decreased uterine muscle tone", "Decreased lochia production"], correctAnswer: "Decreased uterine muscle tone" },
+
+			// Module 2: Cardiovascular & Systemic Changes
+			{ moduleId: 'module-2-system-changes', question: "What is the primary neuro sign of a Postpartum Spinal Headache?", options: ["Headache relieved by sitting up", "Headache worse when lying flat", "Headache worse when sitting up", "Bilateral visual disturbances"], correctAnswer: "Headache worse when sitting up" },
+			{ moduleId: 'module-2-system-changes', question: "The postpartum body eliminates excess fluid volume primarily through what two processes?", options: ["Edema and vomiting", "Diaphoresis and diuresis", "Decreased heart rate and thirst", "Increased blood pressure and hunger"], correctAnswer: "Diaphoresis and diuresis" },
+			{ moduleId: 'module-2-system-changes', question: "Which hormone is responsible for stimulating milk production (lactation)?", options: ["Estrogen", "Progesterone", "Oxytocin", "Prolactin"], correctAnswer: "Prolactin" },
+			
+			// Module 3: Rubin’s Maternal Adjustment Phases
+			{ moduleId: 'module-3-rubins-adaptation', question: "A mother is asking the nurse to change the baby's diaper and bring her a snack. Which of Rubin's phases is she in?", options: ["Dependent: Taking In", "Dependent-Independent: Taking Hold", "Interdependent: Letting Go", "Attachment"], correctAnswer: "Dependent: Taking In" },
+			{ moduleId: 'module-3-rubins-adaptation', question: "What term describes the intense fascination often felt between the father and the newborn?", options: ["Attachment", "Bonding", "En face", "Engrossment"], correctAnswer: "Engrossment" },
+			{ moduleId: 'module-3-rubins-adaptation', question: "In which phase does the mother become concerned about her mothering ability and require teaching?", options: ["Dependent: Taking In", "Dependent-Independent: Taking Hold", "Interdependent: Letting Go", "Puerperium"], correctAnswer: "Dependent-Independent: Taking Hold" },
+			
+			// Module 4: Postpartum Mood Disorders
+			{ moduleId: 'module-4-mood-disorders', question: "Which postpartum mood disorder requires immediate psychiatric intervention due to high risk of harm?", options: ["Postpartum Blues", "Postpartum Depression", "Postpartum Psychosis", "Baby Blues"], correctAnswer: "Postpartum Psychosis" },
+			{ moduleId: 'module-4-mood-disorders', question: "Postpartum Blues typically resolves on its own within what timeframe?", options: ["24 hours", "3 days", "10-14 days", "1 month"], correctAnswer: "10-14 days" },
+			{ moduleId: 'module-4-mood-disorders', question: "A mother is diagnosed with Postpartum Depression if symptoms persist for longer than:", options: ["3 days", "1 week", "2 weeks", "6 weeks"], correctAnswer: "2 weeks" },
+			
+			// Module 5: Routine Nursing Care (Vaginal & C/S)
+			{ moduleId: 'module-5-routine-care', question: "What is the mnemonic used to assess the healing of a perineal wound or C-section incision?", options: ["PPH", "H-O-P", "REEDA", "GCS"], correctAnswer: "REEDA" },
+			{ moduleId: 'module-5-routine-care', question: "After a C-section, why should the patient avoid using straws and drinking carbonated beverages?", options: ["To prevent tooth decay", "To avoid stimulating the bowels", "To decrease swallowed air and gas discomfort", "To reduce bleeding"], correctAnswer: "To decrease swallowed air and gas discomfort" },
+			{ moduleId: 'module-5-routine-care', question: "What is the purpose of applying ice packs to the perineum in the immediate postpartum period?", options: ["To promote circulation and healing.", "To reduce swelling and pain.", "To reduce bleeding and inflammation.", "To promote uterine involution."], correctAnswer: "To reduce swelling and pain." },
+			
+			// Module 6: High-Risk Complications (PPH & Infection)
+			{ moduleId: 'module-6-high-risk', question: "What is the most common cause of Postpartum Hemorrhage (PPH)?", options: ["Lacerations (Trauma)", "Uterine Atony (Tone)", "Retained Placenta (Tissue)", "Coagulation Disorder (Thrombin)"], correctAnswer: "Uterine Atony (Tone)" },
+			{ moduleId: 'module-6-high-risk', question: "Which PPH uterotonic medication is contraindicated in patients with Hypertension or Pre-eclampsia?", options: ["Oxytocin (Pitocin)", "Misoprostol (Cytotec)", "Methylergonovine (Methergine)", "Dinoprostone"], correctAnswer: "Methylergonovine (Methergine)" },
+			{ moduleId: 'module-6-high-risk', question: "An infant being diagnosed with Endometritis means they have an infection of the:", options: ["Fallopian tube", "Perineal laceration", "Lining of the uterus", "Breast tissue"], correctAnswer: "Lining of the uterus" }
+		];
+
+		// --- Helper Functions ---
+		const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+		// --- Child Components ---
+
+		/**
+		 * Quiz component for interactive multiple-choice questions.
+		 */
+		const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+			const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+			const [selectedOption, setSelectedOption] = useState([]);
+			const [feedback, setFeedback] = useState(null);
+			const [answers, setAnswers] = useState([]);
+
+			const currentQuestion = questions[currentQuestionIndex];
+
+			// Determine if the current question is multi-select (SATA)
+			const isMultiSelect = Array.isArray(currentQuestion.correctAnswer) && currentQuestion.correctAnswer.length > 1;
+
+			const handleOptionSelect = (option) => {
+				if (feedback && !isPreAssessment) return;
+
+				if (isMultiSelect) {
+					setSelectedOption(prevSelected => {
+						if (prevSelected.includes(option)) {
+							return prevSelected.filter(item => item !== option);
+						} else {
+							return [...prevSelected, option];
+						}
+					});
+				} else {
+					// Single select logic
+					setSelectedOption([option]); // Always store as array internally for consistent checking
+				}
+			};
+
+			const checkCorrectness = (options, correctAnswers) => {
+				if (Array.isArray(correctAnswers)) {
+					// Multi-select (SATA) check: Must contain ALL correct answers and ONLY those correct answers.
+					const correctCount = correctAnswers.filter(ans => options.includes(ans)).length;
+					return correctCount === correctAnswers.length && options.length === correctAnswers.length;
+				} else {
+					// Single select check
+					return options[0] === correctAnswers;
+				}
+			};
+
+			const handlePreAssessmentNext = () => {
+				if (selectedOption.length === 0) return;
+
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+
+				const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+				setAnswers(updatedAnswers);
+
+				if (currentQuestionIndex < questions.length - 1) {
+					setCurrentQuestionIndex(currentQuestionIndex + 1);
+					setSelectedOption([]);
+					setFeedback(null);
+				} else {
+					onComplete(updatedAnswers);
+				}
+			};
+
+			const handleRegularQuizSubmit = () => {
+				if (selectedOption.length === 0) return;
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+				setFeedback(isCorrect ? 'correct' : 'incorrect');
+			};
+
+			const handleRegularQuizNext = () => {
+				if (!feedback) return; // Cannot proceed without submitting first
+
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+				const finalAnswers = [...answers, { question: currentQuestion, isCorrect, score: isCorrect ? 1 : 0 }];
+				
+				if (currentQuestionIndex < questions.length - 1) {
+					setAnswers(finalAnswers);
+					setCurrentQuestionIndex(currentQuestionIndex + 1);
+					setSelectedOption([]);
+					setFeedback(null);
+				} else {
+					const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.score || 0), 0);
+					onComplete({ score: finalScore, total: questions.length });
+				}
+			};
+
+			const selectedAnswerText = isMultiSelect ? selectedOption : selectedOption[0];
+			
+			return (
+				<div className="p-4 bg-white rounded-xl shadow-lg border border-gray-200 animate-fade-in">
+					<h4 className="font-extrabold text-2xl text-gray-800 mb-4 flex justify-between items-center">
+						<span>{isPreAssessment ? 'Diagnostic Question' : 'Module Quiz'}</span>
+						<span className="text-lg font-semibold text-indigo-600">{currentQuestionIndex + 1} of {questions.length}</span>
+					</h4>
+					
+					{isMultiSelect && <p className="text-sm font-bold text-red-500 mb-2">**SELECT ALL THAT APPLY (SATA)**</p>}
+					
+					<p className="font-semibold text-gray-700 mb-4 text-lg">{currentQuestion.question}</p>
+					<div className="space-y-3">
+						{currentQuestion.options.map((option, index) => {
+							const isSelected = selectedOption.includes(option);
+							const isCorrectOption = Array.isArray(currentQuestion.correctAnswer)
+								? currentQuestion.correctAnswer.includes(option)
+								: option === currentQuestion.correctAnswer;
+							
+							let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-300';
+
+							if (feedback && !isPreAssessment) {
+								if (isCorrectOption) {
+									optionClass = 'bg-green-100 border-green-500 text-green-800 font-medium';
+								} else if (isSelected && !isCorrectOption) {
+									optionClass = 'bg-red-100 border-red-500 text-red-800 font-medium';
+								}
+							} else if (isSelected) {
+								optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800 font-medium shadow-inner';
+							}
+
+							return (
+								<div
+									key={index}
+									onClick={() => handleOptionSelect(option)}
+									className={cn('p-3 rounded-xl border-2 cursor-pointer transition-all duration-150 flex items-center', optionClass)}
+								>
+									<span className="flex-1">{option}</span>
+									{feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+										isCorrectOption ? <span className="text-green-600 ml-2">✓</span> : <span className="text-red-600 ml-2">✗</span>
+									)}
+								</div>
+							);
+						})}
+					</div>
+					<div className="mt-6 text-center">
+						{isPreAssessment ? (
+							<button
+								onClick={handlePreAssessmentNext}
+								disabled={selectedOption.length === 0}
+								className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+							>
+								{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+							</button>
+						) : (
+							<>
+								{!feedback ? (
+									<button
+										onClick={handleRegularQuizSubmit}
+										disabled={selectedOption.length === 0}
+										className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+									>
+										Submit Answer
+									</button>
+								) : (
+									<button
+										onClick={handleRegularQuizNext}
+										className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+									>
+										{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'View Score'}
+									</button>
+								)}
+							</>
+						)}
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * PreAssessmentQuiz component to handle the initial diagnostic quiz.
+		 */
+		const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+			const [results, setResults] = useState(null);
+
+			const handleQuizComplete = (finalAnswers) => {
+				const moduleResults = {};
+				finalAnswers.forEach(answer => {
+					const { moduleId } = answer.question;
+					if (!moduleResults[moduleId]) {
+						moduleResults[moduleId] = { correct: 0, total: 0 };
+					}
+					if (answer.isCorrect) {
+						moduleResults[moduleId].correct++;
+					}
+					moduleResults[moduleId].total++;
+				});
+
+				const completedModules = [];
+				for (const moduleId in moduleResults) {
+					// Test-out criteria: 100% correct in that module's diagnostic questions.
+					if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+						completedModules.push(moduleId);
+					}
+				}
+				setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+				onComplete(completedModules);
+			};
+
+			if (results) {
+				return (
+					<div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
+						<div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
+							<h2 className="text-3xl font-extrabold text-gray-800 mb-4">Diagnostic Complete!</h2>
+							<p className="text-lg text-gray-600 mb-6">
+								You correctly answered {results.correct} out of {results.total} questions.
+							</p>
+							{results.completedModules.length > 0 ? (
+								<>
+									<p className="text-green-600 font-bold text-xl mb-4">You've successfully tested out of:</p>
+									<ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-xl shadow-inner border border-green-200">
+										{results.completedModules.map(id => <li key={id} className="font-semibold">{contentData[id].title}</li>)}
+									</ul>
+									<p className="text-gray-700 text-sm italic mb-6">Your progress for these modules has been marked as complete.</p>
+								</>
+							) : (
+								<p className="text-yellow-600 font-bold text-xl mb-6 bg-yellow-50 p-4 rounded-xl shadow-inner border border-yellow-200">
+									Keep going! Use the learning modules to review the content.
+								</p>
+							)}
+							<button
+								onClick={onExit}
+								className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+							>
+								Return to Dashboard
+							</button>
+						</div>
+					</div>
+				);
+			}
+
+			return (
+				<div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
+					<div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl w-full">
+						<h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Diagnostic Quiz (Pre-Assessment)</h2>
+						<Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+					</div>
+				</div>
+			);
+		};
+
+
+		/**
+		 * Dashboard component to display the available learning modules.
+		 */
+		const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+			let totalCompletedSteps = 0;
+			let totalPossibleSteps = 0;
+			let totalQuizCorrect = 0;
+			let totalQuizQuestions = 0;
+
+			// Calculate overall progress and gather quiz scores
+			Object.entries(contentData).forEach(([moduleId, module]) => {
+				totalPossibleSteps += module.steps.length;
+				const moduleProgress = progress[moduleId] || {};
+				
+				Object.values(moduleProgress).forEach(stepProgress => {
+					if (stepProgress.completed) {
+						totalCompletedSteps++;
+					}
+					if (stepProgress.score !== undefined) {
+						totalQuizCorrect += stepProgress.score;
+					}
+				});
+
+				module.steps.forEach(step => {
+					if (step.type === 'quiz' || step.type === 'case_study') {
+						totalQuizQuestions += (step.type === 'quiz' ? step.questions.length : 1);
+					}
+				});
+			});
+
+			const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+			return (
+				<div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+					<div className="w-full">
+						<header className="mb-8 text-center">
+							<div className="flex items-center justify-center gap-3 mb-2">
+								<span className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-lg">PP</span>
+								<h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Postpartum Nursing Care Module</h1>
+								<span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
+							</div>
+							<p className="text-lg text-gray-500 max-w-2xl mx-auto">Master essential concepts in the postpartum period, maternal adaptation, and high-risk complications like PPH.</p>
+						</header>
+
+						{/* Skip Ahead Button */}
+						<div className="mb-8 text-center">
+							<button
+								onClick={onStartPreAssessment}
+								className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-xl shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+							>
+								<div className="text-xl font-extrabold">Skip Ahead: Take Diagnostic Quiz</div>
+								<div className="text-sm font-medium">Test your knowledge and potentially skip modules. (18 Questions)</div>
+							</button>
+						</div>
+
+						{/* Overall Progress Bar & Reset Button */}
+						<div className="mb-12 bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-auto">
+						   <div className="flex justify-between items-center mb-3">
+							  <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+							  <button 
+									onClick={onResetProgress}
+									className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2 transform hover:scale-105"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
+									Reset Progress
+							  </button>
+						   </div>
+						   <div className="w-full bg-gray-200 rounded-full h-4">
+							   <div
+								  className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+								  style={{ width: `${overallPercentage}%` }}
+							   ></div>
+						   </div>
+						   <div className="flex justify-between items-center">
+							  <p className="text-left text-sm text-gray-600 mt-2">
+								  {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+							  </p>
+							  <p className="text-right text-sm text-gray-600 mt-2 font-bold">{Math.round(overallPercentage)}% Completed</p>
+						   </div>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+							{/* Iterate over all modules defined in contentData */}
+							{Object.entries(contentData).map(([id, module]) => {
+								const moduleProgress = progress[id] || {};
+								// Calculate completion count for steps within the module.
+								const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+								const totalSteps = module.steps.length;
+								const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+								let statusText = "Not Started";
+								let statusColor = "text-gray-500";
+								if (completedCount === totalSteps) {
+									statusText = "COMPLETED";
+									statusColor = "text-green-600 font-extrabold";
+								} else if (completedCount > 0) {
+									statusText = "In Progress";
+									statusColor = "text-yellow-600 font-bold";
+								}
+
+								return (
+									<div
+										key={id}
+										onClick={() => onSelectModule(id)}
+										className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group flex flex-col transform animate-fade-in"
+									>
+										<div className="flex justify-between items-start mb-4">
+											{/* Module Icon/Title Tag */}
+											<div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-12 h-12 flex items-center justify-center text-white text-lg font-extrabold shadow-lg flex-shrink-0")}>
+												{module.title.split(':')[0].replace('Module ', 'M')}
+											</div>
+											{/* Progress Circle */}
+											<div className="relative w-12 h-12 flex-shrink-0">
+												<svg className="w-full h-full" viewBox="0 0 36 36">
+													{/* Background circle for the progress bar. */}
+													<path
+														className="text-gray-200"
+														d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="3"
+													/>
+													{/* Foreground arc representing the completion percentage. */}
+													<path
+														className="text-indigo-500 transition-all duration-700"
+														d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="3"
+														strokeDasharray={`${percentage}, 100`}
+														strokeLinecap="round"
+														transform="rotate(-90 18 18)"
+													/>
+												</svg>
+												<span className={cn("absolute inset-0 flex items-center justify-center text-xs font-extrabold", percentage === 100 ? 'text-green-600' : 'text-gray-600')}>
+													{Math.round(percentage)}%
+												</span>
+											</div>
+										</div>
+										<h3 className="text-xl font-extrabold text-gray-800 mb-2">{module.title.split(': ')[1]}</h3>
+										<p className="text-gray-500 text-sm mb-4 h-10">{module.description}</p>
+										<div className="mt-auto pt-2 border-t border-gray-100">
+											<p className={cn("text-sm", statusColor)}>{statusText}</p>
+											<div className="flex items-center justify-between text-sm font-bold text-indigo-600 group-hover:text-indigo-700 mt-2">
+												{percentage === 100 ? 'Review Module' : 'Start Learning'} 
+												<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+													<path fillRule="evenodd" d="M12.97 4.97a.75.75 0 011.06 0l4.5 4.5a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 11-1.06-1.06l3.22-3.22H4a.75.75 0 010-1.5h12.19l-3.22-3.22a.75.75 0 010-1.06z" clipRule="evenodd" />
+												</svg>
+											</div>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * CaseStudy component for a multiple-choice case study challenge.
+		 */
+		const CaseStudy = ({ caseData, onComplete }) => {
+			const [selectedAnswers, setSelectedAnswers] = useState([]);
+			const [showFeedback, setShowFeedback] = useState(false);
+			
+			const isMultiSelect = Array.isArray(caseData.correctAnswer) && caseData.correctAnswer.length > 1;
+
+			const handleSelect = (option) => {
+				if (showFeedback) return;
+
+				if (isMultiSelect) {
+					setSelectedAnswers(prevSelected => {
+						if (prevSelected.includes(option)) {
+							return prevSelected.filter(item => item !== option);
+						} else {
+							return [...prevSelected, option];
+						}
+					});
+				} else {
+					// Single select logic
+					setSelectedAnswers([option]);
+				}
+			};
+
+			const checkCorrectness = (options, correctAnswers) => {
+				if (Array.isArray(correctAnswers)) {
+					const correctCount = correctAnswers.filter(ans => options.includes(ans)).length;
+					return correctCount === correctAnswers.length && options.length === correctAnswers.length;
+				} else {
+					return options[0] === correctAnswers;
+				}
+			};
+
+			const handleSubmit = () => {
+				setShowFeedback(true);
+				const isCorrect = checkCorrectness(selectedAnswers, caseData.correctAnswer);
+				
+				if (isCorrect) {
+					onComplete({ score: 1, total: 1 });
+				} else {
+					onComplete({ score: 0, total: 1 });
+				}
+			};
+
+			return (
+				<div className="p-6 bg-white rounded-xl shadow-lg border border-red-200 animate-fade-in">
+					<h4 className="font-extrabold text-2xl text-red-700 mb-4 flex items-center">
+						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+							<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 001 1h3a1 1 0 100-2h-2V6z" clipRule="evenodd" />
+						</svg>
+						Clinical Case Challenge
+					</h4>
+					{isMultiSelect && <p className="text-sm font-bold text-red-500 mb-2">**SELECT ALL THAT APPLY (SATA)**</p>}
+					<div className="mb-4 p-4 bg-gray-50 rounded-lg border-l-4 border-indigo-400">
+						<h5 className="font-bold text-indigo-700 mb-1">Scenario:</h5>
+						<p className="text-gray-700 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+					</div>
+					
+					<p className="font-bold text-gray-800 mb-3 text-lg">{caseData.question}</p>
+					
+					<div className="space-y-3">
+						{caseData.options.map(option => {
+							const isSelected = selectedAnswers.includes(option);
+							const isCorrectOption = Array.isArray(caseData.correctAnswer)
+								? caseData.correctAnswer.includes(option)
+								: option === caseData.correctAnswer;
+							
+							let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-300';
+							if (showFeedback) {
+								if (isCorrectOption) {
+									optionClass = 'bg-green-100 border-green-500 text-green-800 font-medium shadow-md';
+								} else if (isSelected && !isCorrectOption) {
+									optionClass = 'bg-red-100 border-red-500 text-red-800 font-medium shadow-md';
+								}
+							} else if (isSelected) {
+								optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800 font-medium shadow-inner';
+							}
+
+							return (
+								<div
+									key={option}
+									onClick={() => handleSelect(option)}
+									className={cn('p-3 rounded-xl border-2 cursor-pointer transition-colors flex items-center', optionClass)}
+								>
+									<span className="flex-1">{option}</span>
+									{showFeedback && (
+										isCorrectOption ? <span className="text-green-600 ml-2">✓</span> : (isSelected && <span className="text-red-600 ml-2">✗</span>)
+									)}
+								</div>
+							);
+						})}
+					</div>
+					{!showFeedback && (
+						<div className="mt-6 text-center">
+							<button
+								onClick={handleSubmit}
+								disabled={selectedAnswers.length === 0}
+								className="px-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+							>
+								Submit Case Answer
+							</button>
+						</div>
+					)}
+					{showFeedback && (
+						<div className="mt-6 p-4 bg-yellow-50 rounded-xl border-l-4 border-yellow-500 shadow-inner">
+							<h5 className="font-bold text-yellow-800 text-lg mb-2">Detailed Rationale:</h5>
+							<div className="text-sm text-yellow-900 prose-sm" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></div>
+						</div>
+					)}
+				</div>
+			);
+		};
+
+		/**
+		 * StaticContentStep component for displaying basic text content.
+		 */
+		const StaticContentStep = ({ step, onComplete }) => {
+			// Mark as complete immediately upon rendering to enable progression.
+			useEffect(() => {
+				onComplete();
+			}, [step.id, onComplete]); // Depend on step.id to re-trigger on navigation
+
+			return (
+				<div className="prose max-w-none text-gray-700 leading-relaxed p-6 bg-white rounded-xl shadow-lg border border-gray-200 space-y-4 animate-fade-in">
+					<div dangerouslySetInnerHTML={{ __html: step.content }}></div>
+				</div>
+			);
+		};
+
+		/**
+		 * CompletionModal component displayed when a module is completed.
+		 */
+		const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+			if (!isOpen) return null;
+
+			return (
+				<div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+					<div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+						<h3 className="text-3xl font-extrabold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+						<p className="text-gray-700 text-lg mb-6">You've successfully completed all steps in this module. Great job!</p>
+						<div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+							<button
+								onClick={onClose}
+								className="px-6 py-3 bg-gray-300 text-gray-800 font-bold rounded-xl hover:bg-gray-400 transition-colors shadow-md"
+							>
+								Back to Dashboard
+							</button>
+							{hasNextModule && (
+								<button
+									onClick={onNextModule}
+									className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+								>
+									Continue to Next Module
+								</button>
+							)}
+						</div>
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * LearningModule component to manage steps within the selected module.
+		 */
+		const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+			const [activeStep, setActiveStep] = useState(0);
+			const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+			const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+			// Reset to step 0 when module changes
+			useEffect(() => {
+				setActiveStep(0);
+			}, [module.id]);
+
+			const handleStepComplete = useCallback((stepId, data = {}) => {
+				onProgressUpdate(module.id, stepId, { completed: true, ...data });
+			}, [onProgressUpdate, module.id]);
+
+			const moduleProgress = progress[module.id] || {};
+			
+			// Check if all essential steps (text, quiz, case_study) are completed
+			const allStepsCompletedInModule = module.steps.every(step =>
+				moduleProgress[step.id] && moduleProgress[step.id].completed
+			);
+
+			// Navigates to the next step, if available.
+			const handleNextStep = () => {
+				if (activeStep === module.steps.length - 1) {
+					// If it's the last step and all steps in the module are completed, open the modal
+					if (allStepsCompletedInModule) {
+						setIsCompletionModalOpen(true);
+					}
+				} else if (activeStep < module.steps.length - 1) {
+					// Otherwise, proceed to the next step
+					setActiveStep(activeStep + 1);
+				}
+			};
+
+			// Navigates to the previous step, if available.
+			const handlePrevStep = () => {
+				if (activeStep > 0) {
+					setActiveStep(activeStep - 1);
+				}
+			};
+			
+			if (!module || !module.steps) {
+				return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Error loading module.</div>;
+			}
+
+			const currentStep = module.steps[activeStep];
+			
+			const renderStepContent = (step) => {
+				if (!step) return <p>Please select a step.</p>;
+
+				const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+				switch (step.type) {
+					case 'text':
+						return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+					case 'case_study':
+						return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+					case 'quiz':
+						return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+					default:
+						return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+				}
+			};
+
+			const handleModalClose = () => {
+				setIsCompletionModalOpen(false);
+				onBack(); // Go back to dashboard when modal is closed
+			};
+
+			const handleModalNextModule = () => {
+				setIsCompletionModalOpen(false);
+				onNextModule(); // Proceed to next module
+			};
+
+
+			return (
+				<div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+					{/* Header */}
+					<header className="bg-white shadow-lg p-4 flex items-center justify-between z-30 flex-shrink-0">
+						<button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2 transform hover:scale-105">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+							<span className="hidden sm:inline">Dashboard</span>
+						</button>
+						<h2 className="text-xl font-extrabold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+						
+						{/* Mobile sidebar toggle button */}
+						<button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+						</button>
+					</header>
+					
+					{isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+					<div className="flex flex-1 overflow-hidden">
+						{/* Sidebar for navigation steps within the module. */}
+						<aside className={cn(
+							"bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+							isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+						)}>
+							<h3 className="text-lg font-extrabold mb-4 text-indigo-700 px-3 border-b border-gray-100 pb-2">Module Steps ({activeStep + 1} / {module.steps.length})</h3>
+							<nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+								{module.steps.map((step, index) => (
+									<button
+										key={step.id}
+										onClick={() => {
+											setActiveStep(index);
+											setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
+										}}
+										className={cn(
+											'w-full text-left p-3 rounded-xl flex items-center gap-3 transition-colors shadow-sm',
+											activeStep === index ? 'bg-indigo-100 text-indigo-700 font-bold border-indigo-400 border' : 'hover:bg-gray-100 text-gray-700'
+										)}
+									>
+										{/* Step completion indicator */}
+										<div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+											{moduleProgress[step.id]?.completed ? (
+												<svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+											) : (
+												<div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+											)}
+										</div>
+										<span className="flex-1 text-sm">{step.title}</span>
+									</button>
+								))}
+							</nav>
+						</aside>
+
+						{/* Main content area for the current step. */}
+						<main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+							<div className="max-w-5xl mx-auto">
+								<h3 className="text-2xl font-extrabold text-gray-800 mb-4">{currentStep.title}</h3>
+								{renderStepContent(currentStep)}
+
+								{/* Navigation buttons for moving between steps. */}
+								<div className="flex justify-between mt-8">
+									<button
+										onClick={handlePrevStep}
+										disabled={activeStep === 0}
+										className="px-6 py-3 bg-gray-300 text-gray-800 font-bold rounded-xl hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md transform hover:scale-105 disabled:hover:scale-100"
+									>
+										<span className="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10.707 3.293a1 1 0 010 1.414L7.414 8l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>Previous</span>
+									</button>
+
+									<button
+										onClick={handleNextStep}
+										disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+										className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105 disabled:hover:scale-100"
+									>
+										{activeStep === module.steps.length - 1 ? (allStepsCompletedInModule ? 'Finish Module' : 'Complete All Steps') : <span className="flex items-center">Next <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.293 3.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 8 9.293 4.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg></span>}
+									</button>
+								</div>
+							</div>
+						</main>
+					</div>
+					<CompletionModal
+						isOpen={isCompletionModalOpen}
+						onClose={handleModalClose}
+						onNextModule={handleModalNextModule}
+						hasNextModule={hasNextModule}
+					/>
+				</div>
+			);
+		};
+
+		// --- Main App Component ---
+		function App() {
+			const [currentModuleId, setCurrentModuleId] = useState(null);
+			const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+			const [userId, setUserId] = useState(null);
+			const [progress, setProgress] = useState({});
+			const [isAuthReady, setIsAuthReady] = useState(false);
+
+			// 1. Auth Setup (Local Storage)
+			useEffect(() => {
+				const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+					if (user) setUserId(user.uid);
+					setIsAuthReady(true);
+				});
+				return () => unsubscribe();
+			}, []);
+
+			// 2. Load Progress from Local Storage
+			useEffect(() => {
+				if (!isAuthReady || !userId) return;
+				const storedProgress = localStorage.getItem(`postpartum-module-progress-${userId}`);
+				if (storedProgress) {
+					try {
+						setProgress(JSON.parse(storedProgress));
+					} catch (e) {
+						console.error("Failed to parse stored progress, resetting.", e);
+						setProgress({});
+					}
+				}
+			}, [isAuthReady, userId]);
+
+			// 3. Progress Update Handler (Persist to Local Storage)
+			const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+				if (!isAuthReady || !userId) return;
+
+				setProgress(currentProgress => {
+					const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+					const newStepProgress = { ...currentStepProgress, ...data };
+
+					// Avoid unnecessary updates if data hasn't changed.
+					if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+						return currentProgress;
+					}
+
+					const newProgress = {
+						...currentProgress,
+						[moduleId]: {
+							...(currentProgress[moduleId] || {}),
+							[stepId]: newStepProgress
+						}
+					};
+
+					localStorage.setItem(`postpartum-module-progress-${userId}`, JSON.stringify(newProgress));
+					return newProgress;
+				});
+			}, [isAuthReady, userId]);
+
+			const handlePreAssessmentComplete = (completedModuleIds) => {
+				const newProgress = { ...progress };
+				completedModuleIds.forEach(moduleId => {
+					const module = contentData[moduleId];
+					if (module) {
+						newProgress[moduleId] = {};
+						module.steps.forEach(step => {
+							// Mark all steps in the module as complete
+							newProgress[moduleId][step.id] = { completed: true };
+						});
+					}
+				});
+				setProgress(newProgress);
+				localStorage.setItem(`postpartum-module-progress-${userId}`, JSON.stringify(newProgress));
+			};
+			
+			const handleResetProgress = useCallback(() => {
+				if (!isAuthReady || !userId) return;
+				setProgress({});
+				localStorage.removeItem(`postpartum-module-progress-${userId}`);
+				setCurrentModuleId(null);
+			}, [isAuthReady, userId]);
+
+			const handleNextModule = useCallback(() => {
+				const moduleIds = Object.keys(contentData);
+				const currentIndex = moduleIds.indexOf(currentModuleId);
+				if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+					setCurrentModuleId(moduleIds[currentIndex + 1]);
+				} else {
+					setCurrentModuleId(null);
+				}
+			}, [currentModuleId]);
+
+			const selectedModule = currentModuleId && contentData[currentModuleId]
+														? { ...contentData[currentModuleId], id: currentModuleId }
+														: null;
+
+			const moduleIds = Object.keys(contentData);
+			const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+			const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+
+			if (!isAuthReady) {
+				return (
+					<div className="min-h-screen flex items-center justify-center bg-gray-100">
+						<div className="loader"></div>
+						<p className="text-gray-500 ml-4">Authenticating user...</p>
+					</div>
+				);
+			}
+
+			return (
+				<div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+					{isPreAssessmentActive ? (
+						<PreAssessmentQuiz 
+							onComplete={handlePreAssessmentComplete} 
+							onExit={() => setIsPreAssessmentActive(false)}
+						/>
+					) : selectedModule ? (
+						<LearningModule
+							key={selectedModule.id}
+							module={selectedModule}
+							onBack={() => setCurrentModuleId(null)}
+							progress={progress}
+							onProgressUpdate={handleProgressUpdate}
+							onNextModule={handleNextModule}
+							hasNextModule={hasNextModule}
+						/>
+					) : (
+						<Dashboard 
+							onSelectModule={setCurrentModuleId} 
+							progress={progress} 
+							onResetProgress={handleResetProgress}
+							onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+						/>
+					)}
+				</div>
+			);
+		}
+
+		// --- Render the App into the DOM ---
+		const container = document.getElementById('root');
+		const root = ReactDOM.createRoot(container);
+		root.render(<App />);
+	</script>
+</body>
+</html>
