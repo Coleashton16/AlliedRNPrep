@@ -42,21 +42,22 @@
 		// --- React and Library Setup ---
 		const { useState, useEffect, useCallback, useMemo } = React;
 
-		// --- Mock Authentication Setup for Standalone Demo ---
+		// --- Mock Authentication Setup for Standalone Demo (using local storage for persistence) ---
 		const mockAuth = {
 			onAuthStateChanged: (callback) => {
 				setTimeout(() => callback({ uid: 'standalone-newborn-user' }), 100);
-				return () => {}; 
+				return () => {}; 
 			},
 			signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-newborn-user' } }),
 		};
 
 		// --- Content & Data Structure for the Learning Modules (Newborn) ---
+		// Content is derived from Chapters 20, 21, 22, 23, 28, 29, 30 McKinney
 		const contentData = {
 			'module-1-transition': {
 				title: 'Module 1: Physiological Transition Basics',
 				color: 'from-pink-600 to-red-400',
-				description: 'Identify the critical systemic adaptations (Respiratory and Cardiovascular) necessary for extrauterine life.',
+				description: 'Identify the critical systemic adaptations (Respiratory and Cardiovascular) necessary for extrauterine life (Ch. 21).',
 				steps: [
 					{ id: 'm1-def', title: 'Physiologic Adaptations Overview', type: 'text', content: `
 						<p class="text-xl font-semibold mb-3 text-red-700">From Womb to World: The Newborn's Challenge</p>
@@ -69,44 +70,34 @@
 							<li><strong>Other Systems:</strong> GI, Hepatic, Renal, and Immune adaptations.</li>
 						</ul>
 					`},
-					{ id: 'm1-resp', title: 'Respiratory Adaptation (Chemical & Mechanical)', type: 'text', content: `
+					{ id: 'm1-resp', title: 'Respiratory Initiation (Chemical & Mechanical)', type: 'text', content: `
 						<p class="text-xl font-semibold mb-3 text-red-700">The First Breath: What Stimulates it?</p>
-						<p>Respiratory adaptation relies on chemical, mechanical, thermal, and sensory factors to initiate and sustain breathing.</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Primary Stimulants for Breathing:</h4>
+						<p>Respirations are stimulated by chemical, mechanical, thermal, and sensory factors.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Key Factors:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Chemical Factors:</strong> At birth, temporary **hypoxia and hypercapnia** (low O2, high CO2) stimulate the respiratory center in the medulla.</li>
-							<li><strong>Surfactant:</strong> A lipoprotein coating the alveoli, lowering surface tension and preventing alveolar collapse during expiration. **Insufficient surfactant** causes Respiratory Distress Syndrome (RDS) in preterm infants.</li>
-							<li><strong>Mechanical Factors:</strong>
-								<ul>
-									<li>Fetal **chest compression** during vaginal birth squeezes fluid out of the lungs.</li>
-									<li>When the chest recoils after birth, a negative pressure is created, drawing air into the lungs.</li>
-								</ul>
-							</li>
-							<li><strong>Thermal Factors:</strong> The sudden **drop in temperature** from the warm intra-uterine environment stimulates the nerve endings, promoting respirations.</li>
-							<li><strong>Sensory Factors:</strong> Tactile stimulation (drying, suctioning) and sound/light activate the respiratory center.</li>
+							<li><strong>Chemical:</strong> Temporary **hypoxia and hypercapnia** (low $\text{O}_2$, high $\text{CO}_2$) stimulate the medulla's respiratory center.</li>
+							<li><strong>Mechanical:</strong> **Chest compression** during vaginal birth squeezes fluid out. Recoil creates negative pressure, drawing air in.</li>
+							<li><strong>Surfactant:</strong> Lines alveoli, reducing surface tension to prevent collapse. Insufficient amounts lead to **Respiratory Distress Syndrome (RDS)**.</li>
+							<li><strong>Asphyxia Risk:</strong> Severe asphyxia or pulmonary hypertension can cause fetal shunts to remain open.</li>
 						</ul>
 					`},
-					{ id: 'm1-cv', title: 'Cardiovascular Adaptation (Fetal to Neonatal)', type: 'text', content: `
+					{ id: 'm1-cv', title: 'Cardiovascular Adaptation (Shunts)', type: 'text', content: `
 						<p class="text-xl font-semibold mb-3 text-red-700">Closing the Fetal Shunts</p>
-						<p>The switch from fetal circulation (which bypasses the lungs) to neonatal circulation (which requires pulmonary blood flow) involves the functional closure of three key shunts.</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">The Transition (Neonatal Circulation):</h4>
-						<ul class="list-disc list-inside ml-4">
-							<li>When the cord is clamped, systemic **blood pressure increases**.</li>
-							<li>When the lungs fill with air, **pulmonary pressure drops** significantly.</li>
-							<li>This pressure shift forces the fetal shunts to close:
-								<ol class="list-decimal list-inside ml-4">
-									<li><strong>Foramen Ovale:</strong> Closes functionally 1-2 hours after birth (anatomically months later).</li>
-									<li><strong>Ductus Arteriosus:</strong> Closes functionally within 10-15 hours (permanently 3-4 weeks).</li>
-									<li><strong>Ductus Venosus:</strong> Closes functionally when the cord is clamped.</li>
-								</ol>
-							</li>
-						</ul>
+						<p>The transition requires key shunts that bypassed the lungs in utero to close due to shifts in pressure (blood $\text{O}_2$ increase, pulmonary pressure drop).</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">The Three Fetal Shunts:</h4>
+						<ol class="list-decimal list-inside ml-4">
+							<li><strong>Foramen Ovale:</strong> Opening between the atria. Closes functionally within 1-2 hours.</li>
+							<li><strong>Ductus Arteriosus:</strong> Connection between the pulmonary artery and aorta. Closes functionally within 10-15 hours.</li>
+							<li><strong>Ductus Venosus:</strong> Bypassed the liver. Closes when the cord is clamped.</li>
+						</ol>
+						<p class="font-bold text-red-600 mt-3">Assessment Point:</p>
+						<p>Evaluate for continuous murmurs, which may indicate a persistent patent ductus arteriosus (PDA).</p>
 					`},
 					{ id: 'm1-quiz', title: 'Module 1 Quiz', type: 'quiz',
 						questions: [
 							{ question: "What is the primary function of surfactant in the newborn lung?", options: ["To promote chest wall compression.", "To increase oxygen saturation in the blood.", "To decrease surface tension and prevent alveolar collapse.", "To dilate the ductus arteriosus."], correctAnswer: "To decrease surface tension and prevent alveolar collapse." },
-							{ question: "Which fetal shunt is the opening between the right and left atrium that functionally closes 1-2 hours after birth?", options: ["Ductus Venosus", "Ductus Arteriosus", "Aortic Valve", "Foramen Ovale"], correctAnswer: "Foramen Ovale" },
-							{ question: "What chemical factor stimulates the newborn’s first breath?", options: ["High glucose levels", "Increased Estrogen", "Hypoxia and hypercapnia", "Release of Prolactin"], correctAnswer: "Hypoxia and hypercapnia" }
+							{ question: "Which change immediately after birth causes pulmonary vascular pressure to drop, assisting the transition?", options: ["Clamping of the umbilical cord.", "Drop in ambient temperature.", "Lungs filling with air/oxygenation.", "Release of adrenaline."], correctAnswer: "Lungs filling with air/oxygenation." },
+							{ question: "Which fetal structure functionally closes first, usually within hours after birth?", options: ["Ductus Venosus", "Ductus Arteriosus", "Foramen Ovale", "Pulmonary Artery"], correctAnswer: "Foramen Ovale" }
 						]
 					}
 				]
@@ -114,115 +105,116 @@
 			'module-2-thermoregulation': {
 				title: 'Module 2: Thermoregulation & Cold Stress',
 				color: 'from-blue-600 to-indigo-500',
-				description: 'Identify the four mechanisms of heat loss and the life-threatening consequences of cold stress.',
+				description: 'Identify the four mechanisms of heat loss and the dangerous consequences of cold stress (Ch. 21).',
 				steps: [
 					{ id: 'm2-heat-loss', title: 'Four Mechanisms of Heat Loss', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-blue-700">Newborns Cannot Shiver: Protecting Them from Heat Loss</p>
-						<p>Newborns lose heat quickly due to a large surface area-to-volume ratio and minimal subcutaneous fat. We must protect them from the four routes of heat loss:</p>
+						<p class="text-xl font-semibold mb-3 text-blue-700">Newborn Vulnerabilities to Heat Loss</p>
+						<p>Newborns have minimal subcutaneous fat, blood vessels close to the surface, and a large surface area relative to body volume, leading to rapid heat loss. The four types of heat loss are:</p>
 						<h4 class="text-lg font-bold mt-4 mb-2">Mechanisms and Nursing Interventions:</h4>
 						<ul class="list-disc list-inside ml-4 space-y-3">
-							<li><strong>EVAPORATION:</strong> Heat loss due to moisture evaporating from the skin (e.g., amniotic fluid, post-bath).
-								<p class="font-bold text-sm italic">Nursing Action: <strong>Dry the infant quickly</strong> after birth or bathing; change wet linens/diapers.</p>
+							<li><strong>EVAPORATION:</strong> Loss of heat from moisture (e.g., amniotic fluid, wet diapers).
+								<p class="font-bold text-sm italic">Action: <strong>Dry the infant quickly</strong>, especially the head.</p>
 							</li>
-							<li><strong>CONDUCTION:</strong> Heat loss from direct contact with cool surfaces.
-								<p class="font-bold text-sm italic">Nursing Action: Warm objects (stethoscopes, hands) before contact. Place infant on a **pre-warmed surface**.</p>
+							<li><strong>CONDUCTION:</strong> Loss of heat from direct contact with cooler surfaces.
+								<p class="font-bold text-sm italic">Action: Use **warmed surfaces** (e.g., radiant warmer mattress, warmed stethoscope).</p>
 							</li>
-							<li><strong>CONVECTION:</strong> Heat loss from body surface exposure to cooler ambient air (drafts).
-								<p class="font-bold text-sm italic">Nursing Action: Avoid areas with drafts (hallway doors, air conditioners). Bathe in warm water.</p>
+							<li><strong>CONVECTION:</strong> Loss of heat to cooler circulating air (drafts, open doors).
+								<p class="font-bold text-sm italic">Action: Keep the infant away from drafts; cover the infant.</p>
 							</li>
-							<li><strong>RADIATION:</strong> Heat loss to a cooler surface nearby but **NOT** in direct contact (e.g., cold walls/windows).
-								<p class="font-bold text-sm italic">Nursing Action: Position the newborn bassinet away from walls or windows. Cover the infant's head.</p>
+							<li><strong>RADIATION:</strong> Loss of heat to a cooler solid object nearby (e.g., cold window or wall), **NOT** in direct contact.
+								<p class="font-bold text-sm italic">Action: Place the bassinet away from cold outside walls/windows.</p>
 							</li>
 						</ul>
 					`},
-					{ id: 'm2-heat-prod', title: 'Heat Production & Cold Stress', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-blue-700">The Danger: Cold Stress Cascade</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Heat Production Methods:</h4>
+					{ id: 'm2-heat-prod', title: 'Heat Production & Cold Stress Cascade', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">The Danger: Cold Stress</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Heat Production Methods (Thermogenesis):</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li>Increased muscle activity, crying.</li>
-							<li>Flexion (curling up) to limit surface area exposure.</li>
-							<li>Non-shivering Thermogenesis (NST): Metabolism of **Brown Fat**. Brown fat stores are rapidly depleted during cold stress.</li>
+							<li>Increased activity (restlessness, crying).</li>
+							<li>Flexion to decrease exposed surface area.</li>
+							<li>**Non-shivering Thermogenesis (NST):** Metabolism of **Brown Fat**. This process uses increased oxygen and glucose.</li>
 						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Cold Stress:</h4>
-						<p><strong>Hypothermia (temperature <97.7° F / 36.5° C)</strong> may lead to Cold Stress, a dangerous metabolic cascade that depletes energy stores.</p>
-						<h5 class="font-bold text-lg text-red-600">Consequences of Cold Stress (Must Know):</h5>
+						<h4 class="text-lg font-bold mt-4 mb-2 text-red-600">Cold Stress Consequences:</h4>
+						<p>If the newborn's core temperature drops (Hypothermia < $36.5^\circ \text{C}$ or $97.7^\circ \text{F}$), they enter a cascade that compromises critical functions:</p>
 						<ul class="list-disc list-inside ml-4">
-							<li>Leads to **Hypoglycemia** (due to increased metabolic rate burning glucose).</li>
-							<li>Decreased **Surfactant** production $\rightarrow$ risk of **Respiratory Distress**.</li>
-							<li>Metabolic Acidosis.</li>
+							<li>Increased **Oxygen Need** $\rightarrow$ risk of **Respiratory Distress**</li>
+							<li>Increased Metabolic Rate $\rightarrow$ rapid depletion of glucose stores $\rightarrow$ **Hypoglycemia**</li>
+							<li>Acidosis (due to increased anaerobic metabolism).</li>
+							<li>Decreased surfactant production.</li>
+							<li>Increased fatty acids which interfere with **bilirubin conjugation** $\rightarrow$ Jaundice.</li>
 						</ul>
 					`},
 					{ id: 'm2-quiz', title: 'Module 2 Quiz', type: 'quiz',
 						questions: [
 							{ question: "Heat loss caused by placing a newborn directly on a cool scale is due to which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Conduction" },
-							{ question: "Why is a baby with Cold Stress at risk for Hypoglycemia?", options: ["Decreased insulin production", "Rapid depletion of glucose stores due to increased metabolic rate", "Lack of fluid intake", "Inability to produce adrenaline"], correctAnswer: "Rapid depletion of glucose stores due to increased metabolic rate" },
-							{ question: "The nursing action of drying the infant immediately after birth primarily prevents heat loss through which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Evaporation" }
+							{ question: "Why is a baby experiencing cold stress at risk for Hypoglycemia?", options: ["Decreased insulin production", "Rapid depletion of glucose stores due to increased metabolic rate (NST)", "Lack of fluid intake", "Inability to produce adrenaline"], correctAnswer: "Rapid depletion of glucose stores due to increased metabolic rate (NST)" },
+							{ question: "The nursing action of covering the infant's head and keeping them away from drafts prevents heat loss primarily through:", options: ["Evaporation and Conduction", "Radiation and Conduction", "Convection and Radiation", "Evaporation and Convection"], correctAnswer: "Convection and Radiation" }
 						]
 					}
 				]
 			},
 			'module-3-other-systems': {
-				title: 'Module 3: Hepatic, GI, and Hematopoietic Adaptations',
+				title: 'Module 3: Hepatic, GI, Renal & Immune Adaptations',
 				color: 'from-purple-600 to-pink-500',
-				description: 'Review blood values, jaundice, meconium progression, and initial liver/kidney function.',
+				description: 'Review blood values, jaundice risk, stools progression, and initial liver/kidney/immune function (Ch. 21).',
 				steps: [
 					{ id: 'm3-heme', title: 'Hematopoietic and Immune System', type: 'text', content: `
 						<p class="text-xl font-semibold mb-3 text-purple-700">Blood and Immune System Adaptations</p>
 						<h4 class="text-lg font-bold mt-4 mb-2">Hematopoietic System:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>RBC, Hgb, and Hct</strong> are typically **elevated at birth** and normalize during the first month of life (due to high fetal needs).</li>
-							<li><strong>WBC count</strong> is elevated at birth but normalizes in 4-5 days.</li>
-							<li><strong>Vitamin K</strong> is administered at birth to decrease the risk for **hemorrhagic disease of the newborn** (HDN).</li>
+							<li><strong>RBC, Hgb, and Hct:</strong> Typically **higher** than adults due to the lower $\text{O}_2$ environment in utero.</li>
+							<li><strong>WBC:</strong> Naturally **elevated** at birth, making it difficult to rely on this value alone to detect infection initially.</li>
+							<li><strong>Clotting:</strong> Newborns have naturally low vitamin K, which is necessary to activate clotting factors. **Vitamin K injection** is given at birth to prevent Hemorrhagic Disease of the Newborn (HDN).</li>
 						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Immune System:</h4>
+						<h4 class="text-lg font-bold mt-4 mb-2">Immune System (Infection Defense):</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Passive Immunity (IgG):</strong> Maternal antibodies (IgG) pass through the placenta, providing protection for about the first 6 months.</li>
-							<li><strong>Active Immunity (IgM):</strong> IgM is produced rapidly after birth (often in response to infection/antigens).</li>
+							<li><strong>IgG:</strong> Crosses the placenta, providing **passive temporary immunity** for the first 6 months.</li>
+							<li><strong>IgM:</strong> Produced rapidly by the infant in response to infection; helps protect against Gram-negative bacteria.</li>
+							<li><strong>IgA:</strong> Does **not** cross the placenta. Provided primarily through **breast milk**.</li>
 						</ul>
 					`},
-					{ id: 'm3-gi-renal', title: 'GI, Hepatic, and Renal System', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-purple-700">Excretion and Metabolism</p>
+					{ id: 'm3-gi-renal', title: 'GI, Hepatic (Liver), and Renal System', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">Metabolism, Digestion, and Excretion</p>
 						<h4 class="text-lg font-bold mt-4 mb-2">Gastrointestinal (GI) System:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Stomach Capacity:</strong> Only about 6 mL/kg at birth.</li>
-							<li><strong>Cardiac Sphincter:</strong> Relaxed, leading to frequent **regurgitation** (spitting up).</li>
-							<li><strong>Stools Progression (Must Know!):</strong>
+							<li><strong>Regurgitation:</strong> Common due to a relaxed cardiac sphincter.</li>
+							<li><strong>Stools Progression (Key Assessment):</strong>
 								<ol class="list-decimal list-inside ml-4">
-									<li><strong>Meconium:</strong> Thick, tarry, dark green/black stool. Passed within 24-48 hours.</li>
+									<li><strong>Meconium:</strong> Thick, tarry, dark green/black (passed within 24-48 hours).</li>
 									<li><strong>Transitional Stools:</strong> Loose, greenish-brown.</li>
-									<li><strong>Milk Stools:</strong> Pale yellow (breastfed) or brownish-green (formula).</li>
+									<li><strong>Milk Stools:</strong> Seedy, mustard-colored, frequent (breastfed) or brownish-green (formula).</li>
 								</ol>
 							</li>
 						</ul>
 						<h4 class="text-lg font-bold mt-4 mb-2">Hepatic (Liver) System:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li>Newborn Liver is immature, leading to two major concerns: **Jaundice** (inability to process bilirubin) and **Hypoglycemia** (poor glucose regulation).</li>
+							<li>Liver functions include blood glucose maintenance, drug metabolism, iron storage, and most importantly, **bilirubin conjugation** (conversion of unconjugated bilirubin to a soluble form for excretion). Liver immaturity leads to the high risk of Jaundice/Hyperbilirubinemia.</li>
 						</ul>
 						<h4 class="text-lg font-bold mt-4 mb-2">Renal System:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Weight Loss:</strong> Diuresis of extracellular fluid occurs during the first few days of life, leading to a normal weight loss of **5% to 10%** in most newborns. This fluid shift requires careful monitoring.</li>
+							<li>Kidneys have poor ability to concentrate urine or regulate electrolytes/fluid.</li>
+							<li>Normal weight loss is **5% to 10%** in the first few days due to fluid shifts (diuresis).</li>
 						</ul>
 					`},
 					{ id: 'm3-quiz', title: 'Module 3 Quiz', type: 'quiz',
 						questions: [
-							{ question: "What is the name of the newborn's first stool, typically thick, tarry, and dark green/black?", options: ["Transitional stool", "Meconium", "Milk stool", "Lochia"], correctAnswer: "Meconium" },
-							{ question: "What is the primary reason Vitamin K is administered at birth?", options: ["To prevent jaundice", "To accelerate clotting and prevent hemorrhagic disease", "To boost the immune system", "To aid respiratory function"], correctAnswer: "To accelerate clotting and prevent hemorrhagic disease" },
-							{ question: "What is the normal percentage of weight loss considered acceptable for a healthy newborn in the first few days of life?", options: ["<2%", "5% to 10%", "10% to 15%", ">15%"], correctAnswer: "5% to 10%" }
+							{ question: "Breast milk provides which specific immunoglobulin that does NOT cross the placenta, strengthening the infant's GI defense?", options: ["IgG", "IgM", "IgA", "IgD"], correctAnswer: "IgA" },
+							{ question: "What is the primary reason Vitamin K is administered at birth?", options: ["To prevent jaundice", "To activate clotting factors and prevent HDN", "To boost the immune system", "To aid respiratory function"], correctAnswer: "To activate clotting factors and prevent HDN" },
+							{ question: "The nurse assesses a newborn's stool on day 2. Which finding would be considered normal?", options: ["White, chalky stools", "Transitional greenish-brown stools", "Loose, bloody stools", "Hard, formed brown stools"], correctAnswer: "Transitional greenish-brown stools" }
 						]
 					}
 				]
 			},
 			'module-4-assessment-care': {
-				title: 'Module 4: Assessment & Immediate Care',
+				title: 'Module 4: Immediate Assessment & Routine Care',
 				color: 'from-green-600 to-teal-500',
-				description: 'Prioritize immediate nursing interventions (warmth, secretion management) and understand the purpose of the APGAR score.',
+				description: 'Prioritize immediate interventions and understand APGAR, prophylaxis, and ongoing care (Ch. 21 & 22).',
 				steps: [
-					{ id: 'm4-initial-assess', title: 'Initial Assessment and APGAR', type: 'text', content: `
+					{ id: 'm4-early-assess', title: 'Initial Assessment and APGAR', type: 'text', content: `
 						<p class="text-xl font-semibold mb-3 text-green-700">Initial Assessment: Identifying Need for Resuscitation</p>
-						<p>The initial assessment occurs immediately after birth to quickly identify the need for resuscitation or obvious anomalies.</p>
+						<p>The initial assessment prioritizes airway, breathing, circulation, and warmth.</p>
 						<h4 class="text-lg font-bold mt-4 mb-2">The APGAR Score (1 & 5 Minutes):</h4>
-						<p>A quick, objective method to assess the infant's transition to extrauterine life.</p>
-						<p>It assesses five signs (0-2 points each, max 10):</p>
+						<p>A quick, objective method to assess the infant's transition to extrauterine life. Scores are 0-2 for each component (max 10):</p>
 						<ol class="list-decimal list-inside ml-4 font-bold">
 							<li><strong>A</strong>ppearance (Color)</li>
 							<li><strong>P</strong>ulse (Heart Rate)</li>
@@ -230,79 +222,77 @@
 							<li><strong>A</strong>ctivity (Muscle Tone)</li>
 							<li><strong>R</strong>espiratory Effort</li>
 						</ol>
-						<p class="mt-2"><strong>Apgar scores are taken at 1 minute and 5 minutes.</strong> If the score is <7 at 5 minutes, scoring continues every 5 minutes until 20 minutes of age.</p>
+						<p class="mt-2">Scores are taken at 1 and 5 minutes. If score is $\lt 7$ at 5 minutes, scoring continues every 5 minutes until 20 minutes.</p>
 					`},
-					{ id: 'm4-immediate-care', title: 'Immediate Care Priorities (The First 5 Minutes)', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-green-700">The Golden Hour: Nursing Actions</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Immediate Newborn Care Steps:</h4>
+					{ id: 'm4-immediate-care', title: 'Immediate Care Priorities and Prophylaxis', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-green-700">Immediate Newborn Care Steps (The Golden Hour)</p>
 						<ol class="list-decimal list-inside ml-4 font-bold">
-							<li><strong>Maintain Warmth:</strong> Dry the infant immediately and place skin-to-skin on the mother or under a radiant warmer to prevent **Evaporation** and **Cold Stress**.</li>
-							<li><strong>Clear Secretions:</strong> Suction the mouth then the nose (M before N) as needed to ensure a clear **Airway**.</li>
-							<li><strong>Promote Skin-to-Skin:</strong> Essential for bonding, breastfeeding initiation, and thermoregulation.</li>
-							<li><strong>Assessment:</strong> Perform initial abbreviated exam and Apgar scoring.</li>
+							<li><strong>Maintain Warmth:</strong> Dry and cover the infant immediately (prevents Evaporation and Cold Stress). Place skin-to-skin.</li>
+							<li><strong>Clear Airway:</strong> Suction mouth then nose (M before N) as needed.</li>
+							<li><strong>Prophylaxis:</strong> Administer mandatory medications.</li>
 						</ol>
-						<h4 class="text-lg font-bold mt-4 mb-2">Thorough Assessment:</h4>
-						<p>A more detailed head-to-toe examination, including vital signs, measurements, gestational age assessment, and primitive reflexes, occurs later (after the critical transition period).</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Mandatory Prophylaxis:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Vitamin K (IM):</strong> Given to prevent Hemorrhagic Disease of the Newborn (HDN).</li>
+							<li><strong>Erythromycin Ophthalmic Ointment:</strong> Applied to eyes to prevent **Ophthalmia Neonatorum** (infection, usually gonorrhea/chlamydia, causing blindness).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Routine Care (Chapter 22):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Cord Care:</strong> Keep dry and clean with cool water/soap only if necessary; check for bleeding/oozing.</li>
+							<li><strong>Bathing:</strong> Delay bathing until temperature is stable.</li>
+							<li><strong>Circumcision Care:</strong> Monitor closely for complications like hemorrhage, infection, or failure to urinate.</li>
+						</ul>
 					`},
 					{ id: 'm4-quiz', title: 'Module 4 Quiz', type: 'quiz',
 						questions: [
-							{ question: "The five components assessed in the APGAR score are Appearance, Pulse, Grimace, Activity, and what other component?", options: ["Blood Pressure", "Temperature", "Respiratory Effort", "Gag Reflex"], correctAnswer: "Respiratory Effort" },
-							{ question: "The nurse’s first action immediately following a newborn’s birth is to:", options: ["Weigh the infant", "Apply a hat", "Dry the infant", "Give Vitamin K"], correctAnswer: "Dry the infant" },
-							{ question: "If a newborn's 5-minute APGAR score is 6, what is the required nursing action?", options: ["Initiate full resuscitation immediately.", "Notify the physician.", "Continue Apgar scoring every 5 minutes.", "Place the baby in the nursery."], correctAnswer: "Continue Apgar scoring every 5 minutes." }
+							{ question: "What is the most critical first nursing action immediately after a newborn is delivered?", options: ["Weigh the infant.", "Suction the mouth and nose.", "Dry the infant thoroughly.", "Administer Vitamin K."], correctAnswer: "Dry the infant thoroughly." },
+							{ question: "Eye prophylaxis is given to the newborn primarily to prevent blindness caused by which infections?", options: ["Staphylococcus Aureus", "Ophthalmia Neonatorum", "Hepatitis B", "Group B Streptococcus"], correctAnswer: "Ophthalmia Neonatorum" },
+							{ question: "If a newborn's 5-minute APGAR score is 6, what is the required immediate nursing action?", options: ["Initiate full resuscitation immediately.", "Notify the physician.", "Continue Apgar scoring every 5 minutes (up to 20 minutes).", "Place the baby in the nursery."], correctAnswer: "Continue Apgar scoring every 5 minutes (up to 20 minutes)." }
 						]
 					}
 				]
 			},
-			'module-5-prophylaxis-safety': {
-				title: 'Module 5: Prophylaxis, Screening, and Safety',
+			'module-5-screening-safety': {
+				title: 'Module 5: Screening and Newborn Safety',
 				color: 'from-indigo-600 to-purple-700',
-				description: 'Review mandatory prophylaxis (Vitamin K, Eye), key screenings, and safety measures (SIDS, CCHD).',
+				description: 'Review mandated screening tests, safe sleep guidelines, and infant security (Ch. 22).',
 				steps: [
-					{ id: 'm5-prophylaxis', title: 'Mandatory Prophylaxis & Immunization', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-indigo-700">Protecting the Newborn</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Prophylaxis:</h4>
+					{ id: 'm5-screen', title: 'Newborn Screening and Immunization', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">Mandatory Screening and Immunization</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Mandatory Screening Tests:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Vitamin K Prophylaxis:</strong> Administered IM to prevent Hemorrhagic Disease of the Newborn (HDN).</li>
-							<li><strong>Eye Prophylaxis:</strong> Erythromycin ophthalmic ointment is applied to the eyes to prevent Ophthalmia Neonatorum (gonococcal or chlamydial infection), which can cause blindness.</li>
+							<li><strong>Universal Newborn Screening (Heel Stick):</strong> Done after **24 hours of feeding** to check for metabolic and genetic disorders (e.g., **Phenylketonuria (PKU)**, congenital hypothyroidism, galactosemia).</li>
+							<li><strong>Hearing Screening:</strong> Mandatory screening to check for hearing loss (most common congenital abnormality).</li>
+							<li><strong>CCHD Screening (Critical Congenital Heart Disease):</strong> Uses pulse oximetry on the right hand (pre-ductal) and one foot (post-ductal). Must be $>95\%$ in both with $\lt 3\%$ difference.</li>
 						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Screening & Immunization:</h4>
+						<h4 class="text-lg font-bold mt-4 mb-2">Immunization:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Universal Newborn Screening:</strong> Blood test (heel stick) done after 24 hours of feeding to check for metabolic/genetic disorders (e.g., PKU, hypothyroidism).</li>
-							<li><strong>Hearing Screening:</strong> Mandatory screening to check for hearing loss.</li>
-							<li><strong>Hep B Vaccine:</strong> Administered before discharge (requires parental consent).</li>
+							<li><strong>Hepatitis B Vaccine:</strong> Routine childhood immunization administered prior to discharge. Infants of Hep B-positive mothers receive the vaccine AND Hepatitis B immune globulin.</li>
 						</ul>
 					`},
-					{ id: 'm5-safety', title: 'CCHD Screening and SIDS Prevention', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-indigo-700">Critical Safety and Screening Checks</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">CCHD Screening (Critical Congenital Heart Disease):</h4>
-						<p>Uses Pulse Oximetry to measure oxygen saturation to catch severe heart defects before discharge.</p>
+					{ id: 'm5-safety', title: 'SIDS Prevention and Security', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">Critical Safety Checks</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">SIDS Prevention (Safe Sleep) - AAP Guidelines:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Method:</strong> Measure oxygen saturation in the **right hand (pre-ductal)** and **one foot (post-ductal)**.</li>
-							<li><strong>Normal Result:</strong>
-								<ul>
-									<li>Oxygen saturation >95% in **both** extremities.</li>
-									<li>**<3% difference** between the upper and lower extremity readings.</li>
-								</ul>
-							</li>
+							<li>Place infant <strong>SUPINE</strong> (on the back) for sleep.</li>
+							<li>Use a firm sleep surface.</li>
+							<li>**NO** loose bedding, pillows, bumpers, or toys in the crib.</li>
+							<li>Avoid **overheating**.</li>
+							<li>Pacifiers **MAY** be offered at nap/bedtime to reduce risk (if $\gt 1$ month old).</li>
+							<li>Ensure supervised **tummy time** when awake to prevent plagiocephaly (flat spots on the head).</li>
 						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Promoting Newborn Safety:</h4>
+						<h4 class="text-lg font-bold mt-4 mb-2">Infant Security & Fall Risk:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Prevent Misidentification & Abduction:</strong> Use matching identification bands on the mother, newborn, and support person. Never leave the newborn unattended.</li>
-							<li><strong>Reduce Risk for Falls:</strong> Always transport the newborn in a crib/bassinet; **NEVER** carry the baby if drowsy/tired.</li>
-							<li><strong>SIDS Prevention:</strong> (Safe Sleep)
-								<ul>
-									<li>Place infant <strong>SUPINE</strong> (on the back) for sleep.</li>
-									<li>**NO** loose blankets, pillows, or toys in the crib.</li>
-									<li>Pacifiers **MAY** help reduce SIDS risk (offer at nap/bedtime).</li>
-								</ul>
-							</li>
+							<li>Use matching identification bands on the infant, mother, and support person.</li>
+							<li>Never leave the newborn unattended in the room.</li>
+							<li>**NEVER** carry the baby when drowsy or tired to reduce risk of dropping/falls.</li>
 						</ul>
 					`},
 					{ id: 'm5-quiz', title: 'Module 5 Quiz', type: 'quiz',
 						questions: [
-							{ question: "What is the required normal result for a CCHD screening (oxygen saturation in the right hand and foot)?", options: ["Saturation <90% in both.", "Saturation >95% in both with <3% difference.", "Saturation >95% in both with >3% difference.", "Saturation must be 100% in both."], correctAnswer: "Saturation >95% in both with <3% difference." },
-							{ question: "Eye prophylaxis is given to the newborn to prevent which condition?", options: ["SIDS", "Hypoglycemia", "Ophthalmia Neonatorum", "Jaundice"], correctAnswer: "Ophthalmia Neonatorum" },
-							{ question: "What is the recommended sleep position for a healthy newborn to prevent SIDS?", options: ["Prone", "Side-lying", "Semi-Fowler's", "Supine"], correctAnswer: "Supine" }
+							{ question: "When should the Universal Newborn Screening (PKU/Hypothyroidism) blood test be performed?", options: ["Immediately after birth.", "Before the first feeding.", "After the infant has fed for at least 24 hours.", "Upon discharge from the hospital."], correctAnswer: "After the infant has fed for at least 24 hours." },
+							{ question: "What is the recommended sleep position for a healthy newborn to prevent SIDS?", options: ["Prone", "Side-lying", "Semi-Fowler's", "Supine"], correctAnswer: "Supine" },
+							{ question: "A normal result for CCHD screening requires oxygen saturation to be $>95\%$ in the right hand and foot with what maximum difference between the two sites?", options: ["$\lt 1\%$ difference", "$\lt 3\%$ difference", "$\lt 5\%$ difference", "No difference is allowed."], correctAnswer: "$\lt 3\%$ difference" }
 						]
 					}
 				]
@@ -310,150 +300,302 @@
 			'module-6-metabolic-risk': {
 				title: 'Module 6: Metabolic Emergencies (Jaundice & Hypoglycemia)',
 				color: 'from-orange-500 to-yellow-600',
-				description: 'Recognize the risk factors and interventions for Hyperbilirubinemia (Jaundice) and Hypoglycemia.',
+				description: 'Recognize the risk factors and interventions for Jaundice (Hyperbilirubinemia) and Hypoglycemia (Ch. 21 & 30).',
 				steps: [
 					{ id: 'm6-jaundice', title: 'Hyperbilirubinemia (Jaundice)', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-yellow-700">Jaundice: A Common Newborn Concern</p>
-						<p>Hyperbilirubinemia, or elevated bilirubin, causes jaundice (yellowing of the skin & sclera) in the majority of newborns due to the immature liver's inability to process bilirubin quickly.</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Risk Factors for SEVERE Hyperbilirubinemia:</h4>
+						<p class="text-xl font-semibold mb-3 text-yellow-700">Jaundice: Bilirubin Conjugation Failure</p>
+						<p>Jaundice (yellowing) occurs when unconjugated bilirubin builds up in the blood faster than the immature liver can conjugate it for excretion.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Risk Factors for Severe Jaundice:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li>Gestational age <strong><38 weeks</strong> (preterm/late preterm).</li>
-							<li><strong>Exclusive breastfeeding</strong> (can be slower to establish feeds).</li>
-							<li>Significant jaundice in a sibling.</li>
-							<li>Cephalohematoma or significant bruising (more blood breakdown = more bilirubin).</li>
-							<li>Isoimmune or hemolytic disease (e.g., Rh/ABO incompatibility).</li>
+							<li><strong>Preterm or late preterm</strong> infants (immature liver and feeding difficulties).</li>
+							<li>**Cold Stress** or Asphyxia (fatty acids inhibit conjugation).</li>
+							<li>Significant bruising, **cephalhematoma** (excessive $\text{RBC}$ breakdown).</li>
+							<li>**Blood incompatibility** (Rh or $\text{ABO}$) $\rightarrow$ excessive hemolysis.</li>
+							<li>Delayed feeding (less excretion via stool).</li>
 						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Manifestations & Treatment:</h4>
+						<h4 class="text-lg font-bold mt-4 mb-2">Therapeutic Management (Ch. 30):</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>S/S:</strong> Yellowing of skin & sclera, lethargy, poor feeding.</li>
-							<li><strong>Tests:</strong> Transcutaneous bilirubinometry (TcB), Total Serum Bilirubin (TSB).</li>
-							<li><strong>Treatment:</strong>
-								<ul>
-									<li><strong>Feeding:</strong> Promotes bilirubin excretion via stool.</li>
-									<li><strong>Phototherapy:</strong> Light converts bilirubin into a form the body can excrete.</li>
-									<li><strong>Exchange Transfusion:</strong> Used for very severe cases.</li>
-								</ul>
-							</li>
+							<li><strong>Priority:</strong> Prevent **Kernicterus** (bilirubin encephalopathy), which causes severe neurological damage.</li>
+							<li><strong>Feeding:</strong> Promote early and frequent feeding to ensure excretion via stool (meconium).</li>
+							<li><strong>Phototherapy:</strong> Light converts bilirubin into a soluble form the body can excrete. Protect eyes and genitals; maintain temperature.</li>
+							<li><strong>Exchange Transfusion:</strong> Used for dangerously high levels when phototherapy is inadequate.</li>
 						</ul>
 					`},
 					{ id: 'm6-hypoglycemia', title: 'Hypoglycemia & Management', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-yellow-700">Hypoglycemia: The Fuel Crisis</p>
-						<p>Most newborns experience a transient decrease in glucose levels 1-2 hours after birth, which is normal. However, severe drops require intervention.</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Risk Factors for Hypoglycemia:</h4>
+						<p class="text-xl font-semibold mb-3 text-yellow-700">Hypoglycemia: The Fuel Crisis ($\lt 40 \text{mg/dL}$)</p>
+						<p>Newborns use glucose rapidly and are at risk for dangerous drops in blood sugar.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Infants at Increased Risk:</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Preterm or late preterm</strong> infants (poor glycogen stores).</li>
-							<li><strong>SGA (Small for Gestational Age)</strong> or <strong>LGA (Large for Gestational Age)</strong>.</li>
-							<li>Born to a **mother with diabetes** (rebound hyperinsulinemia).</li>
-							<li>Perinatal stressors (asphyxia, **cold stress**, respiratory distress) $\rightarrow$ increase metabolic rate.</li>
+							<li>**Born to diabetic mothers** (**LGA**) $\rightarrow$ Hyperinsulinemia leads to rapid glucose drop.</li>
+							<li>**SGA** (Small for Gestational Age) or **Preterm** (poor glycogen stores).</li>
+							<li>**Cold Stress**, Respiratory Distress, or Sepsis (increased metabolic demand).</li>
 						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Manifestations & Treatment:</h4>
+						<h4 class="text-lg font-bold mt-4 mb-2">Signs of Hypoglycemia (Ch. 21):</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>S/S:</strong> Jitteriness, tremors, poor muscle tone, lethargy, difficulty feeding.</li>
-							<li><strong>Assessment:</strong> Heelstick or serum glucose assessment. **Early feeding** promotes normal glucose levels.</li>
-							<li><strong>Treatment:</strong> Oral feeding (colostrum/formula), or **IV Dextrose** if levels are severely low or feeding fails.</li>
+							<li>**Jitteriness/Tremors** (most common sign).</li>
+							<li>Poor muscle tone, lethargy, poor suck.</li>
+							<li>Tachypnea, grunting, apnea, cyanosis.</li>
+							<li>High-pitched cry, irritability, seizures.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Management:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Early and adequate feeding** (colostrum/formula) is the first line of defense.</li>
+							<li>If symptomatic or severely low: IV Dextrose.</li>
 						</ul>
 					`},
 					{ id: 'm6-case', title: 'Case Study: Cold Stress & Hypoglycemia', type: 'case_study', case: {
-						scenario: `A late preterm infant (35 weeks) 4 hours old has a rectal temperature of 97.0°F (36.1°C) and is displaying **jitteriness** and a weak suck. The infant was dried but not placed skin-to-skin immediately. A heelstick glucose result is 35 mg/dL.`,
+						scenario: `A late preterm infant (35 weeks) 4 hours old has a rectal temperature of $97.0^\circ \text{F}$ ($36.1^\circ \text{C}$) and is displaying **jitteriness** and a weak suck. A heelstick glucose result is $35 \text{mg}/\text{dL}$.`,
 						question: `What are the two immediate priority nursing interventions? (Select all that apply.)`,
 						options: [
-							"Option A: Place the infant under a radiant warmer and dry again.",
-							"Option B: Notify the physician and prepare for an exchange transfusion.",
-							"Option C: Initiate an immediate heelstick for a total serum bilirubin (TSB) test.",
-							"Option D: Initiate oral feeding of formula or expressed breast milk.",
+							"Option A: Place the infant under a radiant warmer (re-warm).",
+							"Option B: Initiate immediate oral feeding of formula or expressed breast milk.",
+							"Option C: Initiate an immediate heelstick for a Total Serum Bilirubin (TSB) test.",
+							"Option D: Prepare for an exchange transfusion.",
 							"Option E: Place the infant supine in an open crib and monitor.",
 						],
 						correctAnswer: [
-							"Option A: Place the infant under a radiant warmer and dry again.",
-							"Option D: Initiate oral feeding of formula or expressed breast milk.",
+							"Option A: Place the infant under a radiant warmer (re-warm).",
+							"Option B: Initiate immediate oral feeding of formula or expressed breast milk.",
 						],
-						explanation: `<strong>Rationale:</strong> The infant is exhibiting **Hypothermia** (97.0°F) and **Hypoglycemia** (35 mg/dL), both critical risks for preterm infants.
+						explanation: `<strong>Rationale:</strong> The infant is exhibiting **Hypothermia** ($97.0^\circ \text{F}$) and symptomatic **Hypoglycemia** ($35 \text{mg}/\text{dL}$).
 						<ul>
-							<li><strong>Option A (Correct):</strong> Placing the infant under a radiant warmer addresses the hypothermia and stops the cycle of **Cold Stress**, which rapidly burns glucose and oxygen.</li>
-							<li><strong>Option D (Correct):</strong> The infant is symptomatic (jittery) and glucose is low (below the critical threshold of 40-45 mg/dL for symptomatic newborns). The priority intervention is to provide glucose via **oral feeding** (e.g., formula or colostrum) before resorting to IV dextrose.</li>
-							<li><strong>Option B (Incorrect):</strong> Exchange transfusion is for severe hyperbilirubinemia, which is not the immediate life threat here.</li>
-							<li><strong>Option C (Incorrect):</strong> TSB test is for jaundice, but metabolic instability (cold/sugar) is the immediate priority.</li>
-							<li><strong>Option E (Incorrect):</strong> Placing the cold, compromised infant in an open crib is contraindicated; immediate rewarming is required.</li>
+							<li><strong>Option A (Correct):</strong> Addressing hypothermia stops the cycle of **Cold Stress**, preventing further glucose and oxygen depletion.</li>
+							<li><strong>Option B (Correct):</strong> Since the infant is symptomatic (jittery) and glucose is low, immediate provision of glucose via **oral feeding** is the fastest intervention before resorting to IV dextrose.</li>
 						</ul>`
 					}},
 					{ id: 'm6-quiz', title: 'Module 6 Quiz', type: 'quiz',
 						questions: [
-							{ question: "A mother with diabetes gives birth. The newborn's primary risk for hypoglycemia is due to:", options: ["Slow metabolism", "Rebound hyperinsulinemia", "Lack of brown fat", "Immature kidneys"], correctAnswer: "Rebound hyperinsulinemia" },
-							{ question: "Which intervention is used to promote bilirubin excretion in a jaundiced newborn?", options: ["Restricting feeds", "Promoting feeding", "Applying ice packs", "Limiting urination"], correctAnswer: "Promoting feeding" },
-							{ question: "What is the primary manifestation of hypoglycemia in a newborn?", options: ["Projectile vomiting", "Jitteriness/tremors", "Fever", "Bounding pulse"], correctAnswer: "Jitteriness/tremors" }
+							{ question: "Infants born to diabetic mothers are at high risk for hypoglycemia primarily due to:", options: ["Slow metabolism", "Rebound hyperinsulinemia", "Lack of brown fat", "Immature kidneys"], correctAnswer: "Rebound hyperinsulinemia" },
+							{ question: "What is the most serious neurological complication of severe, untreated hyperbilirubinemia?", options: ["Respiratory Distress Syndrome", "Intraventricular Hemorrhage", "Kernicterus (Bilirubin Encephalopathy)", "Polycythemia"], correctAnswer: "Kernicterus (Bilirubin Encephalopathy)" },
+							{ question: "In a jaundiced newborn, the nurse promotes bilirubin excretion by encouraging:", options: ["Restricting feeds to rest the gut.", "Promoting frequent and adequate feeding.", "Applying ice packs to the liver.", "Limiting urination."], correctAnswer: "Promoting frequent and adequate feeding." }
 						]
 					}
 				]
 			},
 			'module-7-prematurity': {
-				title: 'Module 7: Prematurity & High-Risk Care',
+				title: 'Module 7: High-Risk Neonatal Complications',
 				color: 'from-teal-500 to-cyan-600',
-				description: 'Identify the categorization of prematurity, compromised systems, and necessary nursing interventions.',
+				description: 'Master the common complications of prematurity and acquired high-risk conditions (Ch. 29 & 30).',
 				steps: [
-					{ id: 'm7-def', title: 'Preterm Categorization and Compromised Systems', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-teal-700">Preterm: Born Before 37 Weeks</p>
-						<p>Any infant born before completion of 37 weeks of gestation is considered preterm (premature). Prematurity compromises every body system.</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Levels of Prematurity:</h4>
-						<table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
-							<thead class="bg-teal-50">
-								<tr>
-									<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-									<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weeks of Gestation</th>
-								</tr>
-							</thead>
-							<tbody class="bg-white divide-y divide-gray-200">
-								<tr><td><strong>Late Preterm</strong></td><td>34.0 to 36.6 weeks</td></tr>
-								<tr><td><strong>Early Term</strong></td><td>37.0 to 38.6 weeks</td></tr>
-								<tr><td><strong>Full Term</strong></td><td>39.0 to 40.6 weeks</td></tr>
-								<tr><td><strong>Late Term</strong></td><td>41.0 to 41.6 weeks</td></tr>
-								<tr><td><strong>Postterm (Postmature)</strong></td><td>> 42 weeks of gestation</td></tr>
-							</tbody>
-						</table>
-						<h4 class="text-lg font-bold mt-4 mb-2">Impacted Systems (Factors Contributing to Risk):</h4>
-						<ul class="list-disc list-inside ml-4">
-							<li><strong>Respiratory:</strong> Deficient surfactant and decreased number of functional alveoli.</li>
-							<li><strong>Thermoregulation:</strong> Minimal subcutaneous fat and limited brown fat stores.</li>
-							<li><strong>Nutrition/Feeding:</strong> Weak or absent suck, swallow, and gag reflexes.</li>
-							<li><strong>Renal:</strong> Inability to maintain acid-base, fluid, and electrolyte balance.</li>
-						</ul>
-					`},
-					{ id: 'm7-care', title: 'Nursing Care and Positioning', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-teal-700">NICU Care Priorities</p>
-						<h4 class="text-lg font-bold mt-4 mb-2">Nursing Care Interventions:</h4>
-						<ul class="list-disc list-inside ml-4">
-							<li><strong>Thermoregulation:</strong> Maintain warmth (incubator/warmer).</li>
-							<li><strong>Respiratory Support:</strong> Oxygen and ventilation, suctioning as needed, administering **surfactants**.</li>
-							<li><strong>Infection Control:</strong> Strict hand hygiene (impaired immune function).</li>
-							<li><strong>Fluid/Electrolytes:</strong> Maintain fluid and electrolyte balance (immature renal function).</li>
-							<li><strong>Pain Management:</strong> Interventions like **swaddling, pacifiers (non-nutritive sucking)**, and medications.</li>
-							<li><strong>Bonding:</strong> Facilitate parent-infant bond (encourage parents to 'see' the infant, not just the monitors).</li>
-						</ul>
-						<h4 class="text-lg font-bold mt-4 mb-2">Positioning:</h4>
-						<ul class="list-disc list-inside ml-4">
-							<li>Premature infants benefit from **SIDE-LYING** and **PRONE** positioning in the NICU (to conserve energy and promote lung function).</li>
-							<li>**CRITICAL NOTE:** Prone positioning is only used in controlled NICU settings; it is <strong>STRICTLY CONTRAINDICATED</strong> for home use (SIDS risk).</li>
-						</ul>
-					`},
-					{ id: 'm7-rds-nec', title: 'High-Risk Conditions: RDS & NEC', type: 'text', content: `
-						<p class="text-xl font-semibold mb-3 text-teal-700">Life-Threatening Complications of Prematurity</p>
+					{ id: 'm7-resp-safety', title: 'Respiratory Support and $\text{O}_2$ Safety (ROP/BPD)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">Oxygen Management: Balancing Life and Damage (Ch. 29/30)</p>
 						<h4 class="text-lg font-bold mt-4 mb-2">Respiratory Distress Syndrome (RDS):</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Cause:</strong> Insufficient production of **surfactant**.</li>
-							<li><strong>S/S:</strong> **Tachypnea ($\geq$60 breaths/min)**, Dyspnea, **Retractions**, Flaring of the external nares, **Grunting**, Cyanosis.</li>
-							<li><strong>Rx:</strong> Breathing support, administration of **surfactants** via endotracheal tube.</li>
+							<li><strong>Cause:</strong> Insufficient production of **surfactant** (a key factor in prematurity).</li>
+							<li><strong>S/S:</strong> **Tachypnea ($\geq 60 \text{breaths/min}$)**, Retractions, Flaring, **Grunting**, Cyanosis.</li>
+							<li><strong>Rx:</strong> Exogenous **surfactant** administration; $\text{O}_2$ and ventilatory support (CPAP/ventilation).</li>
 						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2 text-red-600">OXYGEN SAFETY: Retinopathy of Prematurity (ROP) and BPD</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Retinopathy of Prematurity (ROP):</strong> Damage to developing retinal vessels due to **hyperoxia (excessive $\text{O}_2$) or fluctuations in $\text{O}_2$**. This causes abnormal vessel growth and can lead to blindness.
+								<p class="font-bold text-sm italic mt-1">Nursing Action: Strict adherence to targeted **$\text{O}_2$ saturation ranges** ($88\%$ to $95\%$) to minimize damage.</p>
+							</li>
+							<li><strong>Bronchopulmonary Dysplasia (BPD):</strong> Chronic lung disease in infants who required prolonged mechanical ventilation and $\text{O}_2$. Results from barotrauma (pressure) and $\text{O}_2$ toxicity.</li>
+						</ul>
+					`},
+					{ id: 'm7-ivh-sepsis', title: 'Neurologic and Infectious Threats (IVH & Sepsis)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">Protecting the Brain and Immune System (Ch. 29/30)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Intraventricular Hemorrhage (IVH):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Definition:</strong> Bleeding into the brain's ventricular system. Highest risk in extremely premature infants due to fragile cerebral blood vessels.</li>
+							<li><strong>Risk Factors:</strong> Rapid changes in blood pressure, respiratory distress, and physical stress/handling.</li>
+							<li><strong>Nursing Action:</strong> **Minimize stress (clustering care)**, reduce environmental stimuli, and maintain neutral, **midline head position** to prevent rapid changes in cerebral blood flow.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Sepsis Neonatorum (Infection - Ch. 30):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Risk:</strong> Immature immune system (low $\text{IgM}$, skin breakdown). Infection can occur in utero (TORCH), during birth (GBS), or after birth (nosocomial).</li>
+							<li><strong>Clinical Signs:</strong> Often VAGUE! Includes **temperature instability** (low or high), **lethargy**, poor feeding, subtle color changes (mottling), and **apnea/bradycardia**. Advanced signs include jaundice, hemorrhage (petechiae), and respiratory failure.</li>
+							<li><strong>Rx:</strong> Immediate **cultures** ($\text{blood/CSF}$), prompt initiation of **broad-spectrum antibiotics**.</li>
+						</ul>
+					`},
+					{ id: 'm7-nec-nutrition', title: 'Gastrointestinal Complications (NEC) & Size/Age Issues', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">Gut Health and Size/Age Problems (Ch. 29/30)</p>
 						<h4 class="text-lg font-bold mt-4 mb-2">Necrotizing Enterocolitis (NEC):</h4>
 						<ul class="list-disc list-inside ml-4">
-							<li><strong>Cause:</strong> Acute inflammatory condition of the intestinal tract that may lead to **necrosis** (tissue death). Cause is unknown, but linked to gut ischemia and feeding in the preterm infant.</li>
-							<li><strong>Clinical Signs:</strong> **Feeding Intolerance**, **Abdominal Distention** and tenderness, Decreased bowel sounds, **Bloody stools**.</li>
-							<li><strong>Rx:</strong> Relieve gas with NG tube (decompression), **NPO** (rest the gut!), Antibiotics, Supportive care, potential surgery.</li>
+							<li><strong>Cause:</strong> Inflammation/necrosis of the intestinal tract, often after enteral feeding in the preterm infant due to ischemia.</li>
+							<li><strong>Clinical Signs:</strong> **Feeding Intolerance**, **Abdominal Distention/tenderness**, Decreased bowel sounds, **Bloody stools**.</li>
+							<li><strong>Prevention:</strong> Use **human milk** (protective factors), slow and cautious advancement of feeds.</li>
+							<li><strong>Rx for Suspected NEC:</strong> **NPO** (rest the gut!), NG tube for decompression, antibiotics, potential surgery.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Size/Age Related Problems (Ch. 29/30):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>SGA/LGA:</strong> Both Small for Gestational Age ($\lt 10 \text{th}$ percentile) and Large for Gestational Age ($\gt 90 \text{th}$ percentile) infants are at increased risk for **Hypoglycemia**. LGA infants face higher risks of **birth injuries** (fractures, nerve damage).</li>
+							<li>**Postterm Infants** ($\gt 42 \text{wks}$): Often show loose, peeling skin, thin appearance, and meconium staining. They are at risk for meconium aspiration and hypoglycemia.</li>
+							<li>**Polycythemia:** $\text{Hct} \gt 65\%$. Increased blood viscosity leads to thrombi, stroke, CHF, and hyperbilirubinemia.</li>
 						</ul>
 					`},
 					{ id: 'm7-quiz', title: 'Module 7 Quiz', type: 'quiz',
 						questions: [
-							{ question: "An infant born at 36 weeks gestation is classified as:", options: ["Early Term", "Full Term", "Late Preterm", "Postterm"], correctAnswer: "Late Preterm" },
-							{ question: "Which symptom is a classic sign of Respiratory Distress Syndrome (RDS) in a newborn?", options: ["Bradypnea", "Grunting", "Bounding Pulse", "Hypothermia"], correctAnswer: "Grunting" },
-							{ question: "The nursing care intervention for a newborn suspected of Necrotizing Enterocolitis (NEC) is to:", options: ["Increase oral feeds immediately.", "Begin broad-spectrum antibiotics and make the patient NPO.", "Administer an exchange transfusion.", "Place the infant prone in the crib."], correctAnswer: "Begin broad-spectrum antibiotics and make the patient NPO." }
+							{ question: "What neonatal complication is specifically associated with the fluctuation or excessive administration of oxygen to preterm infants?", options: ["Bronchopulmonary Dysplasia (BPD)", "Respiratory Distress Syndrome (RDS)", "Retinopathy of Prematurity (ROP)", "Necrotizing Enterocolitis (NEC)"], correctAnswer: "Retinopathy of Prematurity (ROP)" },
+							{ question: "Which nursing intervention is essential for preventing Intraventricular Hemorrhage (IVH) in a preterm infant?", options: ["Providing passive range of motion exercises.", "Maintaining a slightly Trendelenburg position.", "Minimizing stress and clustering care.", "Administering high-concentration oxygen."], correctAnswer: "Minimizing stress and clustering care." },
+							{ question: "Clinical signs of Necrotizing Enterocolitis (NEC) include which of the following? (Select all that apply.)", options: ["Abdominal Distention", "Bloody Stools", "Feeding Intolerance", "High-pitched cry"], correctAnswer: ["Abdominal Distention", "Bloody Stools", "Feeding Intolerance"] },
+							{ question: "A common, yet often vague, early sign of Sepsis Neonatorum that requires immediate investigation is:", options: ["Projectile vomiting", "Jaundice (after 48 hours)", "Temperature instability", "Persistent meconium stool"], correctAnswer: "Temperature instability" }
+						]
+					}
+				]
+			},
+			'module-8-newborn-feeding': {
+				title: 'Module 8: Newborn Feeding & Nutrition',
+				color: 'from-orange-400 to-yellow-500',
+				description: 'Cover breastfeeding, formula preparation, and infant hunger cues (Ch. 23).',
+				steps: [
+					{ id: 'm8-nutrition', title: 'Nutritional Needs and Milk Types', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-orange-700">Breast Milk vs. Formula (Ch. 23)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Nutritional Needs:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Newborns require higher amounts of protein and minerals relative to adults.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Breast Milk Composition:</h4>
+						<ol class="list-decimal list-inside ml-4">
+							<li>**Colostrum:** Rich in protein, vitamins, minerals, and **immunoglobulins (IgA)**. The "liquid gold" first milk.</li>
+							<li>**Transitional Milk:** Appears between colostrum and mature milk.</li>
+							<li>**Mature Milk:** Contains nutrients in easily digested proportions. The **hindmilk** (milk released later in the feeding) is higher in fat and helps the infant gain weight.</li>
+						</ol>
+						<p class="mt-4">Breast milk provides **enzymes** and **infection-preventing components** that promote normal intestinal flora and reduce risk of infections like NEC.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Formula Feeding:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Types: Ready-to-use, concentrated liquid, or powdered.</li>
+							<li>Safety: Must be diluted **exactly** according to directions. **NEVER** heat formula or breast milk in the microwave (creates hot spots).</li>
+						</ul>
+					`},
+					{ id: 'm8-cues-problems', title: 'Feeding Cues and Concerns', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-orange-700">Identifying Hunger and Addressing Challenges</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Infant Hunger Cues:</h4>
+						<p>Early cues should be addressed before the infant progresses to crying (a **late** cue):</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>Licking or sucking movements, lip smacking.</li>
+							<li>Rooting (turning head toward touch and opening mouth).</li>
+							<li>Hand-to-mouth movements, sucking on hands.</li>
+							<li>Increased activity/alertness.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Common Breastfeeding Concerns:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Engorgement:** Breasts are painfully full. Needs frequent emptying.</li>
+							<li>**Nipple Pain:** Often due to improper latch.</li>
+							<li>**Plugged Ducts:** Presents as a tender lump; requires frequent feeding/pumping and massage.</li>
+							<li>**Breast Surgery/Maternal Illness:** May affect milk supply or require consultation regarding drug transfer.</li>
+						</ul>
+					`},
+					{ id: 'm8-quiz', title: 'Module 8 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Which component of breast milk is rich in immunoglobulins and is the first milk produced?", options: ["Mature Milk", "Foremilk", "Hindmilk", "Colostrum"], correctAnswer: "Colostrum" },
+							{ question: "Which behavior is considered a **late** sign of hunger in an infant?", options: ["Rooting", "Hand to mouth movements", "Licking lips", "Crying"], correctAnswer: "Crying" },
+							{ question: "Why should breast milk or formula never be heated in a microwave?", options: ["It destroys all nutrients.", "It causes separation of fat molecules.", "It creates dangerous hot spots (burn risk).", "It changes the taste dramatically."], correctAnswer: "It creates dangerous hot spots (burn risk)." }
+						]
+					}
+				]
+			},
+			'module-9-maternal-postpartum': {
+				title: 'Module 9: Postpartum Maternal Adaptation',
+				color: 'from-pink-400 to-red-500',
+				description: 'Review normal maternal adaptations and assessment in the postpartum period (Ch. 20).',
+				steps: [
+					{ id: 'm9-involution', title: 'Uterine Involution and Lochia', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-600">Returning to the Nonpregnant State (Ch. 20)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Involution of the Uterus:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>The process where the uterus returns to its nonpregnant size, achieved through: muscle fiber contraction, catabolic processes, and regeneration of uterine epithelium.</li>
+							<li><strong>Placental Site:</strong> Heals by **exfoliation**, leaving the endometrium smooth (no scars).</li>
+							<li><strong>Fundal Descent:</strong> The fundus descends about **$1 \text{cm}$ per day** and should no longer be palpable abdominally by **14 days** postpartum.</li>
+							<li><strong>Afterpains:</strong> Intermittent uterine contractions (more severe in multiparas and breastfeeding women).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Lochia (Vaginal Discharge):</h4>
+						<ol class="list-decimal list-inside ml-4">
+							<li>**Lochia Rubra:** (Days 1-3) Dark red or bloody.</li>
+							<li>**Lochia Serosa:** (Days 4-10) Pinkish/brownish.</li>
+							<li>**Lochia Alba:** (Days 11-21) White, cream, or light yellow.</li>
+						</ol>
+						<p class="mt-2 font-bold text-red-600">Foul odor always suggests endometrial infection.</p>
+					`},
+					{ id: 'm9-systems', title: 'Other System Adaptations and Assessment', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-600">Key Postpartum Assessments (BUBBLE-HE)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Cardiovascular & Weight Loss:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Weight Loss:</strong> Approximately $10-13 \text{lbs}$ lost at birth. An additional $9 \text{lbs}$ over the next 2 weeks.</li>
+							<li>**Blood Pressure:** Assess for **Orthostatic Hypotension** (dizziness when standing up) due to rapid fluid shifts.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Urinary and GI Systems:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Urinary:</strong> Increased bladder capacity and decreased sensitivity can lead to **urinary retention**. A distended bladder displaces the uterus and interferes with involution, risking **Postpartum Hemorrhage (PPH)**.</li>
+							<li><strong>Gastrointestinal:</strong> Constipation is common due to decreased muscle tone, perineal pain, and fear of tearing sutures (lacerations).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Neurologic and Psychosocial:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Headache:</strong> A common complaint. Must be differentiated between a benign cause (fluid shifts/fatigue) and a serious cause like **Spinal Headache** (from anesthesia) or **Preeclampsia** (if accompanied by blurred vision/abdominal pain).</li>
+							<li>**Postpartum Blues:** Transient period of sadness, anxiety, or tearfulness (self-limiting, usually lasts less than 2 weeks).</li>
+						</ul>
+					`},
+					{ id: 'm9-quiz', title: 'Module 9 Quiz', type: 'quiz',
+						questions: [
+							{ question: "The process by which the placental site heals without scarring in the postpartum uterus is called:", options: ["Atrophy", "Involution", "Exfoliation", "Regeneration"], correctAnswer: "Exfoliation" },
+							{ question: "Which fundal height finding is expected on Day 10 postpartum?", options: ["At the umbilicus.", "1 cm above the symphysis pubis.", "No longer abdominally palpable.", "5 cm above the umbilicus."], correctAnswer: "No longer abdominally palpable." },
+							{ question: "What is the primary risk associated with urinary retention and a distended bladder in the immediate postpartum period?", options: ["Puerperal infection.", "Perineal laceration.", "Postpartum Hemorrhage (PPH).", "Thromboembolic disorder."], correctAnswer: "Postpartum Hemorrhage (PPH)." }
+						]
+					}
+				]
+			},
+			'module-10-maternal-complications': {
+				title: 'Module 10: Postpartum Complications',
+				color: 'from-red-600 to-red-800',
+				description: 'Identify the signs and management of Postpartum Hemorrhage (PPH), Thromboembolism, and Infection (Ch. 28).',
+				steps: [
+					{ id: 'm10-pph', title: 'Postpartum Hemorrhage (PPH) & Trauma', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-800">The Leading Cause of Maternal Morbidity (Ch. 28)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Definition:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Blood loss of $\geq 1000 \text{mL}$ or greater, OR blood loss that causes hemodynamic instability.</li>
+							<li>**Early PPH:** Occurs within the first 24 hours.</li>
+							<li>**Late PPH:** Occurs from 24 hours up to 6 weeks (often due to **subinvolution** or **retained placental fragments**).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Causes (The $4 \text{ Ts}$):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Tone ($\sim 70\%$):** **Uterine Atony** (lack of uterine muscle tone) $\rightarrow$ most common cause.</li>
+							<li>**Trauma:** Lacerations of the cervix, vagina, or perineum; Hematomas.</li>
+							<li>**Tissue:** Retained placental fragments or membranes.</li>
+							<li>**Thrombin:** Coagulation disorders (e.g., DIC).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Management Priority:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Identify predisposing factors (overdistention, grand multiparity, prolonged labor).</li>
+							<li>Immediate action: **Uterine Massage** and check for **bladder distention**. Administer uterotonics (e.g., Pitocin, Methergine).</li>
+						</ul>
+					`},
+					{ id: 'm10-shock-te', title: 'Hypovolemic Shock and Thromboembolic Disorders', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-800">Circulatory and Clotting Risks (Ch. 28)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Hypovolemic Shock:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>A consequence of excessive blood loss (PPH). Signs include **tachycardia**, **hypotension**, decreased $\text{O}_2 \text{sat}$, pale/cool skin, and decreased urine output.</li>
+							<li>**Nursing Action:** Rapid volume replacement ($\text{IV}$ fluids, blood products) and continuous monitoring of vital signs.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Thromboembolic Disorders (TE):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Clots form due to **Virchow's Triad** (venous stasis, hypercoagulation-natural in postpartum, blood vessel injury-from birth trauma).</li>
+							<li>**DVT (Deep Vein Thrombosis):** Often asymptomatic (in $75\%$ of cases). S/S include swelling, redness, tenderness, and warmth in the leg.</li>
+							<li>**Pulmonary Embolism (PE):** A serious complication where a clot travels to the lung. Management is supportive.</li>
+							<li>**Risk Factors:** Inactivity/bed rest, C-section, obesity, smoking, increased maternal age, increased parity.</li>
+						</ul>
+					`},
+					{ id: 'm10-infection', title: 'Puerperal Infection and Affective Disorders', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-800">Infection and Mental Health (Ch. 28)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Puerperal Infection:</h4>
+						<p>Any infection of the genital tract that occurs within 6 weeks after childbirth.</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Endometritis:** Infection of the uterine lining (most common).</li>
+							<li>**Risk Factors:** Operative procedures ($\text{C-section}$, vacuum/forceps), multiple cervical exams, **prolonged labor**, **prolonged rupture of membranes (PROM)**, manual removal of placenta.</li>
+							<li>**S/S:** Fever $\geq 100.4^\circ \text{F}$ on 2 successive days (excluding the first 24 hours), foul-smelling lochia, uterine tenderness.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Affective Disorders:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Postpartum Blues:** (Discussed in Mod 9) Transient mood swings, tearfulness, self-limiting.</li>
+							<li>**Postpartum Depression:** More serious, persistent sadness, irritability, severe anxiety, and difficulty bonding. Requires professional intervention.</li>
+							<li>**Postpartum Psychosis:** Rarest and most severe; requires emergency treatment.</li>
+						</ul>
+					`},
+					{ id: 'm10-quiz', title: 'Module 10 Quiz', type: 'quiz',
+						questions: [
+							{ question: "The most common cause of early postpartum hemorrhage (PPH) is:", options: ["Uterine Lacerations (Trauma)", "Retained Placental Tissue", "Uterine Atony (Tone)", "Coagulation Defects (Thrombin)"], correctAnswer: "Uterine Atony (Tone)" },
+							{ question: "The presence of fever, foul-smelling lochia, and uterine tenderness beyond 24 hours postpartum most likely indicates:", options: ["Postpartum Blues", "Hypovolemic Shock", "Deep Vein Thrombosis (DVT)", "Endometritis (Puerperal Infection)"], correctAnswer: "Endometritis (Puerperal Infection)" },
+							{ question: "In the context of PPH, checking for bladder distention is critical because a full bladder:", options: ["Is a direct sign of kidney failure.", "Displaces the uterus and prevents proper contraction.", "Causes immediate hypovolemic shock.", "Is a common side effect of uterine massage."], correctAnswer: "Displaces the uterus and prevents proper contraction." }
 						]
 					}
 				]
@@ -461,41 +603,57 @@
 		};
 
 		// The pre-assessment quiz data is compiled from the first 3 quiz questions of each module.
+		// NOTE: The preAssessmentQuizData is updated to include the new and revised Module 7, 8, 9, and 10 questions.
 		const preAssessmentQuizData = [
 			// Module 1 Questions
 			{ moduleId: 'module-1-transition', question: "What is the primary function of surfactant in the newborn lung?", options: ["To promote chest wall compression.", "To increase oxygen saturation in the blood.", "To decrease surface tension and prevent alveolar collapse.", "To dilate the ductus arteriosus."], correctAnswer: "To decrease surface tension and prevent alveolar collapse." },
-			{ moduleId: 'module-1-transition', question: "Which fetal shunt is the opening between the right and left atrium that functionally closes 1-2 hours after birth?", options: ["Ductus Venosus", "Ductus Arteriosus", "Aortic Valve", "Foramen Ovale"], correctAnswer: "Foramen Ovale" },
-			{ moduleId: 'module-1-transition', question: "What chemical factor stimulates the newborn’s first breath?", options: ["High glucose levels", "Increased Estrogen", "Hypoxia and hypercapnia", "Release of Prolactin"], correctAnswer: "Hypoxia and hypercapnia" },
+			{ moduleId: 'module-1-transition', question: "Which change immediately after birth causes pulmonary vascular pressure to drop, assisting the transition?", options: ["Clamping of the umbilical cord.", "Drop in ambient temperature.", "Lungs filling with air/oxygenation.", "Release of adrenaline."], correctAnswer: "Lungs filling with air/oxygenation." },
+			{ moduleId: 'module-1-transition', question: "Which fetal structure functionally closes first, usually within hours after birth?", options: ["Ductus Venosus", "Ductus Arteriosus", "Foramen Ovale", "Pulmonary Artery"], correctAnswer: "Foramen Ovale" },
 
 			// Module 2 Questions
 			{ moduleId: 'module-2-thermoregulation', question: "Heat loss caused by placing a newborn directly on a cool scale is due to which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Conduction" },
-			{ moduleId: 'module-2-thermoregulation', question: "Why is a baby with Cold Stress at risk for Hypoglycemia?", options: ["Decreased insulin production", "Rapid depletion of glucose stores due to increased metabolic rate", "Lack of fluid intake", "Inability to produce adrenaline"], correctAnswer: "Rapid depletion of glucose stores due to increased metabolic rate" },
-			{ moduleId: 'module-2-thermoregulation', question: "The nursing action of drying the infant immediately after birth primarily prevents heat loss through which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Evaporation" },
+			{ moduleId: 'module-2-thermoregulation', question: "Why is a baby experiencing cold stress at risk for Hypoglycemia?", options: ["Decreased insulin production", "Rapid depletion of glucose stores due to increased metabolic rate (NST)", "Lack of fluid intake", "Inability to produce adrenaline"], correctAnswer: "Rapid depletion of glucose stores due to increased metabolic rate (NST)" },
+			{ moduleId: 'module-2-thermoregulation', question: "The nursing action of covering the infant's head and keeping them away from drafts prevents heat loss primarily through:", options: ["Evaporation and Conduction", "Radiation and Conduction", "Convection and Radiation", "Evaporation and Convection"], correctAnswer: "Convection and Radiation" },
 
 			// Module 3 Questions
-			{ moduleId: 'module-3-other-systems', question: "What is the name of the newborn's first stool, typically thick, tarry, and dark green/black?", options: ["Transitional stool", "Meconium", "Milk stool", "Lochia"], correctAnswer: "Meconium" },
-			{ moduleId: 'module-3-other-systems', question: "What is the primary reason Vitamin K is administered at birth?", options: ["To prevent jaundice", "To accelerate clotting and prevent hemorrhagic disease", "To boost the immune system", "To aid respiratory function"], correctAnswer: "To accelerate clotting and prevent hemorrhagic disease" },
-			{ moduleId: 'module-3-other-systems', question: "What is the normal percentage of weight loss considered acceptable for a healthy newborn in the first few days of life?", options: ["<2%", "5% to 10%", "10% to 15%", ">15%"], correctAnswer: "5% to 10%" },
+			{ moduleId: 'module-3-other-systems', question: "Breast milk provides which specific immunoglobulin that does NOT cross the placenta, strengthening the infant's GI defense?", options: ["IgG", "IgM", "IgA", "IgD"], correctAnswer: "IgA" },
+			{ moduleId: 'module-3-other-systems', question: "What is the primary reason Vitamin K is administered at birth?", options: ["To prevent jaundice", "To activate clotting factors and prevent HDN", "To boost the immune system", "To aid respiratory function"], correctAnswer: "To activate clotting factors and prevent HDN" },
+			{ moduleId: 'module-3-other-systems', question: "The nurse assesses a newborn's stool on day 2. Which finding would be considered normal?", options: ["White, chalky stools", "Transitional greenish-brown stools", "Loose, bloody stools", "Hard, formed brown stools"], correctAnswer: "Transitional greenish-brown stools" },
 
 			// Module 4 Questions
-			{ moduleId: 'module-4-assessment-care', question: "The five components assessed in the APGAR score are Appearance, Pulse, Grimace, Activity, and what other component?", options: ["Blood Pressure", "Temperature", "Respiratory Effort", "Gag Reflex"], correctAnswer: "Respiratory Effort" },
-			{ moduleId: 'module-4-assessment-care', question: "The nurse’s first action immediately following a newborn’s birth is to:", options: ["Weigh the infant", "Apply a hat", "Dry the infant", "Give Vitamin K"], correctAnswer: "Dry the infant" },
-			{ moduleId: 'module-4-assessment-care', question: "If a newborn's 5-minute APGAR score is 6, what is the required nursing action?", options: ["Initiate full resuscitation immediately.", "Notify the physician.", "Continue Apgar scoring every 5 minutes.", "Place the baby in the nursery."], correctAnswer: "Continue Apgar scoring every 5 minutes." },
+			{ moduleId: 'module-4-assessment-care', question: "What is the most critical first nursing action immediately after a newborn is delivered?", options: ["Weigh the infant.", "Suction the mouth and nose.", "Dry the infant thoroughly.", "Administer Vitamin K."], correctAnswer: "Dry the infant thoroughly." },
+			{ moduleId: 'module-4-assessment-care', question: "Eye prophylaxis is given to the newborn primarily to prevent blindness caused by which infections?", options: ["Staphylococcus Aureus", "Ophthalmia Neonatorum", "Hepatitis B", "Group B Streptococcus"], correctAnswer: "Ophthalmia Neonatorum" },
+			{ moduleId: 'module-4-assessment-care', question: "If a newborn's 5-minute APGAR score is 6, what is the required immediate nursing action?", options: ["Initiate full resuscitation immediately.", "Notify the physician.", "Continue Apgar scoring every 5 minutes (up to 20 minutes).", "Place the baby in the nursery."], correctAnswer: "Continue Apgar scoring every 5 minutes (up to 20 minutes)." },
 
 			// Module 5 Questions
-			{ moduleId: 'module-5-prophylaxis-safety', question: "What is the required normal result for a CCHD screening (oxygen saturation in the right hand and foot)?", options: ["Saturation <90% in both.", "Saturation >95% in both with <3% difference.", "Saturation >95% in both with >3% difference.", "Saturation must be 100% in both."], correctAnswer: "Saturation >95% in both with <3% difference." },
-			{ moduleId: 'module-5-prophylaxis-safety', question: "Eye prophylaxis is given to the newborn to prevent which condition?", options: ["SIDS", "Hypoglycemia", "Ophthalmia Neonatorum", "Jaundice"], correctAnswer: "Ophthalmia Neonatorum" },
-			{ moduleId: 'module-5-prophylaxis-safety', question: "What is the recommended sleep position for a healthy newborn to prevent SIDS?", options: ["Prone", "Side-lying", "Semi-Fowler's", "Supine"], correctAnswer: "Supine" },
+			{ moduleId: 'module-5-screening-safety', question: "When should the Universal Newborn Screening (PKU/Hypothyroidism) blood test be performed?", options: ["Immediately after birth.", "Before the first feeding.", "After the infant has fed for at least 24 hours.", "Upon discharge from the hospital."], correctAnswer: "After the infant has fed for at least 24 hours." },
+			{ moduleId: 'module-5-screening-safety', question: "What is the recommended sleep position for a healthy newborn to prevent SIDS?", options: ["Prone", "Side-lying", "Semi-Fowler's", "Supine"], correctAnswer: "Supine" },
+			{ moduleId: 'module-5-screening-safety', question: "A normal result for CCHD screening requires oxygen saturation to be $>95\%$ in the right hand and foot with what maximum difference between the two sites?", options: ["$\lt 1\%$ difference", "$\lt 3\%$ difference", "$\lt 5\%$ difference", "No difference is allowed."], correctAnswer: "$\lt 3\%$ difference" },
 
 			// Module 6 Questions
-			{ moduleId: 'module-6-metabolic-risk', question: "A mother with diabetes gives birth. The newborn's primary risk for hypoglycemia is due to:", options: ["Slow metabolism", "Rebound hyperinsulinemia", "Lack of brown fat", "Immature kidneys"], correctAnswer: "Rebound hyperinsulinemia" },
-			{ moduleId: 'module-6-metabolic-risk', question: "Which intervention is used to promote bilirubin excretion in a jaundiced newborn?", options: ["Restricting feeds", "Promoting feeding", "Applying ice packs", "Limiting urination"], correctAnswer: "Promoting feeding" },
-			{ moduleId: 'module-6-metabolic-risk', question: "What is the primary manifestation of hypoglycemia in a newborn?", options: ["Projectile vomiting", "Jitteriness/tremors", "Fever", "Bounding pulse"], correctAnswer: "Jitteriness/tremors" },
+			{ moduleId: 'module-6-metabolic-risk', question: "Infants born to diabetic mothers are at high risk for hypoglycemia primarily due to:", options: ["Slow metabolism", "Rebound hyperinsulinemia", "Lack of brown fat", "Immature kidneys"], correctAnswer: "Rebound hyperinsulinemia" },
+			{ moduleId: 'module-6-metabolic-risk', question: "What is the most serious neurological complication of severe, untreated hyperbilirubinemia?", options: ["Respiratory Distress Syndrome", "Intraventricular Hemorrhage", "Kernicterus (Bilirubin Encephalopathy)", "Polycythemia"], correctAnswer: "Kernicterus (Bilirubin Encephalopathy)" },
+			{ moduleId: 'module-6-metabolic-risk', question: "In a jaundiced newborn, the nurse promotes bilirubin excretion by encouraging:", options: ["Restricting feeds to rest the gut.", "Promoting frequent and adequate feeding.", "Applying ice packs to the liver.", "Limiting urination."], correctAnswer: "Promoting frequent and adequate feeding." },
 
 			// Module 7 Questions
-			{ moduleId: 'module-7-prematurity', question: "An infant born at 36 weeks gestation is classified as:", options: ["Early Term", "Full Term", "Late Preterm", "Postterm"], correctAnswer: "Late Preterm" },
-			{ moduleId: 'module-7-prematurity', question: "Which symptom is a classic sign of Respiratory Distress Syndrome (RDS) in a newborn?", options: ["Bradypnea", "Grunting", "Bounding Pulse", "Hypothermia"], correctAnswer: "Grunting" },
-			{ moduleId: 'module-7-prematurity', question: "The nursing care intervention for a newborn suspected of Necrotizing Enterocolitis (NEC) is to:", options: ["Increase oral feeds immediately.", "Begin broad-spectrum antibiotics and make the patient NPO.", "Administer an exchange transfusion.", "Place the infant prone in the crib."], correctAnswer: "Begin broad-spectrum antibiotics and make the patient NPO." }
+			{ moduleId: 'module-7-prematurity', question: "What neonatal complication is specifically associated with the fluctuation or excessive administration of oxygen to preterm infants?", options: ["Bronchopulmonary Dysplasia (BPD)", "Respiratory Distress Syndrome (RDS)", "Retinopathy of Prematurity (ROP)", "Necrotizing Enterocolitis (NEC)"], correctAnswer: "Retinopathy of Prematurity (ROP)" },
+			{ moduleId: 'module-7-prematurity', question: "Which nursing intervention is essential for preventing Intraventricular Hemorrhage (IVH) in a preterm infant?", options: ["Providing passive range of motion exercises.", "Maintaining a slightly Trendelenburg position.", "Minimizing stress and clustering care.", "Administering high-concentration oxygen."], correctAnswer: "Minimizing stress and clustering care." },
+			{ moduleId: 'module-7-prematurity', question: "A common, yet often vague, early sign of Sepsis Neonatorum that requires immediate investigation is:", options: ["Projectile vomiting", "Jaundice (after 48 hours)", "Temperature instability", "Persistent meconium stool"], correctAnswer: "Temperature instability" },
+			
+			// Module 8 Questions (New)
+			{ moduleId: 'module-8-newborn-feeding', question: "Which component of breast milk is rich in immunoglobulins and is the first milk produced?", options: ["Mature Milk", "Foremilk", "Hindmilk", "Colostrum"], correctAnswer: "Colostrum" },
+			{ moduleId: 'module-8-newborn-feeding', question: "Which behavior is considered a **late** sign of hunger in an infant?", options: ["Rooting", "Hand to mouth movements", "Licking lips", "Crying"], correctAnswer: "Crying" },
+			{ moduleId: 'module-8-newborn-feeding', question: "Why should breast milk or formula never be heated in a microwave?", options: ["It destroys all nutrients.", "It causes separation of fat molecules.", "It creates dangerous hot spots (burn risk).", "It changes the taste dramatically."], correctAnswer: "It creates dangerous hot spots (burn risk)." },
+
+			// Module 9 Questions (New)
+			{ moduleId: 'module-9-maternal-postpartum', question: "The process by which the placental site heals without scarring in the postpartum uterus is called:", options: ["Atrophy", "Involution", "Exfoliation", "Regeneration"], correctAnswer: "Exfoliation" },
+			{ moduleId: 'module-9-maternal-postpartum', question: "The lochia stage characterized by pinkish/brownish discharge, typically lasting days 4-10, is:", options: ["Lochia Rubra", "Lochia Serosa", "Lochia Alba", "Lochia Purpura"], correctAnswer: "Lochia Serosa" },
+			{ moduleId: 'module-9-maternal-postpartum', question: "What is the primary risk associated with a distended bladder in the immediate postpartum period?", options: ["Puerperal infection.", "Perineal laceration.", "Postpartum Hemorrhage (PPH).", "Thromboembolic disorder."], correctAnswer: "Postpartum Hemorrhage (PPH)." },
+
+			// Module 10 Questions (New)
+			{ moduleId: 'module-10-maternal-complications', question: "The most common cause of early postpartum hemorrhage (PPH) is:", options: ["Uterine Lacerations (Trauma)", "Retained Placental Tissue", "Uterine Atony (Tone)", "Coagulation Defects (Thrombin)"], correctAnswer: "Uterine Atony (Tone)" },
+			{ moduleId: 'module-10-maternal-complications', question: "Which risk factor is part of Virchow's Triad and is a natural physiological state in the postpartum period?", options: ["Venous stasis", "Hypercoagulation", "Blood vessel injury", "Smoking"], correctAnswer: "Hypercoagulation" },
+			{ moduleId: 'module-10-maternal-complications', question: "A mother reports a fever of $101^\circ \text{F}$ on postpartum Day 3 with foul-smelling lochia. This is most indicative of:", options: ["Postpartum Blues", "Hypovolemic Shock", "Deep Vein Thrombosis (DVT)", "Endometritis (Puerperal Infection)"], correctAnswer: "Endometritis (Puerperal Infection)" }
 		];
 
 		// --- Helper Functions ---
@@ -776,7 +934,7 @@
 							<div className="flex items-center justify-center gap-3 mb-2">
 								<span className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-lg">NB</span>
 								<h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Newborn Adaptations Master Module</h1>
-								<span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:2.0</span>
+								<span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:2.2</span>
 							</div>
 							<p className="text-lg text-gray-500 max-w-2xl mx-auto">Master the critical physiological transition, assessment, safety, and high-risk care of the neonate.</p>
 						</header>
@@ -788,34 +946,34 @@
 								className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-xl shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
 							>
 								<div className="text-xl font-extrabold">Skip Ahead: Take Diagnostic Quiz</div>
-								<div className="text-sm font-medium">Test your knowledge and potentially skip modules. (21 Questions)</div>
+								<div className="text-sm font-medium">Test your knowledge and potentially skip modules. ({preAssessmentQuizData.length} Questions)</div>
 							</button>
 						</div>
 
 						{/* Overall Progress Bar & Reset Button */}
 						<div className="mb-12 bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-auto">
-						   <div className="flex justify-between items-center mb-3">
-							  <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
-							  <button 
+						   <div className="flex justify-between items-center mb-3">
+							  <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+							  <button 
 									onClick={onResetProgress}
 									className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2 transform hover:scale-105"
 								>
 									<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
 									Reset Progress
-							  </button>
-						   </div>
-						   <div className="w-full bg-gray-200 rounded-full h-4">
-							   <div
-								  className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
-								  style={{ width: `${overallPercentage}%` }}
-							   ></div>
-						   </div>
-						   <div className="flex justify-between items-center">
-							  <p className="text-left text-sm text-gray-600 mt-2">
-								  {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
-							  </p>
-							  <p className="text-right text-sm text-gray-600 mt-2 font-bold">{Math.round(overallPercentage)}% Completed</p>
-						   </div>
+							  </button>
+						   </div>
+						   <div className="w-full bg-gray-200 rounded-full h-4">
+							   <div
+								  className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+								  style={{ width: `${overallPercentage}%` }}
+							   ></div>
+						   </div>
+						   <div className="flex justify-between items-center">
+							  <p className="text-left text-sm text-gray-600 mt-2">
+								  {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+							  </p>
+							  <p className="text-right text-sm text-gray-600 mt-2 font-bold">{Math.round(overallPercentage)}% Completed</p>
+						   </div>
 						</div>
 
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -881,7 +1039,7 @@
 										<div className="mt-auto pt-2 border-t border-gray-100">
 											<p className={cn("text-sm", statusColor)}>{statusText}</p>
 											<div className="flex items-center justify-between text-sm font-bold text-indigo-600 group-hover:text-indigo-700 mt-2">
-												{percentage === 100 ? 'Review Module' : 'Start Learning'} 
+												{percentage === 100 ? 'Review Module' : 'Start Learning'} 
 												<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
 													<path fillRule="evenodd" d="M12.97 4.97a.75.75 0 011.06 0l4.5 4.5a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 11-1.06-1.06l3.22-3.22H4a.75.75 0 010-1.5h12.19l-3.22-3.22a.75.75 0 010-1.06z" clipRule="evenodd" />
 												</svg>
@@ -1336,8 +1494,8 @@
 			return (
 				<div className="bg-gray-100 min-h-screen font-sans text-gray-900">
 					{isPreAssessmentActive ? (
-						<PreAssessmentQuiz 
-							onComplete={handlePreAssessmentComplete} 
+						<PreAssessmentQuiz 
+							onComplete={handlePreAssessmentComplete} 
 							onExit={() => setIsPreAssessmentActive(false)}
 						/>
 					) : selectedModule ? (
@@ -1351,9 +1509,9 @@
 							hasNextModule={hasNextModule}
 						/>
 					) : (
-						<Dashboard 
-							onSelectModule={setCurrentModuleId} 
-							progress={progress} 
+						<Dashboard 
+							onSelectModule={setCurrentModuleId} 
+							progress={progress} 
 							onResetProgress={handleResetProgress}
 							onStartPreAssessment={() => setIsPreAssessmentActive(true)}
 						/>
