@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Newborn Adaptations Master Module</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		// Tailwind CSS configuration to use the Inter font and define custom animations.
+		tailwind.config = {
+			theme: {
+				extend: {
+					fontFamily: {
+						sans: ['Inter', 'sans-serif'],
+					},
+					keyframes: {
+						'fade-in': {
+							'0%': { opacity: '0', transform: 'scale(0.95)' },
+							'100%': { opacity: '1', transform: 'scale(1)' },
+						},
+					},
+					animation: {
+						'fade-in': 'fade-in 0.3s ease-out forwards',
+					},
+				},
+			},
+		};
+	</script>
+
+	<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+	<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+	<div id="root"></div>
+
+	<script type="text/babel">
+		// --- React and Library Setup ---
+		const { useState, useEffect, useCallback, useMemo } = React;
+
+		// --- Mock Authentication Setup for Standalone Demo ---
+		const mockAuth = {
+			onAuthStateChanged: (callback) => {
+				setTimeout(() => callback({ uid: 'standalone-newborn-user' }), 100);
+				return () => {}; 
+			},
+			signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-newborn-user' } }),
+		};
+
+		// --- Content & Data Structure for the Learning Modules (Newborn) ---
+		const contentData = {
+			'module-1-transition': {
+				title: 'Module 1: Physiological Transition Basics',
+				color: 'from-pink-600 to-red-400',
+				description: 'Identify the critical systemic adaptations (Respiratory and Cardiovascular) necessary for extrauterine life.',
+				steps: [
+					{ id: 'm1-def', title: 'Physiologic Adaptations Overview', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">From Womb to World: The Newborn's Challenge</p>
+						<p>Physiologic adaptations are necessary for a newborn to transition successfully to extrauterine life. This involves rapid, profound changes across multiple body systems.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Key Systems Involved:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Respiratory System:</strong> Switching from fluid-filled lungs to air-breathing.</li>
+							<li><strong>Cardiovascular System:</strong> Closing fetal shunts and establishing pulmonary circulation.</li>
+							<li><strong>Thermoregulatory System:</strong> Maintaining body heat independently.</li>
+							<li><strong>Other Systems:</strong> GI, Hepatic, Renal, and Immune adaptations.</li>
+						</ul>
+					`},
+					{ id: 'm1-resp', title: 'Respiratory Adaptation (Chemical & Mechanical)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">The First Breath: What Stimulates it?</p>
+						<p>Respiratory adaptation relies on chemical, mechanical, thermal, and sensory factors to initiate and sustain breathing.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Primary Stimulants for Breathing:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Chemical Factors:</strong> At birth, temporary **hypoxia and hypercapnia** (low O2, high CO2) stimulate the respiratory center in the medulla.</li>
+							<li><strong>Surfactant:</strong> A lipoprotein coating the alveoli, lowering surface tension and preventing alveolar collapse during expiration. **Insufficient surfactant** causes Respiratory Distress Syndrome (RDS) in preterm infants.</li>
+							<li><strong>Mechanical Factors:</strong>
+								<ul>
+									<li>Fetal **chest compression** during vaginal birth squeezes fluid out of the lungs.</li>
+									<li>When the chest recoils after birth, a negative pressure is created, drawing air into the lungs.</li>
+								</ul>
+							</li>
+							<li><strong>Thermal Factors:</strong> The sudden **drop in temperature** from the warm intra-uterine environment stimulates the nerve endings, promoting respirations.</li>
+							<li><strong>Sensory Factors:</strong> Tactile stimulation (drying, suctioning) and sound/light activate the respiratory center.</li>
+						</ul>
+					`},
+					{ id: 'm1-cv', title: 'Cardiovascular Adaptation (Fetal to Neonatal)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">Closing the Fetal Shunts</p>
+						<p>The switch from fetal circulation (which bypasses the lungs) to neonatal circulation (which requires pulmonary blood flow) involves the functional closure of three key shunts.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">The Transition (Neonatal Circulation):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>When the cord is clamped, systemic **blood pressure increases**.</li>
+							<li>When the lungs fill with air, **pulmonary pressure drops** significantly.</li>
+							<li>This pressure shift forces the fetal shunts to close:
+								<ol class="list-decimal list-inside ml-4">
+									<li><strong>Foramen Ovale:</strong> Closes functionally 1-2 hours after birth (anatomically months later).</li>
+									<li><strong>Ductus Arteriosus:</strong> Closes functionally within 10-15 hours (permanently 3-4 weeks).</li>
+									<li><strong>Ductus Venosus:</strong> Closes functionally when the cord is clamped.</li>
+								</ol>
+							</li>
+						</ul>
+					`},
+					{ id: 'm1-quiz', title: 'Module 1 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the primary function of surfactant in the newborn lung?", options: ["To promote chest wall compression.", "To increase oxygen saturation in the blood.", "To decrease surface tension and prevent alveolar collapse.", "To dilate the ductus arteriosus."], correctAnswer: "To decrease surface tension and prevent alveolar collapse." },
+							{ question: "Which fetal shunt is the opening between the right and left atrium that functionally closes 1-2 hours after birth?", options: ["Ductus Venosus", "Ductus Arteriosus", "Aortic Valve", "Foramen Ovale"], correctAnswer: "Foramen Ovale" },
+							{ question: "What chemical factor stimulates the newborn’s first breath?", options: ["High glucose levels", "Increased Estrogen", "Hypoxia and hypercapnia", "Release of Prolactin"], correctAnswer: "Hypoxia and hypercapnia" }
+						]
+					}
+				]
+			},
+			'module-2-thermoregulation': {
+				title: 'Module 2: Thermoregulation & Cold Stress',
+				color: 'from-blue-600 to-indigo-500',
+				description: 'Identify the four mechanisms of heat loss and the life-threatening consequences of cold stress.',
+				steps: [
+					{ id: 'm2-heat-loss', title: 'Four Mechanisms of Heat Loss', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">Newborns Cannot Shiver: Protecting Them from Heat Loss</p>
+						<p>Newborns lose heat quickly due to a large surface area-to-volume ratio and minimal subcutaneous fat. We must protect them from the four routes of heat loss:</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Mechanisms and Nursing Interventions:</h4>
+						<ul class="list-disc list-inside ml-4 space-y-3">
+							<li><strong>EVAPORATION:</strong> Heat loss due to moisture evaporating from the skin (e.g., amniotic fluid, post-bath).
+								<p class="font-bold text-sm italic">Nursing Action: <strong>Dry the infant quickly</strong> after birth or bathing; change wet linens/diapers.</p>
+							</li>
+							<li><strong>CONDUCTION:</strong> Heat loss from direct contact with cool surfaces.
+								<p class="font-bold text-sm italic">Nursing Action: Warm objects (stethoscopes, hands) before contact. Place infant on a **pre-warmed surface**.</p>
+							</li>
+							<li><strong>CONVECTION:</strong> Heat loss from body surface exposure to cooler ambient air (drafts).
+								<p class="font-bold text-sm italic">Nursing Action: Avoid areas with drafts (hallway doors, air conditioners). Bathe in warm water.</p>
+							</li>
+							<li><strong>RADIATION:</strong> Heat loss to a cooler surface nearby but **NOT** in direct contact (e.g., cold walls/windows).
+								<p class="font-bold text-sm italic">Nursing Action: Position the newborn bassinet away from walls or windows. Cover the infant's head.</p>
+							</li>
+						</ul>
+					`},
+					{ id: 'm2-heat-prod', title: 'Heat Production & Cold Stress', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">The Danger: Cold Stress Cascade</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Heat Production Methods:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Increased muscle activity, crying.</li>
+							<li>Flexion (curling up) to limit surface area exposure.</li>
+							<li>Non-shivering Thermogenesis (NST): Metabolism of **Brown Fat**. Brown fat stores are rapidly depleted during cold stress.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Cold Stress:</h4>
+						<p><strong>Hypothermia (temperature <97.7° F / 36.5° C)</strong> may lead to Cold Stress, a dangerous metabolic cascade that depletes energy stores.</p>
+						<h5 class="font-bold text-lg text-red-600">Consequences of Cold Stress (Must Know):</h5>
+						<ul class="list-disc list-inside ml-4">
+							<li>Leads to **Hypoglycemia** (due to increased metabolic rate burning glucose).</li>
+							<li>Decreased **Surfactant** production $\rightarrow$ risk of **Respiratory Distress**.</li>
+							<li>Metabolic Acidosis.</li>
+						</ul>
+					`},
+					{ id: 'm2-quiz', title: 'Module 2 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Heat loss caused by placing a newborn directly on a cool scale is due to which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Conduction" },
+							{ question: "Why is a baby with Cold Stress at risk for Hypoglycemia?", options: ["Decreased insulin production", "Rapid depletion of glucose stores due to increased metabolic rate", "Lack of fluid intake", "Inability to produce adrenaline"], correctAnswer: "Rapid depletion of glucose stores due to increased metabolic rate" },
+							{ question: "The nursing action of drying the infant immediately after birth primarily prevents heat loss through which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Evaporation" }
+						]
+					}
+				]
+			},
+			'module-3-other-systems': {
+				title: 'Module 3: Hepatic, GI, and Hematopoietic Adaptations',
+				color: 'from-purple-600 to-pink-500',
+				description: 'Review blood values, jaundice, meconium progression, and initial liver/kidney function.',
+				steps: [
+					{ id: 'm3-heme', title: 'Hematopoietic and Immune System', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">Blood and Immune System Adaptations</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Hematopoietic System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>RBC, Hgb, and Hct</strong> are typically **elevated at birth** and normalize during the first month of life (due to high fetal needs).</li>
+							<li><strong>WBC count</strong> is elevated at birth but normalizes in 4-5 days.</li>
+							<li><strong>Vitamin K</strong> is administered at birth to decrease the risk for **hemorrhagic disease of the newborn** (HDN).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Immune System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Passive Immunity (IgG):</strong> Maternal antibodies (IgG) pass through the placenta, providing protection for about the first 6 months.</li>
+							<li><strong>Active Immunity (IgM):</strong> IgM is produced rapidly after birth (often in response to infection/antigens).</li>
+						</ul>
+					`},
+					{ id: 'm3-gi-renal', title: 'GI, Hepatic, and Renal System', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">Excretion and Metabolism</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Gastrointestinal (GI) System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Stomach Capacity:</strong> Only about 6 mL/kg at birth.</li>
+							<li><strong>Cardiac Sphincter:</strong> Relaxed, leading to frequent **regurgitation** (spitting up).</li>
+							<li><strong>Stools Progression (Must Know!):</strong>
+								<ol class="list-decimal list-inside ml-4">
+									<li><strong>Meconium:</strong> Thick, tarry, dark green/black stool. Passed within 24-48 hours.</li>
+									<li><strong>Transitional Stools:</strong> Loose, greenish-brown.</li>
+									<li><strong>Milk Stools:</strong> Pale yellow (breastfed) or brownish-green (formula).</li>
+								</ol>
+							</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Hepatic (Liver) System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Newborn Liver is immature, leading to two major concerns: **Jaundice** (inability to process bilirubin) and **Hypoglycemia** (poor glucose regulation).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Renal System:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Weight Loss:</strong> Diuresis of extracellular fluid occurs during the first few days of life, leading to a normal weight loss of **5% to 10%** in most newborns. This fluid shift requires careful monitoring.</li>
+						</ul>
+					`},
+					{ id: 'm3-quiz', title: 'Module 3 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the name of the newborn's first stool, typically thick, tarry, and dark green/black?", options: ["Transitional stool", "Meconium", "Milk stool", "Lochia"], correctAnswer: "Meconium" },
+							{ question: "What is the primary reason Vitamin K is administered at birth?", options: ["To prevent jaundice", "To accelerate clotting and prevent hemorrhagic disease", "To boost the immune system", "To aid respiratory function"], correctAnswer: "To accelerate clotting and prevent hemorrhagic disease" },
+							{ question: "What is the normal percentage of weight loss considered acceptable for a healthy newborn in the first few days of life?", options: ["<2%", "5% to 10%", "10% to 15%", ">15%"], correctAnswer: "5% to 10%" }
+						]
+					}
+				]
+			},
+			'module-4-assessment-care': {
+				title: 'Module 4: Assessment & Immediate Care',
+				color: 'from-green-600 to-teal-500',
+				description: 'Prioritize immediate nursing interventions (warmth, secretion management) and understand the purpose of the APGAR score.',
+				steps: [
+					{ id: 'm4-initial-assess', title: 'Initial Assessment and APGAR', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-green-700">Initial Assessment: Identifying Need for Resuscitation</p>
+						<p>The initial assessment occurs immediately after birth to quickly identify the need for resuscitation or obvious anomalies.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">The APGAR Score (1 & 5 Minutes):</h4>
+						<p>A quick, objective method to assess the infant's transition to extrauterine life.</p>
+						<p>It assesses five signs (0-2 points each, max 10):</p>
+						<ol class="list-decimal list-inside ml-4 font-bold">
+							<li><strong>A</strong>ppearance (Color)</li>
+							<li><strong>P</strong>ulse (Heart Rate)</li>
+							<li><strong>G</strong>rimace (Reflex irritability)</li>
+							<li><strong>A</strong>ctivity (Muscle Tone)</li>
+							<li><strong>R</strong>espiratory Effort</li>
+						</ol>
+						<p class="mt-2"><strong>Apgar scores are taken at 1 minute and 5 minutes.</strong> If the score is <7 at 5 minutes, scoring continues every 5 minutes until 20 minutes of age.</p>
+					`},
+					{ id: 'm4-immediate-care', title: 'Immediate Care Priorities (The First 5 Minutes)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-green-700">The Golden Hour: Nursing Actions</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Immediate Newborn Care Steps:</h4>
+						<ol class="list-decimal list-inside ml-4 font-bold">
+							<li><strong>Maintain Warmth:</strong> Dry the infant immediately and place skin-to-skin on the mother or under a radiant warmer to prevent **Evaporation** and **Cold Stress**.</li>
+							<li><strong>Clear Secretions:</strong> Suction the mouth then the nose (M before N) as needed to ensure a clear **Airway**.</li>
+							<li><strong>Promote Skin-to-Skin:</strong> Essential for bonding, breastfeeding initiation, and thermoregulation.</li>
+							<li><strong>Assessment:</strong> Perform initial abbreviated exam and Apgar scoring.</li>
+						</ol>
+						<h4 class="text-lg font-bold mt-4 mb-2">Thorough Assessment:</h4>
+						<p>A more detailed head-to-toe examination, including vital signs, measurements, gestational age assessment, and primitive reflexes, occurs later (after the critical transition period).</p>
+					`},
+					{ id: 'm4-quiz', title: 'Module 4 Quiz', type: 'quiz',
+						questions: [
+							{ question: "The five components assessed in the APGAR score are Appearance, Pulse, Grimace, Activity, and what other component?", options: ["Blood Pressure", "Temperature", "Respiratory Effort", "Gag Reflex"], correctAnswer: "Respiratory Effort" },
+							{ question: "The nurse’s first action immediately following a newborn’s birth is to:", options: ["Weigh the infant", "Apply a hat", "Dry the infant", "Give Vitamin K"], correctAnswer: "Dry the infant" },
+							{ question: "If a newborn's 5-minute APGAR score is 6, what is the required nursing action?", options: ["Initiate full resuscitation immediately.", "Notify the physician.", "Continue Apgar scoring every 5 minutes.", "Place the baby in the nursery."], correctAnswer: "Continue Apgar scoring every 5 minutes." }
+						]
+					}
+				]
+			},
+			'module-5-prophylaxis-safety': {
+				title: 'Module 5: Prophylaxis, Screening, and Safety',
+				color: 'from-indigo-600 to-purple-700',
+				description: 'Review mandatory prophylaxis (Vitamin K, Eye), key screenings, and safety measures (SIDS, CCHD).',
+				steps: [
+					{ id: 'm5-prophylaxis', title: 'Mandatory Prophylaxis & Immunization', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">Protecting the Newborn</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Prophylaxis:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Vitamin K Prophylaxis:</strong> Administered IM to prevent Hemorrhagic Disease of the Newborn (HDN).</li>
+							<li><strong>Eye Prophylaxis:</strong> Erythromycin ophthalmic ointment is applied to the eyes to prevent Ophthalmia Neonatorum (gonococcal or chlamydial infection), which can cause blindness.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Screening & Immunization:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Universal Newborn Screening:</strong> Blood test (heel stick) done after 24 hours of feeding to check for metabolic/genetic disorders (e.g., PKU, hypothyroidism).</li>
+							<li><strong>Hearing Screening:</strong> Mandatory screening to check for hearing loss.</li>
+							<li><strong>Hep B Vaccine:</strong> Administered before discharge (requires parental consent).</li>
+						</ul>
+					`},
+					{ id: 'm5-safety', title: 'CCHD Screening and SIDS Prevention', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">Critical Safety and Screening Checks</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">CCHD Screening (Critical Congenital Heart Disease):</h4>
+						<p>Uses Pulse Oximetry to measure oxygen saturation to catch severe heart defects before discharge.</p>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Method:</strong> Measure oxygen saturation in the **right hand (pre-ductal)** and **one foot (post-ductal)**.</li>
+							<li><strong>Normal Result:</strong>
+								<ul>
+									<li>Oxygen saturation >95% in **both** extremities.</li>
+									<li>**<3% difference** between the upper and lower extremity readings.</li>
+								</ul>
+							</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Promoting Newborn Safety:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Prevent Misidentification & Abduction:</strong> Use matching identification bands on the mother, newborn, and support person. Never leave the newborn unattended.</li>
+							<li><strong>Reduce Risk for Falls:</strong> Always transport the newborn in a crib/bassinet; **NEVER** carry the baby if drowsy/tired.</li>
+							<li><strong>SIDS Prevention:</strong> (Safe Sleep)
+								<ul>
+									<li>Place infant <strong>SUPINE</strong> (on the back) for sleep.</li>
+									<li>**NO** loose blankets, pillows, or toys in the crib.</li>
+									<li>Pacifiers **MAY** help reduce SIDS risk (offer at nap/bedtime).</li>
+								</ul>
+							</li>
+						</ul>
+					`},
+					{ id: 'm5-quiz', title: 'Module 5 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the required normal result for a CCHD screening (oxygen saturation in the right hand and foot)?", options: ["Saturation <90% in both.", "Saturation >95% in both with <3% difference.", "Saturation >95% in both with >3% difference.", "Saturation must be 100% in both."], correctAnswer: "Saturation >95% in both with <3% difference." },
+							{ question: "Eye prophylaxis is given to the newborn to prevent which condition?", options: ["SIDS", "Hypoglycemia", "Ophthalmia Neonatorum", "Jaundice"], correctAnswer: "Ophthalmia Neonatorum" },
+							{ question: "What is the recommended sleep position for a healthy newborn to prevent SIDS?", options: ["Prone", "Side-lying", "Semi-Fowler's", "Supine"], correctAnswer: "Supine" }
+						]
+					}
+				]
+			},
+			'module-6-metabolic-risk': {
+				title: 'Module 6: Metabolic Emergencies (Jaundice & Hypoglycemia)',
+				color: 'from-orange-500 to-yellow-600',
+				description: 'Recognize the risk factors and interventions for Hyperbilirubinemia (Jaundice) and Hypoglycemia.',
+				steps: [
+					{ id: 'm6-jaundice', title: 'Hyperbilirubinemia (Jaundice)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-yellow-700">Jaundice: A Common Newborn Concern</p>
+						<p>Hyperbilirubinemia, or elevated bilirubin, causes jaundice (yellowing of the skin & sclera) in the majority of newborns due to the immature liver's inability to process bilirubin quickly.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Risk Factors for SEVERE Hyperbilirubinemia:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Gestational age <strong><38 weeks</strong> (preterm/late preterm).</li>
+							<li><strong>Exclusive breastfeeding</strong> (can be slower to establish feeds).</li>
+							<li>Significant jaundice in a sibling.</li>
+							<li>Cephalohematoma or significant bruising (more blood breakdown = more bilirubin).</li>
+							<li>Isoimmune or hemolytic disease (e.g., Rh/ABO incompatibility).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Manifestations & Treatment:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>S/S:</strong> Yellowing of skin & sclera, lethargy, poor feeding.</li>
+							<li><strong>Tests:</strong> Transcutaneous bilirubinometry (TcB), Total Serum Bilirubin (TSB).</li>
+							<li><strong>Treatment:</strong>
+								<ul>
+									<li><strong>Feeding:</strong> Promotes bilirubin excretion via stool.</li>
+									<li><strong>Phototherapy:</strong> Light converts bilirubin into a form the body can excrete.</li>
+									<li><strong>Exchange Transfusion:</strong> Used for very severe cases.</li>
+								</ul>
+							</li>
+						</ul>
+					`},
+					{ id: 'm6-hypoglycemia', title: 'Hypoglycemia & Management', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-yellow-700">Hypoglycemia: The Fuel Crisis</p>
+						<p>Most newborns experience a transient decrease in glucose levels 1-2 hours after birth, which is normal. However, severe drops require intervention.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Risk Factors for Hypoglycemia:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Preterm or late preterm</strong> infants (poor glycogen stores).</li>
+							<li><strong>SGA (Small for Gestational Age)</strong> or <strong>LGA (Large for Gestational Age)</strong>.</li>
+							<li>Born to a **mother with diabetes** (rebound hyperinsulinemia).</li>
+							<li>Perinatal stressors (asphyxia, **cold stress**, respiratory distress) $\rightarrow$ increase metabolic rate.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Manifestations & Treatment:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>S/S:</strong> Jitteriness, tremors, poor muscle tone, lethargy, difficulty feeding.</li>
+							<li><strong>Assessment:</strong> Heelstick or serum glucose assessment. **Early feeding** promotes normal glucose levels.</li>
+							<li><strong>Treatment:</strong> Oral feeding (colostrum/formula), or **IV Dextrose** if levels are severely low or feeding fails.</li>
+						</ul>
+					`},
+					{ id: 'm6-case', title: 'Case Study: Cold Stress & Hypoglycemia', type: 'case_study', case: {
+						scenario: `A late preterm infant (35 weeks) 4 hours old has a rectal temperature of 97.0°F (36.1°C) and is displaying **jitteriness** and a weak suck. The infant was dried but not placed skin-to-skin immediately. A heelstick glucose result is 35 mg/dL.`,
+						question: `What are the two immediate priority nursing interventions? (Select all that apply.)`,
+						options: [
+							"Option A: Place the infant under a radiant warmer and dry again.",
+							"Option B: Notify the physician and prepare for an exchange transfusion.",
+							"Option C: Initiate an immediate heelstick for a total serum bilirubin (TSB) test.",
+							"Option D: Initiate oral feeding of formula or expressed breast milk.",
+							"Option E: Place the infant supine in an open crib and monitor.",
+						],
+						correctAnswer: [
+							"Option A: Place the infant under a radiant warmer and dry again.",
+							"Option D: Initiate oral feeding of formula or expressed breast milk.",
+						],
+						explanation: `<strong>Rationale:</strong> The infant is exhibiting **Hypothermia** (97.0°F) and **Hypoglycemia** (35 mg/dL), both critical risks for preterm infants.
+						<ul>
+							<li><strong>Option A (Correct):</strong> Placing the infant under a radiant warmer addresses the hypothermia and stops the cycle of **Cold Stress**, which rapidly burns glucose and oxygen.</li>
+							<li><strong>Option D (Correct):</strong> The infant is symptomatic (jittery) and glucose is low (below the critical threshold of 40-45 mg/dL for symptomatic newborns). The priority intervention is to provide glucose via **oral feeding** (e.g., formula or colostrum) before resorting to IV dextrose.</li>
+							<li><strong>Option B (Incorrect):</strong> Exchange transfusion is for severe hyperbilirubinemia, which is not the immediate life threat here.</li>
+							<li><strong>Option C (Incorrect):</strong> TSB test is for jaundice, but metabolic instability (cold/sugar) is the immediate priority.</li>
+							<li><strong>Option E (Incorrect):</strong> Placing the cold, compromised infant in an open crib is contraindicated; immediate rewarming is required.</li>
+						</ul>`
+					}},
+					{ id: 'm6-quiz', title: 'Module 6 Quiz', type: 'quiz',
+						questions: [
+							{ question: "A mother with diabetes gives birth. The newborn's primary risk for hypoglycemia is due to:", options: ["Slow metabolism", "Rebound hyperinsulinemia", "Lack of brown fat", "Immature kidneys"], correctAnswer: "Rebound hyperinsulinemia" },
+							{ question: "Which intervention is used to promote bilirubin excretion in a jaundiced newborn?", options: ["Restricting feeds", "Promoting feeding", "Applying ice packs", "Limiting urination"], correctAnswer: "Promoting feeding" },
+							{ question: "What is the primary manifestation of hypoglycemia in a newborn?", options: ["Projectile vomiting", "Jitteriness/tremors", "Fever", "Bounding pulse"], correctAnswer: "Jitteriness/tremors" }
+						]
+					}
+				]
+			},
+			'module-7-prematurity': {
+				title: 'Module 7: Prematurity & High-Risk Care',
+				color: 'from-teal-500 to-cyan-600',
+				description: 'Identify the categorization of prematurity, compromised systems, and necessary nursing interventions.',
+				steps: [
+					{ id: 'm7-def', title: 'Preterm Categorization and Compromised Systems', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">Preterm: Born Before 37 Weeks</p>
+						<p>Any infant born before completion of 37 weeks of gestation is considered preterm (premature). Prematurity compromises every body system.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Levels of Prematurity:</h4>
+						<table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
+							<thead class="bg-teal-50">
+								<tr>
+									<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+									<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weeks of Gestation</th>
+								</tr>
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-200">
+								<tr><td><strong>Late Preterm</strong></td><td>34.0 to 36.6 weeks</td></tr>
+								<tr><td><strong>Early Term</strong></td><td>37.0 to 38.6 weeks</td></tr>
+								<tr><td><strong>Full Term</strong></td><td>39.0 to 40.6 weeks</td></tr>
+								<tr><td><strong>Late Term</strong></td><td>41.0 to 41.6 weeks</td></tr>
+								<tr><td><strong>Postterm (Postmature)</strong></td><td>> 42 weeks of gestation</td></tr>
+							</tbody>
+						</table>
+						<h4 class="text-lg font-bold mt-4 mb-2">Impacted Systems (Factors Contributing to Risk):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Respiratory:</strong> Deficient surfactant and decreased number of functional alveoli.</li>
+							<li><strong>Thermoregulation:</strong> Minimal subcutaneous fat and limited brown fat stores.</li>
+							<li><strong>Nutrition/Feeding:</strong> Weak or absent suck, swallow, and gag reflexes.</li>
+							<li><strong>Renal:</strong> Inability to maintain acid-base, fluid, and electrolyte balance.</li>
+						</ul>
+					`},
+					{ id: 'm7-care', title: 'Nursing Care and Positioning', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">NICU Care Priorities</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Nursing Care Interventions:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Thermoregulation:</strong> Maintain warmth (incubator/warmer).</li>
+							<li><strong>Respiratory Support:</strong> Oxygen and ventilation, suctioning as needed, administering **surfactants**.</li>
+							<li><strong>Infection Control:</strong> Strict hand hygiene (impaired immune function).</li>
+							<li><strong>Fluid/Electrolytes:</strong> Maintain fluid and electrolyte balance (immature renal function).</li>
+							<li><strong>Pain Management:</strong> Interventions like **swaddling, pacifiers (non-nutritive sucking)**, and medications.</li>
+							<li><strong>Bonding:</strong> Facilitate parent-infant bond (encourage parents to 'see' the infant, not just the monitors).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Positioning:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>Premature infants benefit from **SIDE-LYING** and **PRONE** positioning in the NICU (to conserve energy and promote lung function).</li>
+							<li>**CRITICAL NOTE:** Prone positioning is only used in controlled NICU settings; it is <strong>STRICTLY CONTRAINDICATED</strong> for home use (SIDS risk).</li>
+						</ul>
+					`},
+					{ id: 'm7-rds-nec', title: 'High-Risk Conditions: RDS & NEC', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">Life-Threatening Complications of Prematurity</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Respiratory Distress Syndrome (RDS):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Cause:</strong> Insufficient production of **surfactant**.</li>
+							<li><strong>S/S:</strong> **Tachypnea ($\geq$60 breaths/min)**, Dyspnea, **Retractions**, Flaring of the external nares, **Grunting**, Cyanosis.</li>
+							<li><strong>Rx:</strong> Breathing support, administration of **surfactants** via endotracheal tube.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Necrotizing Enterocolitis (NEC):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Cause:</strong> Acute inflammatory condition of the intestinal tract that may lead to **necrosis** (tissue death). Cause is unknown, but linked to gut ischemia and feeding in the preterm infant.</li>
+							<li><strong>Clinical Signs:</strong> **Feeding Intolerance**, **Abdominal Distention** and tenderness, Decreased bowel sounds, **Bloody stools**.</li>
+							<li><strong>Rx:</strong> Relieve gas with NG tube (decompression), **NPO** (rest the gut!), Antibiotics, Supportive care, potential surgery.</li>
+						</ul>
+					`},
+					{ id: 'm7-quiz', title: 'Module 7 Quiz', type: 'quiz',
+						questions: [
+							{ question: "An infant born at 36 weeks gestation is classified as:", options: ["Early Term", "Full Term", "Late Preterm", "Postterm"], correctAnswer: "Late Preterm" },
+							{ question: "Which symptom is a classic sign of Respiratory Distress Syndrome (RDS) in a newborn?", options: ["Bradypnea", "Grunting", "Bounding Pulse", "Hypothermia"], correctAnswer: "Grunting" },
+							{ question: "The nursing care intervention for a newborn suspected of Necrotizing Enterocolitis (NEC) is to:", options: ["Increase oral feeds immediately.", "Begin broad-spectrum antibiotics and make the patient NPO.", "Administer an exchange transfusion.", "Place the infant prone in the crib."], correctAnswer: "Begin broad-spectrum antibiotics and make the patient NPO." }
+						]
+					}
+				]
+			}
+		};
+
+		// The pre-assessment quiz data is compiled from the first 3 quiz questions of each module.
+		const preAssessmentQuizData = [
+			// Module 1 Questions
+			{ moduleId: 'module-1-transition', question: "What is the primary function of surfactant in the newborn lung?", options: ["To promote chest wall compression.", "To increase oxygen saturation in the blood.", "To decrease surface tension and prevent alveolar collapse.", "To dilate the ductus arteriosus."], correctAnswer: "To decrease surface tension and prevent alveolar collapse." },
+			{ moduleId: 'module-1-transition', question: "Which fetal shunt is the opening between the right and left atrium that functionally closes 1-2 hours after birth?", options: ["Ductus Venosus", "Ductus Arteriosus", "Aortic Valve", "Foramen Ovale"], correctAnswer: "Foramen Ovale" },
+			{ moduleId: 'module-1-transition', question: "What chemical factor stimulates the newborn’s first breath?", options: ["High glucose levels", "Increased Estrogen", "Hypoxia and hypercapnia", "Release of Prolactin"], correctAnswer: "Hypoxia and hypercapnia" },
+
+			// Module 2 Questions
+			{ moduleId: 'module-2-thermoregulation', question: "Heat loss caused by placing a newborn directly on a cool scale is due to which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Conduction" },
+			{ moduleId: 'module-2-thermoregulation', question: "Why is a baby with Cold Stress at risk for Hypoglycemia?", options: ["Decreased insulin production", "Rapid depletion of glucose stores due to increased metabolic rate", "Lack of fluid intake", "Inability to produce adrenaline"], correctAnswer: "Rapid depletion of glucose stores due to increased metabolic rate" },
+			{ moduleId: 'module-2-thermoregulation', question: "The nursing action of drying the infant immediately after birth primarily prevents heat loss through which mechanism?", options: ["Evaporation", "Conduction", "Convection", "Radiation"], correctAnswer: "Evaporation" },
+
+			// Module 3 Questions
+			{ moduleId: 'module-3-other-systems', question: "What is the name of the newborn's first stool, typically thick, tarry, and dark green/black?", options: ["Transitional stool", "Meconium", "Milk stool", "Lochia"], correctAnswer: "Meconium" },
+			{ moduleId: 'module-3-other-systems', question: "What is the primary reason Vitamin K is administered at birth?", options: ["To prevent jaundice", "To accelerate clotting and prevent hemorrhagic disease", "To boost the immune system", "To aid respiratory function"], correctAnswer: "To accelerate clotting and prevent hemorrhagic disease" },
+			{ moduleId: 'module-3-other-systems', question: "What is the normal percentage of weight loss considered acceptable for a healthy newborn in the first few days of life?", options: ["<2%", "5% to 10%", "10% to 15%", ">15%"], correctAnswer: "5% to 10%" },
+
+			// Module 4 Questions
+			{ moduleId: 'module-4-assessment-care', question: "The five components assessed in the APGAR score are Appearance, Pulse, Grimace, Activity, and what other component?", options: ["Blood Pressure", "Temperature", "Respiratory Effort", "Gag Reflex"], correctAnswer: "Respiratory Effort" },
+			{ moduleId: 'module-4-assessment-care', question: "The nurse’s first action immediately following a newborn’s birth is to:", options: ["Weigh the infant", "Apply a hat", "Dry the infant", "Give Vitamin K"], correctAnswer: "Dry the infant" },
+			{ moduleId: 'module-4-assessment-care', question: "If a newborn's 5-minute APGAR score is 6, what is the required nursing action?", options: ["Initiate full resuscitation immediately.", "Notify the physician.", "Continue Apgar scoring every 5 minutes.", "Place the baby in the nursery."], correctAnswer: "Continue Apgar scoring every 5 minutes." },
+
+			// Module 5 Questions
+			{ moduleId: 'module-5-prophylaxis-safety', question: "What is the required normal result for a CCHD screening (oxygen saturation in the right hand and foot)?", options: ["Saturation <90% in both.", "Saturation >95% in both with <3% difference.", "Saturation >95% in both with >3% difference.", "Saturation must be 100% in both."], correctAnswer: "Saturation >95% in both with <3% difference." },
+			{ moduleId: 'module-5-prophylaxis-safety', question: "Eye prophylaxis is given to the newborn to prevent which condition?", options: ["SIDS", "Hypoglycemia", "Ophthalmia Neonatorum", "Jaundice"], correctAnswer: "Ophthalmia Neonatorum" },
+			{ moduleId: 'module-5-prophylaxis-safety', question: "What is the recommended sleep position for a healthy newborn to prevent SIDS?", options: ["Prone", "Side-lying", "Semi-Fowler's", "Supine"], correctAnswer: "Supine" },
+
+			// Module 6 Questions
+			{ moduleId: 'module-6-metabolic-risk', question: "A mother with diabetes gives birth. The newborn's primary risk for hypoglycemia is due to:", options: ["Slow metabolism", "Rebound hyperinsulinemia", "Lack of brown fat", "Immature kidneys"], correctAnswer: "Rebound hyperinsulinemia" },
+			{ moduleId: 'module-6-metabolic-risk', question: "Which intervention is used to promote bilirubin excretion in a jaundiced newborn?", options: ["Restricting feeds", "Promoting feeding", "Applying ice packs", "Limiting urination"], correctAnswer: "Promoting feeding" },
+			{ moduleId: 'module-6-metabolic-risk', question: "What is the primary manifestation of hypoglycemia in a newborn?", options: ["Projectile vomiting", "Jitteriness/tremors", "Fever", "Bounding pulse"], correctAnswer: "Jitteriness/tremors" },
+
+			// Module 7 Questions
+			{ moduleId: 'module-7-prematurity', question: "An infant born at 36 weeks gestation is classified as:", options: ["Early Term", "Full Term", "Late Preterm", "Postterm"], correctAnswer: "Late Preterm" },
+			{ moduleId: 'module-7-prematurity', question: "Which symptom is a classic sign of Respiratory Distress Syndrome (RDS) in a newborn?", options: ["Bradypnea", "Grunting", "Bounding Pulse", "Hypothermia"], correctAnswer: "Grunting" },
+			{ moduleId: 'module-7-prematurity', question: "The nursing care intervention for a newborn suspected of Necrotizing Enterocolitis (NEC) is to:", options: ["Increase oral feeds immediately.", "Begin broad-spectrum antibiotics and make the patient NPO.", "Administer an exchange transfusion.", "Place the infant prone in the crib."], correctAnswer: "Begin broad-spectrum antibiotics and make the patient NPO." }
+		];
+
+		// --- Helper Functions ---
+		const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+		// --- Child Components ---
+
+		/**
+		 * Quiz component for interactive multiple-choice questions.
+		 */
+		const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+			const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+			const [selectedOption, setSelectedOption] = useState([]);
+			const [feedback, setFeedback] = useState(null);
+			const [answers, setAnswers] = useState([]);
+
+			const currentQuestion = questions[currentQuestionIndex];
+
+			// Determine if the current question is multi-select (SATA)
+			const isMultiSelect = Array.isArray(currentQuestion.correctAnswer) && currentQuestion.correctAnswer.length > 1;
+
+			const handleOptionSelect = (option) => {
+				if (feedback && !isPreAssessment) return;
+
+				if (isMultiSelect) {
+					setSelectedOption(prevSelected => {
+						if (prevSelected.includes(option)) {
+							return prevSelected.filter(item => item !== option);
+						} else {
+							return [...prevSelected, option];
+						}
+					});
+				} else {
+					// Single select logic
+					setSelectedOption([option]); // Always store as array internally for consistent checking
+				}
+			};
+
+			const checkCorrectness = (options, correctAnswers) => {
+				if (Array.isArray(correctAnswers)) {
+					// Multi-select (SATA) check: Must contain ALL correct answers and ONLY those correct answers.
+					const correctCount = correctAnswers.filter(ans => options.includes(ans)).length;
+					return correctCount === correctAnswers.length && options.length === correctAnswers.length;
+				} else {
+					// Single select check
+					return options[0] === correctAnswers;
+				}
+			};
+
+			const handlePreAssessmentNext = () => {
+				if (selectedOption.length === 0) return;
+
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+
+				const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+				setAnswers(updatedAnswers);
+
+				if (currentQuestionIndex < questions.length - 1) {
+					setCurrentQuestionIndex(currentQuestionIndex + 1);
+					setSelectedOption([]);
+					setFeedback(null);
+				} else {
+					onComplete(updatedAnswers);
+				}
+			};
+
+			const handleRegularQuizSubmit = () => {
+				if (selectedOption.length === 0) return;
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+				setFeedback(isCorrect ? 'correct' : 'incorrect');
+			};
+
+			const handleRegularQuizNext = () => {
+				if (!feedback) return; // Cannot proceed without submitting first
+
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+				const finalAnswers = [...answers, { question: currentQuestion, isCorrect, score: isCorrect ? 1 : 0 }];
+				
+				if (currentQuestionIndex < questions.length - 1) {
+					setAnswers(finalAnswers);
+					setCurrentQuestionIndex(currentQuestionIndex + 1);
+					setSelectedOption([]);
+					setFeedback(null);
+				} else {
+					const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.score || 0), 0);
+					onComplete({ score: finalScore, total: questions.length });
+				}
+			};
+
+			const selectedAnswerText = isMultiSelect ? selectedOption : selectedOption[0];
+			
+			return (
+				<div className="p-4 bg-white rounded-xl shadow-lg border border-gray-200 animate-fade-in">
+					<h4 className="font-extrabold text-2xl text-gray-800 mb-4 flex justify-between items-center">
+						<span>{isPreAssessment ? 'Diagnostic Question' : 'Module Quiz'}</span>
+						<span className="text-lg font-semibold text-indigo-600">{currentQuestionIndex + 1} of {questions.length}</span>
+					</h4>
+					
+					{isMultiSelect && <p className="text-sm font-bold text-red-500 mb-2">**SELECT ALL THAT APPLY (SATA)**</p>}
+					
+					<p className="font-semibold text-gray-700 mb-4 text-lg">{currentQuestion.question}</p>
+					<div className="space-y-3">
+						{currentQuestion.options.map((option, index) => {
+							const isSelected = selectedOption.includes(option);
+							const isCorrectOption = Array.isArray(currentQuestion.correctAnswer)
+								? currentQuestion.correctAnswer.includes(option)
+								: option === currentQuestion.correctAnswer;
+							
+							let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-300';
+
+							if (feedback && !isPreAssessment) {
+								if (isCorrectOption) {
+									optionClass = 'bg-green-100 border-green-500 text-green-800 font-medium';
+								} else if (isSelected && !isCorrectOption) {
+									optionClass = 'bg-red-100 border-red-500 text-red-800 font-medium';
+								}
+							} else if (isSelected) {
+								optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800 font-medium shadow-inner';
+							}
+
+							return (
+								<div
+									key={index}
+									onClick={() => handleOptionSelect(option)}
+									className={cn('p-3 rounded-xl border-2 cursor-pointer transition-all duration-150 flex items-center', optionClass)}
+								>
+									<span className="flex-1">{option}</span>
+									{feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+										isCorrectOption ? <span className="text-green-600 ml-2">✓</span> : <span className="text-red-600 ml-2">✗</span>
+									)}
+								</div>
+							);
+						})}
+					</div>
+					<div className="mt-6 text-center">
+						{isPreAssessment ? (
+							<button
+								onClick={handlePreAssessmentNext}
+								disabled={selectedOption.length === 0}
+								className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+							>
+								{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+							</button>
+						) : (
+							<>
+								{!feedback ? (
+									<button
+										onClick={handleRegularQuizSubmit}
+										disabled={selectedOption.length === 0}
+										className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+									>
+										Submit Answer
+									</button>
+								) : (
+									<button
+										onClick={handleRegularQuizNext}
+										className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+									>
+										{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'View Score'}
+									</button>
+								)}
+							</>
+						)}
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * PreAssessmentQuiz component to handle the initial diagnostic quiz.
+		 */
+		const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+			const [results, setResults] = useState(null);
+
+			const handleQuizComplete = (finalAnswers) => {
+				const moduleResults = {};
+				finalAnswers.forEach(answer => {
+					const { moduleId } = answer.question;
+					if (!moduleResults[moduleId]) {
+						moduleResults[moduleId] = { correct: 0, total: 0 };
+					}
+					if (answer.isCorrect) {
+						moduleResults[moduleId].correct++;
+					}
+					moduleResults[moduleId].total++;
+				});
+
+				const completedModules = [];
+				for (const moduleId in moduleResults) {
+					// Test-out criteria: 100% correct in that module's diagnostic questions.
+					if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+						completedModules.push(moduleId);
+					}
+				}
+				setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+				onComplete(completedModules);
+			};
+
+			if (results) {
+				return (
+					<div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
+						<div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
+							<h2 className="text-3xl font-extrabold text-gray-800 mb-4">Diagnostic Complete!</h2>
+							<p className="text-lg text-gray-600 mb-6">
+								You correctly answered {results.correct} out of {results.total} questions.
+							</p>
+							{results.completedModules.length > 0 ? (
+								<>
+									<p className="text-green-600 font-bold text-xl mb-4">You've successfully tested out of:</p>
+									<ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-xl shadow-inner border border-green-200">
+										{results.completedModules.map(id => <li key={id} className="font-semibold">{contentData[id].title}</li>)}
+									</ul>
+									<p className="text-gray-700 text-sm italic mb-6">Your progress for these modules has been marked as complete.</p>
+								</>
+							) : (
+								<p className="text-yellow-600 font-bold text-xl mb-6 bg-yellow-50 p-4 rounded-xl shadow-inner border border-yellow-200">
+									Keep going! Use the learning modules to review the content.
+								</p>
+							)}
+							<button
+								onClick={onExit}
+								className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+							>
+								Return to Dashboard
+							</button>
+						</div>
+					</div>
+				);
+			}
+
+			return (
+				<div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
+					<div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl w-full">
+						<h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Diagnostic Quiz (Pre-Assessment)</h2>
+						<Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+					</div>
+				</div>
+			);
+		};
+
+
+		/**
+		 * Dashboard component to display the available learning modules.
+		 */
+		const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+			let totalCompletedSteps = 0;
+			let totalPossibleSteps = 0;
+			let totalQuizCorrect = 0;
+			let totalQuizQuestions = 0;
+
+			// Calculate overall progress and gather quiz scores
+			Object.entries(contentData).forEach(([moduleId, module]) => {
+				totalPossibleSteps += module.steps.length;
+				const moduleProgress = progress[moduleId] || {};
+				
+				Object.values(moduleProgress).forEach(stepProgress => {
+					if (stepProgress.completed) {
+						totalCompletedSteps++;
+					}
+					if (stepProgress.score !== undefined) {
+						totalQuizCorrect += stepProgress.score;
+					}
+				});
+
+				module.steps.forEach(step => {
+					if (step.type === 'quiz' || step.type === 'case_study') {
+						totalQuizQuestions += (step.type === 'quiz' ? step.questions.length : 1);
+					}
+				});
+			});
+
+			const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+			return (
+				<div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+					<div className="w-full">
+						<header className="mb-8 text-center">
+							<div className="flex items-center justify-center gap-3 mb-2">
+								<span className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-lg">NB</span>
+								<h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Newborn Adaptations Master Module</h1>
+								<span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:2.0</span>
+							</div>
+							<p className="text-lg text-gray-500 max-w-2xl mx-auto">Master the critical physiological transition, assessment, safety, and high-risk care of the neonate.</p>
+						</header>
+
+						{/* Skip Ahead Button */}
+						<div className="mb-8 text-center">
+							<button
+								onClick={onStartPreAssessment}
+								className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-xl shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+							>
+								<div className="text-xl font-extrabold">Skip Ahead: Take Diagnostic Quiz</div>
+								<div className="text-sm font-medium">Test your knowledge and potentially skip modules. (21 Questions)</div>
+							</button>
+						</div>
+
+						{/* Overall Progress Bar & Reset Button */}
+						<div className="mb-12 bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-auto">
+						   <div className="flex justify-between items-center mb-3">
+							  <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+							  <button 
+									onClick={onResetProgress}
+									className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2 transform hover:scale-105"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
+									Reset Progress
+							  </button>
+						   </div>
+						   <div className="w-full bg-gray-200 rounded-full h-4">
+							   <div
+								  className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+								  style={{ width: `${overallPercentage}%` }}
+							   ></div>
+						   </div>
+						   <div className="flex justify-between items-center">
+							  <p className="text-left text-sm text-gray-600 mt-2">
+								  {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+							  </p>
+							  <p className="text-right text-sm text-gray-600 mt-2 font-bold">{Math.round(overallPercentage)}% Completed</p>
+						   </div>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+							{/* Iterate over all modules defined in contentData */}
+							{Object.entries(contentData).map(([id, module]) => {
+								const moduleProgress = progress[id] || {};
+								// Calculate completion count for steps within the module.
+								const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+								const totalSteps = module.steps.length;
+								const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+								let statusText = "Not Started";
+								let statusColor = "text-gray-500";
+								if (completedCount === totalSteps) {
+									statusText = "COMPLETED";
+									statusColor = "text-green-600 font-extrabold";
+								} else if (completedCount > 0) {
+									statusText = "In Progress";
+									statusColor = "text-yellow-600 font-bold";
+								}
+
+								return (
+									<div
+										key={id}
+										onClick={() => onSelectModule(id)}
+										className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group flex flex-col transform animate-fade-in"
+									>
+										<div className="flex justify-between items-start mb-4">
+											{/* Module Icon/Title Tag */}
+											<div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-12 h-12 flex items-center justify-center text-white text-lg font-extrabold shadow-lg flex-shrink-0")}>
+												{module.title.split(':')[0].replace('Module ', 'M')}
+											</div>
+											{/* Progress Circle */}
+											<div className="relative w-12 h-12 flex-shrink-0">
+												<svg className="w-full h-full" viewBox="0 0 36 36">
+													{/* Background circle for the progress bar. */}
+													<path
+														className="text-gray-200"
+														d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="3"
+													/>
+													{/* Foreground arc representing the completion percentage. */}
+													<path
+														className="text-indigo-500 transition-all duration-700"
+														d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="3"
+														strokeDasharray={`${percentage}, 100`}
+														strokeLinecap="round"
+														transform="rotate(-90 18 18)"
+													/>
+												</svg>
+												<span className={cn("absolute inset-0 flex items-center justify-center text-xs font-extrabold", percentage === 100 ? 'text-green-600' : 'text-gray-600')}>
+													{Math.round(percentage)}%
+												</span>
+											</div>
+										</div>
+										<h3 className="text-xl font-extrabold text-gray-800 mb-2">{module.title.split(': ')[1]}</h3>
+										<p className="text-gray-500 text-sm mb-4 h-10">{module.description}</p>
+										<div className="mt-auto pt-2 border-t border-gray-100">
+											<p className={cn("text-sm", statusColor)}>{statusText}</p>
+											<div className="flex items-center justify-between text-sm font-bold text-indigo-600 group-hover:text-indigo-700 mt-2">
+												{percentage === 100 ? 'Review Module' : 'Start Learning'} 
+												<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+													<path fillRule="evenodd" d="M12.97 4.97a.75.75 0 011.06 0l4.5 4.5a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 11-1.06-1.06l3.22-3.22H4a.75.75 0 010-1.5h12.19l-3.22-3.22a.75.75 0 010-1.06z" clipRule="evenodd" />
+												</svg>
+											</div>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * CaseStudy component for a multiple-choice case study challenge.
+		 */
+		const CaseStudy = ({ caseData, onComplete }) => {
+			const [selectedAnswers, setSelectedAnswers] = useState([]);
+			const [showFeedback, setShowFeedback] = useState(false);
+			
+			const isMultiSelect = Array.isArray(caseData.correctAnswer) && caseData.correctAnswer.length > 1;
+
+			const handleSelect = (option) => {
+				if (showFeedback) return;
+
+				if (isMultiSelect) {
+					setSelectedAnswers(prevSelected => {
+						if (prevSelected.includes(option)) {
+							return prevSelected.filter(item => item !== option);
+						} else {
+							return [...prevSelected, option];
+						}
+					});
+				} else {
+					// Single select logic
+					setSelectedAnswers([option]);
+				}
+			};
+
+			const checkCorrectness = (options, correctAnswers) => {
+				if (Array.isArray(correctAnswers)) {
+					const correctCount = correctAnswers.filter(ans => options.includes(ans)).length;
+					return correctCount === correctAnswers.length && options.length === correctAnswers.length;
+				} else {
+					return options[0] === correctAnswers;
+				}
+			};
+
+			const handleSubmit = () => {
+				setShowFeedback(true);
+				const isCorrect = checkCorrectness(selectedAnswers, caseData.correctAnswer);
+				
+				if (isCorrect) {
+					onComplete({ score: 1, total: 1 });
+				} else {
+					onComplete({ score: 0, total: 1 });
+				}
+			};
+
+			return (
+				<div className="p-6 bg-white rounded-xl shadow-lg border border-red-200 animate-fade-in">
+					<h4 className="font-extrabold text-2xl text-red-700 mb-4 flex items-center">
+						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+							<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 001 1h3a1 1 0 100-2h-2V6z" clipRule="evenodd" />
+						</svg>
+						Clinical Case Challenge
+					</h4>
+					{isMultiSelect && <p className="text-sm font-bold text-red-500 mb-2">**SELECT ALL THAT APPLY (SATA)**</p>}
+					<div className="mb-4 p-4 bg-gray-50 rounded-lg border-l-4 border-indigo-400">
+						<h5 className="font-bold text-indigo-700 mb-1">Scenario:</h5>
+						<p className="text-gray-700 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+					</div>
+					
+					<p className="font-bold text-gray-800 mb-3 text-lg">{caseData.question}</p>
+					
+					<div className="space-y-3">
+						{caseData.options.map(option => {
+							const isSelected = selectedAnswers.includes(option);
+							const isCorrectOption = Array.isArray(caseData.correctAnswer)
+								? caseData.correctAnswer.includes(option)
+								: option === caseData.correctAnswer;
+							
+							let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-300';
+							if (showFeedback) {
+								if (isCorrectOption) {
+									optionClass = 'bg-green-100 border-green-500 text-green-800 font-medium shadow-md';
+								} else if (isSelected && !isCorrectOption) {
+									optionClass = 'bg-red-100 border-red-500 text-red-800 font-medium shadow-md';
+								}
+							} else if (isSelected) {
+								optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800 font-medium shadow-inner';
+							}
+
+							return (
+								<div
+									key={option}
+									onClick={() => handleSelect(option)}
+									className={cn('p-3 rounded-xl border-2 cursor-pointer transition-colors flex items-center', optionClass)}
+								>
+									<span className="flex-1">{option}</span>
+									{showFeedback && (
+										isCorrectOption ? <span className="text-green-600 ml-2">✓</span> : (isSelected && <span className="text-red-600 ml-2">✗</span>)
+									)}
+								</div>
+							);
+						})}
+					</div>
+					{!showFeedback && (
+						<div className="mt-6 text-center">
+							<button
+								onClick={handleSubmit}
+								disabled={selectedAnswers.length === 0}
+								className="px-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+							>
+								Submit Case Answer
+							</button>
+						</div>
+					)}
+					{showFeedback && (
+						<div className="mt-6 p-4 bg-yellow-50 rounded-xl border-l-4 border-yellow-500 shadow-inner">
+							<h5 className="font-bold text-yellow-800 text-lg mb-2">Detailed Rationale:</h5>
+							<div className="text-sm text-yellow-900 prose-sm" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></div>
+						</div>
+					)}
+				</div>
+			);
+		};
+
+		/**
+		 * StaticContentStep component for displaying basic text content.
+		 */
+		const StaticContentStep = ({ step, onComplete }) => {
+			// Mark as complete immediately upon rendering to enable progression.
+			useEffect(() => {
+				onComplete();
+			}, [step.id, onComplete]); // Depend on step.id to re-trigger on navigation
+
+			return (
+				<div className="prose max-w-none text-gray-700 leading-relaxed p-6 bg-white rounded-xl shadow-lg border border-gray-200 space-y-4 animate-fade-in">
+					<div dangerouslySetInnerHTML={{ __html: step.content }}></div>
+				</div>
+			);
+		};
+
+		/**
+		 * CompletionModal component displayed when a module is completed.
+		 */
+		const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+			if (!isOpen) return null;
+
+			return (
+				<div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+					<div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+						<h3 className="text-3xl font-extrabold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+						<p className="text-gray-700 text-lg mb-6">You've successfully completed all steps in this module. Great job!</p>
+						<div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+							<button
+								onClick={onClose}
+								className="px-6 py-3 bg-gray-300 text-gray-800 font-bold rounded-xl hover:bg-gray-400 transition-colors shadow-md"
+							>
+								Back to Dashboard
+							</button>
+							{hasNextModule && (
+								<button
+									onClick={onNextModule}
+									className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+								>
+									Continue to Next Module
+								</button>
+							)}
+						</div>
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * LearningModule component to manage steps within the selected module.
+		 */
+		const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+			const [activeStep, setActiveStep] = useState(0);
+			const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+			const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+			// Reset to step 0 when module changes
+			useEffect(() => {
+				setActiveStep(0);
+			}, [module.id]);
+
+			const handleStepComplete = useCallback((stepId, data = {}) => {
+				onProgressUpdate(module.id, stepId, { completed: true, ...data });
+			}, [onProgressUpdate, module.id]);
+
+			const moduleProgress = progress[module.id] || {};
+			
+			// Check if all essential steps (text, quiz, case_study) are completed
+			const allStepsCompletedInModule = module.steps.every(step =>
+				moduleProgress[step.id] && moduleProgress[step.id].completed
+			);
+
+			// Navigates to the next step, if available.
+			const handleNextStep = () => {
+				if (activeStep === module.steps.length - 1) {
+					// If it's the last step and all steps in the module are completed, open the modal
+					if (allStepsCompletedInModule) {
+						setIsCompletionModalOpen(true);
+					}
+				} else if (activeStep < module.steps.length - 1) {
+					// Otherwise, proceed to the next step
+					setActiveStep(activeStep + 1);
+				}
+			};
+
+			// Navigates to the previous step, if available.
+			const handlePrevStep = () => {
+				if (activeStep > 0) {
+					setActiveStep(activeStep - 1);
+				}
+			};
+			
+			if (!module || !module.steps) {
+				return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Error loading module.</div>;
+			}
+
+			const currentStep = module.steps[activeStep];
+			
+			const renderStepContent = (step) => {
+				if (!step) return <p>Please select a step.</p>;
+
+				const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+				switch (step.type) {
+					case 'text':
+						return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+					case 'case_study':
+						return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+					case 'quiz':
+						return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+					default:
+						return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+				}
+			};
+
+			const handleModalClose = () => {
+				setIsCompletionModalOpen(false);
+				onBack(); // Go back to dashboard when modal is closed
+			};
+
+			const handleModalNextModule = () => {
+				setIsCompletionModalOpen(false);
+				onNextModule(); // Proceed to next module
+			};
+
+
+			return (
+				<div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+					{/* Header */}
+					<header className="bg-white shadow-lg p-4 flex items-center justify-between z-30 flex-shrink-0">
+						<button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2 transform hover:scale-105">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+							<span className="hidden sm:inline">Dashboard</span>
+						</button>
+						<h2 className="text-xl font-extrabold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+						
+						{/* Mobile sidebar toggle button */}
+						<button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+						</button>
+					</header>
+					
+					{isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+					<div className="flex flex-1 overflow-hidden">
+						{/* Sidebar for navigation steps within the module. */}
+						<aside className={cn(
+							"bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+							isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+						)}>
+							<h3 className="text-lg font-extrabold mb-4 text-indigo-700 px-3 border-b border-gray-100 pb-2">Module Steps ({activeStep + 1} / {module.steps.length})</h3>
+							<nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+								{module.steps.map((step, index) => (
+									<button
+										key={step.id}
+										onClick={() => {
+											setActiveStep(index);
+											setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
+										}}
+										className={cn(
+											'w-full text-left p-3 rounded-xl flex items-center gap-3 transition-colors shadow-sm',
+											activeStep === index ? 'bg-indigo-100 text-indigo-700 font-bold border-indigo-400 border' : 'hover:bg-gray-100 text-gray-700'
+										)}
+									>
+										{/* Step completion indicator */}
+										<div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+											{moduleProgress[step.id]?.completed ? (
+												<svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+											) : (
+												<div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+											)}
+										</div>
+										<span className="flex-1 text-sm">{step.title}</span>
+									</button>
+								))}
+							</nav>
+						</aside>
+
+						{/* Main content area for the current step. */}
+						<main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+							<div className="max-w-5xl mx-auto">
+								<h3 className="text-2xl font-extrabold text-gray-800 mb-4">{currentStep.title}</h3>
+								{renderStepContent(currentStep)}
+
+								{/* Navigation buttons for moving between steps. */}
+								<div className="flex justify-between mt-8">
+									<button
+										onClick={handlePrevStep}
+										disabled={activeStep === 0}
+										className="px-6 py-3 bg-gray-300 text-gray-800 font-bold rounded-xl hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md transform hover:scale-105 disabled:hover:scale-100"
+									>
+										<span className="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10.707 3.293a1 1 0 010 1.414L7.414 8l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>Previous</span>
+									</button>
+
+									<button
+										onClick={handleNextStep}
+										disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+										className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105 disabled:hover:scale-100"
+									>
+										{activeStep === module.steps.length - 1 ? (allStepsCompletedInModule ? 'Finish Module' : 'Complete All Steps') : <span className="flex items-center">Next <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.293 3.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 8 9.293 4.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg></span>}
+									</button>
+								</div>
+							</div>
+						</main>
+					</div>
+					<CompletionModal
+						isOpen={isCompletionModalOpen}
+						onClose={handleModalClose}
+						onNextModule={handleModalNextModule}
+						hasNextModule={hasNextModule}
+					/>
+				</div>
+			);
+		};
+
+		// --- Main App Component ---
+		function App() {
+			const [currentModuleId, setCurrentModuleId] = useState(null);
+			const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+			const [userId, setUserId] = useState(null);
+			const [progress, setProgress] = useState({});
+			const [isAuthReady, setIsAuthReady] = useState(false);
+
+			// 1. Auth Setup (Local Storage)
+			useEffect(() => {
+				const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+					if (user) setUserId(user.uid);
+					setIsAuthReady(true);
+				});
+				return () => unsubscribe();
+			}, []);
+
+			// 2. Load Progress from Local Storage
+			useEffect(() => {
+				if (!isAuthReady || !userId) return;
+				const storedProgress = localStorage.getItem(`newborn-module-progress-${userId}`);
+				if (storedProgress) {
+					try {
+						setProgress(JSON.parse(storedProgress));
+					} catch (e) {
+						console.error("Failed to parse stored progress, resetting.", e);
+						setProgress({});
+					}
+				}
+			}, [isAuthReady, userId]);
+
+			// 3. Progress Update Handler (Persist to Local Storage)
+			const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+				if (!isAuthReady || !userId) return;
+
+				setProgress(currentProgress => {
+					const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+					const newStepProgress = { ...currentStepProgress, ...data };
+
+					// Avoid unnecessary updates if data hasn't changed.
+					if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+						return currentProgress;
+					}
+
+					const newProgress = {
+						...currentProgress,
+						[moduleId]: {
+							...(currentProgress[moduleId] || {}),
+							[stepId]: newStepProgress
+						}
+					};
+
+					localStorage.setItem(`newborn-module-progress-${userId}`, JSON.stringify(newProgress));
+					return newProgress;
+				});
+			}, [isAuthReady, userId]);
+
+			const handlePreAssessmentComplete = (completedModuleIds) => {
+				const newProgress = { ...progress };
+				completedModuleIds.forEach(moduleId => {
+					const module = contentData[moduleId];
+					if (module) {
+						newProgress[moduleId] = {};
+						module.steps.forEach(step => {
+							// Mark all steps in the module as complete
+							newProgress[moduleId][step.id] = { completed: true };
+						});
+					}
+				});
+				setProgress(newProgress);
+				localStorage.setItem(`newborn-module-progress-${userId}`, JSON.stringify(newProgress));
+			};
+			
+			const handleResetProgress = useCallback(() => {
+				if (!isAuthReady || !userId) return;
+				setProgress({});
+				localStorage.removeItem(`newborn-module-progress-${userId}`);
+				setCurrentModuleId(null);
+			}, [isAuthReady, userId]);
+
+			const handleNextModule = useCallback(() => {
+				const moduleIds = Object.keys(contentData);
+				const currentIndex = moduleIds.indexOf(currentModuleId);
+				if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+					setCurrentModuleId(moduleIds[currentIndex + 1]);
+				} else {
+					setCurrentModuleId(null);
+				}
+			}, [currentModuleId]);
+
+			const selectedModule = currentModuleId && contentData[currentModuleId]
+														? { ...contentData[currentModuleId], id: currentModuleId }
+														: null;
+
+			const moduleIds = Object.keys(contentData);
+			const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+			const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+
+			if (!isAuthReady) {
+				return (
+					<div className="min-h-screen flex items-center justify-center bg-gray-100">
+						<div className="loader"></div>
+						<p className="text-gray-500 ml-4">Authenticating user...</p>
+					</div>
+				);
+			}
+
+			return (
+				<div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+					{isPreAssessmentActive ? (
+						<PreAssessmentQuiz 
+							onComplete={handlePreAssessmentComplete} 
+							onExit={() => setIsPreAssessmentActive(false)}
+						/>
+					) : selectedModule ? (
+						<LearningModule
+							key={selectedModule.id}
+							module={selectedModule}
+							onBack={() => setCurrentModuleId(null)}
+							progress={progress}
+							onProgressUpdate={handleProgressUpdate}
+							onNextModule={handleNextModule}
+							hasNextModule={hasNextModule}
+						/>
+					) : (
+						<Dashboard 
+							onSelectModule={setCurrentModuleId} 
+							progress={progress} 
+							onResetProgress={handleResetProgress}
+							onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+						/>
+					)}
+				</div>
+			);
+		}
+
+		// --- Render the App into the DOM ---
+		const container = document.getElementById('root');
+		const root = ReactDOM.createRoot(container);
+		root.render(<App />);
+	</script>
+</body>
+</html>
