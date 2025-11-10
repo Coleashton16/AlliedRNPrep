@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Intracranial Regulation Master Module</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		// Tailwind CSS configuration to use the Inter font and define custom animations.
+		tailwind.config = {
+			theme: {
+				extend: {
+					fontFamily: {
+						sans: ['Inter', 'sans-serif'],
+					},
+					keyframes: {
+						'fade-in': {
+							'0%': { opacity: '0', transform: 'scale(0.95)' },
+							'100%': { opacity: '1', transform: 'scale(1)' },
+						},
+					},
+					animation: {
+						'fade-in': 'fade-in 0.3s ease-out forwards',
+					},
+				},
+			},
+		};
+	</script>
+
+	<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+	<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+	<div id="root"></div>
+
+	<script type="text/babel">
+		// --- React and Library Setup ---
+		const { useState, useEffect, useCallback, useMemo } = React;
+
+		// --- Mock Authentication Setup for Standalone Demo ---
+		const mockAuth = {
+			onAuthStateChanged: (callback) => {
+				setTimeout(() => callback({ uid: 'standalone-icr-user' }), 100);
+				return () => {}; 
+			},
+			signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-icr-user' } }),
+		};
+
+		// --- Content & Data Structure for the Learning Modules (Intracranial Regulation) ---
+		const contentData = {
+			'module-1-icr-basics': {
+				title: 'Module 1: ICR Definition & Scope',
+				color: 'from-blue-700 to-sky-500',
+				description: 'Define Intracranial Regulation (ICR), its components, and the spectrum of function from normal to impaired.',
+				steps: [
+					{ id: 'm1-def', title: 'Concept Definition and Components', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">ICR - The Brain's Homeostasis</p>
+						<p><strong>Intracranial Regulation (ICR)</strong> is defined as the mechanisms or conditions that impact intracranial processing and function. Think of it as keeping the brain's internal environment perfect.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">ICR Components (The 3 Contents of the Skull):</h4>
+						<p>The skull is a fixed, non-expanding box. It contains three main components:</p>
+						<ol class="list-decimal list-inside ml-4">
+							<li><strong>Brain Tissue (80%):</strong> The neurons and glia.</li>
+							<li><strong>Cerebrospinal Fluid (CSF) (10%):</strong> Bathes and protects the brain and spinal cord.</li>
+							<li><strong>Circulatory System (Blood/Vascular) (10%):</strong> Supplies oxygen and nutrients.</li>
+						</ol>
+						<h4 class="text-lg font-bold mt-4 mb-2">Regulation: Compliance and Balance</h4>
+						<p>The term <strong>Regulation</strong> refers to compliance and maintenance of balance. In ICR, it means constantly working to maintain a balance to promote an environment that is conducive to optimal brain functioning.</p>
+					`},
+					{ id: 'm1-scope', title: 'Scope, Consequences, and Risk', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-blue-700">Scope and Variation (Normal to Impaired)</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Impairment Causes:</h4>
+						<p>Impairment can range from minimal to severe and permanent. It is caused by factors including:</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Reduced Blood Flow** (Ischemia) to the brain.</li>
+							<li>Compromised **Neurotransmission**.</li>
+							<li>Direct **Damage to Brain Tissue**.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Interrelated Concepts:</h4>
+						<p>ICR is closely linked to:</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Perfusion:** Adequate blood flow is essential.</li>
+							<li>**Cognition:** The result of optimal ICR.</li>
+							<li>**Mobility:** Neurological damage affects motor control.</li>
+							<li>**Development:** Brain function is linked to growth and milestones.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Populations at Risk:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**All populations** are at risk.</li>
+							<li>**Elderly:** Due to degenerative causes (e.g., stroke, Alzheimer's).</li>
+							<li>**Adolescents & Young Adults:** Due to **injuries** (e.g., TBI, sports accidents).</li>
+							<li>**Youngest & Oldest:** Due to **falls**.</li>
+						</ul>
+					`},
+					{ id: 'm1-quiz', title: 'Module 1 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Which term refers to the maintenance of balance in the intracranial environment?", options: ["Compliance", "Homeostasis", "Regulation", "Perfusion"], correctAnswer: "Regulation" },
+							{ question: "Which population is primarily at risk for ICR impairment due to degenerative causes?", options: ["Adolescents", "Toddlers", "Elderly", "Young adults"], correctAnswer: "Elderly" },
+							{ question: "The three components that occupy space within the skull are the brain, blood, and:", options: ["Cerebral Arteries", "Spinal Cord", "Cerebrospinal Fluid (CSF)", "Dura Mater"], correctAnswer: "Cerebrospinal Fluid (CSF)" }
+						]
+					}
+				]
+			},
+			'module-2-peds-anatomy': {
+				title: 'Module 2: Peds Neuro Anatomy & S/S',
+				color: 'from-purple-600 to-pink-500',
+				description: 'Identify key differences in child versus adult neurologic systems and primary red flags in pediatric patients.',
+				steps: [
+					{ id: 'm2-kids-vs-adults', title: 'Pediatric Neurologic Differences', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">Kids vs. Adults: Why Peds Neuro is Different</p>
+						<p>A child's nervous system is constantly developing, making them uniquely vulnerable to injury or disease.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Key Differences in Children:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Gestation (First 3-4 Weeks):</strong> The nervous system is one of the **first systems to form**. Infection, trauma, teratogens (e.g., drugs), and malnutrition during this period can cause physical defects and affect CNS development.</li>
+							<li><strong>Birth/Infancy:</strong>
+								<ul>
+									<li>**Cranial Bones:** Well developed, but **NOT FUSED** (Sutures and fontanels are open). This increases the risk for skull fracture and allows for *some* temporary expansion in case of increased ICP.</li>
+									<li>**Brain:** Highly vascular, meaning there is an **increased risk for hemorrhage** (bleeding) with trauma.</li>
+								</ul>
+							</li>
+							<li><strong>Childhood:</strong> **Spinal Cord is Mobile.** This high mobility increases the **risk for cervical spine injury** (especially in upper vs. lower sections).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Clinical Connection: Fontanels</h4>
+						<p>In infants, you use the fontanels (soft spots) to assess ICP: a **bulging fontanel** indicates increased ICP, while a **sunken fontanel** indicates dehydration.</p>
+					`},
+					{ id: 'm2-ss-red-flags', title: 'Common Signs and Symptoms (S/S)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-purple-700">Neurologic Red Flags in Children</p>
+						<p>Recognizing subtle changes is vital, as a child may not be able to verbalize symptoms.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Red Flags (S/S of Neurologic Disease):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Changes in Level of Consciousness (LOC) or Confusion.</strong></li>
+							<li><strong>Nausea, Vomiting</strong> (especially projectile vomiting, often without nausea).</li>
+							<li>**Headaches:** Frequent, persistent, or those that **wake the child up early in the morning** (a classic sign of tumor or increased ICP).</li>
+							<li>**Changes in Gait:** New onset of clumsiness, difficulty walking, or ataxia (incoordination).</li>
+							<li>Loss of motor function (weakness, paralysis).</li>
+							<li>Visual disturbances (double vision, blurred vision).</li>
+							<li>Increased **Irritability** (especially in infants or toddlers).</li>
+							<li>Altered muscle tone (flaccidity or rigidity).</li>
+						</ul>
+					`},
+					{ id: 'm2-quiz', title: 'Module 2 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Why is an infant at increased risk for hemorrhage after head trauma?", options: ["Their cranial bones are fused.", "The brain is highly vascular.", "The spinal cord is mobile.", "The fontanels are sunken."], correctAnswer: "The brain is highly vascular." },
+							{ question: "Which symptom, especially if new and persistent, is a classic 'red flag' for a brain tumor or increased ICP?", options: ["Afternoon headache", "Headache that wakes the child up in the morning", "Occasional nausea after a meal", "Increased appetite"], correctAnswer: "Headache that wakes the child up in the morning" },
+							{ question: "In a young child, what is the major risk factor related to the mobility of the spinal cord?", options: ["Increased risk for hydrocephalus", "Increased risk for cervical spine injury", "Increased risk for seizures", "Increased risk for cerebral edema"], correctAnswer: "Increased risk for cervical spine injury" }
+						]
+					}
+				]
+			},
+			'module-3-assessment': {
+				title: 'Module 3: Assessment and LOC',
+				color: 'from-orange-500 to-yellow-600',
+				description: 'Master assessment tools (GCS, LOC) and understand common abnormal posturing findings.',
+				steps: [
+					{ id: 'm3-loc-states', title: 'Level of Consciousness (LOC) States', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-yellow-700">LOC: The Most Important Neuro Assessment</p>
+						<p><strong>Level of Consciousness (LOC)</strong> is the most sensitive indicator of altered ICR and neurologic status.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Spectrum of Consciousness:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Conscious / Alert:</strong> Awake, attentive, interacts with environment.</li>
+							<li><strong>Altered States:</strong>
+								<ul>
+									<li>**Confusion:** Disoriented to time, place, or person. Impaired decision-making.</li>
+									<li>**Delirium:** State of altered consciousness, agitation, hallucinations, incoherent.</li>
+									<li>**Lethargy:** Sluggish speech, drowsiness, limited spontaneous movement.</li>
+									<li>**Stupor:** Deep sleep, responds only to vigorous and repeated stimulation (e.g., sternal rub, pain).</li>
+									<li>**Coma:** Unresponsive to painful stimuli, loss of corneal/pupillary reflexes, no motor response.</li>
+								</ul>
+							</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Causes of Altered LOC:</h4>
+						<p>Look for the underlying cause to guide treatment!</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>Infection (e.g., meningitis, sepsis)</li>
+							<li>Trauma (e.g., head injury, TBI)</li>
+							<li>Hypoxia (lack of oxygen)</li>
+							<li>Poisoning or Overdose</li>
+							<li>Seizures</li>
+							<li>Increased Intracranial Pressure (ICP) & decreased cerebral perfusion</li>
+						</ul>
+					`},
+					{ id: 'm3-gcs-posturing', title: 'GCS & Abnormal Posturing', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-yellow-700">Assessment Tools and Red Flags</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Glasgow Coma Scale (GCS):</h4>
+						<p>Used to assess the child's neurological status and monitor changes.</p>
+						<p>It assesses three components:</p>
+						<ol class="list-decimal list-inside ml-4">
+							<li>**Eye Opening** (E)</li>
+							<li>**Verbal Response** (V) - Adjusted for age/development (e.g., infants: cries, coos).</li>
+							<li>**Motor Response** (M)</li>
+						</ol>
+						<p class="font-bold">Score Range: 3 (deep coma/death) to 15 (fully awake).</p>
+						
+						<h4 class="text-lg font-bold mt-4 mb-2">Abnormal Positioning (Brain Injury Signs):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Decorticate Posturing (Flexor):</strong> Arms flexed inward toward the core (like holding a "cord"). Suggests **damage to the cerebral cortex** or pathways *above* the brainstem.</li>
+							<li><strong>Decerebrate Posturing (Extensor):</strong> Arms extended and pronated, wrists flexed, and legs extended. Suggests **damage to the brainstem** or midbrain. (More severe outcome).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Infection Signs (Meningitis):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Kernig Sign:</strong> Inability to fully extend the knee when the hip is flexed 90 degrees (resistance/pain).</li>
+							<li><strong>Brudzinski Sign:</strong> Passive flexion of the neck causes involuntary flexion of the hip and knee.</li>
+							<li><strong>Opisthotonos:</strong> Severe hyperextension of the head, neck, and spine (arching the back).</li>
+						</ul>
+					`},
+					{ id: 'm3-quiz', title: 'Module 3 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Which state of consciousness requires vigorous and repeated stimulation to elicit a response?", options: ["Lethargy", "Confusion", "Stupor", "Delirium"], correctAnswer: "Stupor" },
+							{ question: "A patient displays arms flexed inward toward the core. This abnormal posturing is called:", options: ["Decerebrate", "Decorticate", "Opisthotonos", "Brudzinski"], correctAnswer: "Decorticate" },
+							{ question: "The GCS assesses which three main components?", options: ["Respirations, Blood Pressure, Pulse", "Eye Opening, Verbal Response, Motor Response", "LOC, Muscle Tone, Reflexes", "Headache, Vomiting, Vision"], correctAnswer: "Eye Opening, Verbal Response, Motor Response" }
+						]
+					}
+				]
+			},
+			'module-4-icp-consequences': {
+				title: 'Module 4: Increased ICP & Complications',
+				color: 'from-red-600 to-orange-500',
+				description: 'Learn the causes and signs of increased Intracranial Pressure (ICP) and the deadly consequences.',
+				steps: [
+					{ id: 'm4-icp-patho', title: 'Increased ICP: Causes & Pathophysiology', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">Monro-Kellie Doctrine:</p>
+						<p>The Monro-Kellie doctrine states that because the skull is a rigid container, an increase in any one of the three components (brain, blood, CSF) must be compensated by a decrease in one or both of the others. If compensation fails, **Increased ICP** results.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Causes of Increased ICP:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**TBI** (Traumatic Brain Injury)</li>
+							<li>**Hemorrhage** (bleeding)</li>
+							<li>**Hydrocephalus** (excess CSF accumulation)</li>
+							<li>**CNS Infections** (e.g., Meningitis, Encephalitis)</li>
+							<li>**Brain Tumors**</li>
+							<li>**Cerebral Edema** (swelling)</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Cerebral Edema Consequence:</h4>
+						<p>Results in increased brain size, which negatively affects **perfusion** and **oxygenation** to the brain tissue. It's a key intermediate step leading to increased ICP.</p>
+					`},
+					{ id: 'm4-icp-signs', title: 'Signs of Increased ICP (Infant vs. Child)', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">Recognizing the Critical Signs of ICP</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Early Signs (Subtle):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Headache** (especially upon awakening).</li>
+							<li>**Nausea/Vomiting** (often projectile).</li>
+							<li>**Decreased Level of Consciousness (LOC)** - Irritability, restlesness, confusion.</li>
+							<li>**Visual Disturbances** (diplopia, blurred vision).</li>
+						</ul>
+
+						<h4 class="text-lg font-bold mt-4 mb-2">Late/Severe Signs:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Bradycardia** (decreased heart rate).</li>
+							<li>**Cushing's Triad:** (A very late, ominous sign):
+								<ol class="list-decimal list-inside ml-4">
+									<li>Widening Pulse Pressure (Increased SBP/Decreased DBP)</li>
+									<li>Bradycardia (Slow Heart Rate)</li>
+									<li>Irregular Respirations (Apnea/Cheyne-Stokes)</li>
+								</ol>
+							</li>
+							<li>**Fixed and Dilated Pupils.**</li>
+							<li>Abnormal posturing (Decorticate/Decerebrate).</li>
+						</ul>
+
+						<h4 class="text-lg font-bold mt-4 mb-2">Infant-Specific Signs:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Bulging Fontanel** (tense/non-pulsatile).</li>
+							<li>**Separated Sutures.**</li>
+							<li>**Macewen Sign** (Cracked-pot sound on percussion).</li>
+							<li>**High-pitched cry** (cat-like).</li>
+						</ul>
+					`},
+					{ id: 'm4-consequences', title: 'Consequences and Treatment Goals', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-red-700">The Deadly Progression</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Consequences:</h4>
+						<p>Uncontrolled ICP leads to brain herniation, resulting in:</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Coma or Death.**</li>
+							<li>Permanent severe neurologic dysfunction.</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Management & Nursing Priorities:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Treat the Underlying Cause** (e.g., antibiotics for meningitis, shunt for hydrocephalus).</li>
+							<li>**Maintain Airway, Breathing, Circulation (ABCs).**</li>
+							<li>**Frequent Neuro Status Assessments** (LOC, GCS, pupil checks).</li>
+							<li>**Positioning:** HOB 30 degrees (to promote venous drainage), head midline (prevent jugular compression).</li>
+							<li>**Sensory Management:** Minimize environmental stimuli (quiet room, soft lighting).</li>
+							<li>**Fluid Balance & Nutrition:** Maintain adequate but not excessive hydration.</li>
+						</ul>
+					`},
+					{ id: 'm4-quiz', title: 'Module 4 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the most sensitive and earliest indicator of increased intracranial pressure?", options: ["Cushing's Triad", "Pupil changes", "Changes in Level of Consciousness (LOC)", "Papilledema"], correctAnswer: "Changes in Level of Consciousness (LOC)" },
+							{ question: "Which assessment finding is part of Cushing's Triad?", options: ["Tachypnea", "Hypotension", "Widening Pulse Pressure", "Hypoglycemia"], correctAnswer: "Widening Pulse Pressure" },
+							{ question: "What is an infant-specific sign of increased ICP?", options: ["High-pitched cry", "Decerebrate posturing", "Headache upon waking", "Projectile diarrhea"], correctAnswer: "High-pitched cry" }
+						]
+					}
+				]
+			},
+			'module-5-seizure': {
+				title: 'Module 5: Exemplar - Seizure Disorders',
+				color: 'from-indigo-600 to-purple-700',
+				description: 'Differentiate epilepsy from seizures, understand medication goals, and apply safety precautions.',
+				steps: [
+					{ id: 'm5-seizure-basics', title: 'Seizure vs. Epilepsy', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">The Electrical Storm</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Definitions:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Seizure:** A temporary disruption of electrical communication among the neurons of the brain. Approximately 4-10% of children experience one.</li>
+							<li>**Epilepsy:** A chronic condition in which **2 or more unprovoked seizures** occur more than 24 hours apart. (A single seizure is NOT epilepsy.)</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Causes of Seizures (Often Extracranial):</h4>
+						<p>Most seizures are caused by disorders that originate **outside** of the brain (treatable causes!):</p>
+						<ul class="list-disc list-inside ml-4">
+							<li>High fever (**Febrile Seizures**)</li>
+							<li>Infection (e.g., meningitis)</li>
+							<li>Head trauma</li>
+							<li>Hypoxia</li>
+							<li>Toxins or poisoning</li>
+							<li>Cardiac arrhythmias (leading to hypoxia)</li>
+						</ul>
+					`},
+					{ id: 'm5-meds', title: 'Medication Goal and Types', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-indigo-700">Raising the Seizure Threshold</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Goal of Seizure Medication:</h4>
+						<p>The primary goal is to **raise the seizure threshold** and allow the child to live a full life with controlled seizures.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Anticipated Medications (Acute & Maintenance):</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Benzodiazepines (e.g., Diazepam, Lorazepam, Midazolam):**
+								<p class="text-sm italic"><strong>Mechanism:</strong> Potentiate the effects of **GABA** (the inhibitory neurotransmitter) and depress the CNS. Used for *acute* seizure cessation (Status Epilepticus).</p>
+							</li>
+							<li>**Phenobarbital:**
+								<p class="text-sm italic"><strong>Mechanism:</strong> Also enhances the inhibitory GABA neurotransmitter.</p>
+							</li>
+							<li>**Phenytoin (Dilantin):**
+								<p class="text-sm italic"><strong>Mechanism:</strong> Stabilizes the neural membrane by regulating sodium ions during nerve impulses.</p>
+							</li>
+						</ul>
+						<p class="mt-4">Living with a seizure disorder has a devastating impact on the quality of life; proper medication adherence and family support are vital.</p>
+					`},
+					{ id: 'm5-case-study', title: 'Case Study: Status Epilepticus', type: 'case_study', case: {
+						scenario: `Alsen Jones, 2 years old, is brought to the ER by his parents and is actively having seizures. His mother reports Alsen has been having one seizure after another for the past **20 minutes** and has **not regained consciousness** between seizures. Alsen has a known history of epilepsy.`,
+						question: `Based on this presentation (Status Epilepticus), what are the nurse's *priority* actions? (Select all that apply.)`,
+						options: [
+							"Option A: Place a padded tongue blade in his mouth to prevent biting.",
+							"Option B: Administer a loading dose of Phenobarbital.",
+							"Option C: Ensure airway patency and administer supplemental oxygen.",
+							"Option D: Initiate IV access for rapid delivery of Benzodiazepines (e.g., Lorazepam).",
+							"Option E: Document the exact time the seizure began and ended.",
+						],
+						correctAnswer: [
+							"Option C: Ensure airway patency and administer supplemental oxygen.",
+							"Option D: Initiate IV access for rapid delivery of Benzodiazepines (e.g., Lorazepam).",
+							"Option E: Document the exact time the seizure began and ended.",
+						],
+						explanation: `<strong>Rationale:</strong> Alsen is experiencing <strong>Status Epilepticus</strong> (seizure lasting >5 minutes, or recurrent seizures without regaining consciousness). This is a medical emergency requiring rapid intervention.
+						<ul>
+							<li><strong>Option C (Correct):</strong> Airway and oxygen are always the top priority (ABCs). Sustained seizing compromises ventilation.</li>
+							<li><strong>Option D (Correct):</strong> Benzodiazepines (often Lorazepam or Midazolam) are the first-line, rapid-acting medication to *stop* the active seizure.</li>
+							<li><strong>Option E (Correct):</strong> Precise timing and detailed observation are critical for documenting the event, drug timing, and overall management.</li>
+							<li><strong>Option A (INCORRECT):</strong> <strong>NEVER</strong> put anything in the mouth during a seizure. This can cause injury to teeth, jaw, and oral tissues. Safety precautions include padding the bed rails and turning the patient on their side (if possible) to prevent aspiration.</li>
+							<li><strong>Option B (INCORRECT):</strong> Phenobarbital or Phenytoin are often used as second-line or maintenance drugs, but **Benzodiazepines** are the first line for acute cessation of Status Epilepticus.</li>
+						</ul>`
+					}},
+					{ id: 'm5-quiz', title: 'Module 5 Quiz', type: 'quiz',
+						questions: [
+							{ question: "Epilepsy is defined by at least two unprovoked seizures occurring more than how many hours apart?", options: ["6 hours", "12 hours", "24 hours", "7 days"], correctAnswer: "24 hours" },
+							{ question: "Which neurotransmitter is enhanced by Benzodiazepines to help stop a seizure?", options: ["Serotonin", "Dopamine", "GABA", "Acetylcholine"], correctAnswer: "GABA" },
+							{ question: "What is the most crucial safety precaution during an active seizure?", options: ["Restraining the patient's limbs.", "Placing a bite block in the mouth.", "Turning the patient onto their side.", "Inserting a nasal cannula."], correctAnswer: "Turning the patient onto their side." }
+						]
+					}
+				]
+			},
+			'module-6-hydrocephalus': {
+				title: 'Module 6: Exemplar - Hydrocephalus',
+				color: 'from-teal-600 to-green-500',
+				description: 'Understand CSF imbalance, shunt function, and the life-threatening signs of shunt malfunction/infection.',
+				steps: [
+					{ id: 'm6-patho', title: 'Hydrocephalus Pathophysiology', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">The "Water on the Brain" Balance</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Definition:</h4>
+						<p>Hydrocephalus results from an **imbalance in the production and absorption of Cerebrospinal Fluid (CSF)**. CSF accumulates within the ventricular system, causing the ventricles to enlarge and increasing ICP.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Ventriculoperitoneal (VP) Shunt:</h4>
+						<p>The standard treatment is the surgical placement of a **Ventriculoperitoneal (VP) Shunt**.</p>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Function:</strong> A catheter inserted into the ventricle diverts excess CSF to the peritoneal cavity (abdomen), where it can be safely absorbed by the body.</li>
+							<li><strong>Lifelong Care:</strong> Shunts are placed early in infancy, require revisions as the child grows, and necessitate lifelong follow-up.</li>
+						</ul>
+					`},
+					{ id: 'm6-shunt-comp', title: 'Shunt Infection and Malfunction', type: 'text', content: `
+						<p class="text-xl font-semibold mb-3 text-teal-700">The Shunt Emergency</p>
+						<p>The two main complications of a VP shunt are **infection** and **malfunction** (blockage or fracture). Both cause CSF to back up, leading to acute **Increased ICP**.</p>
+						<h4 class="text-lg font-bold mt-4 mb-2">Signs and Symptoms of SHUNT MALFUNCTION/INFECTION:</h4>
+						<ul class="list-disc list-inside ml-4">
+							<li>**Signs of Increased ICP** (Headache, vomiting, decreased LOC/irritability).</li>
+							<li>**Fever** (sign of infection).</li>
+							<li>**Signs of Local Inflammation** along the shunt tract (redness, tenderness, discharge).</li>
+							<li>**Poor feeding** (Infants).</li>
+							<li>**Seizure Activity** (Can be triggered by increased ICP).</li>
+						</ul>
+						<h4 class="text-lg font-bold mt-4 mb-2">Nursing Priority for Shunt Malfunction:</h4>
+						<p>A shunt malfunction is a life-threatening emergency. Treatment is surgical shunt revision. Your job is rapid assessment and notification.</p>
+						<ul class="list-disc list-inside ml-4">
+							<li><strong>Post-Op Positioning:</strong> The surgeon will order specific positioning (e.g., flat or slightly elevated) to prevent rapid CSF drainage, which can cause complications like subdural hematoma.</li>
+							<li>**Monitoring:** Maintain strict I/O and frequent neuro assessments.</li>
+						</ul>
+					`},
+					{ id: 'm6-quiz', title: 'Module 6 Quiz', type: 'quiz',
+						questions: [
+							{ question: "What is the goal of surgically placing a VP shunt in a child with hydrocephalus?", options: ["Increase CSF production.", "Increase brain compliance.", "Divert excess CSF to allow for absorption.", "Strengthen the ventricular walls."], correctAnswer: "Divert excess CSF to allow for absorption." },
+							{ question: "Which symptom, in a child with a VP shunt, is a key sign of a shunt *infection*?", options: ["Diarrhea", "Fever", "Tingling in the extremities", "Dry skin"], correctAnswer: "Fever" },
+							{ question: "The two primary complications associated with a VP shunt are malfunction and:", options: ["Hemorrhage", "Cerebral Edema", "Seizures", "Infection"], correctAnswer: "Infection" }
+						]
+					}
+				]
+			}
+		};
+
+		// The pre-assessment quiz data is compiled from the first 3 quiz questions of each module.
+		const preAssessmentQuizData = [
+			// Module 1 Questions
+			{ moduleId: 'module-1-icr-basics', question: "Which term refers to the maintenance of balance in the intracranial environment?", options: ["Compliance", "Homeostasis", "Regulation", "Perfusion"], correctAnswer: "Regulation" },
+			{ moduleId: 'module-1-icr-basics', question: "Which population is primarily at risk for ICR impairment due to degenerative causes?", options: ["Adolescents", "Toddlers", "Elderly", "Young adults"], correctAnswer: "Elderly" },
+			{ moduleId: 'module-1-icr-basics', question: "The three components that occupy space within the skull are the brain, blood, and:", options: ["Cerebral Arteries", "Spinal Cord", "Cerebrospinal Fluid (CSF)", "Dura Mater"], correctAnswer: "Cerebrospinal Fluid (CSF)" },
+
+			// Module 2 Questions
+			{ moduleId: 'module-2-peds-anatomy', question: "Why is an infant at increased risk for hemorrhage after head trauma?", options: ["Their cranial bones are fused.", "The brain is highly vascular.", "The spinal cord is mobile.", "The fontanels are sunken."], correctAnswer: "The brain is highly vascular." },
+			{ moduleId: 'module-2-peds-anatomy', question: "Which symptom, especially if new and persistent, is a classic 'red flag' for a brain tumor or increased ICP?", options: ["Afternoon headache", "Headache that wakes the child up in the morning", "Occasional nausea after a meal", "Increased appetite"], correctAnswer: "Headache that wakes the child up in the morning" },
+			{ moduleId: 'module-2-peds-anatomy', question: "In a young child, what is the major risk factor related to the mobility of the spinal cord?", options: ["Increased risk for hydrocephalus", "Increased risk for cervical spine injury", "Increased risk for seizures", "Increased risk for cerebral edema"], correctAnswer: "Increased risk for cervical spine injury" },
+
+			// Module 3 Questions
+			{ moduleId: 'module-3-assessment', question: "Which state of consciousness requires vigorous and repeated stimulation to elicit a response?", options: ["Lethargy", "Confusion", "Stupor", "Delirium"], correctAnswer: "Stupor" },
+			{ moduleId: 'module-3-assessment', question: "A patient displays arms flexed inward toward the core. This abnormal posturing is called:", options: ["Decerebrate", "Decorticate", "Opisthotonos", "Brudzinski"], correctAnswer: "Decorticate" },
+			{ moduleId: 'module-3-assessment', question: "The GCS assesses which three main components?", options: ["Respirations, Blood Pressure, Pulse", "Eye Opening, Verbal Response, Motor Response", "LOC, Muscle Tone, Reflexes", "Headache, Vomiting, Vision"], correctAnswer: "Eye Opening, Verbal Response, Motor Response" },
+
+			// Module 4 Questions
+			{ moduleId: 'module-4-icp-consequences', question: "What is the most sensitive and earliest indicator of increased intracranial pressure?", options: ["Cushing's Triad", "Pupil changes", "Changes in Level of Consciousness (LOC)", "Papilledema"], correctAnswer: "Changes in Level of Consciousness (LOC)" },
+			{ moduleId: 'module-4-icp-consequences', question: "Which assessment finding is part of Cushing's Triad?", options: ["Tachypnea", "Hypotension", "Widening Pulse Pressure", "Hypoglycemia"], correctAnswer: "Widening Pulse Pressure" },
+			{ moduleId: 'module-4-icp-consequences', question: "What is an infant-specific sign of increased ICP?", options: ["High-pitched cry", "Decerebrate posturing", "Headache upon waking", "Projectile diarrhea"], correctAnswer: "High-pitched cry" },
+
+			// Module 5 Questions
+			{ moduleId: 'module-5-seizure', question: "Epilepsy is defined by at least two unprovoked seizures occurring more than how many hours apart?", options: ["6 hours", "12 hours", "24 hours", "7 days"], correctAnswer: "24 hours" },
+			{ moduleId: 'module-5-seizure', question: "Which neurotransmitter is enhanced by Benzodiazepines to help stop a seizure?", options: ["Serotonin", "Dopamine", "GABA", "Acetylcholine"], correctAnswer: "GABA" },
+			{ moduleId: 'module-5-seizure', question: "What is the most crucial safety precaution during an active seizure?", options: ["Restraining the patient's limbs.", "Placing a bite block in the mouth.", "Turning the patient onto their side.", "Inserting a nasal cannula."], correctAnswer: "Turning the patient onto their side." },
+
+			// Module 6 Questions
+			{ moduleId: 'module-6-hydrocephalus', question: "What is the goal of surgically placing a VP shunt in a child with hydrocephalus?", options: ["Increase CSF production.", "Increase brain compliance.", "Divert excess CSF to allow for absorption.", "Strengthen the ventricular walls."], correctAnswer: "Divert excess CSF to allow for absorption." },
+			{ moduleId: 'module-6-hydrocephalus', question: "Which symptom, in a child with a VP shunt, is a key sign of a shunt *infection*?", options: ["Diarrhea", "Fever", "Tingling in the extremities", "Dry skin"], correctAnswer: "Fever" },
+			{ moduleId: 'module-6-hydrocephalus', question: "The two primary complications associated with a VP shunt are malfunction and:", options: ["Hemorrhage", "Cerebral Edema", "Seizures", "Infection"], correctAnswer: "Infection" }
+		];
+
+		// --- Helper Functions ---
+		const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+		// --- Child Components ---
+
+		/**
+		 * Quiz component for interactive multiple-choice questions.
+		 */
+		const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+			const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+			const [selectedOption, setSelectedOption] = useState([]);
+			const [feedback, setFeedback] = useState(null);
+			const [answers, setAnswers] = useState([]);
+
+			const currentQuestion = questions[currentQuestionIndex];
+
+			// Determine if the current question is multi-select (SATA)
+			const isMultiSelect = Array.isArray(currentQuestion.correctAnswer) && currentQuestion.correctAnswer.length > 1;
+
+			const handleOptionSelect = (option) => {
+				if (feedback && !isPreAssessment) return;
+
+				if (isMultiSelect) {
+					setSelectedOption(prevSelected => {
+						if (prevSelected.includes(option)) {
+							return prevSelected.filter(item => item !== option);
+						} else {
+							return [...prevSelected, option];
+						}
+					});
+				} else {
+					// Single select logic
+					setSelectedOption([option]); // Always store as array internally for consistent checking
+				}
+			};
+
+			const checkCorrectness = (options, correctAnswers) => {
+				if (Array.isArray(correctAnswers)) {
+					// Multi-select (SATA) check: Must contain ALL correct answers and ONLY those correct answers.
+					const correctCount = correctAnswers.filter(ans => options.includes(ans)).length;
+					return correctCount === correctAnswers.length && options.length === correctAnswers.length;
+				} else {
+					// Single select check
+					return options[0] === correctAnswers;
+				}
+			};
+
+			const handlePreAssessmentNext = () => {
+				if (selectedOption.length === 0) return;
+
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+
+				const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+				setAnswers(updatedAnswers);
+
+				if (currentQuestionIndex < questions.length - 1) {
+					setCurrentQuestionIndex(currentQuestionIndex + 1);
+					setSelectedOption([]);
+					setFeedback(null);
+				} else {
+					onComplete(updatedAnswers);
+				}
+			};
+
+			const handleRegularQuizSubmit = () => {
+				if (selectedOption.length === 0) return;
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+				setFeedback(isCorrect ? 'correct' : 'incorrect');
+			};
+
+			const handleRegularQuizNext = () => {
+				if (!feedback) return; // Cannot proceed without submitting first
+
+				const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+				const finalAnswers = [...answers, { question: currentQuestion, isCorrect, score: isCorrect ? 1 : 0 }];
+				
+				if (currentQuestionIndex < questions.length - 1) {
+					setAnswers(finalAnswers);
+					setCurrentQuestionIndex(currentQuestionIndex + 1);
+					setSelectedOption([]);
+					setFeedback(null);
+				} else {
+					const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.score || 0), 0);
+					onComplete({ score: finalScore, total: questions.length });
+				}
+			};
+
+			const selectedAnswerText = isMultiSelect ? selectedOption : selectedOption[0];
+			
+			return (
+				<div className="p-4 bg-white rounded-xl shadow-lg border border-gray-200 animate-fade-in">
+					<h4 className="font-extrabold text-2xl text-gray-800 mb-4 flex justify-between items-center">
+						<span>{isPreAssessment ? 'Diagnostic Question' : 'Module Quiz'}</span>
+						<span className="text-lg font-semibold text-indigo-600">{currentQuestionIndex + 1} of {questions.length}</span>
+					</h4>
+					
+					{isMultiSelect && <p className="text-sm font-bold text-red-500 mb-2">**SELECT ALL THAT APPLY (SATA)**</p>}
+					
+					<p className="font-semibold text-gray-700 mb-4 text-lg">{currentQuestion.question}</p>
+					<div className="space-y-3">
+						{currentQuestion.options.map((option, index) => {
+							const isSelected = selectedOption.includes(option);
+							const isCorrectOption = Array.isArray(currentQuestion.correctAnswer)
+								? currentQuestion.correctAnswer.includes(option)
+								: option === currentQuestion.correctAnswer;
+							
+							let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-300';
+
+							if (feedback && !isPreAssessment) {
+								if (isCorrectOption) {
+									optionClass = 'bg-green-100 border-green-500 text-green-800 font-medium';
+								} else if (isSelected && !isCorrectOption) {
+									optionClass = 'bg-red-100 border-red-500 text-red-800 font-medium';
+								}
+							} else if (isSelected) {
+								optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800 font-medium shadow-inner';
+							}
+
+							return (
+								<div
+									key={index}
+									onClick={() => handleOptionSelect(option)}
+									className={cn('p-3 rounded-xl border-2 cursor-pointer transition-all duration-150 flex items-center', optionClass)}
+								>
+									<span className="flex-1">{option}</span>
+									{feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+										isCorrectOption ? <span className="text-green-600 ml-2">✓</span> : <span className="text-red-600 ml-2">✗</span>
+									)}
+								</div>
+							);
+						})}
+					</div>
+					<div className="mt-6 text-center">
+						{isPreAssessment ? (
+							<button
+								onClick={handlePreAssessmentNext}
+								disabled={selectedOption.length === 0}
+								className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+							>
+								{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+							</button>
+						) : (
+							<>
+								{!feedback ? (
+									<button
+										onClick={handleRegularQuizSubmit}
+										disabled={selectedOption.length === 0}
+										className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+									>
+										Submit Answer
+									</button>
+								) : (
+									<button
+										onClick={handleRegularQuizNext}
+										className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+									>
+										{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'View Score'}
+									</button>
+								)}
+							</>
+						)}
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * PreAssessmentQuiz component to handle the initial diagnostic quiz.
+		 */
+		const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+			const [results, setResults] = useState(null);
+
+			const handleQuizComplete = (finalAnswers) => {
+				const moduleResults = {};
+				finalAnswers.forEach(answer => {
+					const { moduleId } = answer.question;
+					if (!moduleResults[moduleId]) {
+						moduleResults[moduleId] = { correct: 0, total: 0 };
+					}
+					if (answer.isCorrect) {
+						moduleResults[moduleId].correct++;
+					}
+					moduleResults[moduleId].total++;
+				});
+
+				const completedModules = [];
+				for (const moduleId in moduleResults) {
+					// Test-out criteria: 100% correct in that module's diagnostic questions.
+					if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+						completedModules.push(moduleId);
+					}
+				}
+				setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+				onComplete(completedModules);
+			};
+
+			if (results) {
+				return (
+					<div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
+						<div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
+							<h2 className="text-3xl font-extrabold text-gray-800 mb-4">Diagnostic Complete!</h2>
+							<p className="text-lg text-gray-600 mb-6">
+								You correctly answered {results.correct} out of {results.total} questions.
+							</p>
+							{results.completedModules.length > 0 ? (
+								<>
+									<p className="text-green-600 font-bold text-xl mb-4">You've successfully tested out of:</p>
+									<ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-xl shadow-inner border border-green-200">
+										{results.completedModules.map(id => <li key={id} className="font-semibold">{contentData[id].title}</li>)}
+									</ul>
+									<p className="text-gray-700 text-sm italic mb-6">Your progress for these modules has been marked as complete.</p>
+								</>
+							) : (
+								<p className="text-yellow-600 font-bold text-xl mb-6 bg-yellow-50 p-4 rounded-xl shadow-inner border border-yellow-200">
+									Keep going! Use the learning modules to review the content.
+								</p>
+							)}
+							<button
+								onClick={onExit}
+								className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+							>
+								Return to Dashboard
+							</button>
+						</div>
+					</div>
+				);
+			}
+
+			return (
+				<div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
+					<div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl w-full">
+						<h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">Diagnostic Quiz (Pre-Assessment)</h2>
+						<Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+					</div>
+				</div>
+			);
+		};
+
+
+		/**
+		 * Dashboard component to display the available learning modules.
+		 */
+		const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+			let totalCompletedSteps = 0;
+			let totalPossibleSteps = 0;
+			let totalQuizCorrect = 0;
+			let totalQuizQuestions = 0;
+
+			// Calculate overall progress and gather quiz scores
+			Object.entries(contentData).forEach(([moduleId, module]) => {
+				totalPossibleSteps += module.steps.length;
+				const moduleProgress = progress[moduleId] || {};
+				
+				Object.values(moduleProgress).forEach(stepProgress => {
+					if (stepProgress.completed) {
+						totalCompletedSteps++;
+					}
+					if (stepProgress.score !== undefined) {
+						totalQuizCorrect += stepProgress.score;
+					}
+				});
+
+				module.steps.forEach(step => {
+					if (step.type === 'quiz' || step.type === 'case_study') {
+						totalQuizQuestions += (step.type === 'quiz' ? step.questions.length : 1);
+					}
+				});
+			});
+
+			const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+			return (
+				<div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+					<div className="w-full">
+						<header className="mb-8 text-center">
+							<div className="flex items-center justify-center gap-3 mb-2">
+								<span className="w-12 h-12 bg-blue-700 text-white rounded-full flex items-center justify-center font-extrabold text-xl shadow-lg">ICR</span>
+								<h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Intracranial Regulation Master Module</h1>
+								<span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
+							</div>
+							<p className="text-lg text-gray-500 max-w-2xl mx-auto">Focused study guide for ICR concepts, assessment, ICP, and neurological emergencies in children.</p>
+						</header>
+
+						{/* Skip Ahead Button */}
+						<div className="mb-8 text-center">
+							<button
+								onClick={onStartPreAssessment}
+								className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-xl shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+							>
+								<div className="text-xl font-extrabold">Skip Ahead: Take Diagnostic Quiz</div>
+								<div className="text-sm font-medium">Test your knowledge and potentially skip modules. (18 Questions)</div>
+							</button>
+						</div>
+
+						{/* Overall Progress Bar & Reset Button */}
+						<div className="mb-12 bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-auto">
+						   <div className="flex justify-between items-center mb-3">
+							  <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+							  <button 
+									onClick={onResetProgress}
+									className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2 transform hover:scale-105"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
+									Reset Progress
+							  </button>
+						   </div>
+						   <div className="w-full bg-gray-200 rounded-full h-4">
+							   <div
+								  className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+								  style={{ width: `${overallPercentage}%` }}
+							   ></div>
+						   </div>
+						   <div className="flex justify-between items-center">
+							  <p className="text-left text-sm text-gray-600 mt-2">
+								  {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+							  </p>
+							  <p className="text-right text-sm text-gray-600 mt-2 font-bold">{Math.round(overallPercentage)}% Completed</p>
+						   </div>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+							{/* Iterate over all modules defined in contentData */}
+							{Object.entries(contentData).map(([id, module]) => {
+								const moduleProgress = progress[id] || {};
+								// Calculate completion count for steps within the module.
+								const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+								const totalSteps = module.steps.length;
+								const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+								let statusText = "Not Started";
+								let statusColor = "text-gray-500";
+								if (completedCount === totalSteps) {
+									statusText = "COMPLETED";
+									statusColor = "text-green-600 font-extrabold";
+								} else if (completedCount > 0) {
+									statusText = "In Progress";
+									statusColor = "text-yellow-600 font-bold";
+								}
+
+								return (
+									<div
+										key={id}
+										onClick={() => onSelectModule(id)}
+										className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group flex flex-col transform animate-fade-in"
+									>
+										<div className="flex justify-between items-start mb-4">
+											{/* Module Icon/Title Tag */}
+											<div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-12 h-12 flex items-center justify-center text-white text-lg font-extrabold shadow-lg flex-shrink-0")}>
+												{module.title.split(':')[0].replace('Module ', 'M')}
+											</div>
+											{/* Progress Circle */}
+											<div className="relative w-12 h-12 flex-shrink-0">
+												<svg className="w-full h-full" viewBox="0 0 36 36">
+													{/* Background circle for the progress bar. */}
+													<path
+														className="text-gray-200"
+														d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="3"
+													/>
+													{/* Foreground arc representing the completion percentage. */}
+													<path
+														className="text-indigo-500 transition-all duration-700"
+														d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="3"
+														strokeDasharray={`${percentage}, 100`}
+														strokeLinecap="round"
+														transform="rotate(-90 18 18)"
+													/>
+												</svg>
+												<span className={cn("absolute inset-0 flex items-center justify-center text-xs font-extrabold", percentage === 100 ? 'text-green-600' : 'text-gray-600')}>
+													{Math.round(percentage)}%
+												</span>
+											</div>
+										</div>
+										<h3 className="text-xl font-extrabold text-gray-800 mb-2">{module.title.split(': ')[1]}</h3>
+										<p className="text-gray-500 text-sm mb-4 h-10">{module.description}</p>
+										<div className="mt-auto pt-2 border-t border-gray-100">
+											<p className={cn("text-sm", statusColor)}>{statusText}</p>
+											<div className="flex items-center justify-between text-sm font-bold text-indigo-600 group-hover:text-indigo-700 mt-2">
+												{percentage === 100 ? 'Review Module' : 'Start Learning'} 
+												<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+													<path fillRule="evenodd" d="M12.97 4.97a.75.75 0 011.06 0l4.5 4.5a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 11-1.06-1.06l3.22-3.22H4a.75.75 0 010-1.5h12.19l-3.22-3.22a.75.75 0 010-1.06z" clipRule="evenodd" />
+												</svg>
+											</div>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * CaseStudy component for a multiple-choice case study challenge.
+		 */
+		const CaseStudy = ({ caseData, onComplete }) => {
+			const [selectedAnswers, setSelectedAnswers] = useState([]);
+			const [showFeedback, setShowFeedback] = useState(false);
+			
+			const isMultiSelect = Array.isArray(caseData.correctAnswer) && caseData.correctAnswer.length > 1;
+
+			const handleSelect = (option) => {
+				if (showFeedback) return;
+
+				if (isMultiSelect) {
+					setSelectedAnswers(prevSelected => {
+						if (prevSelected.includes(option)) {
+							return prevSelected.filter(item => item !== option);
+						} else {
+							return [...prevSelected, option];
+						}
+					});
+				} else {
+					// Single select logic
+					setSelectedAnswers([option]);
+				}
+			};
+
+			const checkCorrectness = (options, correctAnswers) => {
+				if (Array.isArray(correctAnswers)) {
+					const correctCount = correctAnswers.filter(ans => options.includes(ans)).length;
+					return correctCount === correctAnswers.length && options.length === correctAnswers.length;
+				} else {
+					return options[0] === correctAnswers;
+				}
+			};
+
+			const handleSubmit = () => {
+				setShowFeedback(true);
+				const isCorrect = checkCorrectness(selectedAnswers, caseData.correctAnswer);
+				
+				if (isCorrect) {
+					onComplete({ score: 1, total: 1 });
+				} else {
+					onComplete({ score: 0, total: 1 });
+				}
+			};
+
+			return (
+				<div className="p-6 bg-white rounded-xl shadow-lg border border-red-200 animate-fade-in">
+					<h4 className="font-extrabold text-2xl text-red-700 mb-4 flex items-center">
+						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+							<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 001 1h3a1 1 0 100-2h-2V6z" clipRule="evenodd" />
+						</svg>
+						Clinical Case Challenge
+					</h4>
+					{isMultiSelect && <p className="text-sm font-bold text-red-500 mb-2">**SELECT ALL THAT APPLY (SATA)**</p>}
+					<div className="mb-4 p-4 bg-gray-50 rounded-lg border-l-4 border-indigo-400">
+						<h5 className="font-bold text-indigo-700 mb-1">Scenario:</h5>
+						<p className="text-gray-700 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+					</div>
+					
+					<p className="font-bold text-gray-800 mb-3 text-lg">{caseData.question}</p>
+					
+					<div className="space-y-3">
+						{caseData.options.map(option => {
+							const isSelected = selectedAnswers.includes(option);
+							const isCorrectOption = Array.isArray(caseData.correctAnswer)
+								? caseData.correctAnswer.includes(option)
+								: option === caseData.correctAnswer;
+							
+							let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-300';
+							if (showFeedback) {
+								if (isCorrectOption) {
+									optionClass = 'bg-green-100 border-green-500 text-green-800 font-medium shadow-md';
+								} else if (isSelected && !isCorrectOption) {
+									optionClass = 'bg-red-100 border-red-500 text-red-800 font-medium shadow-md';
+								}
+							} else if (isSelected) {
+								optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800 font-medium shadow-inner';
+							}
+
+							return (
+								<div
+									key={option}
+									onClick={() => handleSelect(option)}
+									className={cn('p-3 rounded-xl border-2 cursor-pointer transition-colors flex items-center', optionClass)}
+								>
+									<span className="flex-1">{option}</span>
+									{showFeedback && (
+										isCorrectOption ? <span className="text-green-600 ml-2">✓</span> : (isSelected && <span className="text-red-600 ml-2">✗</span>)
+									)}
+								</div>
+							);
+						})}
+					</div>
+					{!showFeedback && (
+						<div className="mt-6 text-center">
+							<button
+								onClick={handleSubmit}
+								disabled={selectedAnswers.length === 0}
+								className="px-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105"
+							>
+								Submit Case Answer
+							</button>
+						</div>
+					)}
+					{showFeedback && (
+						<div className="mt-6 p-4 bg-yellow-50 rounded-xl border-l-4 border-yellow-500 shadow-inner">
+							<h5 className="font-bold text-yellow-800 text-lg mb-2">Detailed Rationale:</h5>
+							<div className="text-sm text-yellow-900 prose-sm" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></div>
+						</div>
+					)}
+				</div>
+			);
+		};
+
+		/**
+		 * StaticContentStep component for displaying basic text content.
+		 */
+		const StaticContentStep = ({ step, onComplete }) => {
+			// Mark as complete immediately upon rendering to enable progression.
+			useEffect(() => {
+				onComplete();
+			}, [step.id, onComplete]); // Depend on step.id to re-trigger on navigation
+
+			return (
+				<div className="prose max-w-none text-gray-700 leading-relaxed p-6 bg-white rounded-xl shadow-lg border border-gray-200 space-y-4 animate-fade-in">
+					<div dangerouslySetInnerHTML={{ __html: step.content }}></div>
+				</div>
+			);
+		};
+
+		/**
+		 * CompletionModal component displayed when a module is completed.
+		 */
+		const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+			if (!isOpen) return null;
+
+			return (
+				<div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+					<div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+						<h3 className="text-3xl font-extrabold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+						<p className="text-gray-700 text-lg mb-6">You've successfully completed all steps in this module. Great job!</p>
+						<div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+							<button
+								onClick={onClose}
+								className="px-6 py-3 bg-gray-300 text-gray-800 font-bold rounded-xl hover:bg-gray-400 transition-colors shadow-md"
+							>
+								Back to Dashboard
+							</button>
+							{hasNextModule && (
+								<button
+									onClick={onNextModule}
+									className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors transform hover:scale-105"
+								>
+									Continue to Next Module
+								</button>
+							)}
+						</div>
+					</div>
+				</div>
+			);
+		};
+
+		/**
+		 * LearningModule component to manage steps within the selected module.
+		 */
+		const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+			const [activeStep, setActiveStep] = useState(0);
+			const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+			const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+			// Reset to step 0 when module changes
+			useEffect(() => {
+				setActiveStep(0);
+			}, [module.id]);
+
+			const handleStepComplete = useCallback((stepId, data = {}) => {
+				onProgressUpdate(module.id, stepId, { completed: true, ...data });
+			}, [onProgressUpdate, module.id]);
+
+			const moduleProgress = progress[module.id] || {};
+			
+			// Check if all essential steps (text, quiz, case_study) are completed
+			const allStepsCompletedInModule = module.steps.every(step =>
+				moduleProgress[step.id] && moduleProgress[step.id].completed
+			);
+
+			// Navigates to the next step, if available.
+			const handleNextStep = () => {
+				if (activeStep === module.steps.length - 1) {
+					// If it's the last step and all steps in the module are completed, open the modal
+					if (allStepsCompletedInModule) {
+						setIsCompletionModalOpen(true);
+					}
+				} else if (activeStep < module.steps.length - 1) {
+					// Otherwise, proceed to the next step
+					setActiveStep(activeStep + 1);
+				}
+			};
+
+			// Navigates to the previous step, if available.
+			const handlePrevStep = () => {
+				if (activeStep > 0) {
+					setActiveStep(activeStep - 1);
+				}
+			};
+			
+			if (!module || !module.steps) {
+				return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Error loading module.</div>;
+			}
+
+			const currentStep = module.steps[activeStep];
+			
+			const renderStepContent = (step) => {
+				if (!step) return <p>Please select a step.</p>;
+
+				const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+				switch (step.type) {
+					case 'text':
+						return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+					case 'case_study':
+						return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+					case 'quiz':
+						return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+					default:
+						return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+				}
+			};
+
+			const handleModalClose = () => {
+				setIsCompletionModalOpen(false);
+				onBack(); // Go back to dashboard when modal is closed
+			};
+
+			const handleModalNextModule = () => {
+				setIsCompletionModalOpen(false);
+				onNextModule(); // Proceed to next module
+			};
+
+
+			return (
+				<div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+					{/* Header */}
+					<header className="bg-white shadow-lg p-4 flex items-center justify-between z-30 flex-shrink-0">
+						<button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2 transform hover:scale-105">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+							<span className="hidden sm:inline">Dashboard</span>
+						</button>
+						<h2 className="text-xl font-extrabold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+						
+						{/* Mobile sidebar toggle button */}
+						<button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+						</button>
+					</header>
+					
+					{isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+					<div className="flex flex-1 overflow-hidden">
+						{/* Sidebar for navigation steps within the module. */}
+						<aside className={cn(
+							"bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+							isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+						)}>
+							<h3 className="text-lg font-extrabold mb-4 text-indigo-700 px-3 border-b border-gray-100 pb-2">Module Steps ({activeStep + 1} / {module.steps.length})</h3>
+							<nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+								{module.steps.map((step, index) => (
+									<button
+										key={step.id}
+										onClick={() => {
+											setActiveStep(index);
+											setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
+										}}
+										className={cn(
+											'w-full text-left p-3 rounded-xl flex items-center gap-3 transition-colors shadow-sm',
+											activeStep === index ? 'bg-indigo-100 text-indigo-700 font-bold border-indigo-400 border' : 'hover:bg-gray-100 text-gray-700'
+										)}
+									>
+										{/* Step completion indicator */}
+										<div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+											{moduleProgress[step.id]?.completed ? (
+												<svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+											) : (
+												<div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+											)}
+										</div>
+										<span className="flex-1 text-sm">{step.title}</span>
+									</button>
+								))}
+							</nav>
+						</aside>
+
+						{/* Main content area for the current step. */}
+						<main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+							<div className="max-w-5xl mx-auto">
+								<h3 className="text-2xl font-extrabold text-gray-800 mb-4">{currentStep.title}</h3>
+								{renderStepContent(currentStep)}
+
+								{/* Navigation buttons for moving between steps. */}
+								<div className="flex justify-between mt-8">
+									<button
+										onClick={handlePrevStep}
+										disabled={activeStep === 0}
+										className="px-6 py-3 bg-gray-300 text-gray-800 font-bold rounded-xl hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md transform hover:scale-105 disabled:hover:scale-100"
+									>
+										<span className="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10.707 3.293a1 1 0 010 1.414L7.414 8l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>Previous</span>
+									</button>
+
+									<button
+										onClick={handleNextStep}
+										disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+										className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors transform hover:scale-105 disabled:hover:scale-100"
+									>
+										{activeStep === module.steps.length - 1 ? (allStepsCompletedInModule ? 'Finish Module' : 'Complete All Steps') : <span className="flex items-center">Next <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9.293 3.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 8 9.293 4.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg></span>}
+									</button>
+								</div>
+							</div>
+						</main>
+					</div>
+					<CompletionModal
+						isOpen={isCompletionModalOpen}
+						onClose={handleModalClose}
+						onNextModule={handleModalNextModule}
+						hasNextModule={hasNextModule}
+					/>
+				</div>
+			);
+		};
+
+		// --- Main App Component ---
+		function App() {
+			const [currentModuleId, setCurrentModuleId] = useState(null);
+			const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+			const [userId, setUserId] = useState(null);
+			const [progress, setProgress] = useState({});
+			const [isAuthReady, setIsAuthReady] = useState(false);
+
+			// 1. Auth Setup (Local Storage)
+			useEffect(() => {
+				const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+					if (user) setUserId(user.uid);
+					setIsAuthReady(true);
+				});
+				return () => unsubscribe();
+			}, []);
+
+			// 2. Load Progress from Local Storage
+			useEffect(() => {
+				if (!isAuthReady || !userId) return;
+				const storedProgress = localStorage.getItem(`icr-module-progress-${userId}`);
+				if (storedProgress) {
+					try {
+						setProgress(JSON.parse(storedProgress));
+					} catch (e) {
+						console.error("Failed to parse stored progress, resetting.", e);
+						setProgress({});
+					}
+				}
+			}, [isAuthReady, userId]);
+
+			// 3. Progress Update Handler (Persist to Local Storage)
+			const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+				if (!isAuthReady || !userId) return;
+
+				setProgress(currentProgress => {
+					const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+					const newStepProgress = { ...currentStepProgress, ...data };
+
+					// Avoid unnecessary updates if data hasn't changed.
+					if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+						return currentProgress;
+					}
+
+					const newProgress = {
+						...currentProgress,
+						[moduleId]: {
+							...(currentProgress[moduleId] || {}),
+							[stepId]: newStepProgress
+						}
+					};
+
+					localStorage.setItem(`icr-module-progress-${userId}`, JSON.stringify(newProgress));
+					return newProgress;
+				});
+			}, [isAuthReady, userId]);
+
+			const handlePreAssessmentComplete = (completedModuleIds) => {
+				const newProgress = { ...progress };
+				completedModuleIds.forEach(moduleId => {
+					const module = contentData[moduleId];
+					if (module) {
+						newProgress[moduleId] = {};
+						module.steps.forEach(step => {
+							// Mark all steps in the module as complete
+							newProgress[moduleId][step.id] = { completed: true };
+						});
+					}
+				});
+				setProgress(newProgress);
+				localStorage.setItem(`icr-module-progress-${userId}`, JSON.stringify(newProgress));
+			};
+			
+			const handleResetProgress = useCallback(() => {
+				if (!isAuthReady || !userId) return;
+				setProgress({});
+				localStorage.removeItem(`icr-module-progress-${userId}`);
+				setCurrentModuleId(null);
+			}, [isAuthReady, userId]);
+
+			const handleNextModule = useCallback(() => {
+				const moduleIds = Object.keys(contentData);
+				const currentIndex = moduleIds.indexOf(currentModuleId);
+				if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+					setCurrentModuleId(moduleIds[currentIndex + 1]);
+				} else {
+					setCurrentModuleId(null);
+				}
+			}, [currentModuleId]);
+
+			const selectedModule = currentModuleId && contentData[currentModuleId]
+														? { ...contentData[currentModuleId], id: currentModuleId }
+														: null;
+
+			const moduleIds = Object.keys(contentData);
+			const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+			const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+
+			if (!isAuthReady) {
+				return (
+					<div className="min-h-screen flex items-center justify-center bg-gray-100">
+						<div className="loader"></div>
+						<p className="text-gray-500 ml-4">Authenticating user...</p>
+					</div>
+				);
+			}
+
+			return (
+				<div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+					{isPreAssessmentActive ? (
+						<PreAssessmentQuiz 
+							onComplete={handlePreAssessmentComplete} 
+							onExit={() => setIsPreAssessmentActive(false)}
+						/>
+					) : selectedModule ? (
+						<LearningModule
+							key={selectedModule.id}
+							module={selectedModule}
+							onBack={() => setCurrentModuleId(null)}
+							progress={progress}
+							onProgressUpdate={handleProgressUpdate}
+							onNextModule={handleNextModule}
+							hasNextModule={hasNextModule}
+						/>
+					) : (
+						<Dashboard 
+							onSelectModule={setCurrentModuleId} 
+							progress={progress} 
+							onResetProgress={handleResetProgress}
+							onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+						/>
+					)}
+				</div>
+			);
+		}
+
+		// --- Render the App into the DOM ---
+		const container = document.getElementById('root');
+		const root = ReactDOM.createRoot(container);
+		root.render(<App />);
+	</script>
+</body>
+</html>
