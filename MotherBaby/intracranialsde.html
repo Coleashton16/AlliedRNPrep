@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,9 +54,10 @@
         .nav-item.bg-gray-200:hover {
             background-color: #d1d5db;
         }
+        /* Style for Answered Questions */
         .nav-item.answered {
-            background-color: #d1d5db; /* A subdued color for answered questions */
-            color: #374151; /* Darker text for readability */
+            background-color: #d1d5db; 
+            color: #374151; 
         }
         .nav-item.answered::after {
             content: '';
@@ -71,24 +71,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Using a box-shadow to simulate a checkmark */
             box-shadow: 0 0 0 2px #10b981, 
                         inset 0 0 0 1px white,
                         inset 2px 2px 0 0 white,
                         inset -2px 2px 0 0 white;
             transform: rotate(-45deg);
         }
+        /* Style for Flagged Questions (New) */
+        .nav-item.flagged {
+            border: 2px solid #f59e0b; /* Amber/Gold border for easy spotting */
+            color: #f59e0b;
+        }
         .nav-item.active {
             background-color: #3b82f6;
             color: white;
             outline: 2px solid #3b82f6;
             outline-offset: 2px;
+            border: none; /* Remove gold border if active/blue */
         }
-        .nav-item.active.answered {
-            background-color: #3b82f6;
-            color: white;
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
+        .nav-item.active.flagged {
+            /* Keep the active color but add the border back */
+            border: 2px solid #f59e0b;
         }
         .nav-item.active.answered::after {
             background-color: white;
@@ -123,7 +126,7 @@
             justify-content: center;
             align-items: center;
             background-color: #e5e7eb;
-            border-radius: 9999px; /* Changed from rounded-0.25rem to fully rounded */
+            border-radius: 9999px;
             font-weight: 500;
             margin-right: 1rem;
             transition: all 0.2s;
@@ -143,17 +146,29 @@
             color: #9ca3af;
         }
         .review-box {
-            background-color: #f9fafb;
+            background-color: #ffffff; /* Changed to white for better contrast with children */
             padding: 1.5rem;
             border-radius: 0.75rem;
             margin-bottom: 1.5rem;
             border: 1px solid #e5e7eb;
         }
-        .correct-answer {
+        /* Review Screen Classes for Clarity (Modified) */
+        .review-option {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f9fafb;
+        }
+        .correct-answer-review {
             background-color: #dcfce7;
             border-color: #22c55e;
+            font-weight: 600;
         }
-        .incorrect-answer {
+        .user-incorrect-review {
             background-color: #fee2e2;
             border-color: #ef4444;
         }
@@ -243,12 +258,13 @@
 
     <!-- Review Screen -->
     <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
-        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <h2 class="text-3xl font-bold mb-2 text-custom-dark">Exam Review: Question Breakdown</h2>
+        <p class="text-gray-600 mb-8">Review the rationale for all questions you answered incorrectly.</p>
         <div id="review-questions" class="space-y-8">
             <!-- Missed questions review will be injected here -->
         </div>
         <div class="mt-8 text-center">
-            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review and View Score</button>
         </div>
     </div>
     
@@ -1347,7 +1363,7 @@
         let currentQuestionIndex = 0;
         let shuffledQuizData = [];
         let userAnswers = [];
-        let flaggedQuestions = Array(quizData.length).fill(false);
+        let flaggedQuestions = []; // Initialized in startQuiz
         let timeLeft = 7200; // 2 hours in seconds
         let timerInterval;
 
@@ -1430,7 +1446,7 @@
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center space-x-4">
                             <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
-                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white ${flaggedQuestions[currentQuestionIndex] ? 'bg-yellow-600 hover:bg-yellow-700' : 'btn-orange'} font-semibold">
                                 ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
                             </button>
                         </div>
@@ -1439,7 +1455,7 @@
                         <span class="mr-2">^</span> Which is the correct answer?
                     </div>
                     <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
-                    <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
+                    <div class="text-sm font-medium text-gray-500 mb-4">${questionData.type === 'mc' ? 'Select ONE answer' : 'Select ALL that apply'}</div>
                     <div id="options-container" class="space-y-4 flex-1"></div>
                 `;
                 
@@ -1488,6 +1504,14 @@
                 flagBtn.addEventListener('click', () => {
                     flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
                     flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    // Update the button color based on state
+                    if(flaggedQuestions[currentQuestionIndex]) {
+                         flagBtn.classList.remove('btn-orange');
+                         flagBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                    } else {
+                         flagBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                         flagBtn.classList.add('btn-orange');
+                    }
                     updateNavigationSidebar();
                 });
             }
@@ -1509,15 +1533,22 @@
         }
 
         /**
-         * Updates the left navigation sidebar with current question status.
+         * Updates the left navigation sidebar with current question status (including flagged state).
          */
         function updateNavigationSidebar() {
             if (navQuestionsContainer) {
                 navQuestionsContainer.innerHTML = '';
                 shuffledQuizData.forEach((_, i) => {
                     const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                    const isFlagged = flaggedQuestions[i]; // Check flag status
                     const navItem = document.createElement('div');
-                    navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                    
+                    let classes = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                    if (isFlagged) {
+                        classes += ' flagged'; // Add flagged class
+                    }
+
+                    navItem.className = classes;
                     navItem.textContent = i + 1;
                     navItem.onclick = () => {
                         saveUserAnswer();
@@ -1585,7 +1616,7 @@
         }
 
         /**
-         * Renders the review screen with missed questions.
+         * Renders the review screen with missed questions. (UPDATED for clarity)
          */
         function renderReviewScreen() {
             if (mainContent) mainContent.classList.add('hidden');
@@ -1596,7 +1627,7 @@
             if (!reviewQuestionsContainer) return;
             reviewQuestionsContainer.innerHTML = '';
             
-            const missedQuestions = [];
+            // Check all questions, not just missed ones, to show a full review breakdown
             shuffledQuizData.forEach((question, index) => {
                 const userAnswer = userAnswers[index] || [];
                 let isCorrect = false;
@@ -1610,56 +1641,80 @@
                     isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
                 }
 
-                if (!isCorrect) {
-                    missedQuestions.push({ question, index });
-                }
-            });
+                // Only show questions that were missed OR questions that were flagged, for a focused review
+                if (isCorrect && !flaggedQuestions[index]) return; 
 
-            if (missedQuestions.length === 0) {
-                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
-            } else {
-                missedQuestions.forEach(({ question, index }) => {
-                    const userAnswer = userAnswers[index] || [];
-                    const reviewItem = document.createElement('div');
-                    reviewItem.className = 'review-box';
-                    let optionsHtml = '';
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'review-box';
+                let optionsHtml = '';
+                let correctAnswersArray = Array.isArray(question.correctAnswer) ? question.correctAnswer : [question.correctAnswer];
+                
+                // Friendly status message for the review header
+                const statusColor = isCorrect ? 'text-green-600' : 'text-red-600';
+                const statusIcon = isCorrect ? '✅' : '❌';
+                const statusText = isCorrect ? 'Correctly Answered' : 'Incorrectly Answered';
 
-                    Object.keys(question.options).forEach(letter => {
-                        const isUserSelected = userAnswer.includes(letter);
-                        let correctAnswers = question.correctAnswer;
-                        if (!Array.isArray(correctAnswers)) {
-                            correctAnswers = [correctAnswers];
-                        }
-                        const isCorrectAnswer = correctAnswers.includes(letter);
-                        
-                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
-                        if (isCorrectAnswer) {
-                            optionClasses += ' correct-answer';
-                        }
-                        if (isUserSelected && !isCorrectAnswer) {
-                            optionClasses += ' incorrect-answer';
-                        }
+                Object.keys(question.options).forEach(letter => {
+                    const isUserSelected = userAnswer.includes(letter);
+                    const isCorrectAnswer = correctAnswersArray.includes(letter);
+                    
+                    let optionClasses = 'review-option';
+                    let statusLabel = '';
 
-                        optionsHtml += `
-                            <div class="${optionClasses}">
+                    if (isCorrectAnswer) {
+                        optionClasses += ' correct-answer-review';
+                        statusLabel += '<span class="text-xs font-bold text-green-700">✅ Correct Answer</span>';
+                    }
+
+                    if (isUserSelected && !isCorrectAnswer) {
+                        optionClasses += ' user-incorrect-review';
+                        statusLabel += '<span class="text-xs font-bold text-red-700">❌ Your Selection</span>';
+                    } else if (isUserSelected && isCorrectAnswer) {
+                         // User selected a correct answer
+                         statusLabel = '<span class="text-xs font-bold text-green-700">✅ Correct & Your Selection</span>';
+                    } else if (isCorrectAnswer && !isUserSelected) {
+                         // Correct answer was missed
+                         statusLabel = '<span class="text-xs font-bold text-green-700">✅ Correct Answer (Missed)</span>';
+                    } else if (isUserSelected && !isCorrectAnswer) {
+                        // User selected an incorrect answer (already handled above but for clarity)
+                        optionClasses += ' user-incorrect-review';
+                        statusLabel = '<span class="text-xs font-bold text-red-700">❌ Your Selection</span>';
+                    } else {
+                        // Unselected incorrect distractors
+                        statusLabel = '<span class="text-xs text-gray-400">Distractor</span>';
+                    }
+
+                    optionsHtml += `
+                        <div class="${optionClasses}">
+                            <div class="flex items-center space-x-3">
                                 <span class="option-letter bg-gray-300 rounded-full">${letter}</span>
-                                <span>${question.options[letter]}</span>
+                                <span class="flex-1">${question.options[letter]}</span>
                             </div>
-                        `;
-                    });
-
-                    reviewItem.innerHTML = `
-                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
-                        <div class="space-y-2 mb-4">
-                            ${optionsHtml}
-                        </div>
-                        <div class="p-4 bg-gray-100 rounded-lg">
-                            <h4 class="font-semibold text-lg">Rationale:</h4>
-                            <p class="text-gray-700">${question.rationale}</p>
+                            ${statusLabel}
                         </div>
                     `;
-                    reviewQuestionsContainer.appendChild(reviewItem);
                 });
+
+                reviewItem.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold">Question #${index + 1}: ${question.questionText}</h3>
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold ${statusColor} bg-white shadow-inner border border-current">
+                            ${statusIcon} ${statusText}
+                        </span>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        ${optionsHtml}
+                    </div>
+                    <div class="p-4 bg-gray-100 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-lg">Rationale:</h4>
+                        <p class="text-gray-700">${question.rationale}</p>
+                    </div>
+                `;
+                reviewQuestionsContainer.appendChild(reviewItem);
+            });
+            
+             if (reviewQuestionsContainer.innerHTML === '') {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all required questions correctly and have no flagged items to review.</div>`;
             }
         }
 
@@ -1689,15 +1744,6 @@
                     if (isFullyCorrect) {
                         questionScore = 1;
                     } 
-                    // Note: Partial credit logic is removed/simplified to standard NCLEX scoring (all or nothing) for simplicity, 
-                    // but the original had a partial credit line. I'll stick to all or nothing for clarity, but keep 
-                    // the full logic from the original file for SATA (partial credit for selected answers)
-                    /* const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
-                    if (!hasIncorrect && userSelections.size > 0) {
-                        questionScore = userSelections.size / correctAnswers.size; // This is the original partial credit logic
-                    }
-                    */
-
                 }
                 totalScore += questionScore;
             });
@@ -1759,7 +1805,7 @@
                 // 2. Select only the first MAX_QUESTIONS (30) for the actual test
                 shuffledQuizData = quizData.slice(0, MAX_QUESTIONS);
                 
-                // 3. Initialize user answers for the selected 30 questions
+                // 3. Initialize user answers and flags for the selected 30 questions
                 userAnswers = Array(shuffledQuizData.length).fill([]);
                 flaggedQuestions = Array(shuffledQuizData.length).fill(false); // Reset flags for new test
 
