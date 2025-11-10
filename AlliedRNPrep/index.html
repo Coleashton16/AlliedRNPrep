@@ -4,7 +4,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlliedRNPrep - Navigate Nursing School</title>
+    <title>AlliedRNPrep - Happy Fall Y'all</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for Icons -->
@@ -12,7 +12,7 @@
     <!-- Inter font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Custom CSS for animations and blob effect */
+        /* Custom CSS for generic animations */
         @keyframes fadeInFromBottom {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -34,10 +34,9 @@
         .animate-blob {
             animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
         }
+        
         /* Style for the password visibility toggle */
-        .password-input-container {
-            position: relative;
-        }
+        .password-input-container { position: relative; }
         .password-toggle-icon {
             position: absolute;
             top: 50%;
@@ -46,50 +45,76 @@
             cursor: pointer;
             color: #9ca3af; /* gray-400 */
         }
-        .password-toggle-icon:hover {
-            color: #374151; /* gray-700 */
-        }
-        /* Style for custom modal - Note: Modal CSS kept for general structure, but no longer used in HTML body */
-        .modal {
-            display: none;
+        .password-toggle-icon:hover { color: #574d41; /* Fall accent color */ }
+
+        /* --- FALL DECORATIONS --- */
+        
+        /* Fixed Container for Leaf Animation */
+        .leaf-container {
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            justify-content: center;
-            align-items: center;
+            pointer-events: none;
+            z-index: 5; 
+            overflow: hidden;
         }
-        .modal-content {
-            background-color: #fefefe;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            max-width: 400px;
-            width: 90%;
-            animation: slideInFromTop 0.3s ease-out;
+
+        /* Leaf Animation Keyframes */
+        @keyframes fall {
+            0% { 
+                transform: translate(var(--x-start), var(--y-start)) rotate(0deg) scale(1); 
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translate(var(--x-end), 100vh) rotate(var(--r-end)) scale(0.5); 
+                opacity: 0; 
+            }
         }
-        @keyframes slideInFromTop {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+
+        /* Leaf Element Style */
+        .leaf {
+            position: absolute;
+            background-color: var(--leaf-color);
+            border-radius: 50% 0 50% 0; /* Simple leaf shape */
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            animation: fall var(--duration) linear infinite;
+            z-index: 10;
+        }
+
+        /* Fall Themed Banner */
+        .fall-banner {
+            background-color: #92400E; /* Amber 800 */
+            color: white;
+            text-align: center;
+            padding: 0.5rem 0;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-sans antialiased text-gray-800">
+<body class="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 font-sans antialiased text-gray-800">
+
+    <!-- Leaf Animation Container (Fixed to Viewport) -->
+    <div id="leaf-container" class="leaf-container"></div>
+
+    <!-- Fall/Thanksgiving Banner -->
+    <div class="fall-banner sticky top-0 z-50">
+        🍁 Happy Thanksgiving! Take time to rest and recharge for the next semester. 🍂
+    </div>
 
     <!-- Authentication Container -->
     <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4">
         <div class="w-full max-w-md">
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-extrabold text-blue-700">AlliedRNPrep</h1>
+                <h1 class="text-4xl font-extrabold text-red-700">AlliedRNPrep</h1>
                 <p class="text-gray-600 mt-2">Secure Portal for Nursing Students</p>
             </div>
             <div class="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100">
                 <!-- Login/Signup Toggle -->
                 <div class="flex border border-gray-200 rounded-lg p-1 mb-6">
+                    <!-- Adjusted colors to Red/Orange scheme -->
                     <button id="show-login" class="w-1/2 p-2 rounded-md text-center font-semibold transition-all duration-300">Login</button>
                     <button id="show-signup" class="w-1/2 p-2 rounded-md text-center font-semibold transition-all duration-300">Sign Up</button>
                 </div>
@@ -98,31 +123,32 @@
                 <form id="auth-form" class="space-y-5">
                     <div>
                         <label for="auth-email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
                     </div>
 
                     <div class="password-input-container">
                         <label for="auth-password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
                         <i class="fas fa-eye password-toggle-icon" data-target="auth-password"></i>
                     </div>
 
                     <div id="confirm-password-group" class="hidden password-input-container">
                         <label for="auth-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input type="password" id="auth-confirm-password" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <input type="password" id="auth-confirm-password" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
                         <i class="fas fa-eye password-toggle-icon" data-target="auth-confirm-password"></i>
                     </div>
 
                     <div class="flex items-center justify-between text-sm">
                         <div class="flex items-center">
-                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
                             <label for="remember-me-checkbox" class="ml-2 block text-gray-900">Remember me</label>
                         </div>
-                        <a href="#" id="forgot-password-link" class="font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                        <a href="#" id="forgot-password-link" class="font-medium text-red-600 hover:text-red-500">Forgot password?</a>
                     </div>
 
                     <div>
-                        <button type="submit" id="main-auth-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
+                        <!-- Main button uses red scheme -->
+                        <button type="submit" id="main-auth-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-bold text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-transform transform hover:scale-105">
                             Login
                         </button>
                     </div>
@@ -133,41 +159,43 @@
         </div>
     </div>
 
-    <!-- Removed Custom Modal for Classroom Code Input -->
-
     <!-- Main Application Content (Initially Hidden) -->
     <div id="app-content" class="hidden min-h-screen">
         <!-- Header Section -->
-        <header class="bg-white shadow-lg py-4 relative z-10">
+        <header class="bg-white shadow-lg py-4 relative z-20">
             <div class="container mx-auto px-4 flex justify-between items-center">
-                <a href="#" class="text-3xl font-extrabold text-blue-700 rounded-lg p-2 hover:bg-blue-50 transition duration-300 transform hover:scale-105">
+                <!-- Logo text changed to red -->
+                <a href="#" class="text-3xl font-extrabold text-red-700 rounded-lg p-2 hover:bg-red-50 transition duration-300 transform hover:scale-105">
                     AlliedRNPrep
                 </a>
                 <nav>
                     <ul class="flex items-center space-x-8">
-                        <li><a href="#" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
-                        <li><a href="About.html" class="text-gray-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
+                        <!-- Navigation links updated to use red hover -->
+                        <li><a href="#" class="text-gray-700 hover:text-red-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
+                        <li><a href="About.html" class="text-gray-700 hover:text-red-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
                         <li id="logout-button-container" class="hidden">
                             <span id="welcome-user-name" class="text-gray-600 mr-4"></span>
-                            <button id="logout-button" class="bg-red-500 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-red-600 transition duration-300 font-bold transform hover:scale-105">Logout</button>
+                            <button id="logout-button" class="bg-gray-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-gray-800 transition duration-300 font-bold transform hover:scale-105">Logout</button>
                         </li>
                     </ul>
                 </nav>
             </div>
         </header>
 
-        <!-- Hero Section -->
-        <section class="relative bg-gradient-to-br from-blue-600 to-indigo-800 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
-            <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+        <!-- Hero Section - Updated to Fall Colors -->
+        <section class="relative bg-gradient-to-br from-red-800 to-orange-600 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
+            <!-- Blob effects updated to match fall colors -->
+            <div class="absolute top-0 left-0 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
             <div class="container mx-auto px-4 text-center relative z-10">
                 <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up">
-                    Navigate Nursing School with AlliedRNPrep.
+                    Fall into Success with AlliedRNPrep!
                 </h1>
                 <p class="text-xl md:text-2xl mb-10 max-w-4xl mx-auto opacity-95 animate-fade-in-up animation-delay-500">
-                    Access supplementary study resources and materials to support your nursing education journey.
+                    Access supplementary study resources and materials to support your nursing education journey this cozy season.
                 </p>
-                <button class="bg-white text-blue-700 px-10 py-5 rounded-full text-xl font-bold shadow-2xl hover:bg-gray-100 transform hover:scale-105 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
+                <!-- Button color updated -->
+                <button class="bg-white text-red-700 px-10 py-5 rounded-full text-xl font-bold shadow-2xl hover:bg-gray-100 transform hover:scale-105 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
                     Start Your Journey Today
                 </button>
             </div>
@@ -176,46 +204,47 @@
         <!-- Semesters Section -->
         <section class="py-20 md:py-32 bg-white relative z-10">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-800 animate-fade-in-up">
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-red-800 animate-fade-in-up">
                     Your Structured Path to Support
                 </h2>
                 <!-- Adjusted grid layout to support 5 cards cleanly on large screens -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-                    <!-- Semester One Card -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
-                        <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                    
+                    <!-- Card 1-4: Updated color accents -->
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
+                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester One</h3>
+                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester One</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supplementary resources for foundational concepts, basic patient care, and nursing principles.</p>
-                        <a href="SemesterOne.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <a href="SemesterOne.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
                     </div>
                     <!-- Semester Two Card -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
-                        <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
+                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Two</h3>
+                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester Two</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Additional materials for intermediate clinical skills, pharmacology, and common health alterations.</p>
-                        <a href="SemesterTwo.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <a href="SemesterTwo.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
                     </div>
                     <!-- Semester Three Card -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
-                        <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
+                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Three</h3>
+                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester Three</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
-                        <a href="SemesterThree.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <a href="SemesterThree.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
                     </div>
                     <!-- Semester Four Card -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-blue-300 group">
-                        <div class="bg-blue-100 text-blue-600 rounded-full p-5 mb-6 group-hover:bg-blue-200 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
+                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-blue-800 group-hover:text-blue-700 transition duration-300">Semester Four</h3>
+                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester Four</h3>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Preparation aids for leadership, management, community health, and NCLEX study strategies.</p>
-                        <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <a href="#" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
                     </div>
                     
                     <!-- HESI Exam Prep Card (Coming Soon) -->
@@ -295,6 +324,9 @@
         const showSignupButton = document.getElementById('show-signup');
         const confirmPasswordGroup = document.getElementById('confirm-password-group');
         const welcomeUserName = document.getElementById('welcome-user-name');
+        
+        // --- NEW: Leaf Generator Reference ---
+        const leafContainer = document.getElementById('leaf-container');
 
         let isLoginMode = true;
 
@@ -307,21 +339,21 @@
         function setAuthMode(mode) {
             isLoginMode = (mode === 'login');
             if (isLoginMode) {
-                // Style for Login mode
-                showLoginButton.classList.add('bg-blue-600', 'text-white');
+                // Style for Login mode (Red/White)
+                showLoginButton.classList.add('bg-red-600', 'text-white');
                 showLoginButton.classList.remove('bg-transparent', 'text-gray-600');
                 showSignupButton.classList.add('bg-transparent', 'text-gray-600');
-                showSignupButton.classList.remove('bg-blue-600', 'text-white');
+                showSignupButton.classList.remove('bg-red-600', 'text-white');
 
                 mainAuthButton.textContent = 'Login';
                 confirmPasswordGroup.classList.add('hidden');
                 forgotPasswordLink.classList.remove('hidden');
             } else {
-                // Style for Signup mode
-                showSignupButton.classList.add('bg-blue-600', 'text-white');
+                // Style for Signup mode (Red/White)
+                showSignupButton.classList.add('bg-red-600', 'text-white');
                 showSignupButton.classList.remove('bg-transparent', 'text-gray-600');
                 showLoginButton.classList.add('bg-transparent', 'text-gray-600');
-                showLoginButton.classList.remove('bg-blue-600', 'text-white');
+                showLoginButton.classList.remove('bg-red-600', 'text-white');
 
                 mainAuthButton.textContent = 'Create Account';
                 confirmPasswordGroup.classList.remove('hidden');
@@ -365,6 +397,43 @@
                 welcomeUserName.textContent = '';
             }
         }
+
+        // --- NEW: Falling Leaves Logic ---
+        function createLeaves(count) {
+            const colors = ['#D97706', '#92400E', '#B91C1C', '#94A3B8']; // Orange, Brown, Red, Slate (Grey)
+            const shapes = ['50% 0 50% 0', '0 50% 50% 50%', '50%']; // Maple, Oak, Round
+
+            for (let i = 0; i < count; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+
+                // Random parameters
+                const xStart = Math.random() * 100 + 'vw';
+                const yStart = Math.random() * -20 + 'vh'; // Start slightly above viewport
+                const duration = (Math.random() * 10) + 8; // 8 to 18 seconds
+                const delay = Math.random() * 15; // 0 to 15 seconds delay
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = Math.random() * 15 + 10; // 10px to 25px
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                const rEnd = Math.random() * 360 + 'deg';
+
+                // Set CSS variables for animation
+                leaf.style.setProperty('--x-start', xStart);
+                leaf.style.setProperty('--x-end', (Math.random() * 50 - 25) + 'vw'); // Horizontal drift
+                leaf.style.setProperty('--y-start', yStart);
+                leaf.style.setProperty('--r-end', rEnd);
+                leaf.style.setProperty('--duration', duration + 's');
+                
+                leaf.style.width = size + 'px';
+                leaf.style.height = size + 'px';
+                leaf.style.borderRadius = shape;
+                leaf.style.backgroundColor = color;
+                leaf.style.animationDelay = delay + 's';
+
+                leafContainer.appendChild(leaf);
+            }
+        }
+
 
         // --- Firebase Authentication Logic ---
 
@@ -463,9 +532,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             setAuthMode('login');
+            createLeaves(30); // Start the fall animation
         });
 
-        // Removed all Classroom Modal Logic here
     </script>
 </body>
 </html>
