@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bg-custom-dark {
+            background-color: #1f2937;
+        }
+        .text-custom-dark {
+            color: #1f2937;
+        }
+        .bg-custom-gray {
+            background-color: #e5e7eb;
+        }
+        .text-custom-gray {
+            color: #9ca3af;
+        }
+        .btn-orange {
+            background-color: #f97316;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c;
+        }
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        .nav-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-item.bg-gray-200:hover {
+            background-color: #d1d5db;
+        }
+        .nav-item.answered {
+            background-color: #d1d5db; /* A subdued color for answered questions */
+            color: #374151; /* Darker text for readability */
+        }
+        .nav-item.answered::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Using a box-shadow to simulate a checkmark */
+            box-shadow: 0 0 0 2px #10b981, 
+                        inset 0 0 0 1px white,
+                        inset 2px 2px 0 0 white,
+                        inset -2px 2px 0 0 white;
+            transform: rotate(-45deg);
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered::after {
+            background-color: white;
+            box-shadow: 0 0 0 2px white,
+                        inset 0 0 0 1px #10b981,
+                        inset 2px 2px 0 0 #10b981,
+                        inset -2px 2px 0 0 #10b981;
+        }
+        /* Style for locked (past) navigation items */
+        .nav-item.locked {
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .radio-btn, .check-btn {
+            display: none;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        .option-label .option-letter {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Changed from rounded-0.25rem to fully rounded */
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+        .radio-btn:checked + .option-label,
+        .check-btn:checked + .option-label {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .radio-btn:checked + .option-label .option-letter,
+        .check-btn:checked + .option-label .option-letter {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .review-box {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .loading-animation, .grade-screen, .rationale-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Header - Custom design based on image -->
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
+        <div class="flex items-center space-x-6">
+            <div class="font-bold">ARP</div>
+            <div class="hidden sm:block font-medium">Allied RN Prep</div>
+            <div class="hidden sm:block text-gray-400">Medical Surgical II Unit 1 Exam</div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.957.703l4.084-1.714a.75.75 0 00-.597-1.42l-3.375 1.416V6z" clip-rule="evenodd" />
+                </svg>
+                <span id="timer" class="font-semibold">02:00:00</span>
+            </div>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">EXAM CONTROLS</button>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">TOOL KIT</button>
+        </div>
+    </header>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
+
+    <!-- Main Content Area - Updated to a three-column layout -->
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-20 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
+            <div class="mb-4 text-xs text-gray-500">FILTER ></div>
+            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
+                <!-- Question navigation items will be injected here -->
+            </div>
+        </aside>
+
+        <!-- Question Section -->
+        <main class="flex-1 flex overflow-hidden">
+            <div id="question-container" class="flex-1 p-8 overflow-y-auto flex flex-col justify-between">
+                <!-- Question will be injected here -->
+            </div>
+            
+            <!-- Right Sidebar placeholder -->
+            <div class="hidden md:flex items-center justify-center bg-white border-l border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Screen -->
+    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
+        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <div id="review-questions" class="space-y-8">
+            <!-- Missed questions review will be injected here -->
+        </div>
+        <div class="mt-8 text-center">
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+        </div>
+    </div>
+    
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
+    </div>
+
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 md:w-1/2 mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-custom-dark">Exam Submitted Successfully!</h2>
+            <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+            <!-- Initial color class is text-blue-600, which will be overwritten by JS -->
+            <div class="text-6xl font-extrabold text-blue-600 mb-8 transition-colors duration-300" id="final-grade"></div>
+            
+            <!-- PARTIAL CREDIT TOGGLE -->
+            <div class="mt-6 mb-8 p-4 bg-gray-50 rounded-lg flex items-center justify-center space-x-3">
+                <label for="partial-credit-toggle" class="text-base font-medium text-gray-700 cursor-pointer">
+                    Apply Partial Credit (SATA Only)
+                </label>
+                <input type="checkbox" id="partial-credit-toggle" class="h-5 w-5 rounded-full text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer">
+            </div>
+            <!-- END PARTIAL CREDIT TOGGLE -->
+            
+            <button id="restart-btn" class="px-6 py-3 btn-blue text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+        </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
+            <span id="question-counter">1 OF 11 QUESTIONS</span>
+            <span class="hidden sm:block text-xs">VERSION 5.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- The 'Previous' button is permanently disabled for one-way navigation -->
+            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition cursor-not-allowed opacity-50" disabled>Previous</button>
+            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
+            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data and State ---
+        const quizData = [ 
+{
+    "questionText": "A nurse is assessing a client four hours postpartum who delivered vaginally. The nurse notes the fundus is firm, two fingerbreadths above the umbilicus, and deviated to the right. The priority nursing action should be to:",
+    "options": {
+      "A": "Encourage the client to ambulate to the bathroom to void.",
+      "B": "Gently massage the fundus to encourage contractions.",
+      "C": "Administer methylergonovine maleate (Methergine) as ordered.",
+      "D": "Document the finding as normal for a multiparous client."
+    },
+    "correctAnswer": "A",
+    "rationale": "A full bladder is the most common cause of uterine displacement (deviation) and atony in the postpartum period. A displaced uterus is at risk for hemorrhage because it cannot contract efficiently. The priority is to correct the cause by encouraging voiding.",
+    "section": "Postpartum Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client who delivered via elective Cesarean section $12$ hours ago has a temperature of $100.8^{\circ} \text{F}$ ($38.2^{\circ} \text{C}$) and a heart rate of $98 \text{ beats}/\text{min}$. Her incision is clean and dry. The nurse's best action is to:",
+    "options": {
+      "A": "Notify the primary healthcare provider immediately.",
+      "B": "Administer a prescribed antibiotic and antipyretic.",
+      "C": "Increase oral fluid intake and encourage the use of the incentive spirometer.",
+      "D": "Obtain a wound culture from the incision site."
+    },
+    "correctAnswer": "C",
+    "rationale": "A temperature up to $100.4^{\circ} \text{F}$ ($38^{\circ} \text{C}$) in the first $24$ hours postpartum is often due to dehydration or respiratory stasis (atelectasis), especially post-C-section. Increasing fluids and encouraging the incentive spirometer is the priority to manage the dehydration and prevent pulmonary complications.",
+    "section": "Postpartum Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which laboratory value, when assessed $24$ hours after an uncomplicated vaginal delivery, would the nurse consider a normal and expected finding?",
+    "options": {
+      "A": "White Blood Cell (WBC) count of $18,000 \text{ cells}/\text{mm}^3$.",
+      "B": "Hemoglobin (Hgb) of $9.5 \text{ g}/\text{dL}$.",
+      "C": "Platelet count of $90,000 \text{ cells}/\text{mm}^3$.",
+      "D": "Blood pressure of $90/60 \text{ mmHg}$."
+    },
+    "correctAnswer": "A",
+    "rationale": "Leukocytosis (an elevated WBC count) is common during the immediate postpartum period, often ranging from $14,000$ to $20,000 \text{ cells}/\text{mm}^3$ (or higher) due to the stress of labor and delivery.",
+    "section": "Postpartum Labs",
+    "type": "mc"
+  },
+  {
+    "questionText": "A postpartum client is tearful, reports difficulty sleeping, and feels overwhelmed three days after delivery. The nurse recognizes these findings as most consistent with:",
+    "options": {
+      "A": "Postpartum psychosis.",
+      "B": "Postpartum depression.",
+      "C": "Postpartum \"baby blues.\"",
+      "D": "Puerperal infection."
+    },
+    "correctAnswer": "C",
+    "rationale": "Postpartum \"baby blues\" is a common, transient condition occurring in up to $80\%$ of mothers, typically starting around day $3$ and resolving spontaneously within two weeks. Symptoms include mood lability, tearfulness, and feeling overwhelmed.",
+    "section": "Postpartum Mental Health",
+    "type": "mc"
+  },
+  {
+    "questionText": "When educating a client about normal lochia progression, the nurse should include which of the following statements?",
+    "options": {
+      "A": "\"Lochia alba is the initial discharge and will last for about three days.\"",
+      "B": "\"The amount of lochia should decrease daily and never revert to a previous color.\"",
+      "C": "\"You should expect lochia serosa to last for up to six weeks postpartum.\"",
+      "D": "\"Lochia rubra should only be present for $24$ hours, after which it should be serosa.\""
+    },
+    "correctAnswer": "B",
+    "rationale": "The progression of lochia (rubra $\rightarrow$ serosa $\rightarrow$ alba) and the overall volume should decrease daily. Any reverse progression (e.g., from serosa back to rubra) or a sudden increase in volume is a warning sign of hemorrhage.",
+    "section": "Postpartum Lochia",
+    "type": "mc"
+  },
+  {
+    "questionText": "To prevent the most common cause of postpartum hemorrhage, the nurse should prioritize which intervention?",
+    "options": {
+      "A": "Administering broad-spectrum antibiotics prophylactically.",
+      "B": "Ensuring the client voids every $2$ to $3$ hours.",
+      "C": "Placing the client in a side-lying position for rest.",
+      "D": "Restricting ambulation for the first $24$ hours postpartum."
+    },
+    "correctAnswer": "B",
+    "rationale": "The most common cause of postpartum hemorrhage is uterine atony, often exacerbated by a full bladder. An overdistended bladder prevents the uterus from contracting effectively. Promoting frequent voiding prevents bladder distention and supports firm uterine contraction.",
+    "section": "Postpartum Hemorrhage Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client is diagnosed with endometritis on the third postpartum day. The nurse should anticipate which combination of clinical findings?",
+    "options": {
+      "A": "Lochia alba with a foul odor and a temperature of $100.2^{\circ} \text{F}$.",
+      "B": "Uterine subinvolution, fever, and purulent, foul-smelling lochia.",
+      "C": "Scant lochia rubra, severe perineal pain, and blood pressure $140/90 \text{ mmHg}$.",
+      "D": "Headache, blurred vision, and epigastric pain."
+    },
+    "correctAnswer": "B",
+    "rationale": "Endometritis is a postpartum infection of the uterine lining. Classic signs include fever (usually over $100.4^{\circ} \text{F}$), uterine subinvolution (the uterus remains large and high), and purulent/foul-smelling lochia.",
+    "section": "Puerperal Infection",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is explaining the process of uterine involution to a new mother. Which statement best describes the expected rate of descent?",
+    "options": {
+      "A": "The fundus descends approximately $2 \text{ fingerbreadths}$ every $24$ hours.",
+      "B": "The fundus should be non-palpable by the second postpartum day.",
+      "C": "The fundus descends about $1 \text{ fingerbreadth}$ per day below the umbilicus.",
+      "D": "The uterus returns to its non-pregnant size around four weeks postpartum."
+    },
+    "correctAnswer": "C",
+    "rationale": "The normal rate of involution is for the fundus to descend approximately $1 \text{ cm}$ (or $1 \text{ fingerbreadth}$) per day below the umbilicus after the initial $24$ hours.",
+    "section": "Uterine Involution",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse assesses a client one hour after delivery and finds her perineal pad saturated and the fundus boggy. After calling for assistance, the nurse’s immediate priority action is to:",
+    "options": {
+      "A": "Start an IV bolus of Lactated Ringer's solution.",
+      "B": "Administer a blood transfusion.",
+      "C": "Initiate fundal massage until the uterus is firm.",
+      "D": "Elevate the client's legs to improve venous return."
+    },
+    "correctAnswer": "C",
+    "rationale": "The immediate priority for postpartum hemorrhage due to uterine atony (boggy fundus) is to mechanically stimulate the uterus to contract via vigorous fundal massage. This is the fastest, most effective way to address the cause of bleeding.",
+    "section": "Postpartum Hemorrhage Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which medication is the first-line pharmacologic treatment used for the prevention and treatment of postpartum hemorrhage caused by uterine atony?",
+    "options": {
+      "A": "Methylergonovine maleate (Methergine)",
+      "B": "Carboprost tromethamine (Hemabate)",
+      "C": "Oxytocin (Pitocin)",
+      "D": "Misoprostol (Cytotec)"
+    },
+    "correctAnswer": "C",
+    "rationale": "Oxytocin (Pitocin) is the primary medication used immediately after delivery to promote sustained uterine contractions and prevent/treat uterine atony, often given as an IV infusion.",
+    "section": "PPH Medications",
+    "type": "mc"
+  },
+  {
+    "questionText": "To help prevent mastitis in a breastfeeding client, the nurse should teach the client to prioritize:",
+    "options": {
+      "A": "Applying ice packs to the breasts after every feeding.",
+      "B": "Increasing her intake of dairy products.",
+      "C": "Ensuring complete emptying of the breasts with each feeding.",
+      "D": "Decreasing the frequency of breastfeeding to every six hours."
+    },
+    "correctAnswer": "C",
+    "rationale": "Mastitis is often caused by milk stasis, which allows bacteria to enter the milk duct. Complete emptying of the breast, either by nursing or pumping, prevents stasis and is the most critical preventative measure.",
+    "section": "Mastitis Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client calls the clinic reporting a localized, painful, red, and swollen area on her right breast, accompanied by a fever of $101.5^{\circ} \text{F}$. She is $3$ weeks postpartum and breastfeeding. The nurse should advise the client to:",
+    "options": {
+      "A": "Stop breastfeeding immediately and switch to formula.",
+      "B": "Apply warm compresses and continue to breastfeed frequently, starting with the affected breast.",
+      "C": "Pump the breast instead of nursing until the infection clears.",
+      "D": "Switch to a tighter-fitting bra to restrict milk flow."
+    },
+    "correctAnswer": "B",
+    "rationale": "The client is showing classic signs of mastitis. Treatment involves heat (warm compresses) and, critically, continued and complete emptying of the breast. Starting with the affected breast helps to ensure better drainage. Cessation of breastfeeding can worsen stasis and infection.",
+    "section": "Mastitis Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "When providing discharge teaching about contraception to a breastfeeding client, which method should the nurse recommend as the most appropriate first choice?",
+    "options": {
+      "A": "Combined oral contraceptives (COCs)",
+      "B": "Progestin-only pills (Minipill)",
+      "C": "Intrauterine device (IUD) with copper",
+      "D": "Contraceptive patch"
+    },
+    "correctAnswer": "B",
+    "rationale": "Estrogen-containing methods (COCs and the patch) can suppress lactation and decrease milk supply. Progestin-only pills are the preferred hormonal method during breastfeeding as they do not affect milk production.",
+    "section": "Postpartum Contraception",
+    "type": "mc"
+  },
+  {
+    "questionText": "According to Rubin's phases of maternal role attainment, the mother is primarily focused on meeting her own immediate needs, such as sleep and food, during which phase?",
+    "options": {
+      "A": "Letting-Go phase",
+      "B": "Taking-In phase",
+      "C": "Taking-Hold phase",
+      "D": "Attachment phase"
+    },
+    "correctAnswer": "B",
+    "rationale": "The Taking-In phase is the first phase, lasting $1$ to $2$ days, where the mother is largely dependent on others, focused on her own physical recovery, and repeatedly talks about her birth experience.",
+    "section": "Maternal Role Attainment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A mother is demonstrating interest in learning infant care skills, asking for assistance with a baby bath, and expressing anxiety about caring for her infant independently. The nurse recognizes this mother is most likely in which of Rubin's phases?",
+    "options": {
+      "A": "Letting-Go phase",
+      "B": "Attachment phase",
+      "C": "Taking-In phase",
+      "D": "Taking-Hold phase"
+    },
+    "correctAnswer": "D",
+    "rationale": "The Taking-Hold phase is characterized by the mother becoming independent, concerned about her own mothering ability, and eager to learn and assume responsibility for infant care.",
+    "section": "Maternal Role Attainment",
+    "type": "mc"
+  },
+  {
+    "questionText": "Where should the nurse expect to palpate the fundus $10$ days after an uncomplicated vaginal delivery?",
+    "options": {
+      "A": "At the level of the umbilicus.",
+      "B": "$5 \text{ cm}$ below the umbilicus.",
+      "C": "Not palpable abdominally.",
+      "D": "$2 \text{ fingerbreadths}$ above the symphysis pubis."
+    },
+    "correctAnswer": "C",
+    "rationale": "The fundus descends about $1 \text{ cm}$ (or $1 \text{ fingerbreadth}$) per day. By the $10$th to $14$th day, it has descended into the true pelvis and is no longer palpable abdominally.",
+    "section": "Uterine Involution",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is preparing to administer Rho(D) immune globulin (RhoGAM) to a client. Which condition must be met for this administration to be appropriate?",
+    "options": {
+      "A": "The client is $\text{Rh-positive}$ and the baby is $\text{Rh-negative}$.",
+      "B": "The client is $\text{Rh-negative}$ and the Coombs test is positive.",
+      "C": "The client is $\text{Rh-negative}$ and the baby is $\text{Rh-positive}$ with a negative direct Coombs test.",
+      "D": "The client is $\text{Rh-positive}$ and the baby is $\text{Rh-positive}$."
+    },
+    "correctAnswer": "C",
+    "rationale": "RhoGAM is given to an $\text{Rh-negative}$ mother to prevent her from developing antibodies to the $\text{Rh-positive}$ red blood cells of her baby. A negative Coombs test ensures sensitization has not yet occurred.",
+    "section": "Rh Incompatibility/RhoGAM",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client had a third-degree perineal laceration during delivery. Which instruction is most critical for the nurse to include in the discharge teaching?",
+    "options": {
+      "A": "Use a sitz bath with warm water twice daily for $15$ minutes.",
+      "B": "Take a stool softener daily to prevent straining with bowel movements.",
+      "C": "Restrict fluid intake to prevent the need for frequent voiding.",
+      "D": "Apply an ice pack every $4$ hours for $30$ minutes until pain subsides."
+    },
+    "correctAnswer": "B",
+    "rationale": "A third-degree laceration extends through the anal sphincter muscle. Stool softeners are crucial to ensure soft, easy-to-pass stools, preventing straining which could disrupt the surgical repair.",
+    "section": "Perineal Laceration Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following is considered the most significant risk factor for developing a puerperal infection?",
+    "options": {
+      "A": "Advanced maternal age ($>35 \text{ years}$)",
+      "B": "Previous history of a Cesarean section",
+      "C": "Prolonged rupture of membranes (PROM)",
+      "D": "Multiparity (having four or more children)"
+    },
+    "correctAnswer": "C",
+    "rationale": "Prolonged rupture of membranes (typically $>18$ to $24 \text{ hours}$) increases the risk by providing a direct ascending pathway for bacteria into the uterus.",
+    "section": "Puerperal Infection Risk",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is caring for a $6$-hour postpartum client who has had no urge to void since delivery. The fundus is firm, $1 \text{ fingerbreadth}$ above the umbilicus, and midline. The most appropriate initial action is to:",
+    "options": {
+      "A": "Catheterize the client for residual urine.",
+      "B": "Check for signs of a perineal hematoma.",
+      "C": "Encourage the client to try to void in the shower or with running water.",
+      "D": "Document the finding as normal since she just delivered."
+    },
+    "correctAnswer": "C",
+    "rationale": "Early postpartum urinary retention is common. The initial, least invasive intervention is to use comfort measures like showering or listening to running water to promote spontaneous voiding. Catheterization is a later intervention.",
+    "section": "Postpartum Urinary Function",
+    "type": "mc"
+  },
+  {
+    "questionText": "When teaching a client about caring for her Cesarean section incision, the nurse should include which instruction?",
+    "options": {
+      "A": "Scrub the incision vigorously with soap and water daily in the shower.",
+      "B": "Cover the incision with sterile gauze at all times.",
+      "C": "Wear a binder or tight clothing to compress the incision site.",
+      "D": "Gently wash the incision with soap and water and allow it to air dry."
+    },
+    "correctAnswer": "D",
+    "rationale": "The best C-section incision care involves keeping the site clean and dry. Gently washing it and allowing it to air dry reduces moisture that promotes microbial growth.",
+    "section": "C-Section Incision Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "A postpartum client who had a normal blood pressure during pregnancy reports a severe, persistent headache that is unrelieved by ibuprofen, $48$ hours after delivery. The nurse's highest priority action is to:",
+    "options": {
+      "A": "Assess the client's blood pressure, deep tendon reflexes (DTRs), and check for edema.",
+      "B": "Provide a warm compress for her neck and back.",
+      "C": "Administer an opioid analgesic for pain relief.",
+      "D": "Tell the client it is likely a stress-related headache from lack of sleep."
+    },
+    "correctAnswer": "A",
+    "rationale": "A severe, persistent headache postpartum, especially if unrelieved by standard analgesia, must be thoroughly evaluated as it can be a sign of a postdural puncture headache or, more dangerously, preeclampsia/eclampsia. Assessing BP, DTRs, and edema is the critical first step.",
+    "section": "Postpartum Headache/Preeclampsia",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which medication is most commonly prescribed to a client diagnosed with uterine subinvolution at her $4$-week postpartum checkup?",
+    "options": {
+      "A": "Magnesium sulfate",
+      "B": "Terbutaline (Brethine)",
+      "C": "Methylergonovine maleate (Methergine)",
+      "D": "Indomethacin"
+    },
+    "correctAnswer": "C",
+    "rationale": "Subinvolution is the failure of the uterus to return to a non-pregnant state. Methylergonovine maleate (Methergine) is a uterotonic medication that causes sustained uterine contractions, which helps the uterus firm up and return to normal size.",
+    "section": "Subinvolution Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse explains to a new mother that lochia rubra is expected to last for approximately how many days?",
+    "options": {
+      "A": "$1$ to $2 \text{ days}$",
+      "B": "$3$ to $4 \text{ days}$",
+      "C": "$5$ to $7 \text{ days}$",
+      "D": "$10$ to $14 \text{ days}$"
+    },
+    "correctAnswer": "B",
+    "rationale": "Lochia rubra, the initial discharge, is primarily blood and decidual tissue and typically lasts for $3$ to $4 \text{ days}$ postpartum. It is then followed by lochia serosa.",
+    "section": "Postpartum Lochia",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client is experiencing intense, uncontrollable shivering $30$ minutes after delivery. The nurse understands this is most likely related to:",
+    "options": {
+      "A": "Postpartum hemorrhage.",
+      "B": "An initial sign of puerperal infection.",
+      "C": "The body's response to a sudden release of pressure and thermoregulation instability.",
+      "D": "An adverse reaction to epidural anesthesia."
+    },
+    "correctAnswer": "C",
+    "rationale": "The \"postpartum shake\" or chills are a common, self-limiting phenomenon likely caused by the profound fluid shifts, hormonal changes, and the body's abrupt re-equilibration of core temperature following the effort of labor.",
+    "section": "Postpartum Physiologic Changes",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is assessing the legs of a postpartum client. Which finding would warrant the immediate notification of the healthcare provider due to suspicion of deep vein thrombosis (DVT)?",
+    "options": {
+      "A": "Bilateral calf pain when walking long distances.",
+      "B": "Unilateral redness, swelling, and warmth in the left calf.",
+      "C": "Bilateral foot and ankle edema.",
+      "D": "Pain in the calf that is only present when the client dorsiflexes her foot."
+    },
+    "correctAnswer": "B",
+    "rationale": "Unilateral symptoms—such as redness, swelling, warmth, and increased circumference—are the classic and most reliable clinical signs of a DVT and require immediate diagnostic investigation and treatment to prevent pulmonary embolism.",
+    "section": "Postpartum Thrombosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new mother is observed holding her baby \"en face\" and gently exploring the baby's fingers and toes. The nurse recognizes this behavior as an example of:",
+    "options": {
+      "A": "Letting-Go phase.",
+      "B": "Attachment behavior.",
+      "C": "Postpartum psychosis.",
+      "D": "Sexual phase."
+    },
+    "correctAnswer": "B",
+    "rationale": "\"En face\" (direct face-to-face contact) and exploratory touching are hallmark behaviors of early maternal-infant attachment, demonstrating the bonding process.",
+    "section": "Maternal-Infant Bonding",
+    "type": "mc"
+  },
+  {
+    "questionText": "To manage postpartum perineal edema and discomfort immediately following a vaginal delivery, the nurse should instruct the client to:",
+    "options": {
+      "A": "Apply heat packs to the perineum for the first $24$ hours.",
+      "B": "Take a warm sitz bath twice daily for $20$ minutes.",
+      "C": "Apply ice packs to the perineum intermittently for the first $24$ hours.",
+      "D": "Cleanse the perineum with a strong antiseptic solution after each void."
+    },
+    "correctAnswer": "C",
+    "rationale": "Applying cold/ice packs during the first $24$ hours postpartum is the most effective intervention for reducing swelling (edema) and numbing pain (discomfort) caused by perineal trauma.",
+    "section": "Perineal Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client's Hgb remains low ($9.2 \text{ g}/\text{dL}$) at discharge, $48$ hours after a C-section. She is asymptomatic. The nurse should prioritize teaching about:",
+    "options": {
+      "A": "The importance of limiting movement and staying in bed.",
+      "B": "Taking prescribed iron supplements with orange juice.",
+      "C": "Immediately seeking emergency care if she feels lightheaded.",
+      "D": "Avoiding all foods high in iron, such as red meat."
+    },
+    "correctAnswer": "B",
+    "rationale": "Iron supplements are best absorbed when taken with a source of Vitamin $\text{C}$ (such as orange juice) because Vitamin $\text{C}$ enhances iron absorption in the gastrointestinal tract.",
+    "section": "Postpartum Anemia/Nutrition",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which statement is the most concerning and suggestive of a need for immediate psychiatric consultation in a $1$-week postpartum client?",
+    "options": {
+      "A": "\"I feel so tired and overwhelmed, and I just keep bursting into tears.\"",
+      "B": "\"I'm having difficulty sleeping, even when the baby sleeps, and I can't eat.\"",
+      "C": "\"I think the television is telling me to hurt my baby because she is the devil.\"",
+      "D": "\"I worry constantly that I am not a good mother and I can't stop checking on the baby.\""
+    },
+    "correctAnswer": "C",
+    "rationale": "This statement describes a delusion and an auditory hallucination, which are cardinal signs of postpartum psychosis. This is a life-threatening psychiatric emergency due to the high risk of harm to the mother and/or infant.",
+    "section": "Postpartum Psychosis",
+    "type": "mc"
+  },
+  {
+    "questionText": "A full-term newborn's axillary temperature is $97.2^{\circ} \text{F}$ ($36.2^{\circ} \text{C}$) on admission to the nursery. The nurse’s priority intervention is to:",
+    "options": {
+      "A": "Document the finding and reassess in one hour.",
+      "B": "Initiate a full septic workup for hypothermia.",
+      "C": "Assess the infant's blood glucose level.",
+      "D": "Remove the wet blanket and place the infant under a radiant warmer."
+    },
+    "correctAnswer": "D",
+    "rationale": "The infant is hypothermic. The priority is to implement immediate rewarming measures, such as removing the source of heat loss (evaporation from a wet blanket) and using the radiant warmer.",
+    "section": "Neonatal Thermoregulation",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse notes that a newborn has an elongated head shape that crosses the suture lines and is located over the presenting part of the scalp. The nurse should correctly identify this finding as:",
+    "options": {
+      "A": "Cephalohematoma",
+      "B": "Molding",
+      "C": "Caput succedaneum",
+      "D": "Craniosynostosis"
+    },
+    "correctAnswer": "B",
+    "rationale": "Molding is the transient, elongated shaping of the fetal head to adapt to the birth canal during vaginal delivery. It is an expected, benign finding that resolves within a few days.",
+    "section": "Newborn Head Assessment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A newborn is assessed one minute after birth with the following findings: Heart Rate $110/\text{min}$, blue extremities with a pink body, weak cry, minimal flexion, and slow, irregular respirations. What is the correct APGAR score?",
+    "options": {
+      "A": "$8$",
+      "B": "$7$",
+      "C": "$6$",
+      "D": "$5$"
+    },
+    "correctAnswer": "C",
+    "rationale": "The score is calculated as: Appearance ($1$), Pulse ($2$), Grimace ($1$), Activity ($1$), Respiration ($1$), totaling $6$.",
+    "section": "APGAR Scoring",
+    "type": "mc"
+  },
+  {
+    "questionText": "After a vaginal delivery, the first priority nursing action for the newborn should be:",
+    "options": {
+      "A": "Identification by placing matching bands on the mother and baby.",
+      "B": "Assessing the infant's weight and length.",
+      "C": "Establishing a clear airway and drying the infant thoroughly.",
+      "D": "Administering prophylactic eye ointment and Vitamin $\text{K}$ injection."
+    },
+    "correctAnswer": "C",
+    "rationale": "The transition to extrauterine life depends on successful establishment of respirations and maintenance of body temperature. Drying the infant prevents evaporative heat loss, and maintaining a clear airway is always the immediate life-saving priority.",
+    "section": "Neonatal Immediate Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "A newborn delivered via Cesarean section is admitted to the nursery with a respiratory rate of $75 \text{ breaths}/\text{min}$ and grunting. The nurse's initial intervention should be to:",
+    "options": {
+      "A": "Place the infant under a radiant warmer and monitor the respiratory rate.",
+      "B": "Suction the infant's mouth and nose aggressively to remove fluid.",
+      "C": "Prepare to administer surfactant therapy immediately.",
+      "D": "Maintain the infant in a side-lying position and administer blow-by oxygen."
+    },
+    "correctAnswer": "D",
+    "rationale": "Infants delivered by $\text{C-section}$ are at risk for Transient Tachypnea of the Newborn (TTN) due to retained lung fluid. A side-lying position helps drain fluid, and blow-by oxygen can support the high respiratory effort.",
+    "section": "Neonatal Respiratory Distress",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is observing a new mother breastfeeding. Which action indicates a correct, effective latch?",
+    "options": {
+      "A": "The infant's lips are tucked inward, forming a tight circle around the nipple.",
+      "B": "The mother reports a sharp, continuous pain after the first few seconds of latch.",
+      "C": "The infant's nose is touching the breast, and the mouth covers only the nipple.",
+      "D": "The infant's mouth is wide open, covering the nipple and a large portion of the areola."
+    },
+    "correctAnswer": "D",
+    "rationale": "An effective latch involves the infant taking a large amount of the areola into the mouth, which allows the gums to compress the milk sinuses, facilitating milk removal and preventing nipple trauma.",
+    "section": "Breastfeeding",
+    "type": "mc"
+  },
+  {
+    "questionText": "To promote sleep safety and prevent Sudden Infant Death Syndrome (SIDS), the nurse should instruct the parents to:",
+    "options": {
+      "A": "Place the infant to sleep on the stomach to promote better drainage of secretions.",
+      "B": "Put the infant to sleep on a soft mattress with blankets and stuffed animals.",
+      "C": "Place the infant to sleep on the back in a crib alone.",
+      "D": "Co-sleep with the infant in the same bed for the first six months."
+    },
+    "correctAnswer": "C",
+    "rationale": "The \"Back to Sleep\" campaign is the primary recommendation for SIDS prevention: infants should be placed on their backs on a firm sleep surface, alone, and without any soft objects, pillows, or loose bedding.",
+    "section": "SIDS Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A father is observed gazing at his newborn, speaking in a high-pitched voice, and reporting, \"She has my ears.\" The nurse recognizes this paternal behavior as:",
+    "options": {
+      "A": "The Taking-In phase.",
+      "B": "Engrossment.",
+      "C": "Postpartum bonding.",
+      "D": "Attachment anxiety."
+    },
+    "correctAnswer": "B",
+    "rationale": "Engrossment is a specific term for the father's or partner's absorption, preoccupation, and interest in the infant, often noting features that resemble himself or the family.",
+    "section": "Paternal Bonding",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is preparing to administer Erythromycin ophthalmic ointment to a newborn. The primary purpose of this medication is to prevent:",
+    "options": {
+      "A": "Fungal infections of the eye.",
+      "B": "Ophthalmia neonatorum caused by Neisseria gonorrhoeae or Chlamydia trachomatis.",
+      "C": "Retinopathy of prematurity.",
+      "D": "Visual impairment from excessive light exposure."
+    },
+    "correctAnswer": "B",
+    "rationale": "Erythromycin ophthalmic ointment is mandatory prophylaxis for all newborns to prevent ophthalmia neonatorum, which can cause blindness, particularly if caused by gonorrhea or chlamydia passed from the mother.",
+    "section": "Newborn Medications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is preparing to transport a newly delivered infant from the delivery room to the post-anesthesia care unit (PACU). The best intervention to prevent heat loss by evaporation is to:",
+    "options": {
+      "A": "Ensure the bassinet is placed away from drafts.",
+      "B": "Place the infant on a warmed blanket.",
+      "C": "Dry the infant's skin thoroughly and replace the wet linens.",
+      "D": "Keep the walls of the isolette or bassinet closed."
+    },
+    "correctAnswer": "C",
+    "rationale": "Evaporation is the loss of heat when water is converted to vapor (e.g., amniotic fluid evaporating from the skin). Drying the infant immediately and replacing wet linens with dry ones is the most effective way to prevent this type of heat loss.",
+    "section": "Neonatal Heat Loss",
+    "type": "mc"
+  },
+  {
+    "questionText": "What is the expected normal range for a newborn's blood glucose level in the first $72$ hours of life?",
+    "options": {
+      "A": "$30-45 \text{ mg}/\text{dL}$",
+      "B": "$40-60 \text{ mg}/\text{dL}$",
+      "C": "$50-90 \text{ mg}/\text{dL}$",
+      "D": "$70-100 \text{ mg}/\text{dL}$"
+    },
+    "correctAnswer": "B",
+    "rationale": "Current guidelines consider a blood glucose level below $40 \text{ mg}/\text{dL}$ to be hypoglycemia. A normal and desirable range in the first $72$ hours of life is $40-60 \text{ mg}/\text{dL}$ and higher.",
+    "section": "Neonatal Glucose",
+    "type": "mc"
+  },
+  {
+    "questionText": "A neonate born at $37$ weeks gestation is jittery, lethargic, and has a weak cry. The nurse's initial action should be to:",
+    "options": {
+      "A": "Notify the primary healthcare provider.",
+      "B": "Feed the infant formula or breast milk.",
+      "C": "Check the infant's blood glucose level.",
+      "D": "Place the infant under a phototherapy lamp."
+    },
+    "correctAnswer": "C",
+    "rationale": "The symptoms (jitteriness, lethargy, weak cry) are classic signs of neonatal hypoglycemia. Checking the blood glucose level is the critical first step to confirm the diagnosis before intervening with feeding or medical treatment.",
+    "section": "Neonatal Hypoglycemia",
+    "type": "mc"
+  },
+  {
+    "questionText": "A large for gestational age (LGA) infant of a diabetic mother (IDM) is admitted to the nursery. The most critical aspect of the initial nursing assessment is monitoring for:",
+    "options": {
+      "A": "Hyperglycemia.",
+      "B": "Respiratory alkalosis.",
+      "C": "Hypoglycemia.",
+      "D": "Hyperthermia."
+    },
+    "correctAnswer": "C",
+    "rationale": "Infants of diabetic mothers often have hyperinsulinism due to the high glucose exposure in utero. After birth, when the glucose supply is abruptly cut off, the residual hyperinsulinism causes a precipitous drop in blood glucose, leading to hypoglycemia.",
+    "section": "Infants of Diabetic Mothers",
+    "type": "mc"
+  },
+  {
+    "questionText": "When is the State Screening Labs (Newborn Screening/Metabolic Screening) typically collected for a newborn?",
+    "options": {
+      "A": "Immediately after birth in the delivery room.",
+      "B": "Within $24$ hours of birth.",
+      "C": "After the infant is $24$ hours old and has received adequate protein feeding.",
+      "D": "At the first well-child visit, $1$ to $2$ weeks after discharge."
+    },
+    "correctAnswer": "C",
+    "rationale": "The newborn metabolic screen should be collected after $24$ hours of age to ensure the infant has ingested adequate amounts of protein to activate the necessary metabolic pathways for accurate testing.",
+    "section": "Newborn Screening",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse performs the Critical Congenital Heart Disease (CCHD) screening on a newborn and obtains the following results: Right hand oxygen saturation is $98\%$, and right foot saturation is $93\%$. The nurse should interpret this finding as:",
+    "options": {
+      "A": "A passed screen; no further action is needed.",
+      "B": "A failed screen; the infant should be referred for an echocardiogram.",
+      "C": "An inconclusive screen; the screen should be repeated in $1$ hour.",
+      "D": "A false-negative result; monitor for signs of distress."
+    },
+    "correctAnswer": "B",
+    "rationale": "A CCHD screen fails if the oxygen saturation is $<95\%$ in either extremity OR if there is a difference of $>3\%$ between the right hand and the foot saturation. The difference here is $5\%$, indicating a failed screen.",
+    "section": "CCHD Screening",
+    "type": "mc"
+  },
+  {
+    "questionText": "Physiologic jaundice in the newborn is characterized by:",
+    "options": {
+      "A": "Jaundice that appears within the first $24$ hours of life.",
+      "B": "An indirect bilirubin level that rises slowly and peaks between days $3$ and $5$.",
+      "C": "A serum bilirubin level that increases by more than $5 \text{ mg}/\text{dL}$ per day.",
+      "D": "Jaundice that persists beyond $14$ days of life in a full-term infant."
+    },
+    "correctAnswer": "B",
+    "rationale": "Physiologic jaundice is a benign, normal process that appears after $24$ hours of life, rises slowly, peaks between days $3$-$5$, and resolves spontaneously.",
+    "section": "Neonatal Jaundice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A newborn is undergoing phototherapy for hyperbilirubinemia. Which nursing intervention is essential to prevent a complication associated with this therapy?",
+    "options": {
+      "A": "Applying petroleum jelly to the infant's skin to prevent dryness.",
+      "B": "Covering the infant's eyes with protective patches.",
+      "C": "Increasing fluid intake and monitoring for decreased urine output.",
+      "D": "Minimizing the infant's temperature to prevent over-heating."
+    },
+    "correctAnswer": "B",
+    "rationale": "Covering the infant's eyes is essential to protect the retina from the intense light of the phototherapy lamps, which can cause damage.",
+    "section": "Phototherapy Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "A parent calls the clinic and reports that their $1$-week-old infant is not feeding well, is difficult to wake up, and has had only one wet diaper in the last $12$ hours. The nurse should advise the parent to:",
+    "options": {
+      "A": "Give the baby a pacifier and let the baby sleep longer.",
+      "B": "Offer a bottle of water and monitor the baby for an hour.",
+      "C": "Check the baby’s temperature and call back in $4$ hours if no change.",
+      "D": "Bring the infant to the Emergency Department immediately."
+    },
+    "correctAnswer": "D",
+    "rationale": "Lethargy, poor feeding, and severely decreased urinary output are classic warning signs of serious illness in a newborn, such as sepsis or severe dehydration. These symptoms warrant immediate evaluation in an emergency setting.",
+    "section": "Newborn Illness/Dehydration",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is providing discharge teaching regarding car seat safety. Which statement indicates the parents need further instruction?",
+    "options": {
+      "A": "\"The car seat should be placed in the back seat, facing the rear.\"",
+      "B": "\"The retainer clip should be positioned at the level of the baby's armpits.\"",
+      "C": "\"I can put a rolled towel next to the baby's head to keep it steady.\"",
+      "D": "\"The car seat straps should be snug so that I can't pinch the slack.\""
+    },
+    "correctAnswer": "C",
+    "rationale": "Nothing extra (towels, blankets, inserts that did not come with the seat) should be placed in the car seat around the infant, as this can compress with impact or interfere with harness function, increasing the risk of injury.",
+    "section": "Newborn Safety/Car Seat",
+    "type": "mc"
+  },
+  {
+    "questionText": "When teaching new parents how to prepare powdered formula, the nurse emphasizes:",
+    "options": {
+      "A": "Boiling the water for $5$ minutes and mixing the formula while the water is hot.",
+      "B": "Using non-fluoridated bottled water or boiled tap water that has cooled.",
+      "C": "Adding extra scoops of formula powder to ensure adequate nutrition.",
+      "D": "Storing any unused prepared formula at room temperature for up to $12$ hours."
+    },
+    "correctAnswer": "B",
+    "rationale": "Safe formula preparation involves using sterile water (boiled or bottled) that is cooled to prevent burns and kill potential pathogens. Non-fluoridated water is preferred.",
+    "section": "Newborn Feeding/Formula",
+    "type": "mc"
+  },
+  {
+    "questionText": "Meconium (the newborn's first stool) is expected to be passed within how many hours after birth?",
+    "options": {
+      "A": "$6 \text{ hours}$",
+      "B": "$12 \text{ hours}$",
+      "C": "$24$ to $48 \text{ hours}$",
+      "D": "$72 \text{ hours}$"
+    },
+    "correctAnswer": "C",
+    "rationale": "Meconium, a thick, tarry, dark green-black stool, is usually passed within the first $24$ to $48 \text{ hours}$ of life. Failure to pass meconium within this timeframe can indicate a problem.",
+    "section": "Newborn GI Function",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse performs the Moro reflex on a $2$-day-old infant by allowing the infant's head to fall backward slightly. A normal response would include:",
+    "options": {
+      "A": "The infant immediately grasping the nurse's finger.",
+      "B": "The infant turning the head toward the stimulus.",
+      "C": "The infant's arms extending outward with fingers spread, followed by arm flexion and a cry.",
+      "D": "The infant's legs extending and stiffening with plantar flexion."
+    },
+    "correctAnswer": "C",
+    "rationale": "The Moro reflex (or startle reflex) is a primary reflex where an abrupt change in the infant's head and neck position causes symmetric abduction and extension of the arms, followed by adduction and flexion, often accompanied by a cry.",
+    "section": "Newborn Reflexes",
+    "type": "mc"
+  },
+  {
+    "questionText": "A father asks how to care for his infant's recently circumcised penis. The nurse should instruct him to:",
+    "options": {
+      "A": "Wash the penis vigorously with soap and water at every diaper change.",
+      "B": "Cover the glans with a loose, bulky dressing for the first $48$ hours.",
+      "C": "Apply petroleum jelly or an antibiotic ointment with each diaper change for the first few days.",
+      "D": "Expect a constant stream of blood for the first $6$ hours after the procedure."
+    },
+    "correctAnswer": "C",
+    "rationale": "Applying petroleum jelly or a prescribed ointment prevents the glans from sticking to the diaper and promotes healing.",
+    "section": "Circumcision Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "When preparing to perform a heel stick for a newborn, the nurse should ensure which measure is implemented to minimize pain and maximize blood flow?",
+    "options": {
+      "A": "Applying an ice pack to the heel for $5$ minutes before the stick.",
+      "B": "Warming the heel area for $5$ to $10$ minutes prior to the procedure.",
+      "C": "Positioning the infant in the prone position during the stick.",
+      "D": "Sticking the center of the heel pad to avoid bone injury."
+    },
+    "correctAnswer": "B",
+    "rationale": "Warming the heel area increases localized blood flow (vasodilation) and can reduce the infant's perception of pain, making the procedure more efficient and less traumatic.",
+    "section": "Newborn Procedures/Pain Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is caring for a jaundiced newborn. Which assessment finding is a critical, late sign of severe hyperbilirubinemia (Kernicterus) and warrants immediate intervention?",
+    "options": {
+      "A": "The infant is sleeping for $3$-hour stretches between feedings.",
+      "B": "The infant exhibits a high-pitched, shrill cry and poor feeding.",
+      "C": "The infant has a yellow-tinged sclera and skin down to the abdomen.",
+      "D": "The infant has a slightly elevated bilirubin level of $12 \text{ mg}/\text{dL}$ at $36$ hours of life."
+    },
+    "correctAnswer": "B",
+    "rationale": "A high-pitched, shrill cry, poor feeding, lethargy, and hypotonia are neurological signs that bilirubin has crossed the blood-brain barrier and is causing acute bilirubin encephalopathy (Kernicterus), which is a medical emergency.",
+    "section": "Neonatal Jaundice Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "A healthy, term newborn is expected to lose approximately what percentage of their birth weight in the first $3$ to $5$ days of life?",
+    "options": {
+      "A": "$1-3\%$",
+      "B": "$5-10\%$",
+      "C": "$10-15\%$",
+      "D": "$15-20\%$"
+    },
+    "correctAnswer": "B",
+    "rationale": "Newborns typically lose $5\%$ to $10\%$ of their birth weight in the first few days, primarily due to fluid loss and delayed caloric intake. They should regain this weight within $10$ to $14$ days.",
+    "section": "Newborn Weight Loss",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse explains the benefits of colostrum to a new mother. Which benefit is most accurately described?",
+    "options": {
+      "A": "Colostrum is high in fat and lactose, providing immediate energy.",
+      "B": "Colostrum primarily aids in the development of the infant's eyesight.",
+      "C": "Colostrum is rich in maternal antibodies ($\text{IgA}$), providing passive immunity.",
+      "D": "Colostrum is a thin, watery fluid that acts as a stool softener."
+    },
+    "correctAnswer": "C",
+    "rationale": "Colostrum, the \"liquid gold\" produced in the first few days, is rich in maternal antibodies (Immunoglobulin $\text{A}$, $\text{IgA}$) which coat the infant's digestive tract, providing crucial passive immunity.",
+    "section": "Breast Milk/Colostrum",
+    "type": "mc"
+  },
+  {
+    "questionText": "To prevent heat loss in the newborn by conduction, the nurse should:",
+    "options": {
+      "A": "Keep the infant away from open windows.",
+      "B": "Ensure the infant's crib mattress is pre-warmed.",
+      "C": "Minimize the time the infant is wet after a bath.",
+      "D": "Swaddle the infant tightly in a dry blanket."
+    },
+    "correctAnswer": "B",
+    "rationale": "Conduction is the loss of heat from the body surface to a cooler surface in direct contact (e.g., a cold scale, cold mattress). Pre-warming surfaces or placing a barrier prevents this heat loss.",
+    "section": "Neonatal Heat Loss",
+    "type": "mc"
+  },
+  {
+    "questionText": "What is the expected initial average range for a full-term newborn's respiratory rate?",
+    "options": {
+      "A": "$15-30 \text{ breaths}/\text{min}$",
+      "B": "$30-60 \text{ breaths}/\text{min}$",
+      "C": "$60-80 \text{ breaths}/\text{min}$",
+      "D": "$80-100 \text{ breaths}/\text{min}$"
+    },
+    "correctAnswer": "B",
+    "rationale": "The normal respiratory rate for a newborn is $30 \text{ to } 60 \text{ breaths per minute}$, which is characteristically shallow and irregular.",
+    "section": "Newborn Vitals",
+    "type": "mc"
+  },
+  {
+    "questionText": "A full-term infant delivered via elective $\text{C-section}$ without labor is at the highest risk for which respiratory condition?",
+    "options": {
+      "A": "Meconium aspiration syndrome (MAS)",
+      "B": "Respiratory distress syndrome (RDS)",
+      "C": "Transient Tachypnea of the Newborn (TTN)",
+      "D": "Persistent pulmonary hypertension of the newborn (PPHN)"
+    },
+    "correctAnswer": "C",
+    "rationale": "Infants born by $\text{C-section}$ without labor lack the thoracic squeeze provided by vaginal birth, which helps expel lung fluid, making them highly susceptible to Transient Tachypnea of the Newborn (TTN) caused by retained fetal lung fluid.",
+    "section": "Neonatal Respiratory Distress",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which anatomic difference in the neurologic system of a child, compared to an adult, makes the child more susceptible to brain injury from acceleration-deceleration forces?",
+    "options": {
+      "A": "The pediatric skull is fully ossified.",
+      "B": "The child's brain has fewer blood vessels.",
+      "C": "The head size is proportionally larger in a child, and the neck muscles are weaker.",
+      "D": "The meninges are thicker and less flexible in a child."
+    },
+    "correctAnswer": "C",
+    "rationale": "A child's head is proportionally larger and heavier than an adult's relative to their body size, combined with weaker neck muscles. This disproportionate weight causes greater force during trauma, leading to increased risk of brain injury.",
+    "section": "Pediatric Neuro Anatomy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A key difference between the pediatric and adult spinal cord that affects injury patterns is:",
+    "options": {
+      "A": "The pediatric spinal cord is shorter and ends at a lower vertebral level than the adult's.",
+      "B": "The child's vertebral column is more flexible due to underdeveloped vertebral bodies.",
+      "C": "The child's spinal cord requires more force to cause a complete transection.",
+      "D": "The child's spinal column is less flexible at the thoracic level."
+    },
+    "correctAnswer": "B",
+    "rationale": "The pediatric vertebral column is more elastic and flexible due to incomplete ossification and underdeveloped facet joints. This allows the vertebrae to stretch significantly without breaking, leading to a higher incidence of Spinal Cord Injury Without Radiographic Abnormality (SCIWORA).",
+    "section": "Pediatric Spinal Cord",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is assessing the anterior fontanel of a $9$-month-old infant. Which finding is the most concerning and requires immediate reporting?",
+    "options": {
+      "A": "A soft, flat, and pulsating fontanel.",
+      "B": "A fontanel that is tense and bulging when the infant is crying.",
+      "C": "A depressed and sunken fontanel.",
+      "D": "A fontanel that measures $2 \text{ cm} \times 2 \text{ cm}$."
+    },
+    "correctAnswer": "C",
+    "rationale": "A depressed or sunken fontanel is a classic and significant sign of dehydration in an infant and requires fluid volume assessment and intervention.",
+    "section": "Neuro Assessment/Fontanel",
+    "type": "mc"
+  },
+  {
+    "questionText": "In the hierarchy of levels of consciousness ($\text{LOC}$), a child who is only arousable with vigorous and painful stimulation, and then immediately returns to an unconscious state, is described as:",
+    "options": {
+      "A": "Lethargic",
+      "B": "Obtunded",
+      "C": "Stuporous",
+      "D": "Comatose"
+    },
+    "correctAnswer": "C",
+    "rationale": "Stupor is defined as being arousable only with vigorous or painful stimulation, with minimal purposeful response, and quickly reverting to the unresponsive state.",
+    "section": "Levels of Consciousness",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which condition is the most common cause of altered level of consciousness ($\text{LOC}$) in a previously healthy toddler?",
+    "options": {
+      "A": "Brain tumor",
+      "B": "Reye syndrome",
+      "C": "Infection (e.g., Meningitis or Sepsis)",
+      "D": "Subdural hematoma"
+    },
+    "correctAnswer": "C",
+    "rationale": "Infection, specifically acute bacterial meningitis or sepsis, is a highly common and rapidly progressing cause of altered $\text{LOC}$ in the pediatric population due to systemic inflammatory response and increased intracranial pressure.",
+    "section": "Altered LOC Causes",
+    "type": "mc"
+  },
+  {
+    "questionText": "When calculating the Glasgow Coma Scale ($\text{GCS}$) for a $3$-year-old child, how is the Verbal Response component modified?",
+    "options": {
+      "A": "It is scored only on the child's ability to imitate words.",
+      "B": "It is scored based on the child's reaction to a spoken command, not orientation.",
+      "C": "It is scored using age-appropriate responses, such as smiling, crying, or appropriate words/sounds.",
+      "D": "The verbal component is omitted from the $\text{GCS}$ score in any child under $5$ years old."
+    },
+    "correctAnswer": "C",
+    "rationale": "The $\text{GCS}$ is modified for infants and young children because they cannot follow commands or be oriented to time and place. Verbal response is based on age-appropriate criteria (e.g., coos, cries, irritable, inappropriate words).",
+    "section": "Pediatric GCS",
+    "type": "mc"
+  },
+  {
+    "questionText": "The earliest and most subtle sign of an altered level of consciousness ($\text{LOC}$) in a young child is usually:",
+    "options": {
+      "A": "Fixed and dilated pupils.",
+      "B": "Alteration in the quality of crying and increased irritability.",
+      "C": "Significant drop in blood pressure.",
+      "D": "Onset of projectile vomiting."
+    },
+    "correctAnswer": "B",
+    "rationale": "Changes in behavior—specifically increased irritability, restlessness, or a change in the usual crying pattern (e.g., shrill, continuous cry)—are often the first signs of neurological deterioration or increased intracranial pressure ($\text{ICP}$) in a child.",
+    "section": "Increased ICP Signs",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which abnormal positional finding, characterized by rigid extension and pronation of the arms and flexion of the legs, is the most severe and indicates damage to the midbrain or upper brainstem?",
+    "options": {
+      "A": "Decorticate posturing",
+      "B": "Flaccid posturing",
+      "C": "Opisthotonos",
+      "D": "Decerebrate posturing"
+    },
+    "correctAnswer": "D",
+    "rationale": "Decerebrate posturing, involving rigid extension of the arms and legs, indicates severe damage to the midbrain or upper brainstem, carrying a worse prognosis than decorticate posturing.",
+    "section": "Posturing/Brain Injury",
+    "type": "mc"
+  },
+  {
+    "questionText": "For a child with a significantly altered level of consciousness, the nurse's highest priority intervention is to:",
+    "options": {
+      "A": "Place the child in $\text{Trendelenburg}$ position.",
+      "B": "Maintain a patent airway and monitor for aspiration.",
+      "C": "Administer an osmotic diuretic to reduce cerebral edema.",
+      "D": "Insert a nasogastric tube for feeding."
+    },
+    "correctAnswer": "B",
+    "rationale": "Aspiration is a major risk in any unconscious patient due to the loss of protective airway reflexes (cough, gag). Maintaining a patent airway and positioning to prevent aspiration is the highest priority life-saving measure.",
+    "section": "Altered LOC Priorities",
+    "type": "mc"
+  },
+  {
+    "questionText": "The primary goal of pharmacologic treatment for a child with a seizure disorder is to:",
+    "options": {
+      "A": "Eliminate all abnormal electrical activity in the brain.",
+      "B": "Achieve complete seizure freedom with minimal side effects.",
+      "C": "Prevent status epilepticus at all costs.",
+      "D": "Restore the child's social and academic life to normal."
+    },
+    "correctAnswer": "B",
+    "rationale": "The primary objective of anti-epileptic drug ($\text{AED}$) therapy is to control seizures as fully as possible (ideally complete freedom) using the lowest effective dose to minimize detrimental side effects and improve quality of life.",
+    "section": "Seizure Management Goal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A parent is administering phenytoin (Dilantin) suspension to their child for a new seizure disorder. Which instruction is most critical for the nurse to teach the parent?",
+    "options": {
+      "A": "Administer the medication on an empty stomach for better absorption.",
+      "B": "Monitor for increased appetite and weight gain.",
+      "C": "Ensure the child receives frequent dental care and gum massage.",
+      "D": "Stop the medication immediately if the child develops a rash."
+    },
+    "correctAnswer": "C",
+    "rationale": "Gingival hyperplasia (gum overgrowth) is a common and serious side effect of phenytoin. Regular dental check-ups, excellent oral hygiene, and gum massage are essential preventative measures.",
+    "section": "Phenytoin Teaching",
+    "type": "mc"
+  },
+  {
+    "questionText": "A $4$-month-old infant is diagnosed with non-communicating hydrocephalus. The nurse should assess the infant for which classic clinical manifestation?",
+    "options": {
+      "A": "A palpable, linear depression along the sagittal suture line.",
+      "B": "A head circumference measuring $40 \text{ cm}$ with separation of the suture lines.",
+      "C": "Severe, intermittent diarrhea and vomiting.",
+      "D": "A bulging posterior fontanel that closes early."
+    },
+    "correctAnswer": "B",
+    "rationale": "In an infant, the skull sutures are not fused, allowing the head to expand due to excessive CSF accumulation, resulting in a rapidly increasing head circumference and separated sutures.",
+    "section": "Infant Hydrocephalus Signs",
+    "type": "mc"
+  },
+  {
+    "questionText": "A $2$-year-old child with a ventriculoperitoneal ($\text{VP}$) shunt is admitted with a low-grade fever, lethargy, and poor feeding. The nurse recognizes that the most critical complication to assess for is:",
+    "options": {
+      "A": "Shunt failure due to obstruction.",
+      "B": "Shunt infection.",
+      "C": "GI perforation from the distal catheter.",
+      "D": "Tension pneumocephalus."
+    },
+    "correctAnswer": "B",
+    "rationale": "Fever, lethargy, and poor feeding are common initial signs of a shunt infection, which is a life-threatening complication that can quickly lead to meningitis or ventriculitis, requiring immediate antibiotic therapy.",
+    "section": "VP Shunt Complications",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which clinical manifestation is the most common early sign of increased intracranial pressure ($\text{ICP}$) due to possible $\text{VP}$ shunt failure in a preschool-aged child?",
+    "options": {
+      "A": "Bradycardia and wide pulse pressure.",
+      "B": "Difficulty sleeping and increased thirst.",
+      "C": "Headache upon awakening and vomiting.",
+      "D": "Flaccid posturing and loss of all reflexes."
+    },
+    "correctAnswer": "C",
+    "rationale": "The classic early signs of increased $\text{ICP}$ in an older child (preschool and up) are morning headache (due to the accumulation of $\text{CSF}$ overnight) and vomiting (often projectile and without nausea).",
+    "section": "Increased ICP/Shunt Failure",
+    "type": "mc"
+  },
+  {
+    "questionText": "When teaching parents about managing febrile seizures, the nurse should emphasize:",
+    "options": {
+      "A": "The need for daily maintenance anticonvulsant medication to prevent recurrence.",
+      "B": "Immediate administration of rectal diazepam when the seizure starts.",
+      "C": "Keeping the child's fever below $100^{\circ} \text{F}$ by giving scheduled antipyretics.",
+      "D": "Seeking medical evaluation for any fever in the future."
+    },
+    "correctAnswer": "C",
+    "rationale": "Febrile seizures are triggered by the rapidity of the temperature rise. Proactively managing fever with antipyretics and non-pharmacologic measures (like light clothing) is the primary preventative measure for the parents to implement.",
+    "section": "Febrile Seizure Teaching",
+    "type": "mc"
+  },
+  {
+    "questionText": "A child is currently in the postictal phase following a generalized tonic-clonic seizure. The nurse's most important intervention during this phase is to:",
+    "options": {
+      "A": "Attempt to wake the child by speaking loudly and sternly.",
+      "B": "Offer the child a full glass of water or juice immediately.",
+      "C": "Assess for injuries and allow the child to rest/sleep.",
+      "D": "Restrain the child's extremities to prevent further injury."
+    },
+    "correctAnswer": "C",
+    "rationale": "The postictal phase is a period of confusion, deep sleep, and often exhaustion. The priority nursing action is to ensure safety, assess for any injuries sustained during the seizure, and allow the child to recover by resting.",
+    "section": "Postictal Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "In a child with rising intracranial pressure ($\text{ICP}$), which finding is considered a late, critical sign of decompensation (Cushing's Triad)?",
+    "options": {
+      "A": "Sudden onset of projectile vomiting.",
+      "B": "Irritability and high-pitched cry.",
+      "C": "Bradycardia, widened pulse pressure, and irregular respirations.",
+      "D": "Change in pupil reactivity and size."
+    },
+    "correctAnswer": "C",
+    "rationale": "Cushing's Triad—characterized by bradycardia, systolic hypertension with a widened pulse pressure, and irregular respirations—is a critical, late sign of severe, sustained increased $\text{ICP}$ affecting the brainstem.",
+    "section": "Cushing's Triad",
+    "type": "mc"
+  },
+  {
+    "questionText": "A $7$-year-old child is admitted with a possible concussion. The nurse recognizes that the most common early sign of increased $\text{ICP}$ in this older child is:",
+    "options": {
+      "A": "MacEwen's sign (cracked pot sound) on percussion.",
+      "B": "Nausea and headache.",
+      "C": "Distended scalp veins.",
+      "D": "Bulging fontanel."
+    },
+    "correctAnswer": "B",
+    "rationale": "In older children, whose sutures have fused, the most common first signs of increasing $\text{ICP}$ are subtle changes, particularly headache (unrelieved by analgesics) and nausea/vomiting.",
+    "section": "Increased ICP in Older Child",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which test would the nurse use to assess the cerebellar function (balance and coordination) of a school-aged child?",
+    "options": {
+      "A": "The Babinski reflex.",
+      "B": "Romberg test.",
+      "C": "Pupillary reaction to light.",
+      "D": "Deep tendon reflexes ($\text{DTRs}$) of the knee."
+    },
+    "correctAnswer": "B",
+    "rationale": "The Romberg test involves the child standing with feet together and eyes closed. The inability to maintain balance (a positive $\text{Romberg}$ sign) indicates a problem with cerebellar function or proprioception.",
+    "section": "Neuro Assessment/Cerebellar",
+    "type": "mc"
+  },
+  {
+    "questionText": "Cushing's triad is a critical sign of increased intracranial pressure ($\text{ICP}$) that includes:",
+    "options": {
+      "A": "Tachypnea, hypotension, and fever.",
+      "B": "Bradycardia, hypertension with a widened pulse pressure, and irregular respirations.",
+      "C": "Tachycardia, narrow pulse pressure, and deep, rapid respirations.",
+      "D": "Hypotension, tachycardia, and hypothermia."
+    },
+    "correctAnswer": "B",
+    "rationale": "Cushing's triad is the definition of severe brainstem compression, characterized by bradycardia (slow $\text{HR}$), systolic hypertension with a widened pulse pressure, and irregular respirations.",
+    "section": "Cushing's Triad",
+    "type": "mc"
+  },
+  {
+    "questionText": "Reye Syndrome is an acute, non-inflammatory encephalopathy associated with:",
+    "options": {
+      "A": "Uncontrolled febrile seizures in infants.",
+      "B": "An upper respiratory infection treated with acetaminophen.",
+      "C": "A recent viral illness (influenza or varicella) treated with aspirin.",
+      "D": "Severe bacterial meningitis in a toddler."
+    },
+    "correctAnswer": "C",
+    "rationale": "Reye Syndrome is a rare but severe illness that is strongly linked to the use of aspirin (salicylates) in children recovering from a viral illness.",
+    "section": "Reye Syndrome",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is assessing a $3$-year-old toddler for signs of bacterial meningitis. Which finding would be the most difficult to elicit but is a classic sign of meningeal irritation?",
+    "options": {
+      "A": "Fever and poor feeding.",
+      "B": "Photophobia.",
+      "C": "Nuchal rigidity (stiff neck).",
+      "D": "Generalized full-body rash."
+    },
+    "correctAnswer": "C",
+    "rationale": "Nuchal rigidity (stiff neck) is a classic sign of meningeal irritation, but it can be difficult to assess or may be absent in young children and infants, making irritability the most prominent finding. However, among the classic signs listed, nuchal rigidity is the primary indicator of meningeal irritation.",
+    "section": "Bacterial Meningitis Signs",
+    "type": "mc"
+  },
+  {
+    "questionText": "A $5$-year-old child is admitted to the emergency department in status epilepticus. After establishing a patent airway, the nurse’s priority action is to administer:",
+    "options": {
+      "A": "Oral phenytoin (Dilantin)",
+      "B": "Intravenous lorazepam (Ativan) or diazepam (Valium)",
+      "C": "Rectal acetaminophen",
+      "D": "Maintenance dose of phenobarbital"
+    },
+    "correctAnswer": "B",
+    "rationale": "Status epilepticus is a medical emergency requiring rapid intervention. Intravenous benzodiazepines (lorazepam or diazepam) are the first-line drugs for aborting ongoing seizures due to their fast onset of action.",
+    "section": "Status Epilepticus Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "In the initial care plan for a newborn with an unrepaired myelomeningocele (a form of spina bifida), the priority nursing intervention is to:",
+    "options": {
+      "A": "Position the infant on the abdomen (prone) to prevent trauma to the sac.",
+      "B": "Assess the level of sensation by performing deep tendon reflexes.",
+      "C": "Cover the sac with a dry sterile dressing immediately.",
+      "D": "Begin range of motion exercises on the lower extremities."
+    },
+    "correctAnswer": "A",
+    "rationale": "The sac containing the spinal cord and nerves is fragile and highly susceptible to trauma and infection. Positioning the infant prone (on the abdomen) with hips slightly flexed is the standard and highest priority intervention to prevent rupture or injury to the sac.",
+    "section": "Myelomeningocele Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "When assessing the motor function and reflexes of an infant, the nurse notes that the infant is unable to bear weight when held in a standing position. This finding is interpreted as:",
+    "options": {
+      "A": "A normal, expected finding in a $3$-month-old.",
+      "B": "A positive Babinski reflex, indicating normal neurologic function.",
+      "C": "An abnormal finding, suggesting a delay in gross motor development.",
+      "D": "A delay in the development of the stepping (or walking) reflex."
+    },
+    "correctAnswer": "C",
+    "rationale": "An infant should show signs of gradually increasing ability to bear weight (positive support reflex). An absolute inability to bear any weight is an abnormal finding and suggests potential neuromuscular or developmental delay that warrants further investigation.",
+    "section": "Infant Motor Development",
+    "type": "mc"
+  }
+        ];
+
+        let currentQuestionIndex = 0;
+        let shuffledQuizData = [];
+        let userAnswers = [];
+        let flaggedQuestions = [];
+        let timeLeft = 7200; // 2 hours in seconds
+        let timerInterval;
+        let calculatedGrades = { // Stores results for both scoring modes
+            AON: 0, // All-or-Nothing (default)
+            Partial: 0 // Partial Credit
+        };
+
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const header = document.getElementById('header');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const navQuestionsContainer = document.getElementById('nav-questions');
+        const questionContainer = document.getElementById('question-container');
+        const reviewScreen = document.getElementById('review-screen');
+        const reviewQuestionsContainer = document.getElementById('review-questions');
+        const nextBtn = document.getElementById('next-btn');
+        const previousBtn = document.getElementById('previous-btn');
+        const submitExamBtn = document.getElementById('submit-exam-btn');
+        const endReviewBtn = document.getElementById('end-review-btn');
+        const timerDisplay = document.getElementById('timer');
+        const questionCounter = document.getElementById('question-counter');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const gradeScreen = document.getElementById('grade-screen');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        const restartBtn = document.getElementById('restart-btn');
+
+
+        // --- Helper Functions ---
+
+        /**
+         * Returns the appropriate Tailwind color class based on the score threshold.
+         */
+        function getGradeColorClass(score) {
+            // Below 77 is red (Danger)
+            if (score < 77) {
+                return 'text-red-600';
+            // 77 to 85 is yellow (Almost Danger)
+            } else if (score >= 77 && score <= 85) {
+                return 'text-yellow-600';
+            // Above 85 is green (Good)
+            } else {
+                return 'text-green-600';
+            }
+        }
+        
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Starts the 2-hour exam timer.
+         */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the timer display with the remaining time in HH:MM:SS format.
+         */
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            if (timerDisplay) {
+                timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        /**
+         * Renders the current question and its options.
+         */
+        function renderQuestion() {
+            if (currentQuestionIndex >= shuffledQuizData.length) {
+                submitExam();
+                return;
+            }
+
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (questionContainer) {
+                questionContainer.innerHTML = '';
+                const questionHtml = document.createElement('div');
+                questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm flex flex-col h-full';
+
+                questionHtml.innerHTML = `
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
+                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                                ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4 text-sm font-medium text-gray-500">
+                        <span class="mr-2">^</span> ${questionData.type === 'sata' ? 'Select all that apply' : 'Which is the correct answer?'}
+                    </div>
+                    <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
+                    <div class="text-sm font-medium text-gray-500 mb-4">Answers ${Object.keys(questionData.options)[0]} - ${Object.keys(questionData.options).pop()}</div>
+                    <div id="options-container" class="space-y-4 flex-1"></div>
+                `;
+                
+                const optionsContainer = questionHtml.querySelector('#options-container');
+
+                const optionLetters = Object.keys(questionData.options);
+                optionLetters.forEach(letter => {
+                    const optionText = questionData.options[letter];
+                    const isMultipleChoice = questionData.type === 'mc';
+                    const inputType = isMultipleChoice ? 'radio' : 'checkbox';
+                    const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'flex items-center space-x-2';
+                    optionDiv.innerHTML = `
+                        <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${isMultipleChoice ? 'radio-btn' : 'check-btn'}">
+                        <label for="option-${letter}" class="option-label">
+                            <span class="option-letter">${letter}</span>
+                            <span class="flex-1">${optionText}</span>
+                            <button class="strikethrough-btn p-1 rounded-full hover:bg-gray-100 transition" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.822a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.577-3.01-9.964-7.822z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </label>
+                    `;
+                    optionsContainer.appendChild(optionDiv);
+                });
+
+                questionContainer.appendChild(questionHtml);
+            }
+            
+            // Add event listeners for strike-through
+            document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent label click
+                    const label = e.target.closest('label');
+                    const textSpan = label.querySelector('span:nth-child(2)');
+                    textSpan.classList.toggle('strikethrough');
+                });
+            });
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', () => {
+                    flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+                    flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    updateNavigationSidebar();
+                });
+            }
+
+            // Restore previous answer selection
+            if (userAnswers[currentQuestionIndex]) {
+                const savedAnswers = userAnswers[currentQuestionIndex];
+                if (Array.isArray(savedAnswers)) {
+                    savedAnswers.forEach(answer => {
+                        const input = document.getElementById(`option-${answer}`);
+                        if (input) input.checked = true;
+                    });
+                }
+            }
+
+            updateNavigationSidebar();
+            updateQuestionCounter();
+            updateButtonStates();
+        }
+
+        /**
+         * Updates the left navigation sidebar with current question status and enforces one-way movement.
+         */
+        function updateNavigationSidebar() {
+            if (navQuestionsContainer) {
+                navQuestionsContainer.innerHTML = '';
+                shuffledQuizData.forEach((_, i) => {
+                    const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                    
+                    // LOCK LOGIC: Questions that are in the past (index < currentQuestionIndex) cannot be revisited.
+                    const isLocked = i < currentQuestionIndex;
+
+                    const navItem = document.createElement('div');
+                    navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+                    navItem.textContent = i + 1;
+                    
+                    navItem.onclick = () => {
+                        // Prevents backward navigation via the sidebar
+                        if (isLocked) {
+                            console.warn("Backward navigation via sidebar is disallowed in this exam mode.");
+                            return;
+                        }
+
+                        // Allows navigation only to the current question or future (unvisited) questions
+                        saveUserAnswer();
+                        currentQuestionIndex = i;
+                        renderQuestion();
+                    };
+                    navQuestionsContainer.appendChild(navItem);
+                });
+            }
+        }
+
+        /**
+         * Updates the question counter in the footer.
+         */
+        function updateQuestionCounter() {
+            if (questionCounter) {
+                questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
+            }
+        }
+
+        /**
+         * Manages the enabled/disabled/visible state of footer buttons.
+         */
+        function updateButtonStates() {
+            // The 'Previous' button is permanently disabled here to enforce the one-way rule.
+            if (previousBtn) {
+                previousBtn.disabled = true;
+                previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
+            }
+
+            if (nextBtn && submitExamBtn) {
+                if (currentQuestionIndex === shuffledQuizData.length - 1) {
+                    nextBtn.classList.add('hidden');
+                    submitExamBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitExamBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        /**
+         * Collects user's answer(s) for the current question.
+         */
+        function saveUserAnswer() {
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (!questionData) return;
+            let selectedAnswers = [];
+            if (questionData.type === 'mc') {
+                const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
+                if (selectedRadio) {
+                    selectedAnswers.push(selectedRadio.value);
+                }
+            } else if (questionData.type === 'sata') {
+                const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
+                selectedCheckboxes.forEach(checkbox => {
+                    selectedAnswers.push(checkbox.value);
+                });
+            }
+            userAnswers[currentQuestionIndex] = selectedAnswers;
+        }
+
+        /**
+         * Renders the review screen with missed questions.
+         */
+        function renderReviewScreen() {
+            if (mainContent) mainContent.classList.add('hidden');
+            if (reviewScreen) reviewScreen.classList.remove('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+
+            if (!reviewQuestionsContainer) return;
+            reviewQuestionsContainer.innerHTML = '';
+            
+            const missedQuestions = [];
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let isCorrect = false;
+
+                // The review screen uses "all or nothing" logic to determine if the question was "missed" (i.e., not perfect)
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    isCorrect = userAnswer[0] === correctAnswer;
+                } else if (question.type === 'sata') {
+                    const correctSet = new Set(question.correctAnswer);
+                    const userSet = new Set(userAnswer);
+                    // Check for perfect match for the purpose of flagging it as 'missed' for review.
+                    isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
+                }
+
+                if (!isCorrect) {
+                    missedQuestions.push({ question, index });
+                }
+            });
+
+            if (missedQuestions.length === 0) {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
+            } else {
+                missedQuestions.forEach(({ question, index }) => {
+                    const userAnswer = userAnswers[index] || [];
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-box';
+                    let optionsHtml = '';
+
+                    Object.keys(question.options).forEach(letter => {
+                        const isUserSelected = userAnswer.includes(letter);
+                        let correctAnswers = question.correctAnswer;
+                        if (!Array.isArray(correctAnswers)) {
+                            correctAnswers = [correctAnswers];
+                        }
+                        const isCorrectAnswer = correctAnswers.includes(letter);
+                        
+                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
+                        if (isCorrectAnswer) {
+                            optionClasses += ' correct-answer';
+                        }
+                        if (isUserSelected && !isCorrectAnswer) {
+                            optionClasses += ' incorrect-answer';
+                        }
+
+                        optionsHtml += `
+                            <div class="${optionClasses}">
+                                <span class="option-letter bg-gray-300 rounded-full">${letter}</span>
+                                <span>${question.options[letter]}</span>
+                            </div>
+                        `;
+                    });
+
+                    reviewItem.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
+                        <div class="space-y-2 mb-4">
+                            ${optionsHtml}
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-lg">
+                            <h4 class="font-semibold text-lg">Rationale:</h4>
+                            <p class="text-gray-700">${question.rationale}</p>
+                        </div>
+                    `;
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+            }
+        }
+
+        /**
+         * Calculates the final grade based on user answers.
+         * @param {boolean} usePartialCredit If true, applies partial scoring for SATA.
+         * @returns {number} The final grade percentage.
+         */
+        function calculateGrade(usePartialCredit) {
+            let totalScore = 0;
+            const totalQuestions = shuffledQuizData.length;
+
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let questionScore = 0; // Score is normalized between 0 and 1
+
+                if (question.type === 'mc') {
+                    // MC: All or nothing (Score is 1 or 0)
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    if (userAnswer[0] === correctAnswer) {
+                        questionScore = 1;
+                    }
+                } else if (question.type === 'sata') {
+                    const correctAnswers = new Set(question.correctAnswer);
+                    const userSelections = new Set(userAnswer);
+                    
+                    if (usePartialCredit) {
+                        // PARTIAL CREDIT LOGIC (Hits - Fouls / Required)
+                        const numCorrectRequired = correctAnswers.size;
+
+                        let hits = 0;
+                        userSelections.forEach(selection => {
+                            if (correctAnswers.has(selection)) {
+                                hits++;
+                            }
+                        });
+
+                        let fouls = userSelections.size - hits;
+                        let netScore = Math.max(0, hits - fouls); // Score cannot be negative
+                        
+                        questionScore = numCorrectRequired > 0 ? netScore / numCorrectRequired : 0;
+                        
+                    } else {
+                        // ALL-OR-NOTHING LOGIC for SATA
+                        const isPerfectMatch = correctAnswers.size === userSelections.size && [...correctAnswers].every(item => userSelections.has(item));
+                        if (isPerfectMatch) {
+                            questionScore = 1;
+                        }
+                    }
+                }
+                totalScore += questionScore;
+            });
+
+            // Total Score is the sum of normalized question scores (0 to 1). 
+            // The final percentage is (Total Score / Total Questions) * 100.
+            return Math.round((totalScore / totalQuestions) * 100);
+        }
+        
+        /**
+         * Handles the end of the exam review, showing a submission animation and grade.
+         */
+        function handleFinalSubmit() {
+            if (reviewScreen) reviewScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Calculating Grade...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                
+                // Calculate both modes and store them
+                calculatedGrades.Partial = calculateGrade(true);
+                calculatedGrades.AON = calculateGrade(false);
+
+                // Default to All-or-Nothing (AON)
+                const initialGrade = calculatedGrades.AON;
+                const initialColorClass = getGradeColorClass(initialGrade);
+
+                if (finalGradeDisplay) {
+                    finalGradeDisplay.textContent = `${initialGrade}%`;
+                    // Remove existing color classes (including the HTML default)
+                    finalGradeDisplay.classList.remove('text-red-600', 'text-yellow-600', 'text-green-600', 'text-blue-600');
+                    finalGradeDisplay.classList.add(initialColorClass);
+                }
+                
+                // Ensure we get a fresh reference and attach the listener successfully
+                const toggle = document.getElementById('partial-credit-toggle');
+                if (toggle) {
+                    toggle.checked = false;
+                    // Remove any existing listener before attaching a new one (for robustness)
+                    toggle.removeEventListener('change', updateGradeDisplay);
+                    toggle.addEventListener('change', updateGradeDisplay);
+                }
+
+                if (gradeScreen) gradeScreen.classList.remove('hidden');
+            }, 2000); // 2-second animation
+        }
+
+        /**
+         * Updates the displayed grade based on the partial credit toggle state and sets color.
+         */
+        function updateGradeDisplay() {
+            const toggle = document.getElementById('partial-credit-toggle');
+            const display = document.getElementById('final-grade');
+
+            // Use the element's current checked state
+            const isPartial = toggle ? toggle.checked : false;
+            const gradeToShow = isPartial ? calculatedGrades.Partial : calculatedGrades.AON;
+            const colorClass = getGradeColorClass(gradeToShow);
+
+            if (display) {
+                display.textContent = `${gradeToShow}%`;
+                
+                // Remove all possible color classes first
+                display.classList.remove('text-red-600', 'text-yellow-600', 'text-green-600', 'text-blue-600'); 
+                // Apply the new color class
+                display.classList.add(colorClass);
+            }
+        }
+
+        /**
+         * Submits the exam, stops the timer, and shows the review screen.
+         */
+        function submitExam() {
+            clearInterval(timerInterval);
+            saveUserAnswer();
+            renderReviewScreen();
+        }
+
+        /**
+         * Starts the quiz after the initial start screen.
+         */
+        function startQuiz() {
+            if (startScreen) startScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            document.querySelector('body').style.overflow = 'hidden';
+
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Starting Exam...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                if (header) header.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (footer) footer.classList.remove('hidden');
+                document.querySelector('body').style.overflow = '';
+                
+                shuffleArray(quizData);
+                shuffledQuizData = quizData.slice(0, quizData.length); // Use all questions in mock data
+                userAnswers = Array(shuffledQuizData.length).fill([]);
+                flaggedQuestions = Array(shuffledQuizData.length).fill(false);
+                startTimer();
+                renderQuestion();
+            }, 2000); // 2-second animation
+        }
+
+        // --- Event Listeners ---
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                saveUserAnswer();
+                if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+        }
+        
+        if (previousBtn) {
+            previousBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.warn("Backward movement is disabled for this exam.");
+                return; 
+            });
+        }
+
+        if (submitExamBtn) {
+            submitExamBtn.addEventListener('click', submitExam);
+        }
+        
+        if (endReviewBtn) {
+            endReviewBtn.addEventListener('click', handleFinalSubmit);
+        }
+        
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', startQuiz);
+        }
+
+    </script>
+
+</body>
+</html>
