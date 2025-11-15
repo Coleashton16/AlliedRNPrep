@@ -194,6 +194,13 @@
                             link: '/MotherBaby/newbornlearningmodule.html'
                         },
                         {
+                            type: 'exam',
+                            title: 'Unit 3 Exam Simulation',
+                            description: 'Practice test environment covering Unit 3 concepts: Intracranial, Cellular Regulation, Postpartum, and Newborn care.',
+                            icon: 'clipboard-check',
+                            link: '/MotherBaby/unit3examsim.html'
+                        },
+                        {
                             type: 'learn',
                             title: 'Intracranial SDE',
                             description: 'Student-developed learning resource for Intracranial Regulation.',
@@ -263,16 +270,16 @@
                         if (items.length === 0) return '';
                         const iconColor = { 'Learning Modules': 'text-sky-600', 'Diagnostic Exams': 'text-rose-600', 'Final Exam Prep': 'text-indigo-600' }[title] || 'text-slate-600';
                         return `
-                                <div class="mb-8">
-                                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
-                                        <i data-feather="${icon}" class="w-5 h-5 ${iconColor}"></i><span>${title}</span>
-                                    </h3>
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">${items.map(createResourceCard).join('')}</div>
+                                <div class="mb-8"><br>
+                                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2"><br>
+                                        <i data-feather="${icon}" class="w-5 h-5 ${iconColor}"></i><span>${title}</span><br>
+                                    </h3><br>
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">${items.map(createResourceCard).join('')}</div><br>
                                 </div>`;
                     };
                     
-                    resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
                     resourcesHTML += createSection('Diagnostic Exams', 'clipboard', exams);
+                    resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
                     resourcesHTML += createSection('Final Exam Prep', 'award', finalExams);
                     
                     contentHTML += resourcesHTML;
