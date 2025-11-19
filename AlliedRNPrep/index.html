@@ -232,54 +232,67 @@
                 <!-- Adjusted grid layout to support 5 cards cleanly on large screens -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
                     
-                    <!-- Card 1-4: Updated color accents -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
-                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
+                    <!-- Card 1: SEMESTER ONE (ARCHIVED/CLOSED) -->
+                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-50 cursor-not-allowed">
+                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester One</h3>
-                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supplementary resources for foundational concepts, basic patient care, and nursing principles.</p>
-                        <a href="SemesterOne.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">Semester One</h3>
+                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Resources archived due to impending site closure. Please use available materials in Semester 3.</p>
+                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed">
+                            Archived
+                        </span>
                     </div>
-                    <!-- Semester Two Card -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
-                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
+
+                    <!-- Card 2: SEMESTER TWO (ARCHIVED/CLOSED) -->
+                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-50 cursor-not-allowed">
+                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester Two</h3>
-                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Additional materials for intermediate clinical skills, pharmacology, and common health alterations.</p>
-                        <a href="SemesterTwo.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">Semester Two</h3>
+                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Resources archived due to impending site closure. Please use available materials in Semester 3.</p>
+                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed">
+                            Archived
+                        </span>
                     </div>
-                    <!-- Semester Three Card -->
+
+                    <!-- Card 3: SEMESTER THREE (OPEN WITH TIMER) -->
                     <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
-                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
+                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-4 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester Three</h3>
+                        <h3 class="text-2xl font-bold mb-3 text-red-800 group-hover:text-red-700 transition duration-300">Semester Three</h3>
+                        <!-- Closure Timer Display -->
+                        <div id="semester-three-timer" class="mb-5 w-full">
+                            <!-- Timer content inserted by JavaScript -->
+                        </div>
                         <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
-                        <a href="SemesterThree.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <a href="SemesterThree.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying Now</a>
                     </div>
-                    <!-- Semester Four Card -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
-                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-6 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
+
+                    <!-- Card 4: SEMESTER FOUR (ARCHIVED/CLOSED) -->
+                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-50 cursor-not-allowed">
+                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-red-800 group-hover:text-red-700 transition duration-300">Semester Four</h3>
-                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Preparation aids for leadership, management, community health, and NCLEX study strategies.</p>
-                        <a href="#" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying</a>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">Semester Four</h3>
+                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Resources archived due to impending site closure. Please use available materials in Semester 3.</p>
+                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed">
+                            Archived
+                        </span>
                     </div>
                     
-                    <!-- HESI Exam Prep Card (Coming Soon) -->
-                    <div class="bg-gray-50 rounded-2xl shadow-xl transform transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-200 opacity-80 cursor-not-allowed">
+                    <!-- Card 5: HESI Exam Prep (CANCELLED) -->
+                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-40 cursor-not-allowed">
                         <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300 transform">
                             <!-- Icon symbolizing testing/launch -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-700 transition duration-300">HESI Exam Prep</h3>
-                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Dedicated resources, practice exams, and comprehensive review materials specifically for HESI success.</p>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">HESI Exam Prep</h3>
+                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Development of this section has been permanently cancelled due to site closure.</p>
                         <!-- Disabled Button -->
-                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
-                            Coming Soon
+                        <span class="bg-red-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
+                            Cancelled
                         </span>
                     </div>
 
@@ -347,8 +360,13 @@
         const confirmPasswordGroup = document.getElementById('confirm-password-group');
         const welcomeUserName = document.getElementById('welcome-user-name');
         
-        // --- NEW: Leaf Generator Reference ---
+        // --- Leaf Generator Reference ---
         const leafContainer = document.getElementById('leaf-container');
+
+        // --- Timer Logic Setup ---
+        // Target closure date: Wednesday, December 17, 2025, 00:00:00 local time
+        const CLOSURE_DATE = new Date('2025-12-17T00:00:00').getTime(); 
+        let timerInterval;
 
         let isLoginMode = true;
 
@@ -395,6 +413,44 @@
         }
 
         /**
+         * Updates the countdown timer display for Semester 3.
+         */
+        function updateClosureTimer() {
+            const now = new Date().getTime();
+            const distance = CLOSURE_DATE - now;
+
+            const timerElement = document.getElementById('semester-three-timer');
+
+            if (!timerElement) {
+                // If element isn't available (e.g., component not loaded yet)
+                return;
+            }
+
+            if (distance < 0) {
+                timerElement.innerHTML = `<span class="text-2xl text-red-700 font-bold">RESOURCE IS NOW CLOSED.</span>`;
+                clearInterval(timerInterval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timerElement.innerHTML = `
+                <div class="text-center bg-red-50 p-3 rounded-lg border-2 border-red-300">
+                    <p class="text-red-700 font-bold mb-2 text-md">REMAINS OPEN FOR:</p>
+                    <div class="flex justify-center space-x-2 text-base font-extrabold">
+                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${days}D</span>
+                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${hours}H</span>
+                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${minutes}M</span>
+                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${seconds}S</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
          * Updates the UI based on the user's authentication state.
          * @param {object|null} user - The Firebase user object, or null if not signed in.
          */
@@ -412,15 +468,27 @@
                     welcomeUserName.textContent = `Welcome!`;
                 }
 
+                // START TIMER (only when logged in)
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                updateClosureTimer(); // Initial call
+                timerInterval = setInterval(updateClosureTimer, 1000);
+
             } else {
                 authContainer.classList.remove('hidden');
                 appContent.classList.add('hidden');
                 logoutButtonContainer.classList.add('hidden');
                 welcomeUserName.textContent = '';
+                
+                // STOP TIMER (when logged out)
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
             }
         }
 
-        // --- NEW: Falling Leaves Logic ---
+        // --- Falling Leaves Logic ---
         function createLeaves(count) {
             const colors = ['#D97706', '#92400E', '#B91C1C', '#94A3B8']; // Orange, Brown, Red, Slate (Grey)
             const shapes = ['50% 0 50% 0', '0 50% 50% 50%', '50%']; // Maple, Oak, Round
