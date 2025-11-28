@@ -4,7 +4,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlliedRNPrep - Happy Fall Y'all</title>
+    <title>AlliedRNPrep - Finish Strong</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for Icons -->
@@ -12,7 +12,7 @@
     <!-- Inter font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Custom CSS for generic animations */
+        /* Custom CSS for animations */
         @keyframes fadeInFromBottom {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -35,7 +35,7 @@
             animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
         }
         
-        /* Style for the password visibility toggle */
+        /* Password Visibility Toggle */
         .password-input-container { position: relative; }
         .password-toggle-icon {
             position: absolute;
@@ -43,14 +43,14 @@
             right: 1rem;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #9ca3af; /* gray-400 */
+            color: #9ca3af; 
         }
-        .password-toggle-icon:hover { color: #574d41; /* Fall accent color */ }
+        .password-toggle-icon:hover { color: #2563EB; /* Blue-600 hover */ }
 
-        /* --- FALL DECORATIONS --- */
+        /* --- WINTER SNOW ANIMATION --- */
         
-        /* Fixed Container for Leaf Animation */
-        .leaf-container {
+        /* Fixed Container for Snow */
+        .snow-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -61,60 +61,67 @@
             overflow: hidden;
         }
 
-        /* Leaf Animation Keyframes */
-        @keyframes fall {
+        /* Snowfall Keyframes */
+        @keyframes snowfall {
             0% { 
-                transform: translate(var(--x-start), var(--y-start)) rotate(0deg) scale(1); 
-                opacity: 0.8;
+                transform: translate(var(--x-start), -10px); 
+                opacity: var(--opacity);
             }
             100% { 
-                transform: translate(var(--x-end), 100vh) rotate(var(--r-end)) scale(0.5); 
+                transform: translate(var(--x-end), 105vh); 
                 opacity: 0; 
             }
         }
 
-        /* Leaf Element Style */
-        .leaf {
+        /* Snowflake Style */
+        .snowflake {
             position: absolute;
-            background-color: var(--leaf-color);
-            border-radius: 50% 0 50% 0; /* Simple leaf shape */
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-            animation: fall var(--duration) linear infinite;
+            background-color: white;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: snowfall var(--duration) linear infinite;
+            width: var(--size);
+            height: var(--size);
+            opacity: var(--opacity);
             z-index: 10;
         }
 
-        /* Fall Themed Banner */
-        .fall-banner {
-            background-color: #92400E; /* Amber 800 */
+        /* Winter Banner */
+        .winter-banner {
+            background-color: #1E3A8A; /* Blue 900 */
             color: white;
             text-align: center;
             padding: 0.5rem 0;
             font-weight: 600;
             font-size: 0.9rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 font-sans antialiased text-gray-800">
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased text-slate-800">
 
-    <!-- Leaf Animation Container (Fixed to Viewport) -->
-    <div id="leaf-container" class="leaf-container"></div>
+    <!-- Snow Animation Container -->
+    <div id="snow-container" class="snow-container"></div>
 
-    <!-- Fall/Thanksgiving Banner -->
-    <div class="fall-banner sticky top-0 z-50">
-        🍁 Happy Thanksgiving! Take time to rest and recharge for the next semester. 🍂
+    <!-- Winter Banner -->
+    <div class="winter-banner sticky top-0 z-50 flex justify-center items-center space-x-2">
+        <i class="fas fa-snowflake animate-spin-slow" style="animation-duration: 10s;"></i>
+        <span>Finish Strong! The Semester Ends on <strong>Friday, December 5th</strong>.</span>
+        <i class="fas fa-snowflake animate-spin-slow" style="animation-duration: 10s;"></i>
     </div>
 
     <!-- Authentication Container -->
-    <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4">
+    <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4 relative z-20">
         <div class="w-full max-w-md">
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-extrabold text-red-700">AlliedRNPrep</h1>
-                <p class="text-gray-600 mt-2">Secure Portal for Nursing Students</p>
+                <!-- Logo text changed to Winter Blue -->
+                <h1 class="text-4xl font-extrabold text-blue-900 drop-shadow-sm">AlliedRNPrep</h1>
+                <p class="text-slate-600 mt-2 font-medium">Secure Portal for Nursing Students</p>
             </div>
-            <div class="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100">
+            <div class="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-blue-100">
                 <!-- Login/Signup Toggle -->
-                <div class="flex border border-gray-200 rounded-lg p-1 mb-6">
-                    <!-- Adjusted colors to Red/Orange scheme -->
+                <div class="flex border border-slate-200 rounded-lg p-1 mb-6">
+                    <!-- Adjusted colors to Blue scheme -->
                     <button id="show-login" class="w-1/2 p-2 rounded-md text-center font-semibold transition-all duration-300">Login</button>
                     <button id="show-signup" class="w-1/2 p-2 rounded-md text-center font-semibold transition-all duration-300">Sign Up</button>
                 </div>
@@ -122,33 +129,33 @@
                 <!-- Form -->
                 <form id="auth-form" class="space-y-5">
                     <div>
-                        <label for="auth-email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
+                        <label for="auth-email" class="block text-sm font-medium text-slate-700">Email Address</label>
+                        <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     </div>
 
                     <div class="password-input-container">
-                        <label for="auth-password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
+                        <label for="auth-password" class="block text-sm font-medium text-slate-700">Password</label>
+                        <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                         <i class="fas fa-eye password-toggle-icon" data-target="auth-password"></i>
                     </div>
 
                     <div id="confirm-password-group" class="hidden password-input-container">
-                        <label for="auth-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input type="password" id="auth-confirm-password" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
+                        <label for="auth-confirm-password" class="block text-sm font-medium text-slate-700">Confirm Password</label>
+                        <input type="password" id="auth-confirm-password" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                         <i class="fas fa-eye password-toggle-icon" data-target="auth-confirm-password"></i>
                     </div>
 
                     <div class="flex items-center justify-between text-sm">
                         <div class="flex items-center">
-                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-                            <label for="remember-me-checkbox" class="ml-2 block text-gray-900">Remember me</label>
+                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+                            <label for="remember-me-checkbox" class="ml-2 block text-slate-900">Remember me</label>
                         </div>
-                        <a href="#" id="forgot-password-link" class="font-medium text-red-600 hover:text-red-500">Forgot password?</a>
+                        <a href="#" id="forgot-password-link" class="font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
                     </div>
 
                     <div>
-                        <!-- Main button uses red scheme -->
-                        <button type="submit" id="main-auth-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-bold text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-transform transform hover:scale-105">
+                        <!-- Main button uses Blue scheme -->
+                        <button type="submit" id="main-auth-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
                             Login
                         </button>
                     </div>
@@ -161,76 +168,58 @@
 
     <!-- Main Application Content (Initially Hidden) -->
     <div id="app-content" class="hidden min-h-screen">
-        <!-- Floating Vote Button (UPDATED) -->
-        <a id="vote-button" href="mailto:alliedrnprep@mail.com?subject=TOS%20VOTE%20to%20Keep%20AlliedRNPrep%20Active%20Until%2012-17-2025" 
-           class="fixed bottom-8 left-8 z-50 bg-red-600 text-white p-4 rounded-full 
-                  shadow-xl flex items-center space-x-2 text-lg font-bold uppercase 
-                  transition-all duration-300 transform hover:scale-110 hover:bg-red-700 
-                  ring-4 ring-white ring-opacity-50">
-            <i class="fas fa-vote-yea"></i>
-            <!-- Updated text to reference TOS and Arbitration Clause -->
-            <span class="hidden sm:inline">TOS VOTE: Keep Active (Per Arbitration Clause)</span>
-            <span class="inline sm:hidden">TOS Vote</span>
-        </a>
         
         <!-- Header Section -->
-        <header class="bg-white shadow-lg py-4 relative z-20">
+        <header class="bg-white/95 backdrop-blur shadow-lg py-4 relative z-20">
             <div class="container mx-auto px-4 flex justify-between items-center">
-                <!-- Logo text changed to red -->
-                <a href="#" class="text-3xl font-extrabold text-red-700 rounded-lg p-2 hover:bg-red-50 transition duration-300 transform hover:scale-105">
+                <!-- Logo text Blue -->
+                <a href="#" class="text-3xl font-extrabold text-blue-800 rounded-lg p-2 hover:bg-blue-50 transition duration-300 transform hover:scale-105">
                     AlliedRNPrep
                 </a>
                 <nav>
                     <ul class="flex items-center space-x-8">
-                        <!-- Navigation links updated to use red hover -->
-                        <li><a href="#" class="text-gray-700 hover:text-red-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">Home</a></li>
-                        <li><a href="About.html" class="text-gray-700 hover:text-red-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-gray-100">About Us</a></li>
+                        <li><a href="#" class="text-slate-600 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-slate-50">Home</a></li>
+                        <li><a href="About.html" class="text-slate-600 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-slate-50">About Us</a></li>
                         <li id="logout-button-container" class="hidden">
-                            <span id="welcome-user-name" class="text-gray-600 mr-4"></span>
-                            <button id="logout-button" class="bg-gray-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-gray-800 transition duration-300 font-bold transform hover:scale-105">Logout</button>
+                            <span id="welcome-user-name" class="text-slate-500 mr-4 font-medium"></span>
+                            <button id="logout-button" class="bg-slate-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-slate-800 transition duration-300 font-bold transform hover:scale-105">Logout</button>
                         </li>
                     </ul>
                 </nav>
             </div>
         </header>
 
-        <!-- !!! PROMINENT RED CLOSURE ALERT BANNER !!! -->
-        <section id="critical-closure-alert" class="p-4 md:p-6 bg-red-700 shadow-2xl z-30 relative border-b-4 border-red-900">
-            <div class="container mx-auto flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-8">
-                <div class="flex items-center space-x-4 flex-shrink-0">
-                    <!-- Icon: Exclamation Triangle -->
-                    <svg class="w-8 h-8 text-red-300 animate-pulse" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.363 2.721-1.363 3.486 0l5.58 9.92c.764 1.362-.234 3.037-1.742 3.037H4.417c-1.508 0-2.506-1.675-1.742-3.037l5.58-9.92zM10 13a1 1 0 100 2 1 1 0 000-2zm0-8a1 1 0 011 1v3a1 1 0 11-2 0V6a1 1 0 011-1z" clip-rule="evenodd"></path>
-                    </svg>
-                    <p class="text-xl font-extrabold text-white uppercase tracking-wider">
-                        URGENT: PORTAL CLOSURE NOTICE
-                    </p>
-                </div>
-                <div class="text-center sm:text-left">
-                    <p class="text-white text-lg font-medium">
-                        AlliedRNPrep will permanently shut down on <strong class="text-red-300 underline">Wednesday, December 17, 2025</strong>. 
-                        Please download your study materials before this date.
-                    </p>
-                </div>
-            </div>
-        </section>
-        <!-- !!! END CLOSURE ALERT BANNER !!! -->
-
-        <!-- Hero Section - Updated to Fall Colors -->
-        <section class="relative bg-gradient-to-br from-red-800 to-orange-600 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
-            <!-- Blob effects updated to match fall colors -->
-            <div class="absolute top-0 left-0 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+        <!-- Hero Section - Updated to Winter Colors -->
+        <section class="relative bg-gradient-to-br from-blue-900 to-cyan-700 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
+            <!-- Winter Blobs (White/Cyan/Blue) -->
+            <div class="absolute top-0 left-0 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-cyan-400 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+            
             <div class="container mx-auto px-4 text-center relative z-10">
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up">
-                    Fall into Success with AlliedRNPrep!
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-800/50 border border-blue-400/30 text-blue-100 text-sm font-semibold mb-4 animate-fade-in-up">
+                    <i class="fas fa-snowflake mr-2"></i> Winter Session 2025
+                </span>
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up animation-delay-300">
+                    Finish Strong this Winter.
                 </h1>
-                <p class="text-xl md:text-2xl mb-10 max-w-4xl mx-auto opacity-95 animate-fade-in-up animation-delay-500">
-                    Access supplementary study resources and materials to support your nursing education journey this cozy season.
+                <p class="text-xl md:text-2xl mb-10 max-w-4xl mx-auto text-blue-100 animate-fade-in-up animation-delay-500">
+                    Keep your momentum going through the snow and exams. Access your study resources before the semester ends.
                 </p>
-                <!-- Button color updated -->
-                <button class="bg-white text-red-700 px-10 py-5 rounded-full text-xl font-bold shadow-2xl hover:bg-gray-100 transform hover:scale-105 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
-                    Start Your Journey Today
+                
+                <!-- Countdown Timer Area -->
+                <div class="max-w-3xl mx-auto bg-white/10 backdrop-blur-md rounded-xl p-6 mb-10 border border-white/20 animate-fade-in-up animation-delay-500">
+                    <p class="text-blue-200 uppercase tracking-widest text-sm font-bold mb-2">Semester Ends In:</p>
+                    <div id="semester-countdown" class="grid grid-cols-4 gap-4 text-center">
+                        <!-- Timer injected by JS -->
+                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">DAYS</span></div>
+                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">HOURS</span></div>
+                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">MINS</span></div>
+                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">SECS</span></div>
+                    </div>
+                </div>
+
+                <button class="bg-white text-blue-900 px-10 py-5 rounded-full text-xl font-bold shadow-2xl hover:bg-blue-50 transform hover:scale-105 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
+                    Go to Study Materials
                 </button>
             </div>
         </section>
@@ -238,73 +227,66 @@
         <!-- Semesters Section -->
         <section class="py-20 md:py-32 bg-white relative z-10">
             <div class="container mx-auto px-4">
-                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-red-800 animate-fade-in-up">
-                    Your Structured Path to Support
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-slate-800 animate-fade-in-up">
+                    Your Course Material
                 </h2>
-                <!-- Adjusted grid layout to support 5 cards cleanly on large screens -->
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
                     
-                    <!-- Card 1: SEMESTER ONE (ARCHIVED/CLOSED) -->
-                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-50 cursor-not-allowed">
-                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300">
+                    <!-- Card 1: SEMESTER ONE (Active) -->
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-blue-200/50 transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-slate-100 hover:border-blue-300 group">
+                        <div class="bg-blue-50 text-blue-600 rounded-full p-5 mb-4 group-hover:bg-blue-100 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-700">Semester One</h3>
-                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Resources archived due to impending site closure. Please use available materials in Semester 3.</p>
-                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed">
-                            Archived
+                        <h3 class="text-2xl font-bold mb-4 text-slate-800 group-hover:text-blue-700 transition duration-300">Semester One</h3>
+                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Fundamental nursing resources, health assessment, and basic pharmacology modules.</p>
+                        <a href="SemesterOne.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Access Course</a>
+                    </div>
+
+                    <!-- Card 2: SEMESTER TWO (Active) -->
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-blue-200/50 transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-slate-100 hover:border-blue-300 group">
+                        <div class="bg-blue-50 text-blue-600 rounded-full p-5 mb-4 group-hover:bg-blue-100 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-800 group-hover:text-blue-700 transition duration-300">Semester Two</h3>
+                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Med-Surg content focusing on adult health, pathophysiological concepts, and client-centered care.</p>
+                        <a href="SemesterTwo.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Access Course</a>
+                    </div>
+
+                    <!-- Card 3: SEMESTER THREE (Active) -->
+                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-blue-200/50 transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-slate-100 hover:border-blue-300 group">
+                        <div class="bg-blue-50 text-blue-600 rounded-full p-5 mb-4 group-hover:bg-blue-100 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-800 group-hover:text-blue-700 transition duration-300">Semester Three</h3>
+                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
+                        <a href="SemesterThree.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Access Course</a>
+                    </div>
+
+                    <!-- Card 4: SEMESTER FOUR (COMING SOON - Updated) -->
+                    <div class="bg-slate-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-slate-200 opacity-70 cursor-not-allowed">
+                        <div class="bg-slate-200 text-slate-500 rounded-full p-5 mb-4 transition duration-300 transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-700">Semester Four</h3>
+                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Final preparations including leadership, management, and transition to professional practice.</p>
+                        <!-- Disabled Button -->
+                        <span class="bg-slate-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
+                            Coming Soon
                         </span>
                     </div>
 
-                    <!-- Card 2: SEMESTER TWO (ARCHIVED/CLOSED) -->
-                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-50 cursor-not-allowed">
-                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-700">Semester Two</h3>
-                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Resources archived due to impending site closure. Please use available materials in Semester 3.</p>
-                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed">
-                            Archived
-                        </span>
-                    </div>
-
-                    <!-- Card 3: SEMESTER THREE (OPEN WITH TIMER) -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-gray-100 hover:border-red-300 group">
-                        <div class="bg-amber-100 text-amber-700 rounded-full p-5 mb-4 group-hover:bg-amber-200 group-hover:text-amber-800 transition duration-300 transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-3 text-red-800 group-hover:text-red-700 transition duration-300">Semester Three</h3>
-                        <!-- Closure Timer Display -->
-                        <div id="semester-three-timer" class="mb-5 w-full">
-                            <!-- Timer content inserted by JavaScript -->
-                        </div>
-                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
-                        <a href="SemesterThree.html" class="bg-red-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition duration-300 font-semibold transform group-hover:scale-105">Start Studying Now</a>
-                    </div>
-
-                    <!-- Card 4: SEMESTER FOUR (ARCHIVED/CLOSED) -->
-                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-50 cursor-not-allowed">
-                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-700">Semester Four</h3>
-                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Resources archived due to impending site closure. Please use available materials in Semester 3.</p>
-                        <span class="bg-gray-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed">
-                            Archived
-                        </span>
-                    </div>
-
-                    <!-- Card 5: HESI Exam Prep (CANCELLED) -->
-                    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-gray-200 opacity-40 cursor-not-allowed">
-                        <div class="bg-gray-200 text-gray-500 rounded-full p-5 mb-6 transition duration-300 transform">
+                    <!-- Card 5: HESI Exam Prep (COMING SOON) -->
+                    <div class="bg-slate-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-slate-200 opacity-70 cursor-not-allowed">
+                        <div class="bg-slate-200 text-slate-500 rounded-full p-5 mb-4 transition duration-300 transform">
                             <!-- Icon symbolizing testing/launch -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-gray-700">HESI Exam Prep</h3>
-                        <p class="text-gray-500 mb-6 flex-grow leading-relaxed">Development of this section has been permanently cancelled due to site closure.</p>
+                        <h3 class="text-2xl font-bold mb-4 text-slate-700">HESI Exam Prep</h3>
+                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Comprehensive review materials and practice questions for the HESI Admission Assessment Exam.</p>
                         <!-- Disabled Button -->
-                        <span class="bg-red-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
-                            Cancelled
+                        <span class="bg-slate-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
+                            Coming Soon
                         </span>
                     </div>
 
@@ -313,7 +295,7 @@
         </section>
 
         <!-- Footer Section -->
-        <footer class="bg-gray-900 text-gray-300 py-10">
+        <footer class="bg-slate-900 text-slate-400 py-10">
             <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
                 <p class="text-sm mb-4 md:mb-0">&copy; <script>document.write(new Date().getFullYear())</script> AlliedRNPrep. All rights reserved.</p>
                 <div class="flex justify-center space-x-8">
@@ -326,7 +308,6 @@
 
     <!-- Firebase SDK and Authentication Logic -->
     <script type="module">
-        // Import the necessary functions from the Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
         import {
             getAuth,
@@ -340,7 +321,7 @@
             browserSessionPersistence
         } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-        // Firebase configuration will be provided by the environment
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBj6SkqR0iNxNTRMA3x7qske9cmZ6pwpV8",
             authDomain: "vsrep-92201.firebaseapp.com",
@@ -351,11 +332,10 @@
             measurementId: "G-WQKB2E7CLH"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // --- DOM Element References ---
+        // DOM Elements
         const authContainer = document.getElementById('auth-container');
         const appContent = document.getElementById('app-content');
         const authEmailInput = document.getElementById('auth-email');
@@ -372,75 +352,77 @@
         const confirmPasswordGroup = document.getElementById('confirm-password-group');
         const welcomeUserName = document.getElementById('welcome-user-name');
         
-        // --- Leaf Generator Reference ---
-        const leafContainer = document.getElementById('leaf-container');
+        const snowContainer = document.getElementById('snow-container');
+        const countdownContainer = document.getElementById('semester-countdown');
 
-        // --- Timer Logic Setup ---
-        // Target closure date: Wednesday, December 17, 2025, 00:00:00 local time
-        const CLOSURE_DATE = new Date('2025-12-17T00:00:00').getTime(); 
-        let timerInterval;
+        // Semester End Date: First Friday of December 2025 -> December 5, 2025
+        const SEMESTER_END_DATE = new Date('December 5, 2025 23:59:59').getTime();
+        let semesterTimerInterval;
 
         let isLoginMode = true;
 
-        // --- UI Helper Functions ---
+        // --- Functions ---
 
-        /**
-         * Toggles the authentication form between login and signup modes.
-         * @param {string} mode - 'login' or 'signup'.
-         */
         function setAuthMode(mode) {
             isLoginMode = (mode === 'login');
             if (isLoginMode) {
-                // Style for Login mode (Red/White)
-                showLoginButton.classList.add('bg-red-600', 'text-white');
-                showLoginButton.classList.remove('bg-transparent', 'text-gray-600');
-                showSignupButton.classList.add('bg-transparent', 'text-gray-600');
-                showSignupButton.classList.remove('bg-red-600', 'text-white');
-
+                showLoginButton.classList.add('bg-blue-600', 'text-white');
+                showLoginButton.classList.remove('bg-transparent', 'text-slate-600');
+                showSignupButton.classList.add('bg-transparent', 'text-slate-600');
+                showSignupButton.classList.remove('bg-blue-600', 'text-white');
                 mainAuthButton.textContent = 'Login';
                 confirmPasswordGroup.classList.add('hidden');
                 forgotPasswordLink.classList.remove('hidden');
             } else {
-                // Style for Signup mode (Red/White)
-                showSignupButton.classList.add('bg-red-600', 'text-white');
-                showSignupButton.classList.remove('bg-transparent', 'text-gray-600');
-                showLoginButton.classList.add('bg-transparent', 'text-gray-600');
-                showLoginButton.classList.remove('bg-red-600', 'text-white');
-
+                showSignupButton.classList.add('bg-blue-600', 'text-white');
+                showSignupButton.classList.remove('bg-transparent', 'text-slate-600');
+                showLoginButton.classList.add('bg-transparent', 'text-slate-600');
+                showLoginButton.classList.remove('bg-blue-600', 'text-white');
                 mainAuthButton.textContent = 'Create Account';
                 confirmPasswordGroup.classList.remove('hidden');
                 forgotPasswordLink.classList.add('hidden');
             }
-            displayAuthMessage(''); // Clear any previous messages
+            displayAuthMessage('');
         }
 
-        /**
-         * Displays a message on the authentication form.
-         * @param {string} message - The message to display.
-         * @param {boolean} isSuccess - True for a success message, false for an error.
-         */
         function displayAuthMessage(message, isSuccess = false) {
             authMessage.textContent = message;
-            authMessage.style.color = isSuccess ? '#16a34a' : '#dc2626'; // green-600 or red-600
+            authMessage.style.color = isSuccess ? '#16a34a' : '#dc2626';
         }
 
-        /**
-         * Updates the countdown timer display for Semester 3.
-         */
-        function updateClosureTimer() {
-            const now = new Date().getTime();
-            const distance = CLOSURE_DATE - now;
+        // --- Snow Animation ---
+        function createSnowflakes(count) {
+            snowContainer.innerHTML = ''; // Clear existing
+            for (let i = 0; i < count; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
 
-            const timerElement = document.getElementById('semester-three-timer');
+                const xStart = Math.random() * 100 + 'vw';
+                const xEnd = (Math.random() * 20 - 10) + 'vw'; // Slight horizontal drift
+                const duration = Math.random() * 5 + 5; // 5-10s
+                const delay = Math.random() * 5;
+                const size = Math.random() * 5 + 2 + 'px'; // 2-7px
+                const opacity = Math.random() * 0.7 + 0.3;
 
-            if (!timerElement) {
-                // If element isn't available (e.g., component not loaded yet)
-                return;
+                snowflake.style.setProperty('--x-start', xStart);
+                snowflake.style.setProperty('--x-end', xEnd);
+                snowflake.style.setProperty('--duration', duration + 's');
+                snowflake.style.setProperty('--size', size);
+                snowflake.style.setProperty('--opacity', opacity);
+                snowflake.style.animationDelay = delay + 's';
+
+                snowContainer.appendChild(snowflake);
             }
+        }
+
+        // --- Semester Countdown Timer ---
+        function updateSemesterTimer() {
+            const now = new Date().getTime();
+            const distance = SEMESTER_END_DATE - now;
 
             if (distance < 0) {
-                timerElement.innerHTML = `<span class="text-2xl text-red-700 font-bold">RESOURCE IS NOW CLOSED.</span>`;
-                clearInterval(timerInterval);
+                countdownContainer.innerHTML = `<div class="col-span-4 text-2xl font-bold text-white">Semester Complete!</div>`;
+                clearInterval(semesterTimerInterval);
                 return;
             }
 
@@ -449,30 +431,21 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            timerElement.innerHTML = `
-                <div class="text-center bg-red-50 p-3 rounded-lg border-2 border-red-300">
-                    <p class="text-red-700 font-bold mb-2 text-md">REMAINS OPEN FOR:</p>
-                    <div class="flex justify-center space-x-2 text-base font-extrabold">
-                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${days}D</span>
-                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${hours}H</span>
-                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${minutes}M</span>
-                        <span class="bg-red-600 text-white rounded-md px-3 py-1.5 shadow-md">${seconds}S</span>
-                    </div>
-                </div>
+            // Re-render timer blocks
+            countdownContainer.innerHTML = `
+                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${days}</span><span class="text-xs">DAYS</span></div>
+                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${hours}</span><span class="text-xs">HOURS</span></div>
+                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${minutes}</span><span class="text-xs">MINS</span></div>
+                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${seconds}</span><span class="text-xs">SECS</span></div>
             `;
         }
 
-        /**
-         * Updates the UI based on the user's authentication state.
-         * @param {object|null} user - The Firebase user object, or null if not signed in.
-         */
         function updateUI(user) {
             if (user) {
                 authContainer.classList.add('hidden');
                 appContent.classList.remove('hidden');
                 logoutButtonContainer.classList.remove('hidden');
                 
-                // Display the part of the email before the "@"
                 if (user.email) {
                     const username = user.email.split('@')[0];
                     welcomeUserName.textContent = `Welcome, ${username}`;
@@ -480,65 +453,21 @@
                     welcomeUserName.textContent = `Welcome!`;
                 }
 
-                // START TIMER (only when logged in)
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                }
-                updateClosureTimer(); // Initial call
-                timerInterval = setInterval(updateClosureTimer, 1000);
+                // Start Countdown
+                if (semesterTimerInterval) clearInterval(semesterTimerInterval);
+                updateSemesterTimer();
+                semesterTimerInterval = setInterval(updateSemesterTimer, 1000);
 
             } else {
                 authContainer.classList.remove('hidden');
                 appContent.classList.add('hidden');
                 logoutButtonContainer.classList.add('hidden');
                 welcomeUserName.textContent = '';
-                
-                // STOP TIMER (when logged out)
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                }
+                if (semesterTimerInterval) clearInterval(semesterTimerInterval);
             }
         }
 
-        // --- Falling Leaves Logic ---
-        function createLeaves(count) {
-            const colors = ['#D97706', '#92400E', '#B91C1C', '#94A3B8']; // Orange, Brown, Red, Slate (Grey)
-            const shapes = ['50% 0 50% 0', '0 50% 50% 50%', '50%']; // Maple, Oak, Round
-
-            for (let i = 0; i < count; i++) {
-                const leaf = document.createElement('div');
-                leaf.className = 'leaf';
-
-                // Random parameters
-                const xStart = Math.random() * 100 + 'vw';
-                const yStart = Math.random() * -20 + 'vh'; // Start slightly above viewport
-                const duration = (Math.random() * 10) + 8; // 8 to 18 seconds
-                const delay = Math.random() * 15; // 0 to 15 seconds delay
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                const size = Math.random() * 15 + 10; // 10px to 25px
-                const shape = shapes[Math.floor(Math.random() * shapes.length)];
-                const rEnd = Math.random() * 360 + 'deg';
-
-                // Set CSS variables for animation
-                leaf.style.setProperty('--x-start', xStart);
-                leaf.style.setProperty('--x-end', (Math.random() * 50 - 25) + 'vw'); // Horizontal drift
-                leaf.style.setProperty('--y-start', yStart);
-                leaf.style.setProperty('--r-end', rEnd);
-                leaf.style.setProperty('--duration', duration + 's');
-                
-                leaf.style.width = size + 'px';
-                leaf.style.height = size + 'px';
-                leaf.style.borderRadius = shape;
-                leaf.style.backgroundColor = color;
-                leaf.style.animationDelay = delay + 's';
-
-                leafContainer.appendChild(leaf);
-            }
-        }
-
-
-        // --- Firebase Authentication Logic ---
-
+        // --- Auth Logic ---
         onAuthStateChanged(auth, (user) => {
             updateUI(user);
         });
@@ -551,14 +480,11 @@
 
             try {
                 await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-
                 if (isLoginMode) {
                     displayAuthMessage('Logging in...', true);
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
-                    // Signup Logic
                     const confirmPassword = authConfirmPasswordInput.value;
-                    
                     if (password !== confirmPassword) {
                         displayAuthMessage('Passwords do not match.', false);
                         return;
@@ -567,55 +493,39 @@
                         displayAuthMessage('Password must be at least 6 characters.', false);
                         return;
                     }
-
                     displayAuthMessage('Creating account...', true);
                     await createUserWithEmailAndPassword(auth, email, password);
                 }
             } catch (error) {
                 console.error("Authentication Error:", error);
-                let message = "An error occurred. Please try again.";
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    message = "Invalid email or password.";
-                } else if (error.code === 'auth/email-already-in-use') {
-                    message = "This email is already registered. Please login.";
-                } else if (error.code === 'auth/weak-password') {
-                    message = "Password is too weak. Please use at least 6 characters.";
-                }
-                displayAuthMessage(message, false);
+                displayAuthMessage("Error: " + error.message, false);
             }
         });
 
         logoutButton.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error("Logout Error:", error);
-                displayAuthMessage("Failed to log out. Please try again.", false);
-            }
+            try { await signOut(auth); } catch (error) { console.error(error); }
         });
 
         forgotPasswordLink.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = authEmailInput.value;
             if (!email) {
-                displayAuthMessage('Please enter your email to reset your password.', false);
+                displayAuthMessage('Enter email to reset password.', false);
                 return;
             }
             try {
                 await sendPasswordResetEmail(auth, email);
-                displayAuthMessage('Password reset email sent! Check your inbox.', true);
+                displayAuthMessage('Reset email sent.', true);
             } catch (error) {
-                console.error("Password Reset Error:", error);
-                displayAuthMessage("Could not send reset email. Please check the address.", false);
+                displayAuthMessage("Error sending reset email.", false);
             }
         });
-        
-        // --- Event Listeners and Initial Setup ---
 
+        // Toggle UI
         showLoginButton.addEventListener('click', () => setAuthMode('login'));
         showSignupButton.addEventListener('click', () => setAuthMode('signup'));
 
-        // Password visibility toggle
+        // Password Toggle
         document.querySelectorAll('.password-toggle-icon').forEach(icon => {
             icon.addEventListener('click', (e) => {
                 const targetId = e.target.getAttribute('data-target');
@@ -632,11 +542,11 @@
             });
         });
 
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             setAuthMode('login');
-            createLeaves(30); // Start the fall animation
+            createSnowflakes(50); // Winter snow
         });
-
     </script>
 </body>
 </html>
