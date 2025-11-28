@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AlliedRNPrep - Finish Strong</title>
@@ -10,9 +9,14 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <!-- Inter font from Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Custom CSS for animations */
+        /* Configure Tailwind to use Inter font and smooth colors */
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom Animation: Fade In/Up for dynamic content loading */
         @keyframes fadeInFromBottom {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -24,18 +28,19 @@
         .animation-delay-300 { animation-delay: 0.3s; }
         .animation-delay-500 { animation-delay: 0.5s; }
         .animation-delay-1000 { animation-delay: 1s; }
-
+        
+        /* Custom Animation: Blob effect for hero background */
         @keyframes blob {
             0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
+            33% { transform: translate(30px, -50px) scale(1.15); }
             66% { transform: translate(-20px, 20px) scale(0.9); }
             100% { transform: translate(0px, 0px) scale(1); }
         }
         .animate-blob {
-            animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
+            animation: blob 12s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
         }
         
-        /* Password Visibility Toggle */
+        /* Password Visibility Toggle positioning */
         .password-input-container { position: relative; }
         .password-toggle-icon {
             position: absolute;
@@ -45,11 +50,9 @@
             cursor: pointer;
             color: #9ca3af; 
         }
-        .password-toggle-icon:hover { color: #2563EB; /* Blue-600 hover */ }
+        .password-toggle-icon:hover { color: #3b82f6; /* Blue-500 hover */ }
 
         /* --- WINTER SNOW ANIMATION --- */
-        
-        /* Fixed Container for Snow */
         .snow-container {
             position: fixed;
             top: 0;
@@ -60,8 +63,6 @@
             z-index: 5; 
             overflow: hidden;
         }
-
-        /* Snowfall Keyframes */
         @keyframes snowfall {
             0% { 
                 transform: translate(var(--x-start), -10px); 
@@ -72,8 +73,6 @@
                 opacity: 0; 
             }
         }
-
-        /* Snowflake Style */
         .snowflake {
             position: absolute;
             background-color: white;
@@ -85,207 +84,209 @@
             opacity: var(--opacity);
             z-index: 10;
         }
-
-        /* Winter Banner */
+        /* Style for the sticky banner */
         .winter-banner {
-            background-color: #1E3A8A; /* Blue 900 */
+            background-color: #0c4a6e; /* Sky Blue 900 for deep winter feel */
             color: white;
             text-align: center;
-            padding: 0.5rem 0;
+            padding: 0.75rem 0;
             font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-sans antialiased text-slate-800">
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-sky-100 font-sans antialiased text-slate-800">
 
     <!-- Snow Animation Container -->
     <div id="snow-container" class="snow-container"></div>
 
-    <!-- Winter Banner -->
-    <div class="winter-banner sticky top-0 z-50 flex justify-center items-center space-x-2">
-        <i class="fas fa-snowflake animate-spin-slow" style="animation-duration: 10s;"></i>
+    <!-- Winter Session Banner (Sticky) -->
+    <div class="winter-banner sticky top-0 z-50 flex justify-center items-center space-x-3">
+        <i class="fas fa-flag-checkered text-amber-300"></i>
         <span>Finish Strong! The Semester Ends on <strong>Friday, December 5th</strong>.</span>
-        <i class="fas fa-snowflake animate-spin-slow" style="animation-duration: 10s;"></i>
+        <i class="fas fa-flag-checkered text-amber-300"></i>
     </div>
 
-    <!-- Authentication Container -->
-    <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4 relative z-20">
+    <!-- AUTHENTICATION SECTION (Login/Signup) -->
+    <div id="auth-container" class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 relative z-20">
         <div class="w-full max-w-md">
-            <div class="text-center mb-8">
-                <!-- Logo text changed to Winter Blue -->
-                <h1 class="text-4xl font-extrabold text-blue-900 drop-shadow-sm">AlliedRNPrep</h1>
-                <p class="text-slate-600 mt-2 font-medium">Secure Portal for Nursing Students</p>
+            <div class="text-center mb-10">
+                <h1 class="text-5xl font-extrabold text-blue-800 drop-shadow-md">AlliedRNPrep</h1>
+                <p class="text-slate-500 mt-2 text-lg font-light">Your secure nursing student portal.</p>
             </div>
-            <div class="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-blue-100">
+            
+            <div class="bg-white/95 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-2xl shadow-blue-300/50 border-t-4 border-blue-500 animate-fade-in-up">
+                
                 <!-- Login/Signup Toggle -->
-                <div class="flex border border-slate-200 rounded-lg p-1 mb-6">
-                    <!-- Adjusted colors to Blue scheme -->
-                    <button id="show-login" class="w-1/2 p-2 rounded-md text-center font-semibold transition-all duration-300">Login</button>
-                    <button id="show-signup" class="w-1/2 p-2 rounded-md text-center font-semibold transition-all duration-300">Sign Up</button>
+                <div class="flex bg-slate-100 rounded-xl p-1 mb-8 shadow-inner">
+                    <button id="show-login" class="w-1/2 py-3 px-4 rounded-xl text-center font-bold transition-all duration-300 text-sm md:text-base">Login</button>
+                    <button id="show-signup" class="w-1/2 py-3 px-4 rounded-xl text-center font-bold transition-all duration-300 text-sm md:text-base">Sign Up</button>
                 </div>
 
-                <!-- Form -->
-                <form id="auth-form" class="space-y-5">
+                <!-- Auth Form -->
+                <form id="auth-form" class="space-y-6">
                     <div>
-                        <label for="auth-email" class="block text-sm font-medium text-slate-700">Email Address</label>
-                        <input type="email" id="auth-email" required class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <label for="auth-email" class="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+                        <input type="email" id="auth-email" required class="block w-full px-4 py-3 bg-white border border-slate-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-slate-400" placeholder="your.name@student.edu">
                     </div>
 
                     <div class="password-input-container">
-                        <label for="auth-password" class="block text-sm font-medium text-slate-700">Password</label>
-                        <input type="password" id="auth-password" required class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <label for="auth-password" class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                        <input type="password" id="auth-password" required class="block w-full px-4 py-3 bg-white border border-slate-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-slate-400" placeholder="••••••••">
                         <i class="fas fa-eye password-toggle-icon" data-target="auth-password"></i>
                     </div>
 
                     <div id="confirm-password-group" class="hidden password-input-container">
-                        <label for="auth-confirm-password" class="block text-sm font-medium text-slate-700">Confirm Password</label>
-                        <input type="password" id="auth-confirm-password" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <label for="auth-confirm-password" class="block text-sm font-semibold text-slate-700 mb-1">Confirm Password</label>
+                        <input type="password" id="auth-confirm-password" class="block w-full px-4 py-3 bg-white border border-slate-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-slate-400" placeholder="••••••••">
                         <i class="fas fa-eye password-toggle-icon" data-target="auth-confirm-password"></i>
                     </div>
 
                     <div class="flex items-center justify-between text-sm">
                         <div class="flex items-center">
-                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
-                            <label for="remember-me-checkbox" class="ml-2 block text-slate-900">Remember me</label>
+                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                            <label for="remember-me-checkbox" class="ml-2 block text-slate-600 select-none">Remember me</label>
                         </div>
-                        <a href="#" id="forgot-password-link" class="font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                        <a href="#" id="forgot-password-link" class="font-medium text-blue-600 hover:text-blue-700 transition">Forgot password?</a>
                     </div>
 
                     <div>
-                        <!-- Main button uses Blue scheme -->
-                        <button type="submit" id="main-auth-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
+                        <button type="submit" id="main-auth-button" class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-lg font-extrabold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-[1.01] active:scale-95">
                             Login
                         </button>
                     </div>
                 </form>
+                
                 <!-- Message Area -->
-                <p id="auth-message" class="mt-4 text-center text-sm font-medium min-h-[20px]"></p>
+                <p id="auth-message" class="mt-6 text-center text-sm font-medium min-h-[20px]"></p>
             </div>
         </div>
     </div>
 
-    <!-- Main Application Content (Initially Hidden) -->
+    <!-- MAIN APPLICATION CONTENT (Initially Hidden) -->
     <div id="app-content" class="hidden min-h-screen">
         
         <!-- Header Section -->
-        <header class="bg-white/95 backdrop-blur shadow-lg py-4 relative z-20">
-            <div class="container mx-auto px-4 flex justify-between items-center">
-                <!-- Logo text Blue -->
-                <a href="#" class="text-3xl font-extrabold text-blue-800 rounded-lg p-2 hover:bg-blue-50 transition duration-300 transform hover:scale-105">
+        <header class="bg-white/95 backdrop-blur-sm shadow-md py-4 sticky top-12 z-40 border-b border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <a href="#" class="text-2xl font-extrabold text-blue-700 transition duration-300">
                     AlliedRNPrep
                 </a>
-                <nav>
-                    <ul class="flex items-center space-x-8">
-                        <li><a href="#" class="text-slate-600 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-slate-50">Home</a></li>
-                        <li><a href="About.html" class="text-slate-600 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-4 py-2 hover:bg-slate-50">About Us</a></li>
-                        <li id="logout-button-container" class="hidden">
-                            <span id="welcome-user-name" class="text-slate-500 mr-4 font-medium"></span>
-                            <button id="logout-button" class="bg-slate-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-slate-800 transition duration-300 font-bold transform hover:scale-105">Logout</button>
+                <nav class="hidden md:block">
+                    <ul class="flex items-center space-x-6">
+                        <li><a href="#" class="text-slate-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-3 py-2">Home</a></li>
+                        <li><a href="About.html" class="text-slate-700 hover:text-blue-600 font-semibold transition duration-300 rounded-md px-3 py-2">About Us</a></li>
+                        <li id="logout-button-container" class="hidden flex items-center space-x-4">
+                            <span id="welcome-user-name" class="text-blue-600 font-semibold text-sm"></span>
+                            <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 font-bold text-sm transform hover:scale-105 active:scale-95">
+                                <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                            </button>
                         </li>
                     </ul>
                 </nav>
             </div>
         </header>
 
-        <!-- Hero Section - Updated to Winter Colors -->
-        <section class="relative bg-gradient-to-br from-blue-900 to-cyan-700 text-white py-24 md:py-36 overflow-hidden min-h-[50vh]">
-            <!-- Winter Blobs (White/Cyan/Blue) -->
-            <div class="absolute top-0 left-0 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-cyan-400 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <!-- Hero Section - Enhanced Winter Theme -->
+        <section class="relative bg-gradient-to-br from-blue-900 to-cyan-800 text-white py-24 md:py-36 overflow-hidden">
+            <!-- Dynamic Background Blobs -->
+            <div class="absolute top-[-10%] left-[-10%] w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"></div>
+            <div class="absolute bottom-[-10%] right-[5%] w-96 h-96 bg-cyan-400 rounded-full mix-blend-overlay filter blur-3xl opacity-15 animate-blob animation-delay-4000"></div>
             
-            <div class="container mx-auto px-4 text-center relative z-10">
-                <span class="inline-block py-1 px-3 rounded-full bg-blue-800/50 border border-blue-400/30 text-blue-100 text-sm font-semibold mb-4 animate-fade-in-up">
-                    <i class="fas fa-snowflake mr-2"></i> Winter Session 2025
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <span class="inline-block py-1.5 px-4 rounded-full bg-blue-800/50 border border-blue-400/30 text-blue-100 text-sm font-semibold mb-4 animate-fade-in-up">
+                    <i class="fas fa-calendar-alt mr-2"></i> Countdown to Finals
                 </span>
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up animation-delay-300">
-                    Finish Strong this Winter.
+                <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up animation-delay-300 drop-shadow-lg">
+                    Seize the Momentum. Finish Strong.
                 </h1>
-                <p class="text-xl md:text-2xl mb-10 max-w-4xl mx-auto text-blue-100 animate-fade-in-up animation-delay-500">
-                    Keep your momentum going through the snow and exams. Access your study resources before the semester ends.
+                <p class="text-xl md:text-2xl mb-12 max-w-4xl mx-auto text-blue-100 font-light animate-fade-in-up animation-delay-500">
+                    Your entire study resource library is active. Dive into your final review modules now.
                 </p>
                 
-                <!-- Countdown Timer Area -->
-                <div class="max-w-3xl mx-auto bg-white/10 backdrop-blur-md rounded-xl p-6 mb-10 border border-white/20 animate-fade-in-up animation-delay-500">
-                    <p class="text-blue-200 uppercase tracking-widest text-sm font-bold mb-2">Semester Ends In:</p>
+                <!-- Countdown Timer Area - Cleaned up and modernized -->
+                <div class="max-w-3xl mx-auto bg-white/15 backdrop-blur-sm rounded-2xl p-6 md:p-8 mb-10 border border-white/30 shadow-xl animate-fade-in-up animation-delay-700">
+                    <p class="text-blue-200 uppercase tracking-widest text-sm font-bold mb-4">Semester Completion Deadline</p>
                     <div id="semester-countdown" class="grid grid-cols-4 gap-4 text-center">
-                        <!-- Timer injected by JS -->
-                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">DAYS</span></div>
-                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">HOURS</span></div>
-                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">MINS</span></div>
-                        <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">--</span><span class="text-xs">SECS</span></div>
+                        <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">--</span><span class="text-xs font-medium uppercase text-blue-200">DAYS</span></div>
+                        <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">--</span><span class="text-xs font-medium uppercase text-blue-200">HOURS</span></div>
+                        <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">--</span><span class="text-xs font-medium uppercase text-blue-200">MINS</span></div>
+                        <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">--</span><span class="text-xs font-medium uppercase text-blue-200">SECS</span></div>
                     </div>
                 </div>
 
-                <button class="bg-white text-blue-900 px-10 py-5 rounded-full text-xl font-bold shadow-2xl hover:bg-blue-50 transform hover:scale-105 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
-                    Go to Study Materials
-                </button>
+                <a href="#semesters-content" class="inline-flex items-center bg-amber-400 text-blue-900 px-10 py-4 rounded-full text-xl font-extrabold shadow-2xl shadow-amber-500/50 hover:bg-amber-300 transform hover:scale-105 active:scale-95 transition duration-500 ease-in-out animate-fade-in-up animation-delay-1000">
+                    Start Your Final Review <i class="fas fa-arrow-right ml-3"></i>
+                </a>
             </div>
         </section>
 
-        <!-- Semesters Section -->
-        <section class="py-20 md:py-32 bg-white relative z-10">
-            <div class="container mx-auto px-4">
-                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-slate-800 animate-fade-in-up">
-                    Your Course Material
+        <!-- Semesters Content Section -->
+        <section id="semesters-content" class="py-20 md:py-32 bg-sky-50 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-center mb-16 text-slate-800">
+                    Your Study Modules
                 </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
                     
-                    <!-- Card 1: SEMESTER ONE (Active) -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-blue-200/50 transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-slate-100 hover:border-blue-300 group">
-                        <div class="bg-blue-50 text-blue-600 rounded-full p-5 mb-4 group-hover:bg-blue-100 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <!-- Semester Card Template (Active) -->
+                    <div class="bg-white rounded-xl shadow-xl hover:shadow-2xl hover:shadow-blue-200 transform hover:-translate-y-1 transition duration-500 ease-in-out p-6 flex flex-col items-center text-center border-t-4 border-blue-500 group">
+                        <div class="bg-blue-50 text-blue-600 rounded-full p-4 mb-4 group-hover:bg-blue-100 transition duration-300">
+                            <i class="fas fa-graduation-cap text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-slate-800 group-hover:text-blue-700 transition duration-300">Semester One</h3>
-                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Fundamental nursing resources, health assessment, and basic pharmacology modules.</p>
-                        <a href="SemesterOne.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Access Course</a>
+                        <h3 class="text-xl font-bold mb-3 text-slate-900">Semester One</h3>
+                        <p class="text-slate-500 mb-6 flex-grow text-sm leading-relaxed">Fundamental nursing, health assessment, and core pharmacology modules.</p>
+                        <a href="SemesterOne.html" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-semibold text-sm transform group-hover:scale-[1.03]">
+                            Access Course
+                        </a>
                     </div>
 
-                    <!-- Card 2: SEMESTER TWO (Active) -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-blue-200/50 transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-slate-100 hover:border-blue-300 group">
-                        <div class="bg-blue-50 text-blue-600 rounded-full p-5 mb-4 group-hover:bg-blue-100 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <!-- Semester Card Template (Active) -->
+                    <div class="bg-white rounded-xl shadow-xl hover:shadow-2xl hover:shadow-blue-200 transform hover:-translate-y-1 transition duration-500 ease-in-out p-6 flex flex-col items-center text-center border-t-4 border-blue-500 group">
+                        <div class="bg-blue-50 text-blue-600 rounded-full p-4 mb-4 group-hover:bg-blue-100 transition duration-300">
+                            <i class="fas fa-stethoscope text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-slate-800 group-hover:text-blue-700 transition duration-300">Semester Two</h3>
-                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Med-Surg content focusing on adult health, pathophysiological concepts, and client-centered care.</p>
-                        <a href="SemesterTwo.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Access Course</a>
+                        <h3 class="text-xl font-bold mb-3 text-slate-900">Semester Two</h3>
+                        <p class="text-slate-500 mb-6 flex-grow text-sm leading-relaxed">Med-Surg adult health, pathophysiological concepts, and client-centered care.</p>
+                        <a href="SemesterTwo.html" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-semibold text-sm transform group-hover:scale-[1.03]">
+                            Access Course
+                        </a>
                     </div>
 
-                    <!-- Card 3: SEMESTER THREE (Active) -->
-                    <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-blue-200/50 transform hover:-translate-y-3 transition duration-500 ease-in-out p-8 flex flex-col items-center text-center border border-slate-100 hover:border-blue-300 group">
-                        <div class="bg-blue-50 text-blue-600 rounded-full p-5 mb-4 group-hover:bg-blue-100 group-hover:text-blue-700 transition duration-300 transform group-hover:scale-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <!-- Semester Card Template (Active) -->
+                    <div class="bg-white rounded-xl shadow-xl hover:shadow-2xl hover:shadow-blue-200 transform hover:-translate-y-1 transition duration-500 ease-in-out p-6 flex flex-col items-center text-center border-t-4 border-blue-500 group">
+                        <div class="bg-blue-50 text-blue-600 rounded-full p-4 mb-4 group-hover:bg-blue-100 transition duration-300">
+                            <i class="fas fa-heartbeat text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-slate-800 group-hover:text-blue-700 transition duration-300">Semester Three</h3>
-                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Supportive content for advanced medical-surgical nursing, critical care, and specialized populations.</p>
-                        <a href="SemesterThree.html" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition duration-300 font-semibold transform group-hover:scale-105">Access Course</a>
+                        <h3 class="text-xl font-bold mb-3 text-slate-900">Semester Three</h3>
+                        <p class="text-slate-500 mb-6 flex-grow text-sm leading-relaxed">Advanced medical-surgical nursing, critical care, and specialized populations.</p>
+                        <a href="SemesterThree.html" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-semibold text-sm transform group-hover:scale-[1.03]">
+                            Access Course
+                        </a>
                     </div>
 
-                    <!-- Card 4: SEMESTER FOUR (COMING SOON - Updated) -->
-                    <div class="bg-slate-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-slate-200 opacity-70 cursor-not-allowed">
-                        <div class="bg-slate-200 text-slate-500 rounded-full p-5 mb-4 transition duration-300 transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    <!-- Semester Card Template (Coming Soon) -->
+                    <div class="bg-slate-100 rounded-xl shadow-lg p-6 flex flex-col items-center text-center border-t-4 border-slate-300 opacity-80 cursor-not-allowed">
+                        <div class="bg-slate-200 text-slate-500 rounded-full p-4 mb-4 transition duration-300">
+                            <i class="fas fa-user-tie text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-slate-700">Semester Four</h3>
-                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Final preparations including leadership, management, and transition to professional practice.</p>
-                        <!-- Disabled Button -->
-                        <span class="bg-slate-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
+                        <h3 class="text-xl font-bold mb-3 text-slate-700">Semester Four</h3>
+                        <p class="text-slate-500 mb-6 flex-grow text-sm leading-relaxed">Leadership, management, and transition to professional practice modules.</p>
+                        <span class="w-full bg-slate-400 text-white px-6 py-3 rounded-lg shadow-md font-semibold text-sm opacity-90">
                             Coming Soon
                         </span>
                     </div>
 
-                    <!-- Card 5: HESI Exam Prep (COMING SOON) -->
-                    <div class="bg-slate-100 rounded-2xl shadow-lg p-8 flex flex-col items-center text-center border border-slate-200 opacity-70 cursor-not-allowed">
-                        <div class="bg-slate-200 text-slate-500 rounded-full p-5 mb-4 transition duration-300 transform">
-                            <!-- Icon symbolizing testing/launch -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <!-- Semester Card Template (Coming Soon) -->
+                    <div class="bg-slate-100 rounded-xl shadow-lg p-6 flex flex-col items-center text-center border-t-4 border-slate-300 opacity-80 cursor-not-allowed">
+                        <div class="bg-slate-200 text-slate-500 rounded-full p-4 mb-4 transition duration-300">
+                            <i class="fas fa-rocket text-3xl"></i>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-slate-700">HESI Exam Prep</h3>
-                        <p class="text-slate-500 mb-6 flex-grow leading-relaxed">Comprehensive review materials and practice questions for the HESI Admission Assessment Exam.</p>
-                        <!-- Disabled Button -->
-                        <span class="bg-slate-400 text-white px-6 py-3 rounded-full shadow-md font-semibold cursor-not-allowed opacity-90">
+                        <h3 class="text-xl font-bold mb-3 text-slate-700">NCLEX & HESI Prep</h3>
+                        <p class="text-slate-500 mb-6 flex-grow text-sm leading-relaxed">Comprehensive review materials and practice questions for major exams.</p>
+                        <span class="w-full bg-slate-400 text-white px-6 py-3 rounded-lg shadow-md font-semibold text-sm opacity-90">
                             Coming Soon
                         </span>
                     </div>
@@ -296,17 +297,17 @@
 
         <!-- Footer Section -->
         <footer class="bg-slate-900 text-slate-400 py-10">
-            <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
-                <p class="text-sm mb-4 md:mb-0">&copy; <script>document.write(new Date().getFullYear())</script> AlliedRNPrep. All rights reserved.</p>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:flex md:justify-between md:items-center">
+                <p class="text-sm mb-4 md:mb-0">&copy; <span id="current-year"></span> AlliedRNPrep. All rights reserved.</p>
                 <div class="flex justify-center space-x-8">
-                    <a href="#" class="hover:text-white text-sm transition duration-300">Privacy Policy</a>
-                    <a href="#" class="hover:text-white text-sm transition duration-300">Terms of Service</a>
+                    <a href="#" class="hover:text-blue-400 text-sm transition duration-300">Privacy Policy</a>
+                    <a href="#" class="hover:text-blue-400 text-sm transition duration-300">Terms of Service</a>
                 </div>
             </div>
         </footer>
     </div>
 
-    <!-- Firebase SDK and Authentication Logic -->
+    <!-- Firebase SDK and Authentication Logic (EXACTLY AS PROVIDED BY USER) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
         import {
@@ -321,7 +322,7 @@
             browserSessionPersistence
         } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-        // Firebase configuration
+        // Firebase configuration (EXACTLY as provided in the original code)
         const firebaseConfig = {
             apiKey: "AIzaSyBj6SkqR0iNxNTRMA3x7qske9cmZ6pwpV8",
             authDomain: "vsrep-92201.firebaseapp.com",
@@ -366,18 +367,24 @@
         function setAuthMode(mode) {
             isLoginMode = (mode === 'login');
             if (isLoginMode) {
-                showLoginButton.classList.add('bg-blue-600', 'text-white');
+                // Active button styling
+                showLoginButton.classList.add('bg-white', 'text-blue-600', 'shadow-md');
                 showLoginButton.classList.remove('bg-transparent', 'text-slate-600');
+                // Inactive button styling
                 showSignupButton.classList.add('bg-transparent', 'text-slate-600');
-                showSignupButton.classList.remove('bg-blue-600', 'text-white');
+                showSignupButton.classList.remove('bg-white', 'text-blue-600', 'shadow-md');
+                
                 mainAuthButton.textContent = 'Login';
                 confirmPasswordGroup.classList.add('hidden');
                 forgotPasswordLink.classList.remove('hidden');
             } else {
-                showSignupButton.classList.add('bg-blue-600', 'text-white');
+                // Active button styling
+                showSignupButton.classList.add('bg-white', 'text-blue-600', 'shadow-md');
                 showSignupButton.classList.remove('bg-transparent', 'text-slate-600');
+                // Inactive button styling
                 showLoginButton.classList.add('bg-transparent', 'text-slate-600');
-                showLoginButton.classList.remove('bg-blue-600', 'text-white');
+                showLoginButton.classList.remove('bg-white', 'text-blue-600', 'shadow-md');
+                
                 mainAuthButton.textContent = 'Create Account';
                 confirmPasswordGroup.classList.remove('hidden');
                 forgotPasswordLink.classList.add('hidden');
@@ -387,7 +394,8 @@
 
         function displayAuthMessage(message, isSuccess = false) {
             authMessage.textContent = message;
-            authMessage.style.color = isSuccess ? '#16a34a' : '#dc2626';
+            // Use Tailwind color classes for success/error
+            authMessage.className = `mt-6 text-center text-sm font-medium min-h-[20px] ${isSuccess ? 'text-green-600' : 'text-red-600'}`;
         }
 
         // --- Snow Animation ---
@@ -399,10 +407,10 @@
 
                 const xStart = Math.random() * 100 + 'vw';
                 const xEnd = (Math.random() * 20 - 10) + 'vw'; // Slight horizontal drift
-                const duration = Math.random() * 5 + 5; // 5-10s
-                const delay = Math.random() * 5;
-                const size = Math.random() * 5 + 2 + 'px'; // 2-7px
-                const opacity = Math.random() * 0.7 + 0.3;
+                const duration = Math.random() * 5 + 7; // 7-12s
+                const delay = Math.random() * 8;
+                const size = Math.random() * 4 + 2 + 'px'; // 2-6px
+                const opacity = Math.random() * 0.7 + 0.2;
 
                 snowflake.style.setProperty('--x-start', xStart);
                 snowflake.style.setProperty('--x-end', xEnd);
@@ -421,7 +429,7 @@
             const distance = SEMESTER_END_DATE - now;
 
             if (distance < 0) {
-                countdownContainer.innerHTML = `<div class="col-span-4 text-2xl font-bold text-white">Semester Complete!</div>`;
+                countdownContainer.innerHTML = `<div class="col-span-4 text-3xl font-extrabold text-amber-300">Semester Complete!</div>`;
                 clearInterval(semesterTimerInterval);
                 return;
             }
@@ -431,12 +439,12 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Re-render timer blocks
+            // Re-render timer blocks with updated styling
             countdownContainer.innerHTML = `
-                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${days}</span><span class="text-xs">DAYS</span></div>
-                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${hours}</span><span class="text-xs">HOURS</span></div>
-                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${minutes}</span><span class="text-xs">MINS</span></div>
-                <div class="bg-blue-900/40 rounded-lg p-2"><span class="block text-3xl font-bold">${seconds}</span><span class="text-xs">SECS</span></div>
+                <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">${days}</span><span class="text-xs font-medium uppercase text-blue-200">DAYS</span></div>
+                <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">${hours}</span><span class="text-xs font-medium uppercase text-blue-200">HOURS</span></div>
+                <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">${minutes}</span><span class="text-xs font-medium uppercase text-blue-200">MINS</span></div>
+                <div class="bg-blue-900/60 rounded-xl p-3"><span class="block text-4xl font-extrabold">${seconds}</span><span class="text-xs font-medium uppercase text-blue-200">SECS</span></div>
             `;
         }
 
@@ -448,9 +456,9 @@
                 
                 if (user.email) {
                     const username = user.email.split('@')[0];
-                    welcomeUserName.textContent = `Welcome, ${username}`;
+                    welcomeUserName.textContent = `Hello, ${username}!`;
                 } else {
-                    welcomeUserName.textContent = `Welcome!`;
+                    welcomeUserName.textContent = `Hello!`;
                 }
 
                 // Start Countdown
@@ -467,7 +475,7 @@
             }
         }
 
-        // --- Auth Logic ---
+        // --- Auth Logic (EXACTLY AS PROVIDED BY USER) ---
         onAuthStateChanged(auth, (user) => {
             updateUI(user);
         });
@@ -498,7 +506,18 @@
                 }
             } catch (error) {
                 console.error("Authentication Error:", error);
-                displayAuthMessage("Error: " + error.message, false);
+                // Better error display
+                let errorMessage = "An authentication error occurred.";
+                if (error.code === 'auth/wrong-password') {
+                    errorMessage = "Invalid password. Please try again.";
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = "No user found with that email.";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "This email is already registered.";
+                } else {
+                     errorMessage = error.message.replace('Firebase: ', '');
+                }
+                displayAuthMessage("Error: " + errorMessage, false);
             }
         });
 
@@ -515,9 +534,10 @@
             }
             try {
                 await sendPasswordResetEmail(auth, email);
-                displayAuthMessage('Reset email sent.', true);
+                displayAuthMessage(`Password reset link sent to ${email}`, true);
             } catch (error) {
-                displayAuthMessage("Error sending reset email.", false);
+                 let errorMessage = error.message.replace('Firebase: ', '');
+                displayAuthMessage("Error: " + errorMessage, false);
             }
         });
 
@@ -542,10 +562,11 @@
             });
         });
 
-        // Initialize
+        // Initialize UI components on load
         document.addEventListener('DOMContentLoaded', () => {
             setAuthMode('login');
-            createSnowflakes(50); // Winter snow
+            createSnowflakes(60); // More snowflakes for a nicer effect
+            document.getElementById('current-year').textContent = new Date().getFullYear();
         });
     </script>
 </body>
