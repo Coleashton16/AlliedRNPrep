@@ -1,18 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQKB2E7CLH"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-WQKB2E7CLH');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Surgical II | Academic Portal</title>
+    <title>Medical Surgical II | Professional Resource Hub</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,107 +13,124 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Feather Icons for cleaner iconography -->
-    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <style>
-        /* Base styles and custom utilities */
+        /* Base styles and modern, deep background */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* A softer, cooler background */
+            background-color: #f1f5f9; /* Slate-100 */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Custom class for the active navigation link in the sidebar */
-        .nav-link-active {
-            background-color: #e0f2fe; /* light-sky-100 */
-            color: #0c4a6e; /* sky-900 */
+        /* Styles for the active unit tab */
+        .tab-active {
+            color: #0d9488; /* Teal-600 */
+            border-bottom: 3px solid #0d9488; /* Teal-600 indicator */
             font-weight: 600;
         }
         
-        /* Custom class for the main content sections to handle transitions */
+        /* Content transition for a fluent feel */
         .content-section {
-            display: none; /* Hidden by default */
-            animation: fadeIn 0.5s ease-in-out;
+            display: none;
+            animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .content-section.active {
-            display: block; /* Shown when active */
+            display: block;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Ensure smooth icon replacement for Lucide */
+        .lucide { display: inline; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800">
+<body class="text-slate-700">
 
-    <!-- Top Navigation Bar -->
-    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-200">
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Top Navigation Bar (Deep Slate) -->
+    <nav class="sticky top-0 z-40 bg-slate-800 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo and Site Title -->
                 <div class="flex-shrink-0">
-                    <a href="index.html" class="flex items-center gap-3 text-xl font-bold text-slate-900">
-                        <div class="bg-sky-600 p-2 rounded-lg text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        </div>
-                        <span>Medical Surgical Resources</span>
+                    <a href="#" class="flex items-center gap-2 text-xl font-extrabold text-teal-400">
+                        <i data-lucide="crosshair" class="w-6 h-6 text-teal-500"></i>
+                        <span>MedSurg II Focus</span>
                     </a>
                 </div>
                 <!-- Desktop Menu Links -->
-                <div class="hidden md:flex items-center space-x-2">
-                    <a href="index.html" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
-                    <a href="Calendar.html" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Calendar</a>
-                    <a href="AcademicSupportResourcesConsentAndTOS.html" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Support Docs</a>
-                    <a href="https://www.vsrep.org/anonymous-reporting-form" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5">
-                        <span>Complaints</span>
-                        <i data-feather="external-link" class="w-4 h-4"></i>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="text-slate-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                        <i data-lucide="grid-3x3" class="w-4 h-4"></i> Dashboard
+                    </a>
+                    <a href="Calendar.html" class="text-slate-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                        <i data-lucide="calendar-check" class="w-4 h-4"></i> Schedule
+                    </a>
+                    <a href="AcademicSupportResourcesConsentAndTOS.html" class="text-slate-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> Policies
+                    </a>
+                    <a href="https://www.vsrep.org/anonymous-reporting-form" target="_blank" rel="noopener noreferrer" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-md">
+                        <i data-lucide="bell-ring" class="w-4 h-4"></i> Report Incident
                     </a>
                 </div>
-                <div class="md:hidden"></div>
+                <!-- Mobile Hamburger Button -->
+                <button id="mobile-menu-button" class="md:hidden text-white hover:text-teal-400 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
             </div>
         </div>
     </nav>
-
-    <!-- Main Content Area -->
-    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-
-            <!-- Left Sidebar Navigation -->
-            <aside class="md-col-span-3 lg:col-span-2">
-                <div class="sticky top-24">
-                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Course Units</h3>
-                    <nav id="unit-navigation" class="flex flex-col space-y-1">
-                        <!-- Navigation links will be dynamically populated here -->
-                    </nav>
-                </div>
-            </aside>
-
-            <!-- Right Content Pane -->
-            <main class="md:col-span-9 lg:col-span-10">
-                
-                <!-- Page Header -->
-                <header class="relative bg-sky-600 p-8 md:p-10 rounded-2xl shadow-lg mb-8 overflow-hidden">
-                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-sky-500/50 rounded-full"></div>
-                    <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-sky-500/50 rounded-full"></div>
-                    <div class="relative z-10">
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Medical Surgical II</h1>
-                        <p class="mt-3 max-w-3xl text-sky-100">Your central hub for advanced medical-surgical nursing concepts, skills, and patient care.</p>
-                    </div>
-                </header>
-
-                <!-- Content sections will be rendered here -->
-                <div id="content-container"></div>
-
-            </main>
+    
+    <!-- Mobile Menu Drawer (Hidden by default) -->
+    <div id="mobile-menu-drawer" class="fixed inset-0 z-30 bg-slate-900/90 backdrop-blur-sm hidden md:hidden">
+        <div class="absolute top-0 right-0 w-64 h-full bg-slate-800 p-6 shadow-2xl">
+            <button id="close-menu-button" class="absolute top-4 right-4 text-white hover:text-teal-400">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <nav class="flex flex-col space-y-4 pt-10">
+                <a href="#" class="text-xl font-medium text-white hover:text-teal-400 transition-colors">Dashboard</a>
+                <a href="Calendar.html" class="text-xl font-medium text-white hover:text-teal-400 transition-colors">Schedule</a>
+                <a href="AcademicSupportResourcesConsentAndTOS.html" class="text-xl font-medium text-white hover:text-teal-400 transition-colors">Policies</a>
+                <a href="https://www.vsrep.org/anonymous-reporting-form" target="_blank" rel="noopener noreferrer" class="text-xl font-medium text-red-400 hover:text-red-500 transition-colors">Report Incident</a>
+            </nav>
         </div>
     </div>
 
+
+    <!-- Main Content Area (Centralized) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <!-- Hero Banner (Simplified and Focused) -->
+        <header class="bg-white p-8 md:p-10 rounded-2xl shadow-xl border-t-4 border-teal-500 mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Advanced Medical Surgical Nursing II
+            </h1>
+            <p class="mt-2 text-lg text-slate-500">
+                Master complex clinical challenges with structured learning modules, realistic exam simulations, and interactive tools.
+            </p>
+        </header>
+
+        <!-- Unit Navigation (Horizontal Tabs) -->
+        <nav class="bg-white rounded-t-xl border-b border-slate-200 shadow-md">
+            <div id="unit-navigation" class="flex flex-wrap border-b border-slate-200">
+                <!-- Unit tabs will be dynamically populated here -->
+            </div>
+        </nav>
+
+        <!-- Content Pane -->
+        <main id="content-container" class="bg-white p-6 sm:p-8 rounded-b-xl shadow-xl min-h-[60vh] border-t-0">
+            <!-- Content sections will be rendered here -->
+        </main>
+    </div>
+
     <!-- Footer -->
-    <footer class="text-center mt-8 py-6 border-t border-slate-200">
-        <p class="text-sm text-slate-500">&copy; 2025 Cole Ashton VSREP. All rights reserved.</p>
+    <footer class="text-center mt-12 py-8 bg-slate-800 text-slate-400">
+        <p class="text-sm">&copy; 2025 Cole Ashton VSREP. All rights reserved. | Professional Academic Resources.</p>
     </footer>
 
     <script>
@@ -130,73 +138,75 @@
         const courseData = {
             units: [
                 {
-                    id: 'cardiovascular-perfusion-unit',
-                    title: 'Unit 1: Cardiovascular/Perfusion & Renal/Urinary Systems',
-                    subtitle: 'An in-depth study of cardiac function, circulatory dynamics, perfusion management, renal function, and urinary tract disorders.',
+                    id: 'unit-1-cardio-renal',
+                    title: 'Unit 1',
+                    fullTitle: 'Unit 1: Cardiovascular/Perfusion & Renal/Urinary Systems',
+                    subtitle: 'In-depth study of cardiac function, circulatory dynamics, perfusion management, renal function, and urinary tract disorders.',
+                    icon: 'heart-handshake',
                     resources: [
-                        // New exam simulation button added here
                         {
                             type: 'exam',
                             title: 'Unit 1 Exam Simulation',
-                            description: 'A comprehensive exam simulation to test your knowledge of Unit 1 concepts.',
-                            icon: 'clipboard',
+                            description: 'A full-length, timed exam simulation based on unit learning objectives.',
+                            icon: 'file-question',
                             link: '/MedSurgII/Unit1ExamSim.html'
                         },
-                          {
+                        {
                             type: 'exam',
-                            title: 'Unit 1 Exam Textbook Based',
-                            description: 'A comprehensive exam simulation to test your knowledge of Unit 1 concepts.',
-                            icon: 'clipboard',
+                            title: 'Unit 1 Textbook Qs',
+                            description: 'Practice questions derived directly from core textbook chapter materials.',
+                            icon: 'notebook-pen',
                             link: '/MedSurgII/Unit1BookExam.html'
                         },
-                        // Existing learning modules
                         {
                             type: 'learn',
                             title: 'Cardiac ECG Learning Module',
-                            description: 'An interactive module for understanding Electrocardiograms in cardiovascular care.',
-                            icon: 'activity',
+                            description: 'Interactive module for understanding Electrocardiograms and dysrhythmia interpretation.',
+                            icon: 'activity-square',
                             link: 'MSIICaridacEKGLearningModule.html'
                         },
                         {
                             type: 'learn',
-                            title: 'Heart Failure / MI Learning Module',
-                            description: 'An essential module covering the pathophysiology and management of Heart Failure and Myocardial Infarction.',
-                            icon: 'heart',
+                            title: 'Heart Failure / MI Management',
+                            description: 'Essential module covering pathophysiology, assessment, and nursing management of HF and MI.',
+                            icon: 'heart-pulse',
                             link: 'MSIIHeartFailureLearningModule.html'
                         },
                         {
                             type: 'learn',
-                            title: 'Renal Elimination Learning Module',
-                            description: 'An interactive module explaining the physiological processes of urinary elimination and fluid balance.',
-                            icon: 'droplet',
+                            title: 'Renal Elimination Physiology',
+                            description: 'Module explaining the physiological processes of urinary elimination, fluid balance, and renal disorders.',
+                            icon: 'droplets',
                             link: 'urinaryeliminationlearningmodule.html'
                         }
                     ]
                 },
                 {
-                    id: 'acid-base-gas-digestion-unit',
-                    title: 'Unit 2: Acid-Base, Gas Exchange, & Digestion/Elimination',
+                    id: 'unit-2-abg-gas-digestion',
+                    title: 'Unit 2',
+                    fullTitle: 'Unit 2: Acid-Base, Gas Exchange, & Digestion/Elimination',
                     subtitle: 'Focusing on critical physiological processes including acid-base balance, respiratory function, and gastrointestinal health.',
+                    icon: 'gauge',
                     resources: [
                         {
                             type: 'learn',
-                            title: 'Acid-Base Learning Module',
-                            description: 'Master the concepts of acid-base balance, ABG interpretation, and related nursing interventions.',
-                            icon: 'bar-chart-2',
+                            title: 'Acid-Base & ABG Interpretation',
+                            description: 'Master the concepts of acid-base balance and systematic ABG interpretation.',
+                            icon: 'bar-chart-3',
                             link: '/MedSurgII/acidbaselearningmodule.html'
                         },
                         {
-                            type: 'learn',
-                            title: 'Unit 2 SDE',
-                            description: 'Comprehensive book exam about Unit 2',
-                            icon: 'bar-chart-2',
+                            type: 'exam',
+                            title: 'Unit 2 Self-Diagnostic Exam (SDE)',
+                            description: 'Comprehensive assessment to identify knowledge gaps in Unit 2 content.',
+                            icon: 'clipboard-list',
                             link: '/MedSurgII/unit2sde.html'
                         },
                         {
                             type: 'game',
-                            title: 'ABG Hero',
-                            description: 'Test your ABG interpretation skills with this interactive game.',
-                            icon: 'shield',
+                            title: 'ABG Hero: Gamified Practice',
+                            description: 'Interactive game to test and build speed in your ABG interpretation skills.',
+                            icon: 'swords',
                             link: '/MedSurgII/abghero.html'
                         }
                     ]
@@ -204,53 +214,74 @@
             ]
         };
 
-        // --- DYNAMIC RENDERING ---
+        // --- DYNAMIC RENDERING & LOGIC ---
         document.addEventListener('DOMContentLoaded', () => {
             const navContainer = document.getElementById('unit-navigation');
             const contentContainer = document.getElementById('content-container');
+            
+            // Mobile menu logic
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMenuButton = document.getElementById('close-menu-button');
+            const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
 
-            if (!navContainer || !contentContainer) {
-                console.error("Required containers not found.");
-                return;
-            }
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenuDrawer.classList.remove('hidden');
+            });
+
+            closeMenuButton.addEventListener('click', () => {
+                mobileMenuDrawer.classList.add('hidden');
+            });
+
 
             const createResourceCard = (resource) => {
                 const typeStyles = {
-                    exam: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' },
-                    learn: { bg: 'bg-sky-50', border: 'border-sky-200', iconColor: 'text-sky-600', hover: 'hover:border-sky-400 hover:bg-sky-100' },
-                    game: { bg: 'bg-amber-50', border: 'border-amber-200', iconColor: 'text-amber-600', hover: 'hover:border-amber-400 hover:bg-amber-100' },
-                    final: { bg: 'bg-indigo-50', border: 'border-indigo-200', iconColor: 'text-indigo-600', hover: 'hover:border-indigo-400 hover:bg-indigo-100' }
+                    exam: { bg: 'bg-indigo-50', border: 'border-indigo-300', iconColor: 'text-indigo-600', ring: 'ring-indigo-400' },
+                    learn: { bg: 'bg-teal-50', border: 'border-teal-300', iconColor: 'text-teal-600', ring: 'ring-teal-400' },
+                    game: { bg: 'bg-amber-50', border: 'border-amber-300', iconColor: 'text-amber-600', ring: 'ring-amber-400' },
+                    final: { bg: 'bg-red-50', border: 'border-red-300', iconColor: 'text-red-600', ring: 'ring-red-400' }
                 };
                 const styles = typeStyles[resource.type] || typeStyles.learn;
+
                 return `
-                                <a href="${resource.link}" target="_blank" rel="noopener noreferrer" class="group block p-5 rounded-xl border-2 transition-all duration-300 transform-gpu hover:-translate-y-1 hover:shadow-lg ${styles.bg} ${styles.border} ${styles.hover}">
-                                    <div class="flex items-start gap-4">
-                                        <div class="p-2 rounded-lg ${styles.iconColor}"><i data-feather="${resource.icon}" class="w-6 h-6"></i></div>
-                                        <div>
-                                            <h4 class="font-bold text-slate-800 group-hover:text-black break-words">${resource.title}</h4>
-                                            <p class="text-sm text-slate-600 mt-1 break-words">${resource.description}</p>
-                                        </div>
-                                    </div>
-                                </a>`;
+                    <a href="${resource.link}" target="_blank" rel="noopener noreferrer" 
+                        class="group block p-5 rounded-xl border transition-all duration-300 
+                                transform-gpu hover:-translate-y-0.5 shadow-md hover:shadow-xl
+                                ${styles.bg} ${styles.border} hover:border-slate-400
+                                hover:ring-2 ring-offset-2 ring-opacity-50 ${styles.ring}">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 rounded-full ${styles.iconColor} bg-white ring-1 ring-slate-100 shadow-inner">
+                                <i data-lucide="${resource.icon}" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-extrabold text-slate-800 group-hover:text-slate-900 break-words transition-colors">${resource.title}</h4>
+                                <p class="text-sm text-slate-500 mt-1 break-words">${resource.description}</p>
+                            </div>
+                        </div>
+                    </a>`;
             };
             
-            // Clear existing navigation and content before populating
+            // Clear existing content before populating
             navContainer.innerHTML = '';
             contentContainer.innerHTML = '';
 
             courseData.units.forEach((unit) => {
+                // Horizontal Tab Link Generation
                 const navLink = document.createElement('a');
                 navLink.href = `#${unit.id}`;
                 navLink.dataset.target = unit.id;
-                navLink.className = 'nav-link text-slate-700 hover:bg-slate-200 px-3 py-2 rounded-md text-sm font-medium transition-colors';
-                navLink.innerHTML = `<span class="font-semibold">${unit.title.split(':')[0]}</span>: ${unit.title.split(':')[1] || 'Overview'}`;
+                navLink.className = 'tab-link text-slate-600 px-6 py-3 text-base font-medium transition-all duration-200 hover:text-teal-600';
+                navLink.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="${unit.icon}" class="w-4 h-4"></i>${unit.title}</span>`;
                 navContainer.appendChild(navLink);
 
+                // Content Section Generation
                 const section = document.createElement('section');
                 section.id = unit.id;
                 section.className = 'content-section';
                 
-                let contentHTML = `<div class="mb-6"><h2 class="text-2xl font-bold text-slate-900">${unit.title}</h2><p class="text-slate-500">${unit.subtitle}</p></div>`;
+                let contentHTML = `<div class="mb-8 p-6 rounded-lg bg-slate-50 border border-slate-200">
+                    <h2 class="text-3xl font-extrabold text-slate-900">${unit.fullTitle}</h2>
+                    <p class="text-slate-600 mt-2">${unit.subtitle}</p>
+                </div>`;
 
                 if (unit.resources.length > 0) {
                     const learningModules = unit.resources.filter(r => r.type === 'learn');
@@ -262,49 +293,63 @@
                     const createSection = (title, icon, items) => {
                         if (items.length === 0) return '';
                         const iconColor = { 
-                            'Learning Modules': 'text-sky-600', 
+                            'Learning Modules': 'text-teal-600', 
                             'Games & Simulations': 'text-amber-600',
-                            'Diagnostic Exams': 'text-indigo-600', 
-                            'Final Exam Prep': 'text-indigo-600' 
+                            'Exams & Quizzes': 'text-indigo-600', 
+                            'Final Exam Prep': 'text-red-600' 
                         }[title] || 'text-slate-600';
+                        const iconType = {
+                            'Learning Modules': 'book-open',
+                            'Games & Simulations': 'gamepad-2',
+                            'Exams & Quizzes': 'clipboard-check',
+                            'Final Exam Prep': 'award'
+                        }[title] || 'target';
+
                         return `
-                                <div class="mb-8">
-                                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-3 mb-4 border-b pb-2">
-                                        <i data-feather="${icon}" class="w-5 h-5 ${iconColor}"></i><span>${title}</span>
-                                    </h3>
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">${items.map(createResourceCard).join('')}</div>
-                                </div>`;
+                            <div class="mb-10">
+                                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-3 mb-5 pb-2 border-b-2 border-slate-100">
+                                    <i data-lucide="${iconType}" class="w-6 h-6 ${iconColor}"></i><span>${title} (${items.length})</span>
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">${items.map(createResourceCard).join('')}</div>
+                            </div>`;
                     };
                     
+                    resourcesHTML += createSection('Exams & Quizzes', 'clipboard-check', exams);
                     resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
-                    resourcesHTML += createSection('Games & Simulations', 'play-circle', games);
-                    resourcesHTML += createSection('Diagnostic Exams', 'clipboard', exams);
+                    resourcesHTML += createSection('Games & Simulations', 'gamepad-2', games);
                     resourcesHTML += createSection('Final Exam Prep', 'award', finalExams);
                     
                     contentHTML += resourcesHTML;
                 } else {
                     contentHTML += `
-                                <div class="text-center py-12 px-6 bg-white rounded-xl border border-slate-200">
-                                    <i data-feather="folder" class="w-12 h-12 mx-auto text-slate-400"></i>
-                                    <h3 class="mt-4 text-lg font-semibold text-slate-700 text-wrap">No Resources Available Yet</h3>
-                                    <p class="mt-1 text-slate-500 text-wrap">Please check back later for materials related to this unit.</p>
-                                </div>`;
+                        <div class="text-center py-16 px-6 bg-slate-50 rounded-xl border border-dashed border-slate-300 shadow-inner">
+                            <i data-lucide="folder-open" class="w-16 h-16 mx-auto text-slate-300"></i>
+                            <h3 class="mt-6 text-xl font-semibold text-slate-700">No Resources Available Yet</h3>
+                            <p class="mt-2 text-slate-500">Materials for this unit are being prepared. Check back soon!</p>
+                        </div>`;
                 }
                 section.innerHTML = contentHTML;
                 contentContainer.appendChild(section);
             });
             
-            const navLinks = document.querySelectorAll('.nav-link');
+            const navLinks = document.querySelectorAll('.tab-link');
             const contentSections = document.querySelectorAll('.content-section');
 
             const switchTab = (targetId) => {
-                navLinks.forEach(link => link.classList.toggle('nav-link-active', link.dataset.target === targetId));
+                navLinks.forEach(link => {
+                    link.classList.remove('tab-active');
+                    if (link.dataset.target === targetId) {
+                        link.classList.add('tab-active');
+                    }
+                });
                 contentSections.forEach(section => section.classList.toggle('active', section.id === targetId));
-                feather.replace();
+                
+                // Re-initiate Lucide icons after content is visible
+                lucide.createIcons();
             };
 
             navContainer.addEventListener('click', (e) => {
-                const link = e.target.closest('a');
+                const link = e.target.closest('.tab-link');
                 if (link) {
                     e.preventDefault();
                     const targetId = link.dataset.target;
@@ -319,10 +364,13 @@
                 switchTab(initialTab);
             });
 
+            // Initial switch on page load
             const initialTab = window.location.hash.substring(1) || courseData.units[0].id;
             switchTab(initialTab);
+            
+            // Initial Lucide icon replacement for the entire page
+            lucide.createIcons();
         });
     </script>
 </body>
 </html>
-
