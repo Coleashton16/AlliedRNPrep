@@ -195,6 +195,24 @@
                             icon: 'bar-chart-3',
                             link: '/MedSurgII/acidbaselearningmodule.html'
                         },
+                        // --- New Module: Gas Exchange (Pending) ---
+                        {
+                            type: 'learn',
+                            title: 'Gas Exchange & Respiratory Disorders',
+                            description: 'Detailed module on pulmonary function, oxygenation, ventilation, and common respiratory failure modes.',
+                            icon: 'lungs',
+                            link: '/MedSurgII/gasexchangemodule.html',
+                            status: 'pending' // Marked as pending
+                        },
+                        // --- New Module: Digestion (Pending) ---
+                        {
+                            type: 'learn',
+                            title: 'Digestion & GI Health',
+                            description: 'Comprehensive review of the digestive process, common GI disorders, and nutritional support.',
+                            icon: 'stomach',
+                            link: '/MedSurgII/digestionmodule.html',
+                            status: 'pending' // Marked as pending
+                        },
                         {
                             type: 'exam',
                             title: 'Unit 2 Self-Diagnostic Exam (SDE)',
@@ -208,6 +226,60 @@
                             description: 'Interactive game to test and build speed in your ABG interpretation skills.',
                             icon: 'swords',
                             link: '/MedSurgII/abghero.html'
+                        }
+                    ]
+                },
+                // --- New Unit 3 (All Pending) ---
+                {
+                    id: 'unit-3-tis-cell-mob-inf',
+                    title: 'Unit 3',
+                    fullTitle: 'Unit 3: Tissue Integrity, Cellular Regulation, Mobility, & Infection',
+                    subtitle: 'Advanced management of complex integumentary issues, hematologic and oncologic disorders, musculoskeletal impairment, and infectious diseases.',
+                    icon: 'dna',
+                    resources: [
+                        // --- Tissue Integrity (Pending) ---
+                        {
+                            type: 'learn',
+                            title: 'Tissue Integrity & Wound Management',
+                            description: 'Focus on assessment, staging, and therapeutic management of pressure injuries and complex wounds.',
+                            icon: 'bandage',
+                            link: '/MedSurgII/tissueintegritymodule.html',
+                            status: 'pending' // Marked as pending
+                        },
+                        // --- Cellular Regulation (Pending) ---
+                        {
+                            type: 'learn',
+                            title: 'Cellular Regulation (Oncology/Hematology)',
+                            description: 'Study of leukemias, lymphomas, solid tumors, and essential hematological nursing interventions.',
+                            icon: 'microscope',
+                            link: '/MedSurgII/cellularregulationmodule.html',
+                            status: 'pending' // Marked as pending
+                        },
+                        // --- Mobility (Pending) ---
+                        {
+                            type: 'learn',
+                            title: 'Mobility & Musculoskeletal Injuries',
+                            description: 'Assessment and management of fractures, amputations, and degenerative joint diseases.',
+                            icon: 'wheelchair',
+                            link: '/MedSurgII/mobilitymodule.html',
+                            status: 'pending' // Marked as pending
+                        },
+                        // --- Infection (Pending) ---
+                        {
+                            type: 'learn',
+                            title: 'Infection & Sepsis Management',
+                            description: 'Module on recognition, prevention, and treatment protocols for systemic infections and sepsis.',
+                            icon: 'shield-check',
+                            link: '/MedSurgII/infectionmodule.html',
+                            status: 'pending' // Marked as pending
+                        },
+                        {
+                            type: 'exam',
+                            title: 'Unit 3 Exam Simulation',
+                            description: 'A full-length, timed exam simulation based on unit learning objectives.',
+                            icon: 'file-question',
+                            link: '/MedSurgII/Unit3ExamSim.html',
+                            status: 'pending' // Marked as pending
                         }
                     ]
                 }
@@ -234,27 +306,57 @@
 
 
             const createResourceCard = (resource) => {
+                const isPending = resource.status === 'pending';
+                
                 const typeStyles = {
                     exam: { bg: 'bg-indigo-50', border: 'border-indigo-300', iconColor: 'text-indigo-600', ring: 'ring-indigo-400' },
                     learn: { bg: 'bg-teal-50', border: 'border-teal-300', iconColor: 'text-teal-600', ring: 'ring-teal-400' },
                     game: { bg: 'bg-amber-50', border: 'border-amber-300', iconColor: 'text-amber-600', ring: 'ring-amber-400' },
                     final: { bg: 'bg-red-50', border: 'border-red-300', iconColor: 'text-red-600', ring: 'ring-red-400' }
                 };
-                const styles = typeStyles[resource.type] || typeStyles.learn;
+
+                let styles = typeStyles[resource.type] || typeStyles.learn;
+
+                // --- PENDING STATE LOGIC ---
+                let linkAttributes = `href="${resource.link}" target="_blank" rel="noopener noreferrer"`;
+                let cardClasses;
+                let iconColorClass;
+                let textColorClass;
+                let descColorClass;
+                let descriptionText = resource.description;
+
+                if (isPending) {
+                    // Grayed-out/Disabled look
+                    linkAttributes = 'href="#"'; 
+                    cardClasses = `group block p-5 rounded-xl border transition-none shadow-md
+                                   bg-slate-100 border-slate-200 cursor-not-allowed opacity-70`;
+                    iconColorClass = 'text-slate-400';
+                    textColorClass = 'text-slate-500';
+                    descColorClass = 'text-slate-400';
+                    descriptionText = `<span class="font-semibold text-red-500">PENDING:</span> ${resource.description}`;
+                } else {
+                    // Active state look
+                    cardClasses = `group block p-5 rounded-xl border transition-all duration-300 
+                                   transform-gpu hover:-translate-y-0.5 shadow-md hover:shadow-xl
+                                   ${styles.bg} ${styles.border} hover:border-slate-400
+                                   hover:ring-2 ring-offset-2 ring-opacity-50 ${styles.ring}`;
+                    iconColorClass = styles.iconColor;
+                    textColorClass = 'text-slate-800 group-hover:text-slate-900';
+                    descColorClass = 'text-slate-500';
+                }
+                // --- END PENDING STATE LOGIC ---
 
                 return `
-                    <a href="${resource.link}" target="_blank" rel="noopener noreferrer" 
-                        class="group block p-5 rounded-xl border transition-all duration-300 
-                                transform-gpu hover:-translate-y-0.5 shadow-md hover:shadow-xl
-                                ${styles.bg} ${styles.border} hover:border-slate-400
-                                hover:ring-2 ring-offset-2 ring-opacity-50 ${styles.ring}">
+                    <a ${linkAttributes}
+                        ${isPending ? 'onclick="event.preventDefault();"' : ''}
+                        class="${cardClasses}">
                         <div class="flex items-start gap-4">
-                            <div class="p-3 rounded-full ${styles.iconColor} bg-white ring-1 ring-slate-100 shadow-inner">
+                            <div class="p-3 rounded-full ${iconColorClass} bg-white ring-1 ring-slate-100 shadow-inner">
                                 <i data-lucide="${resource.icon}" class="w-5 h-5"></i>
                             </div>
                             <div class="flex-1">
-                                <h4 class="font-extrabold text-slate-800 group-hover:text-slate-900 break-words transition-colors">${resource.title}</h4>
-                                <p class="text-sm text-slate-500 mt-1 break-words">${resource.description}</p>
+                                <h4 class="font-extrabold ${textColorClass} break-words transition-colors">${resource.title}</h4>
+                                <p class="text-sm ${descColorClass} mt-1 break-words">${descriptionText}</p>
                             </div>
                         </div>
                     </a>`;
