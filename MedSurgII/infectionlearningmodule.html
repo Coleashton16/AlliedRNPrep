@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infection and Tissue Integrity Learning Module - AlliedRNPrep</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration to use the Inter font and custom animations.
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                    },
+                },
+            },
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- React and Library Setup ---
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // --- Mock Authentication Setup for Standalone Demo (using localStorage for persistence) ---
+        const mockAuth = {
+            onAuthStateChanged: (callback) => {
+                setTimeout(() => callback({ uid: 'standalone-module-user' }), 100);
+                return () => {};
+            },
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-module-user' } }),
+        };
+
+        // --- Content & Data Structure for the Learning Modules (Filled with user content) ---
+        const contentData = {
+            'module-1': {
+                title: '1. Infection: Foundation & Risk Factors',
+                color: 'from-blue-500 to-blue-600',
+                description: 'Explore the definition of infection, related concepts, and essential laboratory assessment cues.',
+                steps: [
+                    { id: 'm1-step-a', title: 'Step 1.1: Concept Definition & Outcomes', type: 'text', content: `
+                        <h4 class="font-bold text-xl text-blue-800">Infection Concept Overview</h4>
+                        <p>Infection is defined as the invasion and multiplication of microorganisms in body tissues, which may be clinically unapparent or result in local cellular injury due to competitive metabolism, toxins, intracellular replication, or antigen-antibody response.</p>
+                        <p class="italic mt-2">As nurses, understanding the function of infection in disease will facilitate establishing an appropriate plan of treatment.</p>
+                        ${''}
+                        <h4 class="font-bold text-lg mt-4 text-blue-700">Learning Outcomes:</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Assess persons with optimal health, those at risk, and those who are experiencing infection problems.</li>
+                            <li>Recognize when an individual has problems with infection.</li>
+                            <li>Identify factors that minimize the risk of infection.</li>
+                            <li>Implement appropriate nursing and collaborative interventions to optimize health.</li>
+                            <li>Evaluate the plan of care for individuals with problems of infection.</li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm1-step-b', title: 'Step 1.2: HAIs and Clinical Cues', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-blue-700">Healthcare–Associated Infections (HAIs)</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Catheter-Associated Urinary Tract Infection (CAUTI)</li>
+                            <li>Central Line–Associated Bloodstream Infection (CLABSI)</li>
+                            <li>Ventilator-Associated Pneumonia (VAP)</li>
+                            <li>Surgical Site Infection (SSI)</li>
+                            <li>Hospital-Acquired Pneumonia</li>
+                            <li><em>Clostridioides difficile</em> Infection (CDI)</li>
+                        </ul>
+                        <h4 class="font-bold text-lg mt-4 text-blue-700">Assessment: Recognizing Cues</h4>
+                        <p>A comprehensive assessment includes History, Physical assessment, Psychosocial assessment, and Imaging assessment.</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Systemic Signs:</strong> Fever, malaise, increased heart rate, lymphadenopathy.</li>
+                            <li><strong>Local Signs:</strong> Pain, swelling (edema), redness (erythema), purulent drainage.</li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm1-step-c', title: 'Step 1.3: Laboratory Assessment (CRP, ESR, Serology)', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-blue-700">Laboratory Assessment Cues</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Culture and Sensitivity:</strong> Identifies the specific microorganism and its susceptibility to antimicrobials.</li>
+                            <li><strong>C-reactive protein (CRP):</strong> A non-specific marker for inflammation/infection.</li>
+                            <li><strong>Erythrocyte Sedimentation Rate (ESR):</strong> An ESR $> 20 \text{ mm/hr}$ is a marker for inflammation/infection.</li>
+                            <li><strong>Serologic Testing:</strong>
+                                <ul>
+                                    <li><strong>IgM antibodies:</strong> Indicates infection at the <strong>M</strong>oment (recent/acute infection).</li>
+                                    <li><strong>IgG antibodies:</strong> Remains after the infection is <strong>G</strong>one, providing long-term immunity.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm1-step-d', title: 'Step 1.4: WBCs and Differential', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-blue-700">White Blood Cells (WBCs) and Differential</h4>
+                        <p>Normal Range: $4,000 \text{ – } 10,000 /\mu \text{L}$. Function: Defend the body against infection and inflammation.</p>
+                        <table class="min-w-full table-auto border-collapse mt-4">
+                            <thead>
+                                <tr class="bg-blue-100 text-blue-700">
+                                    <th class="p-2 border border-blue-200">Leukocyte</th>
+                                    <th class="p-2 border border-blue-200">Range</th>
+                                    <th class="p-2 border border-blue-200">Key Role & Changes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                <tr><td class="p-2 border font-semibold">Neutrophils</td><td class="p-2 border">50–70%</td><td class="p-2 border">First responders to bacterial infection. Key term: <strong>'Left shift'</strong> = increase in immature neutrophils.</td></tr>
+                                <tr><td class="p-2 border font-semibold">Lymphocytes</td><td class="p-2 border">20–40%</td><td class="p-2 border">Produce antibodies; increased in viral infections, decreased in immunodeficiency (HIV) or with corticosteroids.</td></tr>
+                                <tr><td class="p-2 border font-semibold">Monocytes</td><td class="p-2 border">2–8%</td><td class="p-2 border">Phagocytosis; increased in chronic infections (TB, endocarditis) and recovery phase.</td></tr>
+                                <tr><td class="p-2 border font-semibold">Eosinophils</td><td class="p-2 border">1–4%</td><td class="p-2 border">Respond to allergens and parasites; increased in allergic reactions.</td></tr>
+                                <tr><td class="p-2 border font-semibold">Basophils</td><td class="p-2 border">0.5–1%</td><td class="p-2 border">Release histamine and heparin; increased in allergies, decreased in acute infection.</td></tr>
+                            </tbody>
+                        </table>
+                        ` 
+                    },
+                    { id: 'm1-quiz', title: 'Module 1 Quiz: Foundational Concepts', type: 'quiz',
+                        questions: [
+                            { question: "Which white blood cell type is the first responder to bacterial infection, and an increase in its immature form is known as a 'left shift'?", options: ["Lymphocytes", "Monocytes", "Neutrophils", "Eosinophils"], correctAnswer: "Neutrophils" },
+                            { question: "A patient's C-reactive protein (CRP) and Erythrocyte Sedimentation Rate (ESR) of $35 \text{ mm/hr}$ are both elevated. What does this general finding indicate?", options: ["Viral etiology only", "Long-term immunity to a past infection", "Presence of generalized inflammation or infection", "An allergic reaction or parasitic infection"], correctAnswer: "Presence of generalized inflammation or infection" },
+                            { question: "Immunoglobulin M (IgM) antibodies indicate which status of an infection?", options: ["The infection is resolved (Gone)", "The infection is currently acute (at the Moment)", "Long-term immunity", "A chronic, slow-developing infection"], correctAnswer: "The infection is currently acute (at the Moment)" },
+                        ]
+                    },
+                ]
+            },
+            'module-2': {
+                title: '2. Clinical Management & Septicemia (Exemplar)',
+                color: 'from-purple-500 to-purple-600',
+                description: 'Focuses on screening, interventions, Multidrug-Resistant Organisms (MRDOs), and the consequences of uncontrolled infection like septic shock.',
+                steps: [
+                    { id: 'm2-step-a', title: 'Step 2.1: Secondary Prevention & Interventions', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-purple-700">Clinical Management: Secondary Prevention (Screening)</h4>
+                        <p>Common infection screenings focus on high-risk groups:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Sexually transmitted infection (STI) screening.</li>
+                            <li>Tuberculosis (TB) screening.</li>
+                            <li>COVID screening.</li>
+                        </ul>
+                        <h4 class="font-bold text-lg mt-4 text-purple-700">Collaborative Interventions</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Antimicrobial therapy (correct drug choice, appropriate dosing, compliance).</li>
+                            <li>Rest and comfort care measures.</li>
+                            <li>Nutritional support.</li>
+                            <li>Fluids (to prevent dehydration and maintain perfusion).</li>
+                            <li>Disinfection of the physical environment.</li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm2-step-b', title: 'Step 2.2: Multidrug-Resistant Organisms (MRDOs)', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-purple-700">Multidrug-Resistant Organisms (MRDOs)</h4>
+                        <p>MRDOs are microorganisms that have become resistant to certain antibiotics. A significant factor in resistance is the formation of <strong>biofilm (glycocalyx)</strong> on medical devices.</p>
+                        <h5 class="font-semibold mt-3">Most Common MRDOs:</h5>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Methicillin-resistant <em>Staphylococcus aureus</em> (MRSA):</strong> Resistant to methicillin and other penicillin-based drugs. HA-MRSA is spread by indwelling catheters, vascular access devices, and open wounds. Susceptible to IV vancomycin, oral linezolid, IV ceftaroline fosamil.</li>
+                            <li><strong>Vancomycin-resistant <em>Enterococcus</em> (VRE).</strong></li>
+                            <li><strong>Carbapenem-resistant <em>Enterococcus</em> (CRE):</strong> Resistant to drugs like Ertapenem, Imipenem, and Meropenem.</li>
+                        </ul>
+                        <h5 class="font-semibold mt-3">Community-Associated MRSA (CA-MRSA) Prevention:</h5>
+                        <p class="text-sm italic">Frequent hand hygiene, avoiding close contact with infectious wounds, and good overall hygiene are key.</p>
+                        ` 
+                    },
+                    { id: 'm2-step-c', title: 'Step 2.3: Septicemia and Septic Shock', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-purple-700">Consequences of Uncontrolled Infection (Septicemia)</h4>
+                        <p>When the body’s compensatory mechanisms (vascular, renal, nervous, respiratory) are overcome, the infection can progress to:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Bacteremia / Septicemia:</strong> Bacteria in the bloodstream.</li>
+                            <li><strong>Septic Shock:</strong> Sepsis-induced distributive shock, characterized by persistent hypotension despite adequate fluid resuscitation and the need for vasopressors.</li>
+                            <li><strong>Multiple Organ Failure:</strong> Severe organ dysfunction.</li>
+                            <li><strong>Death.</strong></li>
+                        </ul>
+                        <p class="mt-4"><strong>Inadequate Antimicrobial Therapy</strong> (incorrect drug/dosing or noncompliance) is a major contributor to progression.</p>
+                        ` 
+                    },
+                    { id: 'm2-case-study', title: 'Clinical Case Study: Septic Shock Priority', type: 'case_study', case: {
+                        scenario: `A 78-year-old male, 3 days post-abdominal surgery, has a temperature of $103.5^{\circ}\text{F}$, $\text{HR } 128$, $\text{RR } 26$, and $\text{BP } 88/52 \text{ mmHg}$. He is lethargic and his urinary output is $15 \text{ mL}$ over the past hour. The physician has been notified and orders are awaited.`,
+                        question: `Based on these findings, what is the PRIORITY nursing intervention?`,
+                        options: [
+                            "Option A: Administer prescribed IV broad-spectrum antibiotics immediately.",
+                            "Option B: Initiate two large-bore IV lines and prepare for rapid fluid resuscitation.",
+                            "Option C: Monitor the patient's vital signs every 15 minutes and reassess frequently.",
+                            "Option D: Obtain a blood culture and urine culture for culture and sensitivity testing.",
+                        ],
+                        correctAnswer: "Option B: Initiate two large-bore IV lines and prepare for rapid fluid resuscitation.",
+                        explanation: `<strong>Rationale:</strong> The patient is showing signs of severe sepsis/septoc shock ($\text{BP } 88/52 \text{ mmHg}$, $\text{UO } 15 \text{ mL/hr}$). The absolute priority in septic shock is to restore tissue perfusion and correct hypotension with IV fluid resuscitation (Option B) to prevent irreversible organ damage. While all other options are crucial components of the sepsis bundle, initiating IV fluids is the immediate life-saving action to stabilize the patient while simultaneously preparing to administer antibiotics (Option A) and draw cultures (Option D).`
+                    }},
+                    { id: 'm2-quiz', title: 'Module 2 Quiz: Management Application', type: 'quiz',
+                        questions: [
+                            { question: "What is the primary characteristic that distinguishes septic shock from severe sepsis?", options: ["The presence of fever and tachycardia", "Persistent hypotension despite adequate fluid resuscitation", "A white blood cell count greater than $10,000 /\mu \text{L}$", "Positive blood culture results"], correctAnswer: "Persistent hypotension despite adequate fluid resuscitation" },
+                            { question: "What teaching is most critical for preventing the spread of Community-Associated MRSA (CA-MRSA)?", options: ["Avoid eating raw or undercooked meats", "Perform frequent hand hygiene and avoid contact with infectious wounds", "Ensure all vaccinations are up-to-date", "Use only specific IV antibiotics at home"], correctAnswer: "Perform frequent hand hygiene and avoid contact with infectious wounds" },
+                        ]
+                    },
+                ]
+            },
+            'module-3': {
+                title: '3. Tissue Integrity: Wound Healing',
+                color: 'from-green-500 to-green-600',
+                description: 'A look at the inter-related concept of Tissue Integrity, focusing on wound healing processes, phases, and general wound care principles.',
+                steps: [
+                    { id: 'm3-step-a', title: 'Step 3.1: Wound Healing Intentions', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-green-700">Wound Healing Processes (Intentions)</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Primary intention:</strong> Wound margins are well approximated (e.g., laceration, surgical incision). This process has the most rapid healing.</li>
+                            <li><strong>Secondary intention:</strong> Wound margins are not well approximated; a larger wound area requires the formation of granulation tissue to fill the gap. A longer period of time is needed to heal.</li>
+                            <li><strong>Tertiary intention:</strong> Wound healing is delayed (previously open, then closed). This is usually associated with large, infected, or contaminated wounds.</li>
+                        </ul>
+                        ${'[Image of the three types of wound healing process]'}
+                        ` 
+                    },
+                    { id: 'm3-step-b', title: 'Step 3.2: Phases of Wound Healing', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-green-700">Three Phases of Wound Healing</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>Inflammatory phase:</strong> Lasts $3 \text{ to } 5$ days. Homeostasis develops; macrophages remove debris.</li>
+                            <li><strong>Granulation phase (Proliferative):</strong> Lasts $5 \text{ to } 21$ days. New blood vessels and tissue are formed.</li>
+                            <li><strong>Maturation phase (Remodeling):</strong> Lasts for months. Collagen fiber is remodeled; scar formation and contraction occur.</li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm3-step-c', title: 'Step 3.3: Risk Factors & Wound Care Principles', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-green-700">Individual Risk Factors for Impaired Tissue Integrity</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Poor peripheral perfusion, malnutrition, or obesity.</li>
+                            <li>Dehydration or edema.</li>
+                            <li>Impaired mobility and immunosuppression.</li>
+                            <li>Exposure to irritants (radiation, temperature extremes, friction, shearing, pressure).</li>
+                        </ul>
+                        <h4 class="font-bold text-lg mt-4 text-green-700">Principles of Wound Care</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Assessment:</strong> Initial and ongoing assessment is crucial.</li>
+                            <li><strong>Cleansing and Irrigation:</strong> Performed for debris and exudate removal. Normal saline solution is preferred; harsh solutions should be avoided.</li>
+                            <li><strong>Dressings:</strong> Options include gauze, nonadherent, occlusive, hydrocolloid, hydrogel, and alginate. Vacuum-assisted systems may be used.</li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm3-quiz', title: 'Module 3 Quiz: Wound Healing Basics', type: 'quiz',
+                        questions: [
+                            { question: "A surgical incision healing with wound margins well-approximated is an example of which type of wound healing?", options: ["Secondary intention", "Tertiary intention", "Primary intention", "Granulation intention"], correctAnswer: "Primary intention" },
+                            { question: "During which phase of wound healing does new blood vessel and tissue formation primarily occur?", options: ["Inflammatory phase", "Granulation phase", "Maturation phase", "Homeostasis phase"], correctAnswer: "Granulation phase" },
+                        ]
+                    },
+                ]
+            },
+            'module-4': {
+                title: '4. Exemplar: Burn Injury & Management',
+                color: 'from-red-500 to-red-600',
+                description: 'A deep dive into burn injury classification, phases of care, critical formulas (Parkland), and interventions.',
+                steps: [
+                    { id: 'm4-step-a', title: 'Step 4.1: Burn Phases of Injury', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-red-700">Phases of Burn Injury Management</h4>
+                        <table class="min-w-full table-auto border-collapse mt-4">
+                            <thead>
+                                <tr class="bg-red-100 text-red-700">
+                                    <th class="p-2 border border-red-200">Phase</th>
+                                    <th class="p-2 border border-red-200">Duration</th>
+                                    <th class="p-2 border border-red-200">Primary Goal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                                <tr><td class="p-2 border font-semibold">Emergent/Resuscitative</td><td class="p-2 border">Onset of injury to completion of fluid resuscitation.</td><td class="p-2 border">Prevent hypovolemia causing edema and shock.</td></tr>
+                                <tr><td class="p-2 border font-semibold">Acute (Healing)</td><td class="p-2 border">Begins when the patient is hemodynamically stable and capillary permeability is restored (diuresis, $48 \text{–} 72 \text{ hours}$ post-injury).</td><td class="p-2 border">Prevent infection, provide metabolic support, wound care, restorative therapy.</td></tr>
+                                <tr><td class="p-2 border font-semibold">Rehabilitative (Restorative)</td><td class="p-2 border">From wound closure to return to optimal function. Extends beyond hospitalization.</td><td class="p-2 border">Functional and emotional recovery.</td></tr>
+                            </tbody>
+                        </table>
+                        ` 
+                    },
+                    { id: 'm4-step-b', title: 'Step 4.2: Burn Assessment & Depth', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-red-700">Burn Injury Assessment (Recognize Cues)</h4>
+                        <p>Key assessments include: Circumstances of injury (chemical, electrical, thermal, etc.), Age/weight/height, Health history, and checking for <strong>Black carbon particles</strong> in the nose, mouth, or sputum (sign of inhalation injury).</p>
+                        <h5 class="font-semibold mt-3">Classification by Depth:</h5>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Superficial ($\text{1st degree}$):</strong> Epidermis only. Painful, red, dry. Heals in a few days without scarring.</li>
+                            <li><strong>Superficial-partial thickness ($\text{2nd degree}$):</strong> Epidermis and partial dermis. Painful, red, blister, weeping. Capillary refill intact. Scarring likely.</li>
+                            <li><strong>Full-thickness ($\text{3rd degree}$):</strong> Entire epidermis and dermis. Appears white, red, brown, black, waxy. Loss of hair/sweating. <strong>Painless.</strong></li>
+                            <li><strong>Full-thickness ($\text{4th degree}$):</strong> Deep tissue, muscle and bone. Appears charred. Amputation likely. <strong>Painless.</strong></li>
+                        </ul>
+                        ${'[Image of burn classification by depth]'}
+                        <h5 class="font-semibold mt-3">Estimating Burn Size:</h5>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Rule of Nines:</strong> Quick estimate for adults.</li>
+                            <li><strong>Lund and Browder:</strong> More accurate, used $24 \text{–} 48 \text{ hours}$ after initial assessment.</li>
+                            <li><strong>Palmer’s Surface:</strong> Patient's hand (palm + fingers) is roughly $1\%$ of $\text{TBSA}$.</li>
+                        </ul>
+                        ` 
+                    },
+                    { id: 'm4-step-c', title: 'Step 4.3: Wound Management & Interventions', type: 'text', content: `
+                        <h4 class="font-bold text-lg text-red-700">Interventions: Take Action</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Airway maintenance</strong> (priority).</li>
+                            <li>Pain control and Infection control.</li>
+                            <li><strong>Escharotomy:</strong> Surgical incision to relieve pressure from a rigid eschar (dead tissue).</li>
+                            <li><strong>Wound Debridement:</strong> Removal of necrotic tissue.</li>
+                            <li><strong>Grafting:</strong> Promotes healing and decreases risk of infection/fluid loss.
+                                <ul>
+                                    <li><strong>Autografts:</strong> From the patient (STSG preferred).</li>
+                                    <li><strong>Homografts/Xenografts:</strong> Temporary coverage from humans or animals (pig).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4 class="font-bold text-lg mt-4 text-red-700">Nutritional Support (Hypermetabolism)</h4>
+                        <p>Burn patients have profound metabolic abnormalities. Dietary consult is needed to calculate caloric needs (high carbohydrates, high protein). Enteral route (Jejunal feedings) is frequently used due to lower risk of aspiration.</p>
+                        <p class="mt-2"><strong>Pharmacology:</strong> Oxandrolone (anabolic steroid) and Beta blockers (decrease catecholamine response) may be used.</p>
+                        <h5 class="font-semibold mt-3">Rehabilitation Phase:</h5>
+                        <p>Elastic pressure garments are essential to minimize scarring and promote functional recovery.</p>
+                        ` 
+                    },
+                    { id: 'm4-step-d', title: 'Step 4.4: Parkland Formula Calculation', type: 'parkland_calc', content: 'Interactive Fluid Resuscitation Calculation' },
+                    { id: 'm4-quiz', title: 'Module 4 & Final Review Quiz', type: 'quiz',
+                        questions: [
+                            { question: "A burn injury that is painless, appears white/waxy, and involves the entire epidermis and dermis is classified as:", options: ["Superficial partial-thickness", "Full-thickness (3rd degree)", "Superficial (1st degree)", "Full-thickness (4th degree)"], correctAnswer: "Full-thickness (3rd degree)" },
+                            { question: "In the management of a severe burn patient, the Acute (Healing) Phase begins when which key physiological event occurs?", options: ["The patient is transferred to the ICU", "The burn size is confirmed by Lund and Browder chart", "Capillary permeability is restored, leading to diuresis", "The patient is medically cleared for surgery"], correctAnswer: "Capillary permeability is restored, leading to diuresis" },
+                            { question: "Which is the preferred long-term graft type, taken from the patient's own body?", options: ["Xenograft", "Homograft", "Autograft", "Biosynthetic Dressing"], correctAnswer: "Autograft" },
+                        ]
+                    },
+                ]
+            }
+        };
+
+        // The pre-assessment quiz data
+        const preAssessmentQuizData = [
+            // M1
+            { moduleId: 'module-1', question: "What is the normal range for White Blood Cells (WBCs) per microliter ($\mu\text{L}$)?", options: ["1,000 – 4,000", "4,000 – 10,000", "15,000 – 20,000", "20,000 – 30,000"], correctAnswer: "4,000 – 10,000" },
+            { moduleId: 'module-1', question: "Which lab value specifically indicates a recent (acute) infection?", options: ["IgG antibodies", "CRP level", "IgM antibodies", "ESR level"], correctAnswer: "IgM antibodies" },
+            // M2
+            { moduleId: 'module-2', question: "The primary characteristic that distinguishes septic shock from severe sepsis?", options: ["The presence of fever and tachycardia", "Persistent hypotension despite adequate fluid resuscitation", "A white blood cell count greater than $10,000 /\mu \text{L}$", "Positive blood culture results"], correctAnswer: "Persistent hypotension despite adequate fluid resuscitation" },
+            { moduleId: 'module-2', question: "Which of the following is considered a Multidrug-Resistant Organism (MRDO)?", options: ["Tuberculosis", "Clostridioides difficile (CDI)", "Methicillin-resistant Staphylococcus aureus (MRSA)", "Influenza"], correctAnswer: "Methicillin-resistant Staphylococcus aureus (MRSA)" },
+            // M3
+            { moduleId: 'module-3', question: "Healing of a large pressure ulcer, where margins are not approximated and granulation tissue must form, occurs by which intention?", options: ["Primary intention", "Secondary intention", "Tertiary intention", "Fibrotic intention"], correctAnswer: "Secondary intention" },
+            { moduleId: 'module-3', question: "Which phase of wound healing lasts the longest, involving collagen remodeling and scar contraction?", options: ["Inflammatory phase", "Granulation phase", "Maturation phase", "Homeostasis phase"], correctAnswer: "Maturation phase" },
+            // M4
+            { moduleId: 'module-4', question: "A burn that is red, dry, and painful, involving only the epidermis, is classified as?", options: ["Full-thickness (3rd degree)", "Superficial (1st degree)", "Superficial partial-thickness (2nd degree)", "Full-thickness (4th degree)"], correctAnswer: "Superficial (1st degree)" },
+            { moduleId: 'module-4', question: "What is the primary goal during the Emergent/Resuscitative Phase of burn management?", options: ["Prevent infection and wound colonization", "Optimize nutritional status", "Prevent hypovolemia and shock", "Initiate physical therapy and rehabilitation"], correctAnswer: "Prevent hypovolemia and shock" }
+        ];
+
+        // --- Helper Functions ---
+        // Utility for conditionally joining Tailwind CSS classes.
+        const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+
+        // --- Child Components ---
+
+        /**
+         * ParklandFormulaCalculator component for interactive calculation.
+         */
+        const ParklandFormulaCalculator = ({ onComplete }) => {
+            const [weightLbs, setWeightLbs] = useState('');
+            const [tbsa, setTbsa] = useState('');
+            const [mLOrdered, setMlOrdered] = useState(2); // Default to 2mL as a conservative start
+            const [results, setResults] = useState(null);
+
+            // Calculation Logic: 1. Convert lbs to kg. 2. Calculate Total Fluid. 3. Calculate 8hr/16hr amounts.
+            const calculateFluid = () => {
+                const wLbs = parseFloat(weightLbs);
+                const tbsaPerc = parseFloat(tbsa);
+                const mL = parseFloat(mLOrdered);
+
+                if (isNaN(wLbs) || isNaN(tbsaPerc) || tbsaPerc <= 0 || wLbs <= 0 || isNaN(mL)) {
+                    setResults({ error: 'Please enter valid positive numbers for weight and TBSA. TBSA must be > 0.' });
+                    return;
+                }
+
+                // 1. Convert lbs to kg: 1 lb ≈ 0.453592 kg
+                const weightKg = wLbs / 2.2046;
+
+                // 2. Parkland Formula: 2-4 mL RL x Kg body weight x % burn
+                // Using TBSA as the percentage (e.g., 65 for 65%)
+                const totalVolume = mL * weightKg * tbsaPerc;
+
+                // 3. First half over first 8 hours
+                const first8Hours = totalVolume / 2;
+
+                // 4. Second half over remaining 16 hours
+                const following16Hours = totalVolume / 2;
+
+                // 5. Rate for first 8 hours (mL/hr)
+                const rateFirst8Hr = first8Hours / 8;
+
+                // 6. Rate for next 16 hours (mL/hr)
+                const rateNext16Hr = following16Hours / 16;
+                
+                // 7. Total infused at 16 hours = (Volume for first 8 hours) + (Rate for next 16 hours * 8 hours)
+                const totalInfused16Hr = first8Hours + (rateNext16Hr * 8); 
+                
+                // 8. Remaining at 16 hours = Total Volume - Total Infused at 16 hours
+                const fluidRemaining16Hr = totalVolume - totalInfused16Hr; 
+                
+                setResults({
+                    totalVolume: totalVolume.toFixed(2),
+                    first8Hours: first8Hours.toFixed(2),
+                    following16Hours: following16Hours.toFixed(2),
+                    rateFirst8Hr: rateFirst8Hr.toFixed(2),
+                    rateNext16Hr: rateNext16Hr.toFixed(2),
+                    // Corrected to save all necessary output variables
+                    totalInfused16Hr: totalInfused16Hr.toFixed(2),
+                    fluidRemaining16Hr: fluidRemaining16Hr.toFixed(2),
+                    error: null,
+                });
+                
+                // Mark step as complete
+                onComplete({ completed: true, score: 1 });
+            };
+
+            return (
+                <div className="p-4 bg-white rounded-xl shadow-lg">
+                    <h4 className="font-bold text-xl text-red-700 mb-4">Parkland Formula (Adults)</h4>
+                    <p class="text-sm italic mb-4">The formula uses <strong>Ringer's Lactate (RL)</strong> solution for fluid resuscitation. Use $2 \text{ mL}$, $3 \text{ mL}$, or $4 \text{ mL}$ depending on the prescribed treatment.</p>
+                    {/* Removed $$ for pure JSX rendering within component */}
+                    <p className="text-lg font-bold text-red-700 text-center">TOTAL VOLUME = 2–4 mL $\times$ Kg body weight $\times$ % TBSA</p>
+                    <div className="space-y-4 my-6 p-4 border rounded-lg bg-red-50">
+                        <h5 className="font-semibold text-gray-700">Input Parameters:</h5>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-600">Weight (lbs):</label>
+                                <input
+                                    type="number"
+                                    value={weightLbs}
+                                    onChange={(e) => setWeightLbs(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                    placeholder="e.g., 198"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-600">TBSA Burned (%):</label>
+                                <input
+                                    type="number"
+                                    value={tbsa}
+                                    onChange={(e) => setTbsa(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                    placeholder="e.g., 65"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-600">mL per kg per % TBSA (Order):</label>
+                                <select
+                                    value={mLOrdered}
+                                    onChange={(e) => setMlOrdered(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-white"
+                                >
+                                    <option value={2}>2 mL</option>
+                                    <option value={3}>3 mL</option>
+                                    <option value={4}>4 mL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button
+                            onClick={calculateFluid}
+                            className="w-full px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors disabled:opacity-50"
+                            disabled={!weightLbs || !tbsa}
+                        >
+                            Calculate Fluid Resuscitation
+                        </button>
+                    </div>
+
+                    {results && (
+                        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                            {results.error ? (
+                                <p className="text-red-600 font-semibold">{results.error}</p>
+                            ) : (
+                                <>
+                                    <h5 className="font-bold text-lg text-gray-800 mb-3">Calculation Results (Parkland Formula using {mLOrdered} mL)</h5>
+                                    <div className="space-y-2 text-sm">
+                                        <p><strong>Total Volume to Administer in 24 hours:</strong> <span className="text-red-700 font-bold">{results.totalVolume} mL</span></p>
+                                        <hr className="my-2 border-gray-200" />
+                                        <p><strong>Volume for First 8 Hours:</strong> (First half)</p>
+                                        <p className="text-base ml-4">Volume: <span className="font-bold">{results.first8Hours} mL</span> (Rate: {results.rateFirst8Hr} mL/hr)</p>
+                                        <p><strong>Volume for Next 16 Hours:</strong> (Second half)</p>
+                                        <p className="text-base ml-4">Volume: <span className="font-bold">{results.following16Hours} mL</span> (Rate: {results.rateNext16Hr} mL/hr)</p>
+                                        <hr className="my-2 border-gray-200" />
+                                        {/* Removed LaTeX from calculation description for stable JSX rendering */}
+                                        <p><strong>Total Infused at 16 hours:</strong> <span className="font-bold text-blue-700">{results.totalInfused16Hr} mL</span> (Calculation: {results.first8Hours} mL + 8 hr $\times$ {results.rateNext16Hr} mL/hr)</p>
+                                        <p><strong>Volume Remaining to Infuse at 16 hours:</strong> <span className="font-bold text-red-700">{results.fluidRemaining16Hr} mL</span></p>
+                                        <p className="font-bold text-green-700">Total Infused at 24 hours: <span className="font-bold">{results.totalVolume} mL</span></p>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        
+
+        /**
+         * Quiz component for interactive multiple-choice questions.
+         * Users answer questions and receive immediate feedback.
+         */
+        const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [selectedOption, setSelectedOption] = useState(null); 
+            const [feedback, setFeedback] = useState(null);
+            const [answers, setAnswers] = useState([]);
+
+            const currentQuestion = questions[currentQuestionIndex];
+
+            // Handle option selection
+            const handleOptionSelect = (option) => {
+                if (feedback && !isPreAssessment) return; // Prevent changing answer after feedback in regular quiz
+                setSelectedOption(option);
+            };
+
+            const checkCorrectness = (selected, correct) => {
+                // Normalize and compare (case insensitive and space insensitive for simplicity)
+                const normalize = (str) => String(str).toLowerCase().trim().replace(/\s+/g, ' ');
+                return normalize(selected) === normalize(correct);
+            }
+
+            const handlePreAssessmentNext = () => {
+                if (selectedOption === null) return;
+                
+                const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+                
+                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                setAnswers(updatedAnswers);
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null); // Reset for next question
+                    setFeedback(null);
+                } else {
+                    onComplete(updatedAnswers);
+                }
+            };
+            
+            const handleRegularQuizSubmit = () => {
+                if (selectedOption === null) return;
+                
+                const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
+                
+                setFeedback(isCorrect ? 'correct' : 'incorrect');
+                
+                // Record the answer immediately for the next step function to use
+                setAnswers(prevAnswers => [...prevAnswers, { question: currentQuestion, isCorrect }]);
+            };
+
+            const handleRegularQuizNext = () => {
+                // This function is only called after submission, so the answer should be in `answers` state.
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null); // Reset for next question
+                    setFeedback(null);
+                } else {
+                    // This is the last question. Calculate score from accumulated answers.
+                    const finalScore = answers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    onComplete({ score: finalScore, total: questions.length });
+                }
+            };
+
+            // If question has not been answered yet, wait for user selection
+            const hasSubmittedAnswer = answers.length > currentQuestionIndex;
+            let currentAnswerIsCorrect = false;
+            if (hasSubmittedAnswer) {
+                currentAnswerIsCorrect = answers[currentQuestionIndex].isCorrect;
+            }
+
+
+            return (
+                <div className="p-4 bg-white rounded-xl shadow-lg">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Quiz: {currentQuestionIndex + 1} of {questions.length}</h4>
+                    <p className="font-semibold text-gray-700 mb-3">{currentQuestion.question}</p>
+                    <div className="space-y-2">
+                        {currentQuestion.options.map((option, index) => {
+                            const isSelected = selectedOption === option;
+                            const isCorrectOption = checkCorrectness(option, currentQuestion.correctAnswer);
+                            
+                            let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200';
+
+                            if (feedback && !isPreAssessment) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => handleOptionSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass, (feedback && !isPreAssessment) && 'pointer-events-none')}
+                                >
+                                    <div className="flex items-center">
+                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : <span className="text-red-600 mr-2">✗</span>
+                                        )}
+                                        <span className="flex-1" dangerouslySetInnerHTML={{ __html: option }}></span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-4 text-center">
+                        {isPreAssessment ? (
+                                <button
+                                    onClick={handlePreAssessmentNext}
+                                    disabled={selectedOption === null}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                                </button>
+                        ) : (
+                            <>
+                            {feedback ? (
+                                <button
+                                    onClick={handleRegularQuizNext}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'View Results'}
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleRegularQuizSubmit}
+                                    disabled={selectedOption === null}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Submit Answer
+                                </button>
+                            )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        /**
+         * PreAssessmentQuiz component to handle the initial diagnostic quiz.
+         */
+        const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+            const [results, setResults] = useState(null);
+
+            const handleQuizComplete = (finalAnswers) => {
+                const moduleResults = {};
+                finalAnswers.forEach(answer => {
+                    const { moduleId } = answer.question;
+                    if (!moduleResults[moduleId]) {
+                        moduleResults[moduleId] = { correct: 0, total: 0 };
+                    }
+                    if (answer.isCorrect) {
+                        moduleResults[moduleId].correct++;
+                    }
+                    moduleResults[moduleId].total++;
+                });
+
+                const completedModules = [];
+                for (const moduleId in moduleResults) {
+                    // Module is complete if 100% of its questions in the pre-assessment quiz were correct.
+                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+                        completedModules.push(moduleId);
+                    }
+                }
+                setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+                onComplete(completedModules);
+            };
+
+            if (results) {
+                return (
+                    <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
+                            <p className="text-lg text-gray-600 mb-6">
+                                You correctly answered {results.correct} out of {results.total} questions.
+                            </p>
+                            {results.completedModules.length > 0 ? (
+                                <>
+                                    <p className="text-green-600 font-semibold mb-4">You've tested out of the following modules:</p>
+                                    <ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-lg">
+                                        {results.completedModules.map(id => <li key={id}>{contentData[id].title}</li>)}
+                                    </ul>
+                                </>
+                            ) : (
+                                <p className="text-yellow-600 font-semibold mb-6">You haven't tested out of any modules. Proceed to the dashboard to begin learning!</p>
+                            )}
+                            <button
+                                onClick={onExit}
+                                className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                            >
+                                Return to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
+                        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Diagnostic Quiz: Infection & Tissue Integrity</h2>
+                        <Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+                    </div>
+                </div>
+            );
+        };
+
+
+        /**
+         * Dashboard component to display the available learning modules.
+         */
+        const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+            let totalCompletedSteps = 0;
+            let totalPossibleSteps = 0;
+            let totalQuizCorrect = 0;
+            let totalQuizQuestions = 0;
+
+            // Calculate overall progress and gather quiz scores
+            Object.entries(contentData).forEach(([moduleId, module]) => {
+                totalPossibleSteps += module.steps.length;
+                const moduleProgress = progress[moduleId] || {};
+                
+                Object.values(moduleProgress).forEach(stepProgress => {
+                    if (stepProgress.completed) {
+                        totalCompletedSteps++;
+                    }
+                    if (stepProgress.score !== undefined && stepProgress.total !== undefined) {
+                        // This handles both regular quizzes and the case study/parkland calc which might have a score/total
+                        totalQuizCorrect += stepProgress.score;
+                    }
+                });
+
+                module.steps.forEach(step => {
+                    if (step.type === 'quiz') {
+                        totalQuizQuestions += step.questions.length;
+                    } 
+                    // Case studies are counted as 1 question for overall tracking simplicity
+                    else if (step.type === 'case_study') {
+                        totalQuizQuestions += 1;
+                    }
+                });
+            });
+
+
+            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+            return (
+                <div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+                    <div className="w-full">
+                        <header className="mb-8 text-center">
+                            <div className="flex items-center justify-center gap-3 mb-2">
+                                {/* Text placeholder for the main application identifier */}
+                                <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">RN</span>
+                                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Infection & Tissue Integrity Module</h1>
+                                <span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
+                            </div>
+                            <p className="text-lg text-gray-500 max-w-2xl mx-auto">A detailed module covering core concepts of Infection, its clinical management, and the related concept of Tissue Integrity with Burns as an exemplar.</p>
+                        </header>
+
+                        {/* Skip Ahead Button */}
+                        <div className="mb-8 text-center">
+                            <button
+                                onClick={onStartPreAssessment}
+                                className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
+                            >
+                                <div className="text-xl">Skip Ahead: Diagnostic Quiz</div>
+                                <div className="text-sm font-normal">Test your knowledge and potentially skip modules.</div>
+                            </button>
+                        </div>
+
+                        {/* Overall Progress Bar & Reset Button */}
+                        <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 w-full">
+                           <div className="flex justify-between items-center mb-3">
+                               <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
+                               <button 
+                                    onClick={onResetProgress}
+                                    className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
+                                    Reset Progress
+                               </button>
+                           </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4">
+                                <div
+                                    className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
+                                    style={{ width: `${overallPercentage}%` }}
+                                ></div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-left text-sm text-gray-600 mt-2">
+                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
+                                </p>
+                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                            {/* Iterate over all modules defined in contentData */}
+                            {Object.entries(contentData).map(([id, module]) => {
+                                const moduleProgress = progress[id] || {};
+                                // Calculate completion count for steps within the module.
+                                const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+                                const totalSteps = module.steps.length;
+                                const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+
+                                let statusText = "Not Started";
+                                let statusColor = "text-gray-500";
+                                if (completedCount === totalSteps) {
+                                    statusText = "Completed";
+                                    statusColor = "text-green-600";
+                                } else if (completedCount > 0) {
+                                    statusText = "In Progress";
+                                    statusColor = "text-yellow-600";
+                                }
+
+                                return (
+                                    <div
+                                        key={id}
+                                        onClick={() => onSelectModule(id)}
+                                        // Styling for module cards, including hover effects.
+                                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            {/* Placeholder for module icon: Displays the first letter of the module title. */}
+                                            <div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-10 h-10 flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0")}>
+                                                {module.title.split('.')[0].trim()}
+                                            </div>
+                                            {/* Progress Circle */}
+                                            <div className="relative w-12 h-12 flex-shrink-0">
+                                                <svg className="w-full h-full" viewBox="0 0 36 36">
+                                                    {/* Background circle for the progress bar. */}
+                                                    <path
+                                                        className="text-gray-200"
+                                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                    />
+                                                    {/* Foreground arc representing the completion percentage. */}
+                                                    <path
+                                                        className="text-indigo-500"
+                                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="3"
+                                                        strokeDasharray={`${percentage}, 100`}
+                                                        strokeLinecap="round"
+                                                        transform="rotate(-90 18 18)"
+                                                    />
+                                                </svg>
+                                                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
+                                        <p className="text-gray-500 text-sm mb-2 h-10" dangerouslySetInnerHTML={{ __html: module.description }}></p>
+                                        <div className="mt-auto">
+                                            <p className={cn("text-sm font-semibold", statusColor)}>{statusText}</p>
+                                            <div className="flex items-center justify-end text-sm font-medium text-indigo-600 group-hover:text-indigo-700 mt-2">
+                                                Start Learning <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        /**
+         * CaseStudy component for a multiple-choice case study challenge.
+         */
+        const CaseStudy = ({ caseData, onComplete }) => {
+            // Case Studies are treated as single-select quizzes for simplicity, matching the data structure provided.
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [feedbackShown, setFeedbackShown] = useState(false);
+
+            // Handles the selection of an answer option.
+            const handleSelect = (option) => {
+                if (feedbackShown) return; // Prevent changing the answer once feedback is shown.
+                setSelectedAnswer(option);
+            };
+
+            const handleSubmit = () => {
+                setFeedbackShown(true);
+                // Check if the selected answer matches the correct answer (single select logic used here)
+                const isCorrect = String(selectedAnswer) === String(caseData.correctAnswer);
+                
+                // Note: The structure of the case study data uses a string for correctAnswer, so we treat it as single-select.
+                if (isCorrect) {
+                    onComplete({ completed: true, score: 1, total: 1 }); // Mark as complete with a score of 1 for correct.
+                } else {
+                    onComplete({ completed: true, score: 0, total: 1 }); // Mark as complete with a score of 0 for incorrect.
+                }
+            };
+
+            const isAnswerSelected = selectedAnswer !== null;
+            const correctAnswerNormalized = String(caseData.correctAnswer);
+
+            return (
+                <div className="p-4 bg-white rounded-xl shadow-lg">
+                    <h4 className="font-bold text-lg text-gray-800 mb-2">Clinical Case Study Challenge</h4>
+                    {/* Scenario description, using dangerouslySetInnerHTML to render HTML bold tags */}
+                    <p className="bg-blue-100 text-blue-800 p-3 rounded-md mb-4 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+                    <p className="font-semibold text-gray-700 mb-3">{caseData.question}</p>
+                    <div className="space-y-2">
+                        {caseData.options.map(option => {
+                            const isSelected = selectedAnswer === option;
+                            const isCorrectOption = String(option) === correctAnswerNormalized;
+                            
+                            let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200';
+                            if (feedbackShown) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
+                            }
+
+                            return (
+                                <div
+                                    key={option}
+                                    onClick={() => handleSelect(option)}
+                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass, feedbackShown && 'pointer-events-none')}
+                                >
+                                    <div className="flex items-center">
+                                        {feedbackShown && ( // Display a checkmark or cross icon if feedback is active
+                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>)
+                                        )}
+                                        <span className="flex-1">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {!feedbackShown && (
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!isAnswerSelected}
+                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Submit Answer
+                            </button>
+                        </div>
+                    )}
+                    {feedbackShown && ( // Display the explanation after an answer has been selected.
+                        <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
+                            <h5 className="font-bold text-indigo-800">Explanation</h5>
+                            <p className="text-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+        
+        /**
+         * StaticContentStep component for displaying basic text content.
+         * Marks itself as complete immediately on render.
+         */
+        const StaticContentStep = ({ step, onComplete }) => {
+            // For 'text' type steps, mark them as complete immediately upon rendering.
+            useEffect(() => {
+                onComplete({ completed: true, score: 1 }); // Mark as complete with a score of 1 for reading content.
+            }, []); // Empty dependency array ensures this runs only once.
+
+            // Using dangerouslySetInnerHTML to render HTML content (e.g., <strong> tags and LaTeX notation).
+            return (
+                <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-white rounded-xl shadow-lg space-y-4">
+                    <div dangerouslySetInnerHTML={{ __html: step.content }}></div>
+                </div>
+            );
+        };
+
+        /**
+         * CompletionModal component displayed when a module is completed.
+         */
+        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
+                        <h3 className="text-2xl font-bold text-indigo-700 mb-4">Module Completed! 🎉</h3>
+                        <p className="text-gray-700 mb-6">You've successfully completed all steps in this module. Great job!</p>
+                        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
+                            >
+                                Back to Dashboard
+                            </button>
+                            {hasNextModule && (
+                                <button
+                                    onClick={onNextModule}
+                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+                                >
+                                    Continue to Next Module
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /**
+         * LearningModule component to manage steps within the selected module.
+         */
+        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+            const [activeStep, setActiveStep] = useState(0); // Manages the index of the currently active step.
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Controls the visibility of the sidebar on mobile.
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false); // State for completion modal 
+
+            // Callback function to update the completion status of a specific step.
+            const handleStepComplete = useCallback((stepId, data = {}) => {
+                onProgressUpdate(module.id, stepId, { completed: true, ...data });
+            }, [onProgressUpdate, module.id]);
+
+            const moduleProgress = progress[module.id] || {};
+            
+            // Check if all steps in the current module are completed
+            const allStepsCompletedInModule = module.steps.every(step =>
+                moduleProgress[step.id] && moduleProgress[step.id].completed
+            );
+
+            // Navigates to the next step, if available.
+            const handleNextStep = () => {
+                // If it's the last step and all steps in the module are completed, open the modal 
+                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
+                    setIsCompletionModalOpen(true);
+                } else if (activeStep < module.steps.length - 1) {
+                    setActiveStep(activeStep + 1);
+                }
+            };
+
+            // Navigates to the previous step, if available.
+            const handlePrevStep = () => {
+                if (activeStep > 0) {
+                    setActiveStep(activeStep - 1);
+                }
+            };
+            
+            // Ensure module and its steps are defined before accessing properties 
+            if (!module || !module.steps) {
+                console.error("LearningModule received invalid module prop:", module);
+                return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Loading module...</div>;
+            }
+
+            const currentStep = module.steps[activeStep];
+            
+            // Renders the appropriate content component based on the current step's type.
+            const renderStepContent = (step) => {
+                if (!step) return <p>Please select a step.</p>;
+
+                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+
+                // Check if the current step is already completed
+                const isStepCompleted = moduleProgress[step.id]?.completed;
+
+                switch (step.type) {
+                    case 'text':
+                        return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study':
+                        return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz':
+                        // If quiz is already complete, render completion message
+                        if (isStepCompleted && moduleProgress[step.id].score !== undefined) {
+                            // Render a simple completion message instead of the interactive quiz
+                            return (
+                                <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-green-500">
+                                    <h4 className="text-xl font-bold text-green-700 mb-2">Quiz Completed!</h4>
+                                    <p className="text-gray-700">You scored {moduleProgress[step.id].score} out of {step.questions.length} on this quiz.</p>
+                                    <button onClick={handleNextStep} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Continue</button>
+                                </div>
+                            );
+                        }
+                        return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    case 'parkland_calc':
+                        // If calculator is already complete, render completion message (or let user redo, here we allow redo)
+                        if (isStepCompleted) {
+                            return (
+                                <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-yellow-500">
+                                    <h4 className="text-xl font-bold text-yellow-700 mb-2">Parkland Calculation Completed!</h4>
+                                    <p className="text-gray-700">You have successfully reviewed the Parkland Formula. Feel free to recalculate or proceed.</p>
+                                    <button onClick={() => { setActiveStep(activeStep); onProgressUpdate(step.id, { completed: false });}} className="mt-4 mr-3 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">Recalculate</button>
+                                    <button onClick={handleNextStep} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Continue</button>
+                                    <ParklandFormulaCalculator onComplete={onCompleteForStep} />
+                                </div>
+                            );
+                        }
+                        return <ParklandFormulaCalculator key={step.id} onComplete={onCompleteForStep} />;
+
+                    default:
+                        // Fallback for unrecognized step types, ensuring robust error handling.
+                        return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
+                }
+            };
+
+            const handleModalClose = () => {
+                setIsCompletionModalOpen(false);
+                onBack(); // Go back to dashboard when modal is closed 
+            };
+
+            const handleModalNextModule = () => {
+                setIsCompletionModalOpen(false);
+                onNextModule(); // Proceed to next module 
+            };
+
+
+            return (
+                <div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
+                    {/* Header for the learning module, including back button and module title. */}
+                    <header className="bg-white shadow-md p-4 flex items-center justify-between z-30 flex-shrink-0">
+                        <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                            <span className="hidden sm:inline">Dashboard</span>
+                        </button>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-bold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
+                        </div>
+                        {/* Mobile sidebar toggle button using text/emoji placeholders. */}
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                    </header>
+                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
+                    <div className="flex flex-1 overflow-hidden">
+                        {/* Sidebar for navigation steps within the module. */}
+                        <aside className={cn(
+                            "bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
+                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        )}>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700 px-3">Module Steps</h3>
+                            <nav className="space-y-1 overflow-y-auto flex-1 pr-1">
+                                {module.steps.map((step, index) => (
+                                    <button
+                                        key={step.id}
+                                        onClick={() => {
+                                            setActiveStep(index);
+                                            setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
+                                        }}
+                                        className={cn(
+                                            'w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors',
+                                            activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700'
+                                        )}
+                                    >
+                                        {/* Step completion indicator */}
+                                        <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                                            {moduleProgress[step.id]?.completed ? (
+                                                <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                                            ) : (
+                                                <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
+                                            )}
+                                        </div>
+                                        <span className="flex-1 text-sm">{step.title}</span>
+                                    </button>
+                                ))}
+                            </nav>
+                        </aside>
+
+                        {/* Main content area for the current step. */}
+                        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                            <div className="max-w-5xl mx-auto">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentStep.title}</h3>
+                                {renderStepContent(currentStep)}
+
+                                {/* Navigation buttons for moving between steps. */}
+                                <div className="flex justify-between mt-8">
+                                    <button
+                                        onClick={handlePrevStep}
+                                        disabled={activeStep === 0}
+                                        className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                                    >
+                                        Previous
+                                    </button>
+
+                                    <button
+                                        onClick={handleNextStep}
+                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+                                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+                                    >
+                                        {activeStep === module.steps.length - 1 ? 'Finish Module' : 'Next'}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                    <CompletionModal
+                        isOpen={isCompletionModalOpen}
+                        onClose={handleModalClose}
+                        onNextModule={handleModalNextModule}
+                        hasNextModule={hasNextModule}
+                    />
+                </div>
+            );
+        };
+        
+        // --- Main App Component ---
+        /**
+         * The root component of the Learning Module Template application.
+         */
+        function App() {
+            // State for the currently selected learning module's ID. Null means Dashboard is active.
+            const [currentModuleId, setCurrentModuleId] = useState(null);
+            const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+            // State for the authenticated user's ID, used for local storage progress tracking.
+            const [userId, setUserId] = useState(null);
+            // State for storing the user's progress across all modules and steps.
+            const [progress, setProgress] = useState({});
+            // State to indicate if authentication is complete and user ID is available.
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            // Effect hook for handling initial authentication and setting the user ID.
+            useEffect(() => {
+                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+                    if (user) setUserId(user.uid);
+                    setIsAuthReady(true); // Mark authentication as ready once user is determined.
+                });
+                return () => unsubscribe(); // Cleanup the auth state listener on component unmount.
+            }, []); // Empty dependency array ensures this runs only once on mount.
+
+            // Effect hook for loading user progress from localStorage after authentication is ready.
+            useEffect(() => {
+                if (!isAuthReady || !userId) return; // Only proceed if auth is ready and userId is available.
+                const storedProgress = localStorage.getItem(`template-module-progress-${userId}`);
+                if (storedProgress) {
+                    try {
+                        setProgress(JSON.parse(storedProgress)); // Attempt to parse and set stored progress.
+                    } catch (e) {
+                        console.error("Failed to parse stored progress, resetting.", e);
+                        setProgress({}); // Reset progress if parsing fails (e.g., corrupted data).
+                    }
+                }
+            }, [isAuthReady, userId]); // Reruns when auth status or userId changes.
+
+            // Callback function to update and persist the user's progress for a specific step.
+            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+                if (!isAuthReady || !userId) return;
+
+                setProgress(currentProgress => {
+                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+                    const newStepProgress = { ...currentStepProgress, ...data };
+
+                    // Prevent unnecessary state update if data hasn't actually changed.
+                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
+                        return currentProgress;
+                    }
+
+                    // Otherwise, proceed with the update.
+                    const newProgress = {
+                        ...currentProgress,
+                        [moduleId]: {
+                            ...(currentProgress[moduleId] || {}),
+                            [stepId]: newStepProgress
+                        }
+                    };
+
+                    localStorage.setItem(`template-module-progress-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [isAuthReady, userId]);
+
+            const handlePreAssessmentComplete = (completedModuleIds) => {
+                const newProgress = { ...progress };
+                completedModuleIds.forEach(moduleId => {
+                    const module = contentData[moduleId];
+                    if (module) {
+                        newProgress[moduleId] = {};
+                        module.steps.forEach(step => {
+                            newProgress[moduleId][step.id] = { completed: true };
+                        });
+                    }
+                });
+                setProgress(newProgress);
+                localStorage.setItem(`template-module-progress-${userId}`, JSON.stringify(newProgress));
+            };
+            
+            // Callback to reset all progress
+            const handleResetProgress = useCallback(() => {
+                if (!isAuthReady || !userId) return;
+                // Clear from state
+                setProgress({});
+                // Clear from localStorage
+                localStorage.removeItem(`template-module-progress-${userId}`);
+            }, [isAuthReady, userId]);
+
+            // Function to navigate to the next module in the sequence
+            const handleNextModule = useCallback(() => {
+                const moduleIds = Object.keys(contentData);
+                const currentIndex = moduleIds.indexOf(currentModuleId);
+                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+                    setCurrentModuleId(moduleIds[currentIndex + 1]);
+                } else {
+                    // If it's the last module, go back to the dashboard.
+                    setCurrentModuleId(null);
+                }
+            }, [currentModuleId]);
+
+            // Determine which module is currently selected based on `currentModuleId`.
+            const selectedModule = currentModuleId && contentData[currentModuleId]
+                                                        ? { ...contentData[currentModuleId], id: currentModuleId }
+                                                        : null;
+
+            const moduleIds = Object.keys(contentData);
+            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+
+            return (
+                <div className="bg-gray-100 min-h-screen font-sans text-gray-900">
+                    {isPreAssessmentActive ? (
+                        <PreAssessmentQuiz 
+                            onComplete={handlePreAssessmentComplete} 
+                            onExit={() => setIsPreAssessmentActive(false)}
+                        />
+                    ) : selectedModule ? (
+                        <LearningModule
+                            key={selectedModule.id}
+                            module={selectedModule}
+                            onBack={() => setCurrentModuleId(null)}
+                            progress={progress}
+                            onProgressUpdate={handleProgressUpdate}
+                            onNextModule={handleNextModule}
+                            hasNextModule={hasNextModule}
+                        />
+                    ) : (
+                        <Dashboard 
+                            onSelectModule={setCurrentModuleId} 
+                            progress={progress} 
+                            onResetProgress={handleResetProgress}
+                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // --- Render the App into the DOM ---
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
