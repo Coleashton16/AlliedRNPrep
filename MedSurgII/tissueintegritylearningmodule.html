@@ -3,1183 +3,888 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tissue Integrity and Burns Nursing Module - AlliedRNPrep</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
+    <title>Nursing Neuro-Dive: Skin, Burns & Trauma</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        // Tailwind CSS configuration to use the Inter font and custom animations.
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    keyframes: {
-                        'fade-in': {
-                            '0%': { opacity: '0', transform: 'scale(0.95)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        },
-                    },
-                    animation: {
-                        'fade-in': 'fade-in 0.3s ease-out forwards',
-                    },
-                },
-            },
-        };
-    </script>
-
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
-<body class="font-sans antialiased text-gray-900 bg-gray-100">
-    <div id="root"></div>
-
-    <script type="text/babel">
-        // --- React and Library Setup ---
-        const { useState, useEffect, useCallback, useMemo } = React;
-
-        // --- Mock Authentication Setup for Standalone Demo ---
-        // This mock simulates user authentication for local storage keying.
-        const mockAuth = {
-            onAuthStateChanged: (callback) => {
-                setTimeout(() => callback({ uid: 'standalone-tissue-integrity-user' }), 100);
-                return () => {};
-            },
-            signInAnonymously: () => Promise.resolve({ user: { uid: 'standalone-tissue-integrity-user' } }),
-        };
-
-        // --- Content & Data Structure for the Learning Modules ---
-        const contentData = {
-            'ap-fundamentals': {
-                title: '1. Foundational Anatomy & Physiology',
-                color: 'from-blue-600 to-indigo-700',
-                description: 'Master the layers, cellular components, and vital physiological functions of the skin.',
-                steps: [
-                    { id: 'ap-learning-outcomes', title: 'Concept Definition & Learning Outcomes', type: 'text', content: `
-                        <h4 class="font-bold">Concept Overview: Tissue Integrity</h4>
-                        <p>Tissue integrity is defined as the state of being structurally intact and physiologically functioning epithelial tissues, such as the integument (skin) and mucous membranes. Maintaining this state is essential for life.</p>
-                        <h4 class="font-bold mt-4">Learning Outcomes:</h4>
-                        <ul>
-                            <li>Assess persons at risk and those experiencing tissue integrity problems.</li>
-                            <li>Identify factors that minimize the risk of impairment.</li>
-                            <li>Implement appropriate nursing and collaborative interventions.</li>
-                            <li>Evaluate the plan of care for optimal healing.</li>
-                        </ul>` 
-                    },
-                    { id: 'ap-layers', title: 'The Three Primary Layers of Skin', type: 'text', content: `
-                        <p>The skin (integumentary system) is composed of three main layers, providing distinct functions:</p>
-                        <h4 class="font-bold mt-4">1. Epidermis (Outer Layer)</h4>
-                        <ul>
-                            <li><strong>Structure:</strong> Avascular (receives nutrients from the dermis). Primarily keratinized stratified squamous epithelium.</li>
-                            <li><strong>Cells:</strong> Keratinocytes (produce protective keratin), Melanocytes (produce pigment melanin), Langerhans cells (immune function).</li>
-                            <li><strong>Function:</strong> Provides the waterproof, mechanical, and chemical barrier. Contains the Stratum Corneum, the outermost layer of dead cells.</li>
-                        </ul>
-                        <h4 class="font-bold mt-4">2. Dermis (Middle Layer)</h4>
-                        <ul>
-                            <li><strong>Structure:</strong> Connective tissue, rich in blood vessels, nerves, hair follicles, and glands.</li>
-                            <li><strong>Components:</strong> Contains tough <strong>Collagen</strong> (for tensile strength) and flexible <strong>Elastin</strong> (for elasticity and recoil).</li>
-                            <li><strong>Function:</strong> Supports the epidermis, provides sensation, and critical blood flow for healing and thermoregulation.</li>
-                        </ul>
-                        <h4 class="font-bold mt-4">3. Subcutaneous Layer (Hypodermis)</h4>
-                        <ul>
-                            <li><strong>Structure:</strong> Primarily adipose (fat) tissue.</li>
-                            <li><strong>Function:</strong> Insulation, energy storage, and shock absorption, protecting underlying structures.</li>
-                        </ul>
-                        [Image of the cross-section anatomy of the skin showing epidermis, dermis, and subcutaneous layers]` 
-                    },
-                    { id: 'ap-functions', title: 'Physiology: Skin Functions (The Five Senses and MORE)', type: 'text', content: `
-                        <p>The skin performs essential homeostatic functions, crucial for survival and health:</p>
-                        <ul>
-                            <li><strong>Protection:</strong> Physical barrier against microbial invasion, trauma, and UV light.</li>
-                            <li><strong>Thermoregulation:</strong> Vasodilation/constriction of dermal blood vessels and sweat production.</li>
-                            <li><strong>Sensation/Perception:</strong> Nerve endings (Meissner's corpuscles for touch, Pacinian corpuscles for pressure, pain receptors).</li>
-                            <li><strong>Metabolic Synthesis:</strong> Converts precursor molecules to active <strong>Vitamin D</strong> when exposed to sunlight.</li>
-                            <li><strong>Excretion:</strong> Water, electrolytes, and waste products excreted via sweat.</li>
-                        </ul>
-                        <p class="mt-4 p-3 bg-indigo-100 border-l-4 border-indigo-500">
-                        <strong>Nursing Focus:</strong> Dysfunction in skin perfusion or metabolism directly leads to delayed wound healing or pressure injury development.
-                        </p>` 
-                    },
-                    { id: 'ap-quiz', title: 'Foundations Quiz', type: 'quiz',
-                        questions: [
-                            { question: "Which layer of the skin is avascular and relies on the layer below it for oxygen and nutrients?", options: ["Subcutaneous Layer", "Dermis", "Epidermis", "Fascia"], correctAnswer: "Epidermis" },
-                            { question: "The primary function of the collagen and elastin fibers located in the dermis is to provide:", options: ["Pigmentation and UV protection.", "Insulation and shock absorption.", "Tensile strength and elasticity.", "Waterproofing via keratinocytes."], correctAnswer: "Tensile strength and elasticity." },
-                            { question: "What is the primary role of the skin in synthesizing Vitamin D?", options: ["It excretes excess Vitamin D precursors.", "It converts precursor molecules into active Vitamin D when exposed to UV light.", "It stores Vitamin D for later use.", "It produces the calcitonin hormone."], correctAnswer: "It converts precursor molecules into active Vitamin D when exposed to UV light." }
-                        ]
-                    },
-                ]
-            },
-            'risk-assessment': {
-                title: '2. Risk Factors & Pressure Injury',
-                color: 'from-purple-600 to-pink-500',
-                description: 'Identify high-risk patients, understand the Braden Scale, and master PI pathophysiology.',
-                steps: [
-                    { id: 'risk-factors', title: 'High-Risk Patients and Systemic Impairments', type: 'text', content: `
-                        <p>Compromised tissue integrity is often a sign of underlying systemic problems. Nurses must identify patients with these key risk factors:</p>
-                        <ul>
-                            <li><strong>Impaired Mobility:</strong> Any condition that limits repositioning (spinal cord injury, sedation, severe illness).</li>
-                            <li><strong>Nutrition Deficits:</strong> Lack of protein (essential for tissue repair), Vitamin C (needed for collagen formation), and Zinc (needed for cell division and healing).</li>
-                            <li><strong>Perfusion Deficits:</strong> Conditions like Diabetes, Peripheral Vascular Disease (PVD), and chronic smoking lead to tissue ischemia (lack of blood flow/oxygen).</li>
-                            <li><strong>Moisture/Friction/Shear:</strong> Incontinence (causes maceration), prolonged sweating, or pulling a patient across bed sheets.</li>
-                            <li><strong>Age:</strong> Older adults have thinner, less elastic skin, decreased sensation, and slower cell turnover.</li>
-                        </ul>
-                        <h4 class="font-bold mt-4">The Impact of Poor Perfusion:</h4>
-                        <p>In ischemia, cells cannot eliminate waste or receive oxygen, leading to localized cell death (necrosis), often starting at the bone-muscle interface due to deep pressure.</p>` 
-                    },
-                    { id: 'risk-braden-scale', title: 'Braden Scale and Pressure Injury Pathophysiology', type: 'text', content: `
-                        <h4 class="font-bold">The Braden Scale</h4>
-                        <p>Used to predict pressure ulcer risk. A lower score indicates higher risk (Score $\le 18$ usually indicates risk). Nurses assess six sub-scales:</p>
-                        <ol class="list-decimal list-inside ml-4">
-                            <li>Sensory Perception (ability to respond to discomfort)</li>
-                            <li>Moisture (degree to which skin is kept moist)</li>
-                            <li>Activity (degree of physical activity)</li>
-                            <li>Mobility (ability to change and control body position)</li>
-                            <li>Nutrition (usual food intake pattern)</li>
-                            <li>Friction and Shear (mechanical force)</li>
-                        </ol>
-                        <h4 class="font-bold mt-4">Understanding Mechanical Forces:</h4>
-                        <ul>
-                            <li><strong>Pressure:</strong> Perpendicular force applied over a bony prominence, leading to capillary occlusion and ischemia.</li>
-                            <li><strong>Friction:</strong> Two surfaces rubbing together (e.g., skin dragging across a sheet). Damages the epidermis.</li>
-                            <li><strong>Shear:</strong> Skin remains stationary while deeper tissue/bone moves (e.g., patient slides down in bed). Distorts and tears capillaries in the subcutaneous and dermal layers, causing deep tissue injury.</li>
-                        </ul>
-                        [Image of pressure injury staging (Stage 1 through 4)]` 
-                    },
-                    { id: 'risk-staging', title: 'Pressure Injury Staging', type: 'text', content: `
-                        <p>Accurate staging is crucial for treatment and documentation. PIs are categorized by the depth of visible tissue destruction:</p>
-                        <ul class="list-disc list-inside ml-4">
-                            <li><strong>Stage 1:</strong> Intact skin with non-blanchable redness. May appear red, blue, or purple in dark skin tones.</li>
-                            <li><strong>Stage 2:</strong> Partial-thickness skin loss involving the epidermis and/or dermis. Presents as a shallow open ulcer with a red-pink wound bed, or an intact/ruptured blister.</li>
-                            <li><strong>Stage 3:</strong> Full-thickness skin loss. Subcutaneous fat may be visible, but bone, tendon, or muscle is NOT exposed. Slough/eschar may be present.</li>
-                            <li><strong>Stage 4:</strong> Full-thickness tissue loss with exposed bone, tendon, or muscle. Often includes undermining and tunneling.</li>
-                            <li><strong>Unstageable:</strong> Full-thickness loss where the base of the ulcer is covered by slough and/or eschar. True depth cannot be determined until debridement.</li>
-                            <li><strong>Deep Tissue Pressure Injury (DTPI):</strong> Intact or non-intact skin with persistent non-blanchable deep red, maroon, or purple discoloration. Often caused by intense or prolonged pressure and shear.</li>
-                        </ul>
-                        <p class="mt-4 p-3 bg-red-100 border-l-4 border-red-500">
-                        <strong>Safety Note:</strong> A healing pressure injury is *never* down-staged. A healing Stage 4 PI remains documented as a "healing Stage 4."
-                        </p>` 
-                    },
-                    { id: 'risk-quiz', title: 'Risk & PI Quiz', type: 'quiz',
-                        questions: [
-                            { question: "What is the primary danger associated with shear force in pressure injury development?", options: ["It only damages the superficial epidermis.", "It causes maceration due to excess moisture.", "It distorts capillaries in deeper tissue, leading to Deep Tissue Pressure Injury (DTPI).", "It prevents Vitamin D synthesis."], correctAnswer: "It distorts capillaries in deeper tissue, leading to Deep Tissue Pressure Injury (DTPI)." },
-                            { question: "Which stage of pressure injury involves partial-thickness skin loss presenting as a fluid-filled blister?", options: ["Stage 1", "Stage 2", "Stage 3", "Unstageable"], correctAnswer: "Stage 2" },
-                            { question: "A Braden Scale score of 12 places a patient in which category?", options: ["No Risk", "Mild Risk", "Moderate Risk", "Severe Risk"], correctAnswer: "Moderate Risk" }
-                        ]
-                    },
-                ]
-            },
-            'wound-management': {
-                title: '3. Wound Healing & Management',
-                color: 'from-green-500 to-teal-600',
-                description: 'Explore the phases of healing, the TIME framework, and essential nursing interventions.',
-                steps: [
-                    { id: 'healing-phases', title: 'The Three Phases of Wound Healing', type: 'text', content: `
-                        <p>Healing is a complex, sequential biological response. The nurse's goal is to facilitate and protect these phases:</p>
-                        <h4 class="font-bold">1. Inflammatory Phase (Immediate $\to$ 3 days)</h4>
-                        <ul>
-                            <li><strong>Goal:</strong> Stop bleeding and initiate cleaning.</li>
-                            <li><strong>Action:</strong> Vasoconstriction, platelet aggregation, clot formation. Leukocytes (neutrophils and macrophages) migrate to the area to remove debris and bacteria.</li>
-                        </ul>
-                        <h4 class="font-bold mt-4">2. Proliferative Phase (3 days $\to$ 3 weeks)</h4>
-                        <ul>
-                            <li><strong>Goal:</strong> Fill the wound bed.</li>
-                            <li><strong>Action:</strong> Fibroblasts produce <strong>collagen</strong> to build new connective tissue. <strong>Angiogenesis</strong> (new blood vessel growth) occurs. Epithelial cells migrate across the wound surface (epithelialization). The wound bed is filled with <strong>granulation tissue</strong> (red, beefy, moist).</li>
-                        </ul>
-                        <h4 class="font-bold mt-4">3. Maturation/Remodeling Phase (3 weeks $\to$ 1 year)</h4>
-                        <ul>
-                            <li><strong>Goal:</strong> Strengthen the scar.</li>
-                            <li><strong>Action:</strong> Collagen synthesis and breakdown balance. The scar tissue reorganizes and strengthens. The scar will only reach about 80% of the original tissue's strength.</li>
-                        </ul>
-                        [Image illustrating the phases of wound healing: inflammatory, proliferative, and maturation]` 
-                    },
-                    { id: 'healing-time', title: 'The TIME Framework for Wound Bed Preparation', type: 'text', content: `
-                        <p>The <strong>TIME</strong> acronym provides a systematic approach for evaluating and managing complex chronic wounds:</p>
-                        <ul class="list-disc list-inside ml-4">
-                            <li><strong>T - Tissue:</strong> Manage <strong>T</strong>issue that is non-viable (necrotic, slough, or eschar). Must be removed via debridement (surgical, mechanical, autolytic, or enzymatic).</li>
-                            <li><strong>I - Infection/Inflammation:</strong> Control <strong>I</strong>nfection or inflammation. Assess for signs like cellulitis, purulent exudate, pain, or foul odor.</li>
-                            <li><strong>M - Moisture Imbalance:</strong> Maintain <strong>M</strong>oisture balance. A moist wound bed is ideal for epithelial migration (healing). Avoid both dryness and excessive moisture (maceration).</li>
-                            <li><strong>E - Edge/Epidermis:</strong> Address non-advancing <strong>E</strong>dges or undermining/tunneling. Protect surrounding <strong>E</strong>pidermis.</li>
-                        </ul>
-                        <p class="mt-4 p-3 bg-teal-100 border-l-4 border-teal-500">
-                        <strong>Nursing Role:</strong> Selection of the correct dressing is dictated by the TIME assessment (e.g., Alginates for high exudate (M), Hydrogel for dry eschar (T)).
-                        </p>` 
-                    },
-                    { id: 'management-interventions', title: 'Nursing and Collaborative Interventions', type: 'text', content: `
-                        <h4 class="font-bold">Nursing Interventions (Direct Care)</h4>
-                        <ul>
-                            <li><strong>Debridement:</strong> Choose appropriate debridement based on tissue type (e.g., sharp debridement by RN/MD for large areas of necrotic tissue, autolytic with hydrocolloids for slow, gentle debridement).</li>
-                            <li><strong>Infection Control:</strong> Use sterile technique for dressings. Administer ordered antibiotics. Monitor white blood cell count (WBC) and temperature.</li>
-                            <li><strong>Repositioning:</strong> Implement turning schedules (q2h or q1h in chairs) and use pressure-redistributing surfaces (low air loss mattresses).</li>
-                            <li><strong>Monitoring:</strong> Weekly measurement of wound length, width, and depth to track healing.</li>
-                        </ul>
-                        <h4 class="font-bold mt-4">Collaborative Interventions</h4>
-                        <ul>
-                            <li><strong>Dietitian:</strong> Ensure high protein (1.25–1.5 g/kg/day) and calorie intake to support the proliferative phase.</li>
-                            <li><strong>Wound Care Specialist:</strong> Consultation for complex wounds, Negative Pressure Wound Therapy (NPWT), or hyperbaric oxygen therapy.</li>
-                            <li><strong>Surgeon:</strong> For surgical closure or skin grafting in large full-thickness wounds.</li>
-                        </ul>` 
-                    },
-                    { id: 'management-case-study', title: 'Wound Management Case Study', type: 'case_study', case: {
-                        scenario: `A 78-year-old bedridden patient has a Stage 3 pressure injury on his sacrum. The wound bed is 50% covered in soft, yellow, non-adherent slough and has moderate, thin, pink drainage (serosanguineous). The surrounding skin is slightly red but intact.`,
-                        question: `Based on the TIME framework, what is the priority nursing goal and the most appropriate initial dressing change?`,
-                        options: [
-                            "Option A: Prioritize TISSUE (slough removal); Apply a hydrogel dressing.",
-                            "Option B: Prioritize INFECTION (drainage control); Apply a topical antimicrobial (like Silver Sulfadiazine).",
-                            "Option C: Prioritize MOISTURE (absorption); Apply an alginate or foam dressing to manage exudate.",
-                            "Option D: Prioritize EDGE/EPIDERMIS (protection); Apply a transparent film to the surrounding skin.",
-                        ],
-                        correctAnswer: "Option C: Prioritize MOISTURE (absorption); Apply an alginate or foam dressing to manage exudate.",
-                        explanation: `<strong>Rationale:</strong>
-                        The wound has <strong>50% slough (T)</strong> and <strong>moderate serosanguineous drainage (M)</strong>. While slough needs removal, managing the exudate (M) is crucial to prevent maceration of the surrounding skin and facilitate healing (a moist, not wet, environment).
-
-                        <ul>
-                            <li><strong>Option C (Correct):</strong> Serosanguineous drainage is not purulent (ruling out strong infection priority). Foam or Alginate dressings are highly absorbent, managing the moderate exudate (M) while preventing wound bed desiccation.</li>
-                            <li><strong>Option A (Incorrect):</strong> Hydrogel is mainly a moisture *donor*, inappropriate for a wound with moderate drainage.</li>
-                            <li><strong>Option B (Incorrect):</strong> Serosanguineous drainage is normal for a stage 3 wound; it does not indicate infection requiring systemic or heavy topical antimicrobials.</li>
-                        </ul>`
-                    }},
-                ]
-            },
-            'exemplar-burns': {
-                title: '4. Exemplar: Burns - Assessment & Fluid Management',
-                color: 'from-red-600 to-rose-700',
-                description: 'Critical care principles including classification, TBSA estimation, and fluid resuscitation using the Parkland Formula.',
-                steps: [
-                    { id: 'burns-classification', title: 'Burn Classification by Depth (Degrees)', type: 'text', content: `
-                        <p>Burn depth determines wound severity and healing potential:</p>
-                        <table class="min-w-full table-auto border-collapse mt-4">
-                            <thead>
-                                <tr class="bg-red-100 text-red-700">
-                                    <th class="p-2 border">Depth</th>
-                                    <th class="p-2 border">Layers Affected</th>
-                                    <th class="p-2 border">Appearance & Sensation</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr><td class="p-2 border font-semibold">1st Degree (Superficial)</td><td class="p-2 border">Epidermis only.</td><td class="p-2 border">Redness (erythema), mild pain, no blistering. Heals in 3-5 days.</td></tr>
-                                <tr><td class="p-2 border font-semibold">2nd Degree (Partial Thickness)</td><td class="p-2 border">Epidermis & part of Dermis.</td><td class="p-2 border"><strong>Blisters</strong>, severe pain, moist, red/pink, blanches easily.</td></tr>
-                                <tr><td class="p-2 border font-semibold">3rd Degree (Full Thickness)</td><td class="p-2 border">Entire Epidermis & Dermis.</td><td class="p-2 border">Waxy white, leather-like, brown/black, <strong>painless</strong> (nerve destruction). Requires grafting.</td></tr>
-                                <tr><td class="p-2 border font-semibold">4th Degree (Deep Full Thickness)</td><td class="p-2 border">All skin layers, muscle, tendon, bone.</td><td class="p-2 border">Blackened, charred. Amputation often required.</td></tr>
-                            </tbody>
-                        </table>
-                        [Image illustrating the different burn degrees in a cross section of the skin]` 
-                    },
-                    { id: 'burns-tbsa-fluid-shift', title: 'TBSA Estimation and Fluid Shifts', type: 'text', content: `
-                        <h4 class="font-bold">Total Body Surface Area (TBSA) Estimation</h4>
-                        <p>Used to calculate the volume of resuscitation fluid needed. Only 2nd degree and higher burns are included. The quickest method for adults is the Rule of Nines:</p>
-                        <ul>
-                            <li>Head and Neck: 9%</li>
-                            <li>Each Arm: 9%</li>
-                            <li>Anterior Trunk: 18%</li>
-                            <li>Posterior Trunk: 18%</li>
-                            <li>Each Leg: 18%</li>
-                            <li>Perineum: 1%</li>
-                        </ul>
-                        
-                        <h4 class="font-bold mt-4">Pathophysiology of Burn Shock</h4>
-                        <p>Burns cause massive capillary leakage (increased permeability) across the entire body, not just the burn site. This causes a massive shift of fluid (plasma) into the interstitial space (third spacing), leading to <strong>burn shock</strong> (hypovolemic shock). This leads to decreased cardiac output and systemic organ hypoperfusion.</p>` 
-                    },
-                    { id: 'burns-parkland-formula', title: 'Critical Interventions: Parkland Formula & ABCs', type: 'text', content: `
-                        <h4 class="font-bold">Fluid Resuscitation: The Parkland Formula</h4>
-                        <p>Required for patients with burns $>20\%$ TBSA. Ringer's Lactate (RL) is the fluid of choice due to its electrolyte content.</p>
-                        <p class="text-xl font-bold mt-2 text-red-700">Total Fluid (mL) = $4 \text{ mL} \times \text{Body Weight (kg)} \times \text{TBSA (\%)}$</p>
-                        <h5 class="font-semibold mt-3">Administration Schedule:</h5>
-                        <ul>
-                            <li><strong>First 8 hours:</strong> Give 50% of the total calculated volume.</li>
-                            <li><strong>Next 16 hours:</strong> Give the remaining 50% of the total calculated volume.</li>
-                        </ul>
-                        <p class="mt-4 p-3 bg-red-100 border-l-4 border-red-500">
-                        <strong>Goal:</strong> Maintain Urinary Output (U/O) at $0.5 \text{ mL/kg/hr}$ for adults. Inadequate fluid leads to kidney failure; excessive fluid worsens edema.
-                        </p>
-                        <h4 class="font-bold mt-4">ABC Management Priorities</h4>
-                        <ul>
-                            <li><strong>Airway:</strong> Priority one! Watch for signs of inhalation injury (hoarseness, singed nose hairs, carbonaceous sputum). Intubation may be necessary.</li>
-                            <li><strong>Circulation:</strong> Establish two large-bore IVs immediately (can be placed through burned tissue if necessary).</li>
-                        </ul>` 
-                    },
-                    { id: 'burns-quiz', title: 'Burns & Final Review Quiz', type: 'quiz',
-                        questions: [
-                            { question: "A patient weighs 70 kg and has full-thickness (3rd degree) burns covering 27% TBSA. How much total fluid (mL) should be administered in the first 8 hours according to the Parkland Formula?", options: ["5040 mL", "7560 mL", "3780 mL", "2520 mL"], correctAnswer: "3780 mL" },
-                            { question: "What is the primary clinical manifestation of an inhalation injury?", options: ["Decreased TBSA on the torso.", "Waxy, white appearance of the skin.", "Hoarseness and carbonaceous (sooty) sputum.", "Decreased need for pain medication."], correctAnswer: "Hoarseness and carbonaceous (sooty) sputum." },
-                            { question: "Which burn depth is characterized by waxy white, leather-like skin with absent pain sensation?", options: ["1st Degree", "2nd Degree Partial Thickness", "3rd Degree Full Thickness", "4th Degree Deep Full Thickness"], correctAnswer: "3rd Degree Full Thickness" },
-                            { question: "What is the expected minimum urinary output goal (U/O) for an adult receiving burn fluid resuscitation?", options: ["0.2 mL/kg/hr", "0.5 mL/kg/hr", "1 mL/kg/hr", "30 mL/hr (fixed value)"], correctAnswer: "0.5 mL/kg/hr" }
-                        ]
-                    },
-                ]
-            }
-        };
-
-        // The pre-assessment quiz data now includes questions for all modules.
-        const preAssessmentQuizData = [
-            // M1: A&P
-            { moduleId: 'ap-fundamentals', question: "Which layer of the skin is avascular and relies on the layer below it for oxygen and nutrients?", options: ["Subcutaneous Layer", "Dermis", "Epidermis", "Fascia"], correctAnswer: "Epidermis" },
-            { moduleId: 'ap-fundamentals', question: "The primary function of the collagen and elastin fibers located in the dermis is to provide:", options: ["Pigmentation and UV protection.", "Insulation and shock absorption.", "Tensile strength and elasticity.", "Waterproofing via keratinocytes."], correctAnswer: "Tensile strength and elasticity." },
-
-            // M2: Risk & PI
-            { moduleId: 'risk-assessment', question: "Which stage of pressure injury involves partial-thickness skin loss presenting as a fluid-filled blister?", options: ["Stage 1", "Stage 2", "Stage 3", "Unstageable"], correctAnswer: "Stage 2" },
-            { moduleId: 'risk-assessment', question: "The mechanical force of 'shear' primarily damages which part of the tissue?", options: ["The Stratum Corneum", "The deep capillaries in the dermis/subcutaneous layers.", "The bone and tendon directly.", "The hair follicles."], correctAnswer: "The deep capillaries in the dermis/subcutaneous layers." },
-
-            // M3: Healing & Management
-            { moduleId: 'wound-management', question: "In the proliferative phase of wound healing, what substance do fibroblasts primarily produce to build new tissue?", options: ["Keratin", "Elastin", "Macrophage cells", "Collagen"], correctAnswer: "Collagen" },
-            { moduleId: 'wound-management', question: "According to the TIME framework, what priority issue does the nurse address by applying an absorptive alginate dressing?", options: ["T - Tissue", "I - Infection", "M - Moisture Imbalance", "E - Edge"], correctAnswer: "M - Moisture Imbalance" },
-
-            // M4: Burns
-            { moduleId: 'exemplar-burns', question: "Which burn depth is characterized by waxy white, leather-like skin with absent pain sensation?", options: ["1st Degree", "2nd Degree Partial Thickness", "3rd Degree Full Thickness", "4th Degree Deep Full Thickness"], correctAnswer: "3rd Degree Full Thickness" },
-            { moduleId: 'exemplar-burns', question: "The administration schedule for the Parkland Formula requires giving what percentage of the total fluid volume in the first 8 hours?", options: ["25%", "50%", "66%", "75%"], correctAnswer: "50%" }
-        ];
-
-        // --- Helper Functions ---
-        // Utility for conditionally joining Tailwind CSS classes.
-        const cn = (...classes) => classes.filter(Boolean).join(' ');
-
-
-        // --- Child Components ---
-
-        /**
-         * Quiz component for interactive multiple-choice questions.
-         * Users answer questions and receive immediate feedback.
-         */
-        const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
-            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-            const [selectedOption, setSelectedOption] = useState(null); 
-            const [feedback, setFeedback] = useState(null);
-            const [answers, setAnswers] = useState([]);
-
-            const currentQuestion = questions[currentQuestionIndex];
-
-            // Handle option selection
-            const handleOptionSelect = (option) => {
-                if (feedback && !isPreAssessment) return; // Prevent changing answer after feedback in regular quiz
-                setSelectedOption(option);
-            };
-
-            const checkCorrectness = (selected, correct) => {
-                // Normalize and compare (case insensitive and space insensitive for simplicity)
-                const normalize = (str) => String(str).toLowerCase().trim().replace(/\s+/g, ' ');
-                return normalize(selected) === normalize(correct);
-            }
-
-            const handlePreAssessmentNext = () => {
-                if (selectedOption === null) return;
-                
-                const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
-                
-                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
-                setAnswers(updatedAnswers);
-
-                if (currentQuestionIndex < questions.length - 1) {
-                    setCurrentQuestionIndex(currentQuestionIndex + 1);
-                    setSelectedOption(null); // Reset for next question
-                    setFeedback(null);
-                } else {
-                    onComplete(updatedAnswers);
-                }
-            };
-            
-            const handleRegularQuizSubmit = () => {
-                if (selectedOption === null) return;
-                
-                const isCorrect = checkCorrectness(selectedOption, currentQuestion.correctAnswer);
-                
-                setFeedback(isCorrect ? 'correct' : 'incorrect');
-                
-                // Record the answer immediately for the next step function to use
-                setAnswers(prevAnswers => [...prevAnswers, { question: currentQuestion, isCorrect }]);
-            };
-
-            const handleRegularQuizNext = () => {
-                // This function is only called after submission, so the answer should be in `answers` state.
-                
-                if (currentQuestionIndex < questions.length - 1) {
-                    setCurrentQuestionIndex(currentQuestionIndex + 1);
-                    setSelectedOption(null); // Reset for next question
-                    setFeedback(null);
-                } else {
-                    // This is the last question. Calculate score from accumulated answers.
-                    const finalScore = answers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
-                    onComplete({ score: finalScore, total: questions.length });
-                }
-            };
-
-            // If question has not been answered yet, wait for user selection
-            const hasSubmittedAnswer = answers.length > currentQuestionIndex;
-            let currentAnswerIsCorrect = false;
-            if (hasSubmittedAnswer) {
-                currentAnswerIsCorrect = answers[currentQuestionIndex].isCorrect;
-            }
-
-
-            return (
-                <div className="p-4 bg-white rounded-xl shadow-lg">
-                    <h4 className="font-bold text-lg text-gray-800 mb-2">Quiz: {currentQuestionIndex + 1} of {questions.length}</h4>
-                    <p className="font-semibold text-gray-700 mb-3">{currentQuestion.question}</p>
-                    <div className="space-y-2">
-                        {currentQuestion.options.map((option, index) => {
-                            const isSelected = selectedOption === option;
-                            const isCorrectOption = checkCorrectness(option, currentQuestion.correctAnswer);
-                            
-                            let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200';
-
-                            if (feedback && !isPreAssessment) {
-                                if (isCorrectOption) {
-                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
-                                } else if (isSelected && !isCorrectOption) {
-                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
-                                }
-                            } else if (isSelected) {
-                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
-                            }
-
-                            return (
-                                <div
-                                    key={index}
-                                    onClick={() => handleOptionSelect(option)}
-                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass, (feedback && !isPreAssessment) && 'pointer-events-none')}
-                                >
-                                    <div className="flex items-center">
-                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
-                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : <span className="text-red-600 mr-2">✗</span>
-                                        )}
-                                        <span className="flex-1" dangerouslySetInnerHTML={{ __html: option }}></span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <div className="mt-4 text-center">
-                        {isPreAssessment ? (
-                                <button
-                                    onClick={handlePreAssessmentNext}
-                                    disabled={selectedOption === null}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                >
-                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
-                                </button>
-                        ) : (
-                            <>
-                            {feedback ? (
-                                <button
-                                    onClick={handleRegularQuizNext}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-                                >
-                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'View Results'}
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleRegularQuizSubmit}
-                                    disabled={selectedOption === null}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                >
-                                    Submit Answer
-                                </button>
-                            )}
-                            </>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-        
-        /**
-         * PreAssessmentQuiz component to handle the initial diagnostic quiz.
-         * Displays quiz questions and then results, allowing users to "test out" of modules.
-         */
-        const PreAssessmentQuiz = ({ onComplete, onExit }) => {
-            const [results, setResults] = useState(null);
-
-            const handleQuizComplete = (finalAnswers) => {
-                const moduleResults = {};
-                finalAnswers.forEach(answer => {
-                    const { moduleId } = answer.question;
-                    if (!moduleResults[moduleId]) {
-                        moduleResults[moduleId] = { correct: 0, total: 0 };
-                    }
-                    if (answer.isCorrect) {
-                        moduleResults[moduleId].correct++;
-                    }
-                    moduleResults[moduleId].total++;
-                });
-
-                const completedModules = [];
-                for (const moduleId in moduleResults) {
-                    // Module is complete if 100% of its questions in the pre-assessment quiz were correct.
-                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
-                        completedModules.push(moduleId);
-                    }
-                }
-                setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
-                onComplete(completedModules);
-            };
-
-            if (results) {
-                return (
-                    <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4 animate-fade-in">
-                        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full text-center">
-                            <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
-                            <p className="text-lg text-gray-600 mb-6">
-                                You correctly answered {results.correct} out of {results.total} questions.
-                            </p>
-                            {results.completedModules.length > 0 ? (
-                                <>
-                                    <p className="text-green-600 font-semibold mb-4">You've tested out of the following modules:</p>
-                                    <ul className="list-disc list-inside text-left mb-6 bg-green-50 p-4 rounded-lg">
-                                        {results.completedModules.map(id => <li key={id}>{contentData[id].title}</li>)}
-                                    </ul>
-                                </>
-                            ) : (
-                                <p className="text-yellow-600 font-semibold mb-6">You haven't tested out of any modules. Proceed to the dashboard to begin learning!</p>
-                            )}
-                            <button
-                                onClick={onExit}
-                                className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-                            >
-                                Return to Dashboard
-                            </button>
-                        </div>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
-                        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Diagnostic Quiz: Tissue Integrity</h2>
-                        <Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
-                    </div>
-                </div>
-            );
-        };
-
-
-        /**
-         * Dashboard component to display the available learning modules.
-         * It allows users to select a module to start learning.
-         * Shows progress for each module using a circular progress bar and status.
-         */
-        const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
-            let totalCompletedSteps = 0;
-            let totalPossibleSteps = 0;
-            let totalQuizCorrect = 0;
-            let totalQuizQuestions = 0;
-
-            // Calculate overall progress and gather quiz scores
-            Object.entries(contentData).forEach(([moduleId, module]) => {
-                totalPossibleSteps += module.steps.length;
-                const moduleProgress = progress[moduleId] || {};
-                
-                Object.values(moduleProgress).forEach(stepProgress => {
-                    if (stepProgress.completed) {
-                        totalCompletedSteps++;
-                    }
-                    if (stepProgress.score !== undefined) {
-                        totalQuizCorrect += stepProgress.score;
-                    }
-                });
-
-                module.steps.forEach(step => {
-                    if (step.type === 'quiz') {
-                        totalQuizQuestions += step.questions.length;
-                    }
-                });
-            });
-
-
-            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
-
-            return (
-                <div className="p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
-                    <div className="w-full">
-                        <header className="mb-8 text-center">
-                            <div className="flex items-center justify-center gap-3 mb-2">
-                                {/* Text placeholder for the main application identifier */}
-                                <span className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">TI</span>
-                                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Tissue Integrity Mastery</h1>
-                                <span className="bg-gray-200 text-gray-600 text-xs font-mono px-2.5 py-1 rounded-full">V:1.0</span>
-                            </div>
-                            <p className="text-lg text-gray-500 max-w-2xl mx-auto">A detailed module focusing on A&P, wound healing, pressure injury, and burn management for nursing students.</p>
-                        </header>
-
-                        {/* Skip Ahead Button */}
-                        <div className="mb-8 text-center">
-                            <button
-                                onClick={onStartPreAssessment}
-                                className="w-full max-w-md mx-auto px-6 py-4 bg-teal-500 text-white font-bold rounded-lg shadow-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105"
-                            >
-                                <div className="text-xl">Skip Ahead: Diagnostic Quiz</div>
-                                <div className="text-sm font-normal">Test your knowledge and potentially skip modules.</div>
-                            </button>
-                        </div>
-
-                        {/* Overall Progress Bar & Reset Button */}
-                        <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 w-full">
-                           <div className="flex justify-between items-center mb-3">
-                               <h3 className="text-xl font-bold text-gray-800">Overall Progress</h3>
-                               <button 
-                                    onClick={onResetProgress}
-                                    className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition-colors flex items-center gap-2"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 112 0v1.001A7.002 7.002 0 0112.292 4.293a1 1 0 111.414 1.414A9.002 9.002 0 004 9.899V11a1 1 0 11-2 0V3a1 1 0 011-1z" clipRule="evenodd" /></svg>
-                                    Reset Progress
-                               </button>
-                           </div>
-                            <div className="w-full bg-gray-200 rounded-full h-4">
-                                <div
-                                    className="bg-indigo-600 h-4 rounded-full transition-all duration-500 ease-out"
-                                    style={{ width: `${overallPercentage}%` }}
-                                ></div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <p className="text-left text-sm text-gray-600 mt-2">
-                                    {totalQuizQuestions > 0 && `Quiz Performance: ${totalQuizCorrect} / ${totalQuizQuestions} correct`}
-                                </p>
-                                <p className="text-right text-sm text-gray-600 mt-2">{Math.round(overallPercentage)}% Completed</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
-                            {/* Iterate over all modules defined in contentData */}
-                            {Object.entries(contentData).map(([id, module]) => {
-                                const moduleProgress = progress[id] || {};
-                                // Calculate completion count for steps within the module.
-                                const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
-                                const totalSteps = module.steps.length;
-                                const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
-
-                                let statusText = "Not Started";
-                                let statusColor = "text-gray-500";
-                                if (completedCount === totalSteps) {
-                                    statusText = "Completed";
-                                    statusColor = "text-green-600";
-                                } else if (completedCount > 0) {
-                                    statusText = "In Progress";
-                                    statusColor = "text-yellow-600";
-                                }
-
-                                // Get quiz score for this module if available
-                                const quizStep = module.steps.find(step => step.type === 'quiz');
-                                const quizProgress = quizStep ? moduleProgress[quizStep.id] : null;
-
-                                return (
-                                    <div
-                                        key={id}
-                                        onClick={() => onSelectModule(id)}
-                                        // Styling for module cards, including hover effects.
-                                        className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group flex flex-col"
-                                    >
-                                        <div className="flex justify-between items-start mb-4">
-                                            {/* Placeholder for module icon: Displays the acronym of the module title. */}
-                                            <div className={cn("p-3 rounded-full bg-gradient-to-br", module.color, "w-10 h-10 flex items-center justify-center text-white text-lg font-bold shadow-md flex-shrink-0")}>
-                                                {module.title.split(' ').map(word => word.charAt(0)).join('')}
-                                            </div>
-                                            {/* Progress Circle */}
-                                            <div className="relative w-12 h-12 flex-shrink-0">
-                                                <svg className="w-full h-full" viewBox="0 0 36 36">
-                                                    {/* Background circle for the progress bar. */}
-                                                    <path
-                                                        className="text-gray-200"
-                                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="3"
-                                                    />
-                                                    {/* Foreground arc representing the completion percentage. */}
-                                                    <path
-                                                        className="text-indigo-500"
-                                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="3"
-                                                        strokeDasharray={`${percentage}, 100`}
-                                                        strokeLinecap="round"
-                                                        transform="rotate(-90 18 18)"
-                                                    />
-                                                </svg>
-                                                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-600">{Math.round(percentage)}%</span>
-                                            </div>
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-800 mb-2">{module.title}</h3>
-                                        <p className="text-gray-500 text-sm mb-2 h-10" dangerouslySetInnerHTML={{ __html: module.description }}></p>
-                                        <div className="mt-auto">
-                                            <p className={cn("text-sm font-semibold", statusColor)}>{statusText}</p>
-                                            {quizProgress && quizProgress.score !== undefined && (
-                                                <p className="text-sm text-gray-600 mt-1">Quiz Score: {quizProgress.score} / {quizStep.questions.length}</p>
-                                            )}
-                                            <div className="flex items-center justify-end text-sm font-medium text-indigo-600 group-hover:text-indigo-700 mt-2">
-                                                Start Learning <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-        
-        /**
-         * CaseStudy component for a multiple-choice case study challenge.
-         */
-        const CaseStudy = ({ caseData, onComplete }) => {
-            // Case Studies are treated as single-select quizzes for simplicity, matching the data structure provided.
-            const [selectedAnswer, setSelectedAnswer] = useState(null);
-            const [feedbackShown, setFeedbackShown] = useState(false);
-
-            // Handles the selection of an answer option.
-            const handleSelect = (option) => {
-                if (feedbackShown) return; // Prevent changing the answer once feedback is shown.
-                setSelectedAnswer(option);
-            };
-
-            const handleSubmit = () => {
-                setFeedbackShown(true);
-                // Check if the selected answer matches the correct answer (single select logic used here)
-                const isCorrect = String(selectedAnswer) === String(caseData.correctAnswer);
-                
-                // Note: The structure of the case study data uses a string for correctAnswer, so we treat it as single-select.
-                if (isCorrect) {
-                    onComplete({ score: 1 }); // Mark as complete with a score of 1 for correct.
-                } else {
-                    onComplete({ score: 0 }); // Mark as complete with a score of 0 for incorrect.
-                }
-            };
-
-            const isAnswerSelected = selectedAnswer !== null;
-            const correctAnswerNormalized = String(caseData.correctAnswer);
-
-            return (
-                <div className="p-4 bg-white rounded-xl shadow-lg">
-                    <h4 className="font-bold text-lg text-gray-800 mb-2">Case Study Challenge</h4>
-                    {/* Scenario description, using dangerouslySetInnerHTML to render HTML bold tags */}
-                    <p className="bg-blue-100 text-blue-800 p-3 rounded-md mb-4 text-sm" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
-                    <p className="font-semibold text-gray-700 mb-3">{caseData.question}</p>
-                    <div className="space-y-2">
-                        {caseData.options.map(option => {
-                            const isSelected = selectedAnswer === option;
-                            const isCorrectOption = String(option) === correctAnswerNormalized;
-                            
-                            let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200';
-                            if (feedbackShown) {
-                                if (isCorrectOption) {
-                                    optionClass = 'bg-green-100 border-green-500 text-green-800';
-                                } else if (isSelected && !isCorrectOption) {
-                                    optionClass = 'bg-red-100 border-red-500 text-red-800';
-                                }
-                            } else if (isSelected) {
-                                optionClass = 'bg-indigo-100 border-indigo-500 text-indigo-800';
-                            }
-
-                            return (
-                                <div
-                                    key={option}
-                                    onClick={() => handleSelect(option)}
-                                    className={cn('p-3 rounded-lg border-2 cursor-pointer transition-colors', optionClass, feedbackShown && 'pointer-events-none')}
-                                >
-                                    <div className="flex items-center">
-                                        {feedbackShown && ( // Display a checkmark or cross icon if feedback is active
-                                            isCorrectOption ? <span className="text-green-600 mr-2">✓</span> : (isSelected && <span className="text-red-600 mr-2">✗</span>)
-                                        )}
-                                        <span className="flex-1">{option}</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    {!feedbackShown && (
-                        <div className="mt-4 text-center">
-                            <button
-                                onClick={handleSubmit}
-                                disabled={!isAnswerSelected}
-                                className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                Submit Answer
-                            </button>
-                        </div>
-                    )}
-                    {feedbackShown && ( // Display the explanation after an answer has been selected.
-                        <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
-                            <h5 className="font-bold text-indigo-800">Explanation</h5>
-                            <p className="text-sm text-indigo-700" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-        
-        /**
-         * StaticContentStep component for displaying basic text content.
-         * Marks itself as complete immediately on render.
-         */
-        const StaticContentStep = ({ step, onComplete }) => {
-            // For 'text' type steps, mark them as complete immediately upon rendering.
-            useEffect(() => {
-                onComplete({ completed: true, score: 1 }); // Mark as complete with a score of 1 for reading content.
-            }, []); // Empty dependency array ensures this runs only once.
-
-            // Using dangerouslySetInnerHTML to render HTML content (e.g., <strong> tags and LaTeX notation).
-            return (
-                <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-white rounded-xl shadow-lg space-y-4">
-                    <div dangerouslySetInnerHTML={{ __html: step.content }}></div>
-                </div>
-            );
-        };
-
-        /**
-         * CompletionModal component displayed when a module is completed.
-         */
-        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
-            if (!isOpen) return null;
-
-            return (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center transform animate-fade-in">
-                        <h3 className="text-2xl font-bold text-indigo-700 mb-4">Module Completed! 🎉</h3>
-                        <p className="text-gray-700 mb-6">You've successfully completed all steps in this module. Great job!</p>
-                        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-                            <button
-                                onClick={onClose}
-                                className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
-                            >
-                                Back to Dashboard
-                            </button>
-                            {hasNextModule && (
-                                <button
-                                    onClick={onNextModule}
-                                    className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-                                >
-                                    Continue to Next Module
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        /**
-         * LearningModule component to manage steps within the selected module.
-         * Provides navigation between steps and renders the appropriate content for each.
-         */
-        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
-            const [activeStep, setActiveStep] = useState(0); // Manages the index of the currently active step.
-            const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Controls the visibility of the sidebar on mobile.
-            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false); // State for completion modal 
-
-            // Callback function to update the completion status of a specific step.
-            const handleStepComplete = useCallback((stepId, data = {}) => {
-                onProgressUpdate(module.id, stepId, { completed: true, ...data });
-            }, [onProgressUpdate, module.id]);
-
-            const moduleProgress = progress[module.id] || {};
-            
-            // Check if all steps in the current module are completed
-            const allStepsCompletedInModule = module.steps.every(step =>
-                moduleProgress[step.id] && moduleProgress[step.id].completed
-            );
-
-            // Navigates to the next step, if available.
-            const handleNextStep = () => {
-                // If it's the last step and all steps in the module are completed, open the modal 
-                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
-                    setIsCompletionModalOpen(true);
-                } else if (activeStep < module.steps.length - 1) {
-                    setActiveStep(activeStep + 1);
-                }
-            };
-
-            // Navigates to the previous step, if available.
-            const handlePrevStep = () => {
-                if (activeStep > 0) {
-                    setActiveStep(activeStep - 1);
-                }
-            };
-            
-            // Ensure module and its steps are defined before accessing properties 
-            if (!module || !module.steps) {
-                console.error("LearningModule received invalid module prop:", module);
-                return <div className="fixed inset-0 flex items-center justify-center bg-gray-100 text-gray-700">Loading module...</div>;
-            }
-
-            const currentStep = module.steps[activeStep];
-            
-            // Renders the appropriate content component based on the current step's type.
-            const renderStepContent = (step) => {
-                if (!step) return <p>Please select a step.</p>;
-
-                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
-
-                switch (step.type) {
-                    case 'text':
-                        return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
-                    case 'case_study':
-                        return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
-                    case 'quiz':
-                        // If quiz is already complete and user revisits, prevent re-taking by passing the score from progress
-                        const quizStatus = moduleProgress[step.id];
-                        if (quizStatus && quizStatus.completed && quizStatus.score !== undefined) {
-                            // Render a simple completion message instead of the interactive quiz
-                            return (
-                                <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-green-500">
-                                    <h4 className="text-xl font-bold text-green-700 mb-2">Quiz Completed!</h4>
-                                    <p className="text-gray-700">You scored {quizStatus.score} out of {step.questions.length} on this quiz.</p>
-                                    <button onClick={handleNextStep} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Continue</button>
-                                </div>
-                            );
-                        }
-                        return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
-                    default:
-                        // Fallback for unrecognized step types, ensuring robust error handling.
-                        return <p key={step.id} className="text-red-600">Error: Content for this step type is not available.</p>;
-                }
-            };
-
-            const handleModalClose = () => {
-                setIsCompletionModalOpen(false);
-                onBack(); // Go back to dashboard when modal is closed 
-            };
-
-            const handleModalNextModule = () => {
-                setIsCompletionModalOpen(false);
-                onNextModule(); // Proceed to next module 
-            };
-
-
-            return (
-                <div className="fixed inset-0 bg-gray-100 flex flex-col z-20">
-                    {/* Header for the learning module, including back button and module title. */}
-                    <header className="bg-white shadow-md p-4 flex items-center justify-between z-30 flex-shrink-0">
-                        <button onClick={onBack} className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors p-2 rounded-lg -ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                            <span className="hidden sm:inline">Dashboard</span>
-                        </button>
-                        <div className="flex items-center gap-3">
-                            <h2 className="text-xl font-bold text-gray-800 text-center flex-1 sm:flex-initial truncate px-2">{module.title}</h2>
-                        </div>
-                        {/* Mobile sidebar toggle button using text/emoji placeholders. */}
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                        </button>
-                    </header>
-                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"></div>}
-                    <div className="flex flex-1 overflow-hidden">
-                        {/* Sidebar for navigation steps within the module. */}
-                        <aside className={cn(
-                            "bg-white border-r border-gray-200 p-4 w-72 lg:w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 absolute md:static h-full z-20",
-                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                        )}>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-700 px-3">Module Steps</h3>
-                            <nav className="space-y-1 overflow-y-auto flex-1 pr-1">
-                                {module.steps.map((step, index) => (
-                                    <button
-                                        key={step.id}
-                                        onClick={() => {
-                                            setActiveStep(index);
-                                            setIsSidebarOpen(false); // Close sidebar on mobile after a step is selected.
-                                        }}
-                                        className={cn(
-                                            'w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors',
-                                            activeStep === index ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-gray-100 text-gray-700'
-                                        )}
-                                    >
-                                        {/* Step completion indicator */}
-                                        <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                                            {moduleProgress[step.id]?.completed ? (
-                                                <svg className="w-5 h-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                                            ) : (
-                                                <div className={cn("w-3 h-3 rounded-full border-2", activeStep === index ? "border-indigo-500 bg-indigo-500" : "border-gray-400 bg-white")}></div>
-                                            )}
-                                        </div>
-                                        <span className="flex-1 text-sm">{step.title}</span>
-                                    </button>
-                                ))}
-                            </nav>
-                        </aside>
-
-                        {/* Main content area for the current step. */}
-                        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
-                            <div className="max-w-5xl mx-auto">
-                                <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentStep.title}</h3>
-                                {renderStepContent(currentStep)}
-
-                                {/* Navigation buttons for moving between steps. */}
-                                <div className="flex justify-between mt-8">
-                                    <button
-                                        onClick={handlePrevStep}
-                                        disabled={activeStep === 0}
-                                        className="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
-                                    >
-                                        Previous
-                                    </button>
-
-                                    <button
-                                        onClick={handleNextStep}
-                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
-                                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
-                                    >
-                                        {activeStep === module.steps.length - 1 ? 'Finish Module' : 'Next'}
-                                    </button>
-                                </div>
-                            </div>
-                        </main>
-                    </div>
-                    <CompletionModal
-                        isOpen={isCompletionModalOpen}
-                        onClose={handleModalClose}
-                        onNextModule={handleModalNextModule}
-                        hasNextModule={hasNextModule}
-                    />
-                </div>
-            );
-        };
-        
-        // --- Main App Component ---
-        /**
-         * The root component of the Acid-Base Balance learning module application.
-         * Manages overall application state, including module selection, user ID, and progress.
-         */
-        function App() {
-            // State for the currently selected learning module's ID. Null means Dashboard is active.
-            const [currentModuleId, setCurrentModuleId] = useState(null);
-            const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
-            // State for the authenticated user's ID, used for local storage progress tracking.
-            const [userId, setUserId] = useState(null);
-            // State for storing the user's progress across all modules and steps.
-            const [progress, setProgress] = useState({});
-            // State to indicate if authentication is complete and user ID is available.
-            const [isAuthReady, setIsAuthReady] = useState(false);
-
-            // Effect hook for handling initial authentication and setting the user ID.
-            useEffect(() => {
-                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
-                    if (user) setUserId(user.uid);
-                    setIsAuthReady(true); // Mark authentication as ready once user is determined.
-                });
-                return () => unsubscribe(); // Cleanup the auth state listener on component unmount.
-            }, []); // Empty dependency array ensures this runs only once on mount.
-
-            // Effect hook for loading user progress from localStorage after authentication is ready.
-            useEffect(() => {
-                if (!isAuthReady || !userId) return; // Only proceed if auth is ready and userId is available.
-                const storedProgress = localStorage.getItem(`tissue-integrity-module-progress-${userId}`);
-                if (storedProgress) {
-                    try {
-                        setProgress(JSON.parse(storedProgress)); // Attempt to parse and set stored progress.
-                    } catch (e) {
-                        console.error("Failed to parse stored progress, resetting.", e);
-                        setProgress({}); // Reset progress if parsing fails (e.g., corrupted data).
-                    }
-                }
-            }, [isAuthReady, userId]); // Reruns when auth status or userId changes.
-
-            // Callback function to update and persist the user's progress for a specific step.
-            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
-                if (!isAuthReady || !userId) return;
-
-                setProgress(currentProgress => {
-                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
-                    const newStepProgress = { ...currentStepProgress, ...data };
-
-                    // Prevent unnecessary state update if data hasn't actually changed.
-                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) {
-                        return currentProgress;
-                    }
-
-                    // Otherwise, proceed with the update.
-                    const newProgress = {
-                        ...currentProgress,
-                        [moduleId]: {
-                            ...(currentProgress[moduleId] || {}),
-                            [stepId]: newStepProgress
-                        }
-                    };
-
-                    localStorage.setItem(`tissue-integrity-module-progress-${userId}`, JSON.stringify(newProgress));
-                    return newProgress;
-                });
-            }, [isAuthReady, userId]);
-
-            const handlePreAssessmentComplete = (completedModuleIds) => {
-                const newProgress = { ...progress };
-                completedModuleIds.forEach(moduleId => {
-                    const module = contentData[moduleId];
-                    if (module) {
-                        newProgress[moduleId] = {};
-                        module.steps.forEach(step => {
-                            newProgress[moduleId][step.id] = { completed: true };
-                        });
-                    }
-                });
-                setProgress(newProgress);
-                localStorage.setItem(`tissue-integrity-module-progress-${userId}`, JSON.stringify(newProgress));
-            };
-            
-            // Callback to reset all progress
-            const handleResetProgress = useCallback(() => {
-                if (!isAuthReady || !userId) return;
-                // Clear from state
-                setProgress({});
-                // Clear from localStorage
-                localStorage.removeItem(`tissue-integrity-module-progress-${userId}`);
-            }, [isAuthReady, userId]);
-
-            // Function to navigate to the next module in the sequence
-            const handleNextModule = useCallback(() => {
-                const moduleIds = Object.keys(contentData);
-                const currentIndex = moduleIds.indexOf(currentModuleId);
-                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
-                    setCurrentModuleId(moduleIds[currentIndex + 1]);
-                } else {
-                    // If it's the last module, go back to the dashboard.
-                    setCurrentModuleId(null);
-                }
-            }, [currentModuleId]);
-
-            // Determine which module is currently selected based on `currentModuleId`.
-            const selectedModule = currentModuleId && contentData[currentModuleId]
-                                                     ? { ...contentData[currentModuleId], id: currentModuleId }
-                                                     : null;
-
-            const moduleIds = Object.keys(contentData);
-            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
-            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
-
-
-            return (
-                <div className="bg-gray-100 min-h-screen font-sans text-gray-900">
-                    {isPreAssessmentActive ? (
-                        <PreAssessmentQuiz 
-                            onComplete={handlePreAssessmentComplete} 
-                            onExit={() => setIsPreAssessmentActive(false)}
-                        />
-                    ) : selectedModule ? (
-                        <LearningModule
-                            key={selectedModule.id}
-                            module={selectedModule}
-                            onBack={() => setCurrentModuleId(null)}
-                            progress={progress}
-                            onProgressUpdate={handleProgressUpdate}
-                            onNextModule={handleNextModule}
-                            hasNextModule={hasNextModule}
-                        />
-                    ) : (
-                        <Dashboard 
-                            onSelectModule={setCurrentModuleId} 
-                            progress={progress} 
-                            onResetProgress={handleResetProgress}
-                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
-                        />
-                    )}
-                </div>
-            );
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --light: #F3F4F6;
         }
 
-        // --- Render the App into the DOM ---
-        const container = document.getElementById('root');
-        const root = ReactDOM.createRoot(container);
-        root.render(<App />);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* ADHD Friendly Focus Styles */
+        .bionic-word { font-weight: 800; }
+        
+        .focus-mode .sidebar { display: none; }
+        .focus-mode .main-content { margin-left: 0; max-width: 800px; margin: 0 auto; }
+
+        /* Interactive Elements */
+        .interactive-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight-text {
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .highlight-text:hover { background-color: #e2e8f0; }
+        .highlight-text.selected { background-color: #fef08a; border-bottom: 2px solid #ca8a04; }
+
+        .progress-bar { transition: width 0.5s ease-in-out; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .hidden-content { display: none; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col transition-all duration-300 overflow-y-auto">
+        <div class="p-6 border-b border-slate-700">
+            <h1 class="text-xl font-bold tracking-tight text-indigo-400"><i class="fas fa-user-nurse mr-2"></i>Neuro-Nurse Prep</h1>
+            <p class="text-xs text-slate-400 mt-2">Chapter 21: Skin Trauma & Burns</p>
+            <div class="mt-4 bg-slate-800 rounded-full h-2 w-full overflow-hidden">
+                <div id="overall-progress" class="bg-indigo-500 h-full w-0 progress-bar"></div>
+            </div>
+            <p class="text-xs text-right mt-1 text-slate-400"><span id="progress-text">0</span>% Complete</p>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="loadSection('intro')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 active-nav text-sm"><i class="fas fa-home w-6"></i> Start Here</button>
+            <button onclick="loadSection('healing')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 text-sm"><i class="fas fa-band-aid w-6"></i> Wound Healing</button>
+            <button onclick="loadSection('burns_basics')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 text-sm"><i class="fas fa-fire w-6"></i> Burns: Types & Assessment</button>
+            <button onclick="loadSection('systemic')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 text-sm"><i class="fas fa-heartbeat w-6"></i> Systemic Changes</button>
+            <button onclick="loadSection('resuscitation')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 text-sm"><i class="fas fa-tint w-6"></i> Fluid Resuscitation (Parkland)</button>
+            <button onclick="loadSection('management')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 text-sm"><i class="fas fa-hospital-user w-6"></i> Management & Care</button>
+            <button onclick="loadSection('cancer')" class="nav-btn w-full text-left p-3 rounded hover:bg-slate-800 focus:bg-slate-700 text-sm"><i class="fas fa-sun w-6"></i> Skin Cancer & SJS/TEN</button>
+            <button onclick="loadSection('ngn_case')" class="nav-btn w-full text-left p-3 rounded bg-indigo-900 hover:bg-indigo-800 focus:bg-indigo-800 text-sm border border-indigo-500 shadow-lg glow"><i class="fas fa-clipboard-check w-6"></i> NGN CASE STUDY</button>
+        </nav>
+
+        <div class="p-4 border-t border-slate-700">
+            <button onclick="toggleFocusMode()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"><i class="fas fa-expand mr-2"></i> Focus Mode</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content flex-1 overflow-y-auto bg-slate-50 relative">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-10 px-8 py-4 flex justify-between items-center">
+            <h2 id="section-title" class="text-2xl font-bold text-slate-800">Welcome</h2>
+            <div class="flex gap-3">
+                <button onclick="changeFontSize('decrease')" class="p-2 text-slate-500 hover:text-indigo-600"><i class="fas fa-minus"></i></button>
+                <button onclick="changeFontSize('increase')" class="p-2 text-slate-500 hover:text-indigo-600"><i class="fas fa-plus"></i></button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Container -->
+        <div id="content-area" class="p-8 max-w-5xl mx-auto pb-24">
+            <!-- Content Injected via JS -->
+        </div>
+
+        <!-- Floating Action Button for Notes -->
+        <div class="fixed bottom-8 right-8">
+            <button onclick="toggleNotes()" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-xl transition transform hover:scale-110">
+                <i class="fas fa-sticky-note text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Notes Modal -->
+        <div id="notes-modal" class="hidden fixed bottom-24 right-8 w-80 bg-yellow-100 shadow-2xl rounded-lg border-2 border-yellow-300 p-4 z-50 transform transition-all">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-bold text-yellow-800">Quick Notes</h3>
+                <button onclick="toggleNotes()" class="text-yellow-800 hover:text-red-600"><i class="fas fa-times"></i></button>
+            </div>
+            <textarea id="user-notes" class="w-full h-40 bg-transparent border-none focus:ring-0 resize-none font-handwriting text-slate-800" placeholder="Type reminders here..."></textarea>
+        </div>
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- State Management ---
+        let currentSection = 'intro';
+        let progress = {
+            healing: 0,
+            burns_basics: 0,
+            systemic: 0,
+            resuscitation: 0,
+            management: 0,
+            cancer: 0,
+            ngn_case: 0
+        };
+
+        // --- Data Content ---
+        const sections = {
+            intro: `
+                <div class="fade-in">
+                    <div class="bg-indigo-100 border-l-4 border-indigo-500 text-indigo-700 p-4 mb-6" role="alert">
+                        <p class="font-bold">ADHD Learning Strategy:</p>
+                        <p>This module is broken into "chunks". Don't try to read it all at once. Use the <strong>Pomodoro method</strong>: Work through one section (approx 15 mins), then take a 5 min break.</p>
+                    </div>
+                    <h1 class="text-4xl font-extrabold mb-6">Skin Trauma & Burns</h1>
+                    <p class="text-lg mb-4">We are going to cover Chapter 21. From a simple cut to life-threatening burns.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="bg-white p-6 rounded-xl shadow-md interactive-card" onclick="loadSection('healing')">
+                            <h3 class="text-xl font-bold text-indigo-600 mb-2">1. Wound Healing</h3>
+                            <p class="text-slate-600">The 3 phases, intentions of healing, and what goes wrong.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md interactive-card" onclick="loadSection('resuscitation')">
+                            <h3 class="text-xl font-bold text-pink-600 mb-2">2. The Math (Fluid Resuscitation)</h3>
+                            <p class="text-slate-600">Master the Parkland Formula and Rule of 9s.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md interactive-card" onclick="loadSection('ngn_case')">
+                            <h3 class="text-xl font-bold text-emerald-600 mb-2">3. NCLEX NGN Challenge</h3>
+                            <p class="text-slate-600">Test your knowledge with a complex case study.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            healing: `
+                <div class="fade-in space-y-8">
+                    <section>
+                        <h3 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-4">The 3 Phases of Healing</h3>
+                        <p class="mb-4 italic text-slate-500">Memorize the timeline. It's high-yield for NCLEX.</p>
+                        
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <h4 class="font-bold text-red-700 text-lg mb-2"><i class="fas fa-fire mr-2"></i>1. Inflammatory</h4>
+                                <ul class="list-disc pl-5 text-sm space-y-1 text-slate-700">
+                                    <li><strong>Time:</strong> Injury to 3-5 days.</li>
+                                    <li><strong>Key Events:</strong> Vasoconstriction -> Clot -> Vasodilation (after 10 mins).</li>
+                                    <li><strong>Cells:</strong> Macrophages migrate in.</li>
+                                    <li><strong>S/S:</strong> Edema, Pain, Redness, Warmth.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <h4 class="font-bold text-blue-700 text-lg mb-2"><i class="fas fa-hammer mr-2"></i>2. Proliferative</h4>
+                                <ul class="list-disc pl-5 text-sm space-y-1 text-slate-700">
+                                    <li><strong>Time:</strong> Day 4 to 2-4 weeks.</li>
+                                    <li><strong>Key Events:</strong> Fibrin scaffold forms. Granulation tissue (buds).</li>
+                                    <li><strong>Cells:</strong> Fibroblasts (collagen factories).</li>
+                                    <li><strong>Action:</strong> Wound contracts, Epithelial cells grow over.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                <h4 class="font-bold text-green-700 text-lg mb-2"><i class="fas fa-shield-alt mr-2"></i>3. Maturation</h4>
+                                <ul class="list-disc pl-5 text-sm space-y-1 text-slate-700">
+                                    <li><strong>Time:</strong> 3 weeks to 1+ year.</li>
+                                    <li><strong>Key Events:</strong> Collagen reorganization.</li>
+                                    <li><strong>Outcome:</strong> Scar becomes thinner/paler. Mature scar is firm/inelastic.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Healing Intentions</h3>
+                        <div class="space-y-4">
+                            <details class="group p-4 bg-slate-50 rounded-lg cursor-pointer">
+                                <summary class="font-bold text-indigo-700 flex justify-between items-center">
+                                    <span>First Intention (Primary Union)</span>
+                                    <span class="transition group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
+                                </summary>
+                                <div class="mt-3 text-slate-600 pl-4 border-l-2 border-indigo-300">
+                                    <p>Clean laceration or surgical incision. Edges brought together (sutures/staples). Minimal dead space. Thin scar.</p>
+                                </div>
+                            </details>
+                            <details class="group p-4 bg-slate-50 rounded-lg cursor-pointer">
+                                <summary class="font-bold text-indigo-700 flex justify-between items-center">
+                                    <span>Second Intention (Granulation)</span>
+                                    <span class="transition group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
+                                </summary>
+                                <div class="mt-3 text-slate-600 pl-4 border-l-2 border-indigo-300">
+                                    <p>Deep tissue loss (Pressure injury, venous ulcer). Cavity must fill with connective tissue. Prolonged repair. Large scar.</p>
+                                </div>
+                            </details>
+                            <details class="group p-4 bg-slate-50 rounded-lg cursor-pointer">
+                                <summary class="font-bold text-indigo-700 flex justify-between items-center">
+                                    <span>Third Intention (Delayed Primary)</span>
+                                    <span class="transition group-open:rotate-180"><i class="fas fa-chevron-down"></i></span>
+                                </summary>
+                                <div class="mt-3 text-slate-600 pl-4 border-l-2 border-indigo-300">
+                                    <p>High risk for infection (contaminated wound). Left open intentionally for debris removal/inflammation to subside. Closed surgically later.</p>
+                                </div>
+                            </details>
+                        </div>
+                    </section>
+                    
+                    <div class="bg-orange-50 border border-orange-200 p-6 rounded-xl">
+                        <h4 class="font-bold text-orange-800 mb-2">Check Your Knowledge</h4>
+                        <div id="quiz-healing"></div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <button onclick="markComplete('healing'); loadSection('burns_basics')" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">Next: Burns Basics <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+            `,
+            burns_basics: `
+                <div class="fade-in space-y-8">
+                     <section>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Burn Depth Classification</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white rounded-lg shadow-sm">
+                                <thead class="bg-slate-800 text-white">
+                                    <tr>
+                                        <th class="p-3 text-left">Depth</th>
+                                        <th class="p-3 text-left">Color/Appearance</th>
+                                        <th class="p-3 text-left">Pain?</th>
+                                        <th class="p-3 text-left">Blisters?</th>
+                                        <th class="p-3 text-left">Healing</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr class="border-b">
+                                        <td class="p-3 font-bold text-pink-600">Superficial (1st Degree)</td>
+                                        <td class="p-3">Pink to Red, Dry</td>
+                                        <td class="p-3">Yes</td>
+                                        <td class="p-3">No</td>
+                                        <td class="p-3">~1 week, peeling</td>
+                                    </tr>
+                                    <tr class="border-b bg-slate-50">
+                                        <td class="p-3 font-bold text-red-600">Superficial Partial (2nd)</td>
+                                        <td class="p-3">Red, Moist, Blanching</td>
+                                        <td class="p-3">Yes (Moderate)</td>
+                                        <td class="p-3">Yes</td>
+                                        <td class="p-3">~2 weeks, no scar</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-3 font-bold text-red-800">Deep Partial (Deep 2nd)</td>
+                                        <td class="p-3">Less moist, less blanching</td>
+                                        <td class="p-3">Less painful</td>
+                                        <td class="p-3">Rare</td>
+                                        <td class="p-3">2-6 wks, scar deposition</td>
+                                    </tr>
+                                    <tr class="border-b bg-slate-50">
+                                        <td class="p-3 font-bold text-slate-900">Full Thickness (3rd)</td>
+                                        <td class="p-3">Black, Red, Yellow, White, Dry, Leathery (Eschar)</td>
+                                        <td class="p-3">No (Nerves dead)</td>
+                                        <td class="p-3">No</td>
+                                        <td class="p-3">Wks-Mos, Needs Grafting</td>
+                                    </tr>
+                                     <tr>
+                                        <td class="p-3 font-bold text-black">Deep Full (4th)</td>
+                                        <td class="p-3">Black, Exposed Bone/Muscle</td>
+                                        <td class="p-3">No</td>
+                                        <td class="p-3">No</td>
+                                        <td class="p-3">Amputation/Grafting</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                        <h3 class="text-2xl font-bold text-indigo-900 mb-4">Rule of Nines Calculator (Adult)</h3>
+                        <p class="mb-4">Click the body parts to toggle burns and calculate TBSA (Total Body Surface Area).</p>
+                        
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <!-- Simplified Visual Selector -->
+                            <div class="grid grid-cols-2 gap-2 w-full max-w-xs">
+                                <button onclick="toggleTBSA(this, 9)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Head (9%)</button>
+                                <button onclick="toggleTBSA(this, 18)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Ant. Torso (18%)</button>
+                                <button onclick="toggleTBSA(this, 18)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Post. Torso (18%)</button>
+                                <button onclick="toggleTBSA(this, 9)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Right Arm (9%)</button>
+                                <button onclick="toggleTBSA(this, 9)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Left Arm (9%)</button>
+                                <button onclick="toggleTBSA(this, 18)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Right Leg (18%)</button>
+                                <button onclick="toggleTBSA(this, 18)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Left Leg (18%)</button>
+                                <button onclick="toggleTBSA(this, 1)" class="p-2 bg-white border rounded hover:bg-red-100 transition">Perineum (1%)</button>
+                            </div>
+
+                            <div class="bg-white p-6 rounded shadow-lg text-center w-full max-w-xs">
+                                <div class="text-4xl font-bold text-red-600" id="tbsa-display">0%</div>
+                                <div class="text-sm text-slate-500 uppercase tracking-wide">Total Body Surface Area</div>
+                                <button onclick="resetTBSA()" class="mt-4 text-xs text-slate-400 hover:text-slate-600 underline">Reset</button>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <div class="text-right">
+                        <button onclick="markComplete('burns_basics'); loadSection('systemic')" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">Next: Systemic Changes <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+            `,
+            systemic: `
+                <div class="fade-in space-y-6">
+                    <h3 class="text-2xl font-bold text-slate-800">Systemic Changes (The Body's Reaction)</h3>
+                    <p class="text-slate-600">Burns > 25% TBSA cause systemic issues. It's not just a skin problem.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Vascular -->
+                        <div class="bg-white p-5 rounded shadow border-l-4 border-red-500">
+                            <h4 class="font-bold text-lg mb-2">Vascular (Fluid Shift)</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-2">
+                                <li><strong>Third Spacing:</strong> Capillary leak syndrome (Plasma leaks into tissues).</li>
+                                <li><strong>Timing:</strong> Starts immediately, peaks 12-24 hrs.</li>
+                                <li><strong>Electrolytes:</strong> Hyperkalemia (cell destruction releases K+), Hyponatremia (Na+ trapped in edema).</li>
+                                <li><strong>Blood:</strong> Hemoconcentration (High Hct/Hgb) due to dehydration.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Cardiac -->
+                        <div class="bg-white p-5 rounded shadow border-l-4 border-pink-500">
+                            <h4 class="font-bold text-lg mb-2">Cardiac</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-2">
+                                <li>Heart rate INCREASES (Hypovolemia).</li>
+                                <li>Cardiac Output DECREASES initially.</li>
+                                <li>Shock risk is high.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Pulmonary -->
+                        <div class="bg-white p-5 rounded shadow border-l-4 border-blue-500">
+                            <h4 class="font-bold text-lg mb-2">Pulmonary (Inhalation Injury)</h4>
+                            <p class="text-sm mb-2 font-bold text-red-600">Major cause of death.</p>
+                            <ul class="list-disc pl-5 text-sm space-y-2">
+                                <li><strong>Upper Airway:</strong> Edema (Stridor, hoarseness).</li>
+                                <li><strong>Lower Airway:</strong> Chemical injury, ciliary action slows.</li>
+                                <li><strong>Carbon Monoxide (CO):</strong> Binds to Hgb. "Cherry red" skin. Normal PaO2 but hypoxic tissues.</li>
+                            </ul>
+                        </div>
+
+                        <!-- GI/Metabolic -->
+                        <div class="bg-white p-5 rounded shadow border-l-4 border-yellow-500">
+                            <h4 class="font-bold text-lg mb-2">GI & Metabolic</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-2">
+                                <li><strong>GI:</strong> Decreased blood flow -> Paralytic Ileus. <strong>Curling's Ulcer</strong> (stress ulcer).</li>
+                                <li><strong>Metabolic:</strong> Hypermetabolism. Calorie needs double/triple. Core temp increases.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-800 text-white p-4 rounded-lg mt-6">
+                        <h4 class="font-bold text-yellow-400"><i class="fas fa-exclamation-triangle"></i> NCLEX Critical Rescue</h4>
+                        <p class="mt-2">If you hear a <strong>brassy cough</strong>, wheezes disappear (obstruction!), or see drooling/difficulty swallowing: <strong>IMMEDIATE INTUBATION</strong> may be needed. Apply Oxygen. Call Rapid Response.</p>
+                    </div>
+
+                    <div class="text-right">
+                        <button onclick="markComplete('systemic'); loadSection('resuscitation')" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">Next: Fluid Resuscitation <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+            `,
+            resuscitation: `
+                 <div class="fade-in space-y-8">
+                    <section>
+                        <h3 class="text-3xl font-bold text-slate-800 mb-2">Fluid Resuscitation</h3>
+                        <p class="text-slate-600">The <strong>Parkland (Baxter) Formula</strong> is the gold standard for the first 24 hours.</p>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-lg border-2 border-yellow-400 my-6">
+                            <h4 class="text-xl font-bold text-yellow-900 text-center mb-4">THE FORMULA</h4>
+                            <p class="text-center text-2xl font-mono bg-white p-4 rounded shadow-inner">
+                                4 mL x weight (kg) x %TBSA
+                            </p>
+                            <div class="grid grid-cols-2 gap-4 mt-4 text-center">
+                                <div class="bg-yellow-100 p-2 rounded">
+                                    <span class="font-bold block">1st 8 Hours</span>
+                                    Give 50% of total
+                                </div>
+                                <div class="bg-yellow-100 p-2 rounded">
+                                    <span class="font-bold block">Next 16 Hours</span>
+                                    Give remaining 50%
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Interactive Calculator -->
+                    <section class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-indigo-600">
+                        <h4 class="text-xl font-bold text-slate-700 mb-4"><i class="fas fa-calculator mr-2"></i>Practice Calculator</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700">Weight</label>
+                                <div class="flex mt-1">
+                                    <input type="number" id="calc-weight" placeholder="150" class="flex-1 p-2 border rounded-l focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <select id="calc-unit" class="p-2 border border-l-0 rounded-r bg-slate-50">
+                                        <option value="lbs">lbs</option>
+                                        <option value="kg">kg</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700">TBSA Burned (%)</label>
+                                <input type="number" id="calc-tbsa" placeholder="50" class="mt-1 w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+
+                        <button onclick="calculateParkland()" class="w-full mt-6 bg-indigo-600 text-white font-bold py-3 rounded hover:bg-indigo-700 transition">CALCULATE</button>
+
+                        <div id="calc-results" class="hidden mt-6 bg-slate-100 p-4 rounded border border-slate-300">
+                            <p><strong>Total 24hr Volume:</strong> <span id="res-total" class="text-indigo-700 font-mono text-xl"></span> mL</p>
+                            <hr class="border-slate-300 my-2">
+                            <p><strong>Rate (First 8 hrs):</strong> <span id="res-rate1" class="text-indigo-700 font-bold"></span> mL/hr (Total: <span id="res-vol1"></span> mL)</p>
+                            <p><strong>Rate (Next 16 hrs):</strong> <span id="res-rate2" class="text-indigo-700 font-bold"></span> mL/hr (Total: <span id="res-vol2"></span> mL)</p>
+                        </div>
+                    </section>
+                    
+                    <section>
+                        <h4 class="font-bold text-lg mb-2">How do we know it's working?</h4>
+                        <p class="mb-2">Don't rely on Blood Pressure! The best indicator is <strong>Urine Output</strong>.</p>
+                        <ul class="list-disc pl-5 bg-green-50 p-4 rounded border border-green-200">
+                            <li><strong>Target:</strong> 0.5 mL/kg/hr (approx 30-50 mL/hr).</li>
+                            <li>Electrical burns need higher output (75-100 mL/hr) to clear myoglobin.</li>
+                        </ul>
+                    </section>
+
+                    <div class="text-right">
+                        <button onclick="markComplete('resuscitation'); loadSection('management')" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">Next: Management & Care <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                 </div>
+            `,
+            management: `
+                <div class="fade-in space-y-8">
+                    <h3 class="text-2xl font-bold text-slate-800">Management by Phase</h3>
+
+                    <!-- Accordion for Phases -->
+                    <div class="space-y-4">
+                        <div class="bg-white border rounded-lg shadow-sm">
+                            <button class="w-full text-left p-4 font-bold text-red-600 bg-red-50 flex justify-between" onclick="this.nextElementSibling.classList.toggle('hidden-content')">
+                                1. Emergent Phase (Resuscitation) <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="hidden-content p-4 text-slate-700">
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Duration:</strong> Injury to 24-48 hrs.</li>
+                                    <li><strong>Priorities:</strong> 
+                                        <ol class="list-decimal pl-5 mt-1">
+                                            <li>Airway (Secure it!)</li>
+                                            <li>Circulation (Fluid resuscitation)</li>
+                                            <li>Pain Management (IV Opioids ONLY - no IM/SubQ due to poor absorption).</li>
+                                            <li>Body Temp (Keep warm).</li>
+                                            <li>Emotional support.</li>
+                                        </ol>
+                                    </li>
+                                    <li><strong>Escharotomy:</strong> Cutting eschar to relieve pressure (if chest expansion restricted or compartment syndrome).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border rounded-lg shadow-sm">
+                            <button class="w-full text-left p-4 font-bold text-blue-600 bg-blue-50 flex justify-between" onclick="this.nextElementSibling.classList.toggle('hidden-content')">
+                                2. Acute Phase (Healing) <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="hidden-content p-4 text-slate-700">
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Duration:</strong> 36-48 hrs after injury until wound closure.</li>
+                                    <li><strong>Focus:</strong> Wound care, Infection prevention, Nutrition.</li>
+                                    <li><strong>Wound Care:</strong> 
+                                        <br><em>Mechanical Debridement:</em> Hydrotherapy (shower), forceps/scissors.
+                                        <br><em>Enzymatic:</em> Collagenase (Santyl).
+                                    </li>
+                                    <li><strong>Grafts:</strong> Autograft (Patient's skin), Allograft (Cadaver), Xenograft (Pig/Porcine).</li>
+                                    <li><strong>Nutrition:</strong> High Calorie, High Protein.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border rounded-lg shadow-sm">
+                            <button class="w-full text-left p-4 font-bold text-green-600 bg-green-50 flex justify-between" onclick="this.nextElementSibling.classList.toggle('hidden-content')">
+                                3. Rehabilitative Phase (Restorative) <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="hidden-content p-4 text-slate-700">
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Duration:</strong> Wound closure to highest level of function (years).</li>
+                                    <li><strong>Prevention:</strong> Contractures (positioning, splinting, exercise).</li>
+                                    <li><strong>Scarring:</strong> Pressure garments (Jobst) worn 23 hrs/day for 12-24 months to flatten scars.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-6 rounded-lg">
+                        <h4 class="font-bold text-indigo-900 mb-2">NCLEX Tip: Infection Control</h4>
+                        <p class="text-sm">Burn patients are immunocompromised. Use <strong>Standard Precautions</strong>. For major burns, reverse isolation (protective environment) may be used. No fresh plants/flowers. No raw foods.</p>
+                    </div>
+
+                    <div class="text-right">
+                        <button onclick="markComplete('management'); loadSection('cancer')" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">Next: Skin Cancer & SJS <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+            `,
+            cancer: `
+                <div class="fade-in space-y-8">
+                    <section>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Skin Cancer & Prevention</h3>
+                        <p class="mb-4">Use the <strong>ABCDE</strong> method for assessment.</p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
+                            <div class="bg-white p-2 border rounded font-bold"><span class="text-red-500 block text-xl">A</span>symmetry</div>
+                            <div class="bg-white p-2 border rounded font-bold"><span class="text-red-500 block text-xl">B</span>order Irregularity</div>
+                            <div class="bg-white p-2 border rounded font-bold"><span class="text-red-500 block text-xl">C</span>olor Variation</div>
+                            <div class="bg-white p-2 border rounded font-bold"><span class="text-red-500 block text-xl">D</span>iameter (>6mm)</div>
+                            <div class="bg-white p-2 border rounded font-bold"><span class="text-red-500 block text-xl">E</span>volving</div>
+                        </div>
+
+                        <div class="mt-6 grid md:grid-cols-3 gap-6">
+                            <div class="bg-white p-4 rounded shadow">
+                                <h4 class="font-bold text-slate-700">Basal Cell</h4>
+                                <p class="text-sm">Pearly papule, central crater, rolled waxy borders. Metastasis rare.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded shadow">
+                                <h4 class="font-bold text-slate-700">Squamous Cell</h4>
+                                <p class="text-sm">Firm, nodular, crust/ulceration. Can metastasize (10%).</p>
+                            </div>
+                            <div class="bg-white p-4 rounded shadow border border-red-200">
+                                <h4 class="font-bold text-red-700">Melanoma</h4>
+                                <p class="text-sm">Pigmented, irregular, red/white/blue tones. Highly metastatic. High mortality.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-red-50 p-6 rounded-xl border border-red-200">
+                        <h3 class="text-xl font-bold text-red-800 mb-2">Life Threatening: Stevens-Johnson Syndrome (SJS) & TEN</h3>
+                        <p class="mb-4 text-sm">Usually drug-induced (Antibiotics, Anticonvulsants, NSAIDs, Allopurinol).</p>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1 bg-white p-4 rounded">
+                                <h5 class="font-bold">SJS</h5>
+                                <p class="text-sm">Skin detachment < 10% TBSA.</p>
+                            </div>
+                             <div class="flex-1 bg-white p-4 rounded">
+                                <h5 class="font-bold">TEN (Toxic Epidermal Necrolysis)</h5>
+                                <p class="text-sm">Detachment > 30% TBSA.</p>
+                            </div>
+                        </div>
+                        <p class="mt-4 font-bold text-red-900">Intervention: STOP THE DRUG immediately. Treat like a burn patient.</p>
+                    </section>
+
+                    <div class="text-right">
+                        <button onclick="markComplete('cancer'); loadSection('ngn_case')" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">Next: NGN CHALLENGE <i class="fas fa-flag-checkered ml-2"></i></button>
+                    </div>
+                </div>
+            `,
+            ngn_case: `
+                <div class="fade-in">
+                    <div class="bg-slate-800 text-white p-4 rounded mb-6 flex justify-between items-center">
+                        <h3 class="text-xl font-bold"><i class="fas fa-laptop-medical mr-2"></i>Next Gen NCLEX Challenge</h3>
+                        <span class="text-xs bg-slate-600 px-2 py-1 rounded">Case Study 21.1</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                        
+                        <!-- Left Panel: Chart Data (Sticky) -->
+                        <div class="bg-white border rounded shadow-md h-96 overflow-y-auto sticky top-24">
+                            <div class="bg-slate-100 p-2 border-b font-bold text-slate-600 text-sm">Medical Record: Client J.D.</div>
+                            <div class="p-4 space-y-4 text-sm font-mono">
+                                <div>
+                                    <strong class="block text-slate-800 border-b">1300: History & Physical</strong>
+                                    <p>40 y/o male. House fire rescue attempt. PMH: Metabolic Syndrome. Meds: Metformin, Simvastatin. Wt: 200lb (90.7kg).</p>
+                                    <p>VS: T 100.6F, HR 120, RR 26, BP 98/60, SpO2 88% RA.</p>
+                                </div>
+                                <div>
+                                    <strong class="block text-slate-800 border-b">1305: Nurses Notes</strong>
+                                    <p>Clothing removed. Large bore IV. Client groaning.</p>
+                                    <p><strong>Burn Assessment:</strong></p>
+                                    <ul class="list-disc pl-5">
+                                        <li>R Arm (Ant/Post) - 2nd/3rd deg</li>
+                                        <li>Trunk (Ant/Post - Half) - 2nd/3rd deg</li>
+                                        <li>Both Legs (Ant/Post) - 2nd/3rd deg</li>
+                                        <li>R Face/Head - 2nd deg</li>
+                                    </ul>
+                                    <p class="text-red-600 font-bold">Est TBSA: 49.5%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Questions -->
+                        <div class="space-y-12 pb-24">
+                            
+                            <!-- Q1: Highlight -->
+                            <div class="bg-white p-6 rounded shadow border-l-4 border-indigo-500">
+                                <h4 class="font-bold text-slate-800 mb-4">Question 1: Recognize Cues</h4>
+                                <p class="mb-4 text-sm">Highlight the findings that require immediate follow-up (Click to select).</p>
+                                <div class="bg-slate-50 p-4 rounded leading-loose" id="highlight-area">
+                                    <span class="highlight-text" onclick="toggleHighlight(this)">Client returned into burning house</span>. 
+                                    <span class="highlight-text" onclick="toggleHighlight(this)">Metformin 500mg</span>. 
+                                    <span class="highlight-text" onclick="toggleHighlight(this)">Height: 72 inches</span>. 
+                                    <span class="highlight-text correct-highlight" onclick="toggleHighlight(this)">HR 120 beats/min</span>. 
+                                    <span class="highlight-text correct-highlight" onclick="toggleHighlight(this)">RR 26 breaths/min</span>. 
+                                    <span class="highlight-text correct-highlight" onclick="toggleHighlight(this)">BP 98/60 mm Hg</span>. 
+                                    <span class="highlight-text correct-highlight" onclick="toggleHighlight(this)">SpO2 88% on RA</span>.
+                                </div>
+                                <button onclick="checkHighlight()" class="mt-4 text-xs bg-slate-700 text-white px-3 py-1 rounded">Check Answer</button>
+                                <div id="feedback-q1" class="mt-2 text-sm hidden font-bold"></div>
+                            </div>
+
+                            <!-- Q2: Cloze (Dropdown) -->
+                            <div class="bg-white p-6 rounded shadow border-l-4 border-indigo-500">
+                                <h4 class="font-bold text-slate-800 mb-4">Question 2: Analyze Cues</h4>
+                                <p class="mb-4 text-sm">Complete the sentence.</p>
+                                <div class="p-4 bg-slate-50 rounded">
+                                    The client is at high risk for 
+                                    <select id="q2-select1" class="border rounded p-1">
+                                        <option value="">Select...</option>
+                                        <option value="correct">Hypovolemic Shock</option>
+                                        <option value="wrong">DKA</option>
+                                        <option value="wrong">Hyperthermia</option>
+                                    </select> 
+                                    as evidenced by 
+                                    <select id="q2-select2" class="border rounded p-1">
+                                        <option value="">Select...</option>
+                                        <option value="wrong">Temp 100.6</option>
+                                        <option value="correct">Almost 50% TBSA Burned</option>
+                                    </select>
+                                    and
+                                    <select id="q2-select3" class="border rounded p-1">
+                                        <option value="">Select...</option>
+                                        <option value="correct">Elevated Heart Rate</option>
+                                        <option value="wrong">Groaning</option>
+                                    </select>.
+                                </div>
+                                <button onclick="checkCloze()" class="mt-4 text-xs bg-slate-700 text-white px-3 py-1 rounded">Check Answer</button>
+                                <div id="feedback-q2" class="mt-2 text-sm hidden font-bold"></div>
+                            </div>
+
+                            <!-- Q3: Calculation -->
+                            <div class="bg-white p-6 rounded shadow border-l-4 border-indigo-500">
+                                <h4 class="font-bold text-slate-800 mb-4">Question 3: Generate Solutions</h4>
+                                <p class="mb-4 text-sm">Calculate the fluid volume for the <strong>FIRST 8 HOURS</strong> based on TBSA 49.5% and Wt 90.7kg.</p>
+                                <input type="number" id="q3-input" class="border p-2 rounded w-full mb-2" placeholder="Enter mL">
+                                <button onclick="checkMathQ()" class="text-xs bg-slate-700 text-white px-3 py-1 rounded">Check Answer</button>
+                                <div id="feedback-q3" class="mt-2 text-sm hidden font-bold"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const quizzes = {
+            healing: `
+                <div class="space-y-2">
+                    <p>Which phase involves fibroblast migration and collagen secretion?</p>
+                    <div class="flex gap-2">
+                        <button onclick="checkQuiz(this, false, 'Inflammatory: Only minimal collagen.')" class="flex-1 p-2 bg-white border rounded hover:bg-slate-50">Inflammatory</button>
+                        <button onclick="checkQuiz(this, true, 'Correct! Fibroblasts = Proliferative.')" class="flex-1 p-2 bg-white border rounded hover:bg-slate-50">Proliferative</button>
+                        <button onclick="checkQuiz(this, false, 'Maturation is remodeling.')" class="flex-1 p-2 bg-white border rounded hover:bg-slate-50">Maturation</button>
+                    </div>
+                    <div class="quiz-feedback hidden text-sm mt-2 p-2 rounded"></div>
+                </div>
+            `
+        };
+
+        // --- Logic Functions ---
+
+        function loadSection(sectionId) {
+            currentSection = sectionId;
+            document.getElementById('content-area').innerHTML = sections[sectionId];
+            
+            // Set Title
+            const titles = {
+                intro: 'Introduction',
+                healing: 'Wound Healing',
+                burns_basics: 'Burns: Basics & Assessment',
+                systemic: 'Systemic Changes',
+                resuscitation: 'Fluid Resuscitation',
+                management: 'Nursing Management',
+                cancer: 'Skin Cancer',
+                ngn_case: 'NGN Case Study'
+            };
+            document.getElementById('section-title').innerText = titles[sectionId];
+
+            // Render quizzes if present
+            if (sectionId === 'healing') {
+                document.getElementById('quiz-healing').innerHTML = quizzes.healing;
+            }
+
+            // Scroll to top
+            document.querySelector('.main-content').scrollTop = 0;
+            
+            // Update Active Nav
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav', 'bg-slate-800', 'border-l-4', 'border-indigo-500'));
+            // Note: A real app would map IDs to buttons more robustly, simplified here.
+        }
+
+        function markComplete(section) {
+            progress[section] = 100;
+            updateOverallProgress();
+        }
+
+        function updateOverallProgress() {
+            const keys = Object.keys(progress);
+            const total = keys.reduce((acc, key) => acc + progress[key], 0);
+            const percentage = Math.round(total / keys.length);
+            
+            document.getElementById('overall-progress').style.width = percentage + '%';
+            document.getElementById('progress-text').innerText = percentage;
+        }
+
+        // --- Interactive Tools Logic ---
+
+        // Focus Mode
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+        }
+
+        // Font Sizing
+        let currentFontSize = 16;
+        function changeFontSize(action) {
+            if(action === 'increase' && currentFontSize < 24) currentFontSize += 2;
+            if(action === 'decrease' && currentFontSize > 12) currentFontSize -= 2;
+            document.getElementById('content-area').style.fontSize = currentFontSize + 'px';
+        }
+
+        // Notes
+        function toggleNotes() {
+            const modal = document.getElementById('notes-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        // TBSA Calculator
+        let currentTBSA = 0;
+        function toggleTBSA(btn, val) {
+            if (btn.classList.contains('bg-red-500')) {
+                // Deselect
+                btn.classList.remove('bg-red-500', 'text-white');
+                btn.classList.add('bg-white');
+                currentTBSA -= val;
+            } else {
+                // Select
+                btn.classList.remove('bg-white');
+                btn.classList.add('bg-red-500', 'text-white');
+                currentTBSA += val;
+            }
+            document.getElementById('tbsa-display').innerText = currentTBSA + '%';
+        }
+
+        function resetTBSA() {
+            currentTBSA = 0;
+            document.querySelectorAll('button[onclick^="toggleTBSA"]').forEach(btn => {
+                btn.classList.remove('bg-red-500', 'text-white');
+                btn.classList.add('bg-white');
+            });
+            document.getElementById('tbsa-display').innerText = '0%';
+        }
+
+        // Parkland Calculator
+        function calculateParkland() {
+            const weight = parseFloat(document.getElementById('calc-weight').value);
+            const unit = document.getElementById('calc-unit').value;
+            const tbsa = parseFloat(document.getElementById('calc-tbsa').value);
+            
+            if (!weight || !tbsa) return;
+
+            let kgWeight = weight;
+            if (unit === 'lbs') kgWeight = weight / 2.2;
+
+            const totalVol = 4 * kgWeight * tbsa;
+            const first8 = totalVol / 2;
+            const next16 = totalVol / 2;
+
+            document.getElementById('res-total').innerText = Math.round(totalVol);
+            document.getElementById('res-rate1').innerText = Math.round(first8 / 8);
+            document.getElementById('res-vol1').innerText = Math.round(first8);
+            document.getElementById('res-rate2').innerText = Math.round(next16 / 16);
+            document.getElementById('res-vol2').innerText = Math.round(next16);
+            
+            document.getElementById('calc-results').classList.remove('hidden');
+        }
+
+        // --- Quiz & NGN Logic ---
+
+        function checkQuiz(btn, isCorrect, feedback) {
+            const container = btn.parentElement.parentElement.querySelector('.quiz-feedback');
+            container.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
+            
+            if (isCorrect) {
+                container.classList.add('bg-green-100', 'text-green-800');
+                container.innerText = feedback;
+            } else {
+                container.classList.add('bg-red-100', 'text-red-800');
+                container.innerText = "Try again. " + feedback;
+            }
+        }
+
+        // NGN Q1
+        function toggleHighlight(span) {
+            span.classList.toggle('selected');
+        }
+
+        function checkHighlight() {
+            const selected = document.querySelectorAll('.highlight-text.selected');
+            const correct = document.querySelectorAll('.highlight-text.correct-highlight');
+            const feedback = document.getElementById('feedback-q1');
+            
+            let correctCount = 0;
+            selected.forEach(s => {
+                if (s.classList.contains('correct-highlight')) correctCount++;
+            });
+
+            // Very simple validation for demo
+            feedback.classList.remove('hidden');
+            if (correctCount === 4 && selected.length === 4) {
+                feedback.innerHTML = "<span class='text-green-600'>Correct! High HR, RR, and Low BP/SpO2 indicate shock/hypoxia.</span>";
+            } else {
+                feedback.innerHTML = "<span class='text-red-600'>Incorrect. Focus on Vital Signs indicating instability.</span>";
+            }
+        }
+
+        // NGN Q2
+        function checkCloze() {
+            const s1 = document.getElementById('q2-select1').value;
+            const s2 = document.getElementById('q2-select2').value;
+            const s3 = document.getElementById('q2-select3').value;
+            const fb = document.getElementById('feedback-q2');
+            
+            fb.classList.remove('hidden');
+            if (s1 === 'correct' && s2 === 'correct' && s3 === 'correct') {
+                fb.innerHTML = "<span class='text-green-600'>Correct! Risk is Hypovolemic Shock due to massive TBSA burn.</span>";
+            } else {
+                fb.innerHTML = "<span class='text-red-600'>Review: What is the biggest risk with fluid shift? What VS changes show this?</span>";
+            }
+        }
+
+        // NGN Q3
+        function checkMathQ() {
+            // Wt 90.7kg, TBSA 49.5
+            // 4 * 90.7 * 49.5 = 17,958.6 Total
+            // First 8 hrs = / 2 = 8979.3
+            const input = parseFloat(document.getElementById('q3-input').value);
+            const fb = document.getElementById('feedback-q3');
+            
+            fb.classList.remove('hidden');
+            if (Math.abs(input - 8979.3) < 1) { // Allow small margin
+                fb.innerHTML = "<span class='text-green-600'>Correct! (8979.3 mL)</span>";
+            } else {
+                fb.innerHTML = "<span class='text-red-600'>Incorrect. Did you calculate Total Volume then divide by 2? (4 * 90.7 * 49.5 / 2)</span>";
+            }
+        }
+
+        // Initial Load
+        loadSection('intro');
+
     </script>
 </body>
 </html>
