@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Council Licensure Examination (NCLEX) Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb; /* Light gray background */
+        }
+        .container {
+            max-width: 800px; /* Constrain size for a contained look */
+            margin: 0 auto;
+        }
+        .exam-panel {
+            border: 1px solid #d1d5db; /* Subtle border */
+            box-shadow: none; /* Remove shadows */
+            border-radius: 0; /* Sharp corners */
+        }
+        .option-button {
+            transition: background-color 0.1s;
+            border-radius: 0; /* Sharp corners */
+            box-shadow: none;
+            border-left: 5px solid transparent; /* Space for selection indicator */
+            padding-left: 1rem;
+        }
+        .option-button:hover:not(.selected):not(.correct):not(.incorrect) {
+            background-color: #f9fafb;
+            transform: none;
+        }
+        /* NCLEX-like selection */
+        .selected {
+            background-color: #f0f8ff; /* Very subtle blue */
+            border-left-color: #0b3f8a; /* Strong indicator on the left */
+            font-weight: 600;
+        }
+        /* Review colors - clean and distinct */
+        .correct {
+            background-color: #f0fff4; /* Very light green */
+            border-color: #10b981; 
+            font-weight: 600;
+        }
+        .incorrect {
+            background-color: #fef2f2; /* Very light red */
+            border-color: #ef4444; 
+            font-weight: 600;
+        }
+        .nav-button {
+            border-radius: 0;
+            text-transform: uppercase;
+        }
+        .status-bar {
+            background-color: #f3f4f6;
+            border-bottom: 1px solid #d1d5db;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="container">
+        <header class="mb-6">
+            <div class="bg-gray-700 text-white text-center py-2 font-semibold text-xl rounded-t-sm">
+                National Council Licensure Examination (NCLEX)
+            </div>
+            <div class="bg-white border-b border-gray-300 p-2 text-sm text-gray-500 flex justify-between">
+                <span>Subject: Oncology Practice Module</span>
+                <span class="font-mono">Candidate ID: 900-33-01</span>
+            </div>
+        </header>
+
+        <main id="quiz-container" class="bg-white exam-panel">
+            <!-- Content will be rendered here by JavaScript -->
+        </main>
+
+        <div id="footer-nav" class="mt-4 flex justify-end">
+            <!-- Navigation buttons rendered here -->
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "A nurse in the oncology clinic is providing preoperative education to a client just diagnosed with cancer. The client has been scheduled for surgery in 3 days. What action by the nurse is best?",
+                options: [
+                    "Call the client at home the next day to review teaching.",
+                    "Give the client information about a cancer support group.",
+                    "Provide all the preoperative instructions in writing.",
+                    "Reassure the client that surgery will be over soon."
+                ],
+                ans: "Call the client at home the next day to review teaching.",
+                rationale: "Clients are often overwhelmed at a sudden diagnosis of cancer and may be more overwhelmed at the idea of a major operation. This significantly impacts the client's ability to attend to and understand and recall information. Calling the client the next day allows for review and answering questions when the immediate shock has lessened. Giving written information is important but not enough, and reassurance is false solace."
+            },
+            {
+                q: "A nurse is caring for a client admitted for Non-Hodgkin’s lymphoma and chemotherapy. The client reports nausea, flank pain, and muscle cramps. What action by the nurse is most important?",
+                options: [
+                    "Request an order for serum electrolytes and uric acid.",
+                    "Increase the client’s IV infusion rate.",
+                    "Instruct assistive personnel to strain all urine.",
+                    "Administer an IV antiemetic."
+                ],
+                ans: "Request an order for serum electrolytes and uric acid.",
+                rationale: "The client's symptoms (nausea, flank pain, muscle cramps) are highly consistent with Tumor Lysis Syndrome (TLS), a life-threatening oncologic emergency characterized by severe electrolyte imbalances. The most important action is to confirm this diagnosis by assessing serum electrolytes and uric acid levels."
+            },
+            {
+                q: "A new nurse has been assigned a client who is in the hospital to receive iodine-131 treatment. Which action by the nurse is best?",
+                options: [
+                    "Ensure the client is placed in protective isolation.",
+                    "Have pregnant visitors stay 6 feet from the client.",
+                    "No special action is necessary to care for this client.",
+                    "Read the policy on handling radioactive excreta."
+                ],
+                ans: "Read the policy on handling radioactive excreta.",
+                rationale: "Iodine-131 is a radioisotope excreted in body fluids and excreta (urine and feces). The nurse must follow facility policy for handling and disposing of this radioactive waste to protect themselves and others from exposure. Protective isolation (A) is for immunocompromised clients, not for radiation safety, and pregnant visitors (B) may require more stringent limits."
+            },
+            {
+                q: "A client in the oncology clinic reports her family is frustrated at her ongoing fatigue 4 months after radiation therapy for breast cancer. What response by the nurse is most appropriate?",
+                options: [
+                    "“Are you getting adequate rest and sleep each day?”",
+                    "“It is normal to be fatigued even for months afterward.”",
+                    "“This is not normal and I’ll let the primary health care provider know.”",
+                    "“Try adding more vitamins B and C to your diet.”"
+                ],
+                ans: "“It is normal to be fatigued even for months afterward.”",
+                rationale: "Radiation-induced fatigue is a common, debilitating side effect that can persist for months after the completion of treatment. It is most appropriate to normalize this experience for the client and family, validating their feelings and managing expectations."
+            },
+            {
+                q: "A client tells the oncology nurse about an upcoming vacation to the beach to celebrate completing radiation treatments for cancer. What response by the nurse is most appropriate?",
+                options: [
+                    "“Avoid getting salt water on the radiation site.”",
+                    "“Do not expose the radiation area to direct sunlight.”",
+                    "“Have a wonderful time and enjoy your vacation!”",
+                    "“Remember you should not drink alcohol for a year.”"
+                ],
+                ans: "“Do not expose the radiation area to direct sunlight.”",
+                rationale: "The skin overlying the radiation site is extremely sensitive to sunlight and can easily burn or sustain long-term damage. This instruction to avoid direct sun exposure, especially for up to a year post-treatment, is critical for client safety and skin integrity."
+            },
+            {
+                q: "A client is receiving chemotherapy through a peripheral IV line. What action by the nurse is most important?",
+                options: [
+                    "Assessing the IV site and blood return every hour",
+                    "Educating the client on side effects",
+                    "Monitoring the client for nausea",
+                    "Providing warm packs for comfort"
+                ],
+                ans: "Assessing the IV site and blood return every hour",
+                rationale: "Many chemotherapy agents are vesicants, meaning they can cause severe local tissue destruction if extravasation occurs (leaking into surrounding tissue). Preventing this injury by frequently assessing the IV site for patency and blood return is the highest safety priority."
+            },
+            {
+                q: "A client with cancer is admitted to a short-term rehabilitation facility. The nurse prepares to administer the client’s oral chemotherapy medications. What action by the nurse is most appropriate?",
+                options: [
+                    "Crush the medications if the client cannot swallow them.",
+                    "Give one medication at a time with a full glass of water.",
+                    "No special precautions are needed for these medications.",
+                    "Wear personal protective equipment when handling the medications."
+                ],
+                ans: "Wear personal protective equipment when handling the medications.",
+                rationale: "Nurses must use the same safety precautions, including wearing appropriate PPE (chemotherapy gloves and gown), when handling oral chemotherapy agents as they do for IV agents, as these drugs are cytotoxic and can pose an occupational exposure risk. Oral chemotherapy should not be crushed, split, or chewed."
+            },
+            {
+                q: "The nurse working with oncology clients understands that which age-related change increases the older client’s susceptibility to infection during chemotherapy?",
+                options: [
+                    "Decreased immune function",
+                    "Diminished nutritional stores",
+                    "Existing cognitive deficits",
+                    "Poor physical reserves"
+                ],
+                ans: "Decreased immune function",
+                rationale: "Aging is associated with an age-related decline in immune function (immunosenescence). This makes older adults naturally more susceptible to infection, and this risk is compounded by the immunosuppressive effects of chemotherapy."
+            },
+            {
+                q: "The nurse has educated a client on precautions to take with thrombocytopenia. What statement by the client indicates that more teaching is needed?",
+                options: [
+                    "“I will be careful if I need enemas for constipation.”",
+                    "“I will use an electric shaver instead of a razor.”",
+                    "“I should only eat soft food that is either cool or warm.”",
+                    "“I won’t be able to play sports with my grandkids.”"
+                ],
+                ans: "“It’s alright for me to keep my pets and change the litter box.”",
+                rationale: "Immunocompromised clients (due to chemotherapy) should not handle animal waste, especially cat litter, due to the risk of acquiring toxoplasmosis. The client needs further teaching to understand the necessary limitations on pet care."
+            },
+            {
+                q: "A client has a platelet count of 9800/mm³ (9.8 x 10⁹/L). What action by the nurse is most appropriate?",
+                options: [
+                    "Assess the client for calf pain, warmth, and redness.",
+                    "Instruct the client to call for help to get out of bed.",
+                    "Obtain cultures as per the facility’s standing policy.",
+                    "Place the client on protective Isolation Precautions."
+                ],
+                ans: "Instruct the client to call for help to get out of bed.",
+                rationale: "A platelet count of 9,800/mm³ is critically low and places the client at high risk for spontaneous bleeding or bleeding from minor trauma. The most appropriate safety action is to prevent falls or bumps, so instructing the client to use the call bell for assistance before ambulating is essential."
+            },
+            {
+                q: "A client hospitalized for chemotherapy has a hemoglobin of 6.1 mg/dL (61 mmol/L). The client is symptomatic but refuses blood transfusions. What medication does the nurse prepare to administer?",
+                options: [
+                    "Epoetin alfa",
+                    "Filgrastim",
+                    "Mesna",
+                    "Dexrazoxane"
+                ],
+                ans: "Epoetin alfa",
+                rationale: "Epoetin alfa is an erythropoiesis-stimulating agent (ESA) that promotes the production of red blood cells. Given the client's critically low hemoglobin (anemia) and refusal of a blood transfusion, epoetin alfa is the appropriate alternative to improve the red blood cell count. Filgrastim is for neutropenia, and the others are protective agents."
+            },
+            {
+                q: "A nurse works with clients who have alopecia from chemotherapy. What action by the nurse takes priority?",
+                options: [
+                    "Helping clients adjust to their appearance",
+                    "Reassuring clients that this change is temporary",
+                    "Referring clients to a reputable wig shop",
+                    "Teaching measures to prevent scalp injury"
+                ],
+                ans: "Teaching measures to prevent scalp injury",
+                rationale: "While psychosocial care is important (A, B, C), the highest priority is always client safety. Teaching measures to protect the scalp (e.g., from sun exposure, heat, or trauma) addresses the immediate physical risk associated with the loss of the protective hair covering."
+            },
+            {
+                q: "A client is receiving rituximab. What assessment by the nurse takes priority?",
+                options: [
+                    "Blood pressure",
+                    "Temperature",
+                    "Oral mucous membranes",
+                    "Pain"
+                ],
+                ans: "Blood pressure",
+                rationale: "Rituximab is a monoclonal antibody that carries a high risk of infusion-related reactions, which commonly include acute hypotension (potentially leading to cardiovascular collapse). Monitoring the blood pressure for stability is the priority safety assessment during the infusion."
+            },
+            {
+                q: "A client is receiving rituximab and asks how it works. What response by the nurse is best?",
+                options: [
+                    "“It causes rapid lysis of the cancer cell membranes.”",
+                    "“It destroys the enzymes needed to create cancer cells.”",
+                    "“It prevents the start of cell division in the cancer cells.”",
+                    "“It sensitizes certain cancer cells to chemotherapy.”"
+                ],
+                ans: "“It prevents the start of cell division in the cancer cells.”",
+                rationale: "Rituximab is a targeted therapy that binds to the CD20 antigen on the surface of B-lymphocytes, leading to cell death and preventing their proliferation (cell division/growth). This is the best, most simple explanation for the client among the choices."
+            },
+            {
+                q: "Four clients are receiving tyrosine kinase inhibitors (TKIs). Which of these four clients would the nurse assess first?",
+                options: [
+                    "Dry, itchy, peeling skin",
+                    "Serum calcium of 9.2 mg/dL (2.3 mmol/L)",
+                    "Serum potassium of 2.8 mEq/L (2.8 mmol/L)",
+                    "Weight gain of 0.5 lb (1.1 kg) in 1 day"
+                ],
+                ans: "Serum potassium of 2.8 mEq/L (2.8 mmol/L)",
+                rationale: "A serum potassium level of 2.8 mEq/L (severe hypokalemia) is an acute, life-threatening electrolyte imbalance that can cause fatal cardiac dysrhythmias. This client requires immediate assessment and intervention over the other less critical findings."
+            },
+            {
+                q: "A nurse is assessing a female client who is taking hormone therapy for breast cancer. What assessment finding requires the nurse to notify the primary health care provider immediately?",
+                options: [
+                    "Irregular menses",
+                    "Edema in the lower extremities",
+                    "Ongoing breast tenderness",
+                    "Red, warm, swollen calf"
+                ],
+                ans: "Red, warm, swollen calf",
+                rationale: "Many hormone therapies (e.g., tamoxifen) increase the risk of thromboembolism. A unilateral, red, warm, swollen calf is a classic sign of deep vein thrombosis (DVT), which is a medical emergency due to the risk of pulmonary embolism. The provider must be notified immediately."
+            },
+            {
+                q: "A client with a history of prostate cancer is in the clinic and reports new-onset of severe low back pain. What action by the nurse is most important?",
+                options: [
+                    "Assess the client’s gait and balance.",
+                    "Ask the client about the ease of urine flow.",
+                    "Document the report completely.",
+                    "Inquire about the client’s job risks."
+                ],
+                ans: "Assess the client’s gait and balance.",
+                rationale: "In a client with prostate cancer (which frequently metastasizes to bone), severe new-onset back pain is a potential sign of Spinal Cord Compression (SCC)—an oncologic emergency. Assessing gait and balance is the most immediate way to assess for neurological impairment and ensure client safety."
+            },
+            {
+                q: "The nurse has taught a client with cancer ways to prevent infection. What statement by the client indicates that more teaching is needed?",
+                options: [
+                    "“I should take my temperature daily and when I don’t feel well.”",
+                    "“I will discard perishable liquids after sitting out for over an hour.”",
+                    "“I won’t let anyone share any of my personal toiletries.”",
+                    "“It’s alright for me to keep my pets and change the litter box.”"
+                ],
+                ans: "“It’s alright for me to keep my pets and change the litter box.”",
+                rationale: "Immunocompromised clients (due to chemotherapy) should not handle animal waste, especially cat litter, due to the risk of acquiring toxoplasmosis. The client needs further teaching to understand the necessary limitations on pet care."
+            },
+            {
+                q: "A client with long-standing heart failure is treated with ondansetron for nausea. What action by the nurse is most important?",
+                options: [
+                    "Assess the client for a headache or dizziness.",
+                    "Request a prescription for cardiac monitoring.",
+                    "Instruct the client to change positions slowly.",
+                    "Weigh the client daily before eating."
+                ],
+                ans: "Request a prescription for cardiac monitoring.",
+                rationale: "Ondansetron can prolong the QT interval on an ECG, increasing the risk of Torsades de Pointes, a life-threatening arrhythmia. This risk is amplified in clients with pre-existing heart conditions like heart failure. Requesting cardiac monitoring is the most important safety action."
+            },
+            {
+                q: "A nurse working with clients who experience alopecia knows that which is the best method of helping clients manage the psychosocial impact of this problem?",
+                options: [
+                    "Assisting the client to pre-plan for this event",
+                    "Reassuring the client that alopecia is temporary",
+                    "Teaching the client ways to protect the scalp",
+                    "Telling the client that there are worse side effects"
+                ],
+                ans: "Assisting the client to pre-plan for this event",
+                rationale: "The psychosocial impact of hair loss is best managed by allowing the client control and preparing them for the event *before* it happens. This can include buying a wig, hats, or scarves, or deciding to shave their head. This proactive approach supports coping."
+            },
+            {
+                q: "A client is admitted with superior vena cava syndrome (SVCS). What action by the nurse is most appropriate?",
+                options: [
+                    "Administer a dose of allopurinol.",
+                    "Assess the client’s serum potassium level.",
+                    "Gently inquire about advance directives.",
+                    "Prepare the client for emergency surgery."
+                ],
+                ans: "Gently inquire about advance directives.",
+                rationale: "SVCS is a medical emergency that is often a late-stage manifestation of cancer, carrying a poor prognosis. Once the client is stabilized, initiating a gentle conversation about advance directives is the most appropriate action, addressing the psychosocial and end-of-life planning needs."
+            },
+            {
+                q: "A client is having a catheter placed to deliver chemotherapy beads into a liver tumor via the femoral artery. What action by the nurse is most important?",
+                options: [
+                    "Assessing the client’s abdomen beforehand",
+                    "Ensuring that informed consent is on the chart",
+                    "Marking the client’s bilateral pedal pulses",
+                    "Reviewing client teaching done previously"
+                ],
+                ans: "Ensuring that informed consent is on the chart",
+                rationale: "This procedure (chemoembolization) is invasive and requires informed consent. Ethically and legally, ensuring that a properly executed informed consent document is present *before* the procedure begins is the most important pre-procedural nursing action."
+            },
+            {
+                q: "A nurse works on an oncology unit and delegates personal hygiene to assistive personnel (AP). What action by the AP requires intervention from the nurse?",
+                options: [
+                    "Allowing a very tired client to skip oral hygiene and sleep",
+                    "Assisting clients with washing the perianal area every 12 hours",
+                    "Helping the client use a soft-bristled toothbrush for oral care",
+                    "Reminding the client to rinse the mouth with water or saline"
+                ],
+                ans: "Allowing a very tired client to skip oral hygiene and sleep",
+                rationale: "Oral hygiene is critical for oncology clients to prevent mucositis and stomatitis, which can lead to life-threatening infections. Skipping this care, even if the client is tired, increases the risk of complications and requires the nurse to intervene and ensure the care is performed."
+            },
+            {
+                q: "A client with cancer has anorexia and mucositis, and is losing weight. The client’s family members continually bring favorite foods to the client and are distressed when the client won’t eat them. What action by the nurse is best?",
+                options: [
+                    "Explain the pathophysiologic reasons behind the client not eating.",
+                    "Help the family show other ways to demonstrate love and caring.",
+                    "Suggest foods and liquids the client might be willing to try to eat.",
+                    "Tell the family the client isn't able to eat now no matter what they bring."
+                ],
+                ans: "Help the family show other ways to demonstrate love and caring.",
+                rationale: "Refusal of food can be distressing to family members, who often equate feeding with caring. The most therapeutic nursing action is to address the family’s psychosocial needs by reframing their efforts, suggesting alternative ways to express love and support that don't rely on food intake."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null); 
+        let currentSelection = null; 
+        let examState = 'quiz'; 
+
+        const quizContainer = document.getElementById('quiz-container');
+        const footerNav = document.getElementById('footer-nav');
+
+        // Helper function for rendering buttons
+        const createButton = (text, onClick, classes = '', disabled = false) => {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.onclick = onClick;
+            button.className = `px-6 py-3 font-bold text-sm text-center border-2 nav-button transition duration-150 ease-in-out ${classes}`;
+            button.disabled = disabled;
+            return button;
+        };
+
+        // RENDER FUNCTIONS
+
+        const renderQuestion = () => {
+            if (examState !== 'quiz' && examState !== 'review') return;
+            
+            const currentQSet = questions; 
+            const qData = currentQSet[currentQuestionIndex];
+            if (!qData) {
+                if (examState === 'review') {
+                    renderResults();
+                }
+                return;
+            }
+
+            const isReview = examState === 'review';
+            const committedAnswer = userAnswers[currentQuestionIndex]; 
+            const correctAnswer = qData.ans;
+            const visualSelection = examState === 'quiz' ? currentSelection : committedAnswer;
+
+            // Status bar (Mock Timer)
+            let statusHtml = `
+                <div class="flex justify-between items-center px-6 py-2 status-bar">
+                    <span class="text-xs font-medium text-gray-700">
+                        ITEM: <span class="font-bold">${currentQuestionIndex + 1}</span> of ${currentQSet.length}
+                    </span>
+                    <span class="text-xs font-bold text-gray-700 border border-gray-400 px-2 py-0.5 bg-gray-200">
+                        TIME REMAINING: 03:59:45
+                    </span>
+                </div>
+            `;
+
+            let html = statusHtml + `
+                <div class="p-6 md:p-8">
+                    <div class="mb-6">
+                        <span class="text-xl font-extrabold text-gray-900 border-b-2 border-gray-800 pb-1 mr-2">QUESTION:</span>
+                        <span class="text-xl font-extrabold text-gray-800">${currentQuestionIndex + 1}</span>
+                    </div>
+
+                    <div class="text-lg p-4 bg-gray-50 border border-gray-300 mb-6 font-medium text-gray-800">
+                        ${qData.q}
+                    </div>
+                    <div id="options-list" class="space-y-2">
+            `;
+
+            qData.options.forEach((option, index) => {
+                let btnClasses = 'option-button w-full text-left p-3 border border-gray-300';
+                let isSelected = visualSelection === option;
+                let isCorrect = option === correctAnswer;
+                let isIncorrectSelected = isSelected && !isCorrect;
+                
+                // Add letter prefix for clarity
+                const optionLetter = String.fromCharCode(65 + index) + '. ';
+
+                if (isSelected && examState === 'quiz') {
+                    btnClasses += ' selected';
+                }
+
+                if (isReview) {
+                    if (isCorrect) {
+                        btnClasses += ' correct';
+                    } else if (isIncorrectSelected) {
+                        btnClasses += ' incorrect';
+                    } else if (isSelected) {
+                        btnClasses += ' selected'; 
+                    }
+                }
+
+                html += `
+                    <button 
+                        class="${btnClasses}" 
+                        ${examState === 'quiz' ? `onclick="selectAnswer('${option.replace(/'/g, "\\'")}')"` : ''}
+                        ${isReview ? 'disabled' : ''}
+                    >
+                        ${optionLetter} ${option}
+                    </button>
+                `;
+            });
+
+            html += `</div></div>`;
+
+            if (isReview) {
+                const rationaleDisplay = `
+                    <div id="rationale-box" class="mx-6 mb-6 p-4 border border-gray-300 bg-gray-50">
+                        <h4 class="font-extrabold text-lg text-gray-800 mb-2">Rationale</h4>
+                        <p class="text-gray-700 mb-3">${qData.rationale}</p>
+                        <p class="mt-2 font-medium">Your Selection: <span class="${committedAnswer === qData.ans ? 'text-green-700' : 'text-red-700'} font-extrabold">${committedAnswer ? committedAnswer : 'N/A (Skipped)'}</span></p>
+                        <p class="font-medium text-gray-800">Correct Answer: <span class="font-extrabold text-green-700">${qData.ans}</span></p>
+                    </div>
+                `;
+                html += rationaleDisplay;
+            }
+
+            quizContainer.innerHTML = html;
+            renderNavigation();
+        };
+
+        const renderNavigation = () => {
+            footerNav.innerHTML = '';
+            
+            if (examState === 'quiz') {
+                const isOptionSelected = currentSelection !== null;
+                const nextBtn = createButton('CONFIRM & NEXT', nextQuestion, 'bg-gray-200 text-gray-800 hover:bg-gray-300 border-gray-500 disabled:opacity-50', !isOptionSelected);
+                footerNav.appendChild(nextBtn);
+            } else if (examState === 'review') {
+                const backToResultsBtn = createButton('END REVIEW & REPORT', renderResults, 'bg-gray-600 text-white hover:bg-gray-700 border-gray-800');
+                const nextBtn = createButton('NEXT ITEM →', nextQuestion, 'bg-gray-200 text-gray-800 hover:bg-gray-300 border-gray-500');
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    footerNav.appendChild(nextBtn);
+                } else {
+                    footerNav.appendChild(backToResultsBtn);
+                }
+            }
+        };
+
+        const renderResults = () => {
+            examState = 'results';
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].ans) {
+                    score++;
+                }
+            });
+
+            const percentage = ((score / questions.length) * 100).toFixed(1);
+            
+            // NCLEX Pass Criteria (Simulated)
+            const passed = score >= Math.ceil(questions.length * 0.60); 
+            
+            const scoreColor = passed ? 'text-green-700' : 'text-red-700'; 
+            const statusText = passed ? 'EXAMINATION STATUS: PASS' : 'EXAMINATION STATUS: FAIL';
+            const advisoryText = passed ? 'The test concluded with competence exceeding the minimum standard. Candidate is likely to be successful.' : 'The test concluded below the minimum standard. Candidate must review content areas.';
+            const statusBg = passed ? 'bg-green-50 border-green-700' : 'bg-red-50 border-red-700';
+
+            let resultHTML = `
+                <div class="p-0 bg-white exam-panel">
+                    <div class="bg-gray-700 text-white text-center py-2 font-semibold text-xl rounded-t-sm">
+                        CANDIDATE SCORE REPORT
+                    </div>
+                    <div class="p-8 md:p-10 text-center">
+                        <h2 class="text-3xl font-extrabold text-gray-800 mb-6">COMPLETION STATUS</h2>
+                        
+                        <div class="inline-block px-10 py-6 my-4 ${statusBg} border-2">
+                            <p class="text-4xl font-extrabold mb-2 ${scoreColor}">${statusText}</p>
+                            <p class="text-md text-gray-700 font-semibold">${advisoryText}</p>
+                        </div>
+                        
+                        <div class="mt-8 border border-gray-300 p-4 bg-gray-50 text-left">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">PERFORMANCE METRICS (FOR EDUCATIONAL USE ONLY)</h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm font-medium">
+                                <p>Total Items Attempted:</p><p class="font-bold">${questions.length}</p>
+                                <p>Correct Items:</p><p class="font-bold text-green-700">${score}</p>
+                                <p>Accuracy Rate:</p><p class="font-bold">${percentage}%</p>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-300 mt-8 pt-6 flex justify-center space-x-4">
+                            ${createButton('REVIEW ALL ITEMS', () => startReview('all'), 'bg-gray-200 text-gray-800 hover:bg-gray-300 border-gray-500').outerHTML}
+                            ${createButton('START NEW SIMULATION', restartExam, 'bg-blue-600 text-white hover:bg-blue-700 border-blue-800').outerHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+            quizContainer.innerHTML = resultHTML;
+            footerNav.innerHTML = '';
+        };
+
+        // ACTION FUNCTIONS
+
+        const selectAnswer = (choice) => {
+            currentSelection = choice;
+            // Visually update selection
+            const options = document.querySelectorAll('.option-button');
+            options.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.textContent.trim().endsWith(choice.trim())) { // Check the option content, ignoring the letter prefix
+                    btn.classList.add('selected');
+                }
+            });
+            renderNavigation(); 
+        };
+
+        const nextQuestion = () => {
+            // Forward-only rule enforcement
+            if (examState === 'quiz') {
+                if (currentSelection === null) return; 
+
+                // Commit the answer
+                userAnswers[currentQuestionIndex] = currentSelection;
+                currentSelection = null; 
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                } else {
+                    // End of Quiz
+                    renderResults();
+                }
+            } else if (examState === 'review') {
+                // Review mode still allows forward movement
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                } else {
+                    renderResults();
+                }
+            }
+        };
+
+        const restartExam = () => {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            currentSelection = null;
+            examState = 'quiz';
+            renderQuestion();
+        }
+
+        const startReview = (mode) => {
+            examState = 'review';
+            currentQuestionIndex = 0;
+            renderQuestion();
+        };
+        
+        // Initial load
+        window.onload = () => {
+            restartExam(); // Ensure a clean start
+        };
+
+    </script>
+</body>
+</html>
