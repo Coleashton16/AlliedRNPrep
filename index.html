@@ -3,90 +3,1025 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Allied EMS & RN Prep - Notice of Closure</title>
-    <!-- Load Tailwind CSS -->
+    <title>AlliedRNPrep - Professional Learning Platform</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Set default font to Inter -->
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
+        /* New Professional Academic Theme Configuration */
+        :root {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f6f8; /* Light professional gray */
         }
-        /* Custom styles for professional accents */
-        .gradient-bg {
-            background-image: linear-gradient(to right, #1d4ed8, #3b82f6); /* Deep Blue to Sky Blue */
+
+        /* Custom Animation: Subtle Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .animate-fade-in {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+        
+        /* Dropdown Animation */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-menu {
+            animation: slideDown 0.2s ease-out forwards;
+        }
+
+        /* Primary CTA Button Style - Clean and Responsive */
+        .btn-primary {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -2px rgba(59, 130, 246, 0.3); /* Blue Shadow */
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5), 0 4px 6px -4px rgba(59, 130, 246, 0.5);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -2px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Disabled State */
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+            box-shadow: none;
+        }
+
+        /* Password Visibility Toggle positioning - Standard */
+        .password-input-container { position: relative; }
+        .password-toggle-icon {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9ca3af; /* Gray-400 */
+        }
+        .password-toggle-icon:hover { color: #3b82f6; /* Blue-500 hover */ }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4 sm:p-8">
+<body class="min-h-screen bg-gray-100 font-sans antialiased text-gray-800 selection:bg-blue-300 selection:text-blue-900">
 
-    <!-- Main Closure Card Container -->
-    <div class="max-w-4xl w-full bg-white shadow-2xl rounded-xl overflow-hidden transform transition duration-500 hover:shadow-3xl">
-
-        <!-- Header Banner -->
-        <div class="gradient-bg p-6 text-white text-center rounded-t-xl">
-            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-1">
-                Allied EMS & RN Prep
-            </h1>
-            <p class="text-xl font-light opacity-90">
-                Official Notice of Service Suspension
-            </p>
+    <!-- MODAL FOR ALERTS (Instead of alert()) -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm mx-4 transform transition-all duration-300 scale-95 opacity-0" id="alert-content-box">
+            <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i> Error</h3>
+            <p id="alert-message-text" class="text-gray-700 mb-6">Error message.</p>
+            <button id="alert-close-button" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">Close</button>
         </div>
-
-        <!-- Content Section -->
-        <div class="p-6 sm:p-10 md:p-12">
-
-            <div class="flex flex-col md:flex-row gap-8 items-center">
-                
-                <!-- Left: Graphic/Icon Area -->
-                <div class="md:w-1/3 flex justify-center p-4">
-                    <!-- Placeholder Graphic: Medical/Educational Focus -->
-                    <!-- Using a simple, clean SVG for a professional feel -->
-                    <svg class="w-24 h-24 text-red-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-
-                <!-- Right: Message Details -->
-                <div class="md:w-2/3 text-gray-700">
-                    <h2 class="text-3xl font-bold mb-4 text-gray-900">
-                        An Important Announcement Regarding Our Services
-                    </h2>
-
-                    <p class="mb-6 leading-relaxed">
-                        It is with regret that we announce the immediate cessation of services for Allied EMS & RN Prep, effective today. We want to extend our deepest gratitude to all the students, instructors, and partners who have been a part of our journey in advancing pre-hospital and nursing education.
-                    </p>
-
-                    <!-- Closure Reason Block -->
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
-                        <h3 class="font-semibold text-lg text-red-700 mb-1">Reason for Closure:</h3>
-                        <p class="text-red-800 text-sm">
-                            This difficult decision was made following an extensive financial review, primarily due to <strong>increasing operational costs and sustained low website traffic</strong>. Regrettably, the current resources are no longer sufficient to maintain the quality and scope of services you expect and deserve.
-                        </p>
-                    </div>
-
-                    <!-- Final Date Block -->
-                    <div class="bg-gray-100 p-4 rounded-lg shadow-inner">
-                        <h3 class="font-semibold text-xl text-blue-700 mb-2">Permanent Site Disablement:</h3>
-                        <p class="text-gray-800 font-medium">
-                            Please note that the Allied EMS & RN Prep website address, alliedemsrnprep.com (or similar), will be <strong>permanently retired and disabled in August of 2026</strong>. This includes all associated content, databases, and login portals.
-                        </p>
-                        <p class="text-sm text-gray-600 mt-2">
-                            We encourage any remaining users to secure any necessary documentation or records before this date.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="bg-gray-50 p-6 text-center text-sm text-gray-500 border-t border-gray-200 rounded-b-xl">
-            Thank you for your understanding and support over the program We wish you the very best in your professional careers.
-        </div>
-
     </div>
 
+    <!-- AUTHENTICATION SECTION (Login/Signup) -->
+    <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4 relative z-20">
+        <div class="w-full max-w-lg">
+            <div class="text-center mb-10 animate-fade-in">
+                <h1 class="text-5xl font-extrabold text-blue-800 tracking-tight drop-shadow-sm">
+                    AlliedRNPrep
+                </h1>
+                <p class="text-gray-500 mt-2 text-lg font-normal">Secure Access to Your Digital Learning Environment</p>
+            </div>
+            
+            <div class="bg-white p-8 sm:p-10 rounded-xl shadow-2xl border-t-4 border-blue-500 animate-fade-in">
+                
+                <!-- Login/Signup Toggle -->
+                <div class="flex bg-gray-50 rounded-lg p-1 mb-8 border border-gray-200">
+                    <button id="show-login" class="w-1/2 py-2.5 px-4 rounded-lg text-center font-bold transition-all duration-300 text-sm md:text-base"></button>
+                    <button id="show-signup" class="w-1/2 py-2.5 px-4 rounded-lg text-center font-bold transition-all duration-300 text-sm md:text-base"></button>
+                </div>
+
+                <!-- Auth Form -->
+                <form id="auth-form" class="space-y-6">
+                    <div>
+                        <label for="auth-email" class="block text-sm font-semibold text-gray-700 mb-1">Email (Institution ID)</label>
+                        <input type="email" id="auth-email" required class="block w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-400" placeholder="student@university.edu">
+                    </div>
+
+                    <div class="password-input-container">
+                        <label for="auth-password" class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                        <input type="password" id="auth-password" required class="block w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-400" placeholder="••••••••">
+                        <i class="fas fa-eye password-toggle-icon" data-target="auth-password"></i>
+                    </div>
+
+                    <div id="confirm-password-group" class="hidden password-input-container">
+                        <label for="auth-confirm-password" class="block text-sm font-semibold text-gray-700 mb-1">Confirm Password</label>
+                        <input type="password" id="auth-confirm-password" class="block w-full px-4 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-gray-400" placeholder="••••••••">
+                        <i class="fas fa-eye password-toggle-icon" data-target="auth-confirm-password"></i>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center">
+                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="remember-me-checkbox" class="ml-2 block text-gray-600 select-none">Stay Signed In</label>
+                        </div>
+                        <a href="#" id="forgot-password-link" class="font-medium text-blue-600 hover:text-blue-700 transition">Forgot Password?</a>
+                    </div>
+
+                    <div>
+                        <button type="submit" id="main-auth-button" class="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform btn-primary">
+                            <i class="fas fa-arrow-right-to-bracket mr-2"></i> Log In
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Message Area -->
+                <p id="auth-message" class="mt-6 text-center text-sm font-medium min-h-[20px]"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION CONTENT (Initially Hidden) -->
+    <div id="app-content" class="hidden min-h-screen">
+        
+        <!-- Fixed Header/Navigation Bar -->
+        <header class="bg-white shadow-lg py-3 sticky top-0 z-40 border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <a href="#" class="text-2xl font-extrabold text-blue-700 tracking-tight">
+                    <i class="fas fa-chart-line text-blue-500 mr-1"></i> RN Prep
+                </a>
+                
+                <nav>
+                    <ul class="flex items-center space-x-2 sm:space-x-6">
+                        
+                        <!-- USER INFO/ENROLLMENT DROPDOWN -->
+                        <li class="relative">
+                            <!-- Dropdown Toggle Button -->
+                            <button id="user-info-toggle" class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100 transition duration-300 hidden focus:outline-none" aria-expanded="false">
+                                <i class="fas fa-info-circle text-xl"></i>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div id="user-info-dropdown" class="absolute right-0 mt-3 w-72 origin-top-right rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 hidden dropdown-menu" role="menu" aria-orientation="vertical">
+                                
+                                <!-- User Identity -->
+                                <div class="px-4 py-3">
+                                    <p class="text-sm font-medium text-gray-900">Signed in as:</p>
+                                    <p id="dropdown-user-email" class="text-xs text-blue-600 truncate font-semibold">--</p>
+                                </div>
+                                
+                                <!-- Enrollment Info Section -->
+                                <div class="py-1" id="dropdown-enrollment-details">
+                                    <p class="text-xs font-semibold uppercase text-gray-400 px-4 py-2">Enrollment Details</p>
+                                    <div class="px-4 py-2 text-sm text-gray-700">
+                                        
+                                        <!-- Status -->
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-medium"><i class="fas fa-check-circle text-green-500 mr-2"></i> Status:</span>
+                                            <span id="dropdown-status-display" class="font-bold text-green-700">Active Student</span>
+                                        </div>
+
+                                        <!-- Date -->
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-medium"><i class="fas fa-calendar-alt text-blue-400 mr-2"></i> Date:</span>
+                                            <span id="dropdown-enrollment-date" class="font-semibold text-gray-800">--</span>
+                                        </div>
+                                        
+                                        <!-- Expiration -->
+                                        <div class="flex justify-between items-center mb-2 border-b pb-2">
+                                            <span class="font-medium"><i class="fas fa-hourglass-end text-amber-400 mr-2"></i> Expires:</span>
+                                            <span id="dropdown-expiration-date" class="font-semibold text-gray-800">--</span>
+                                        </div>
+
+                                        <!-- User ID -->
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-medium"><i class="fas fa-fingerprint text-gray-400 mr-2"></i> User ID:</span>
+                                            <div class="flex items-center space-x-2">
+                                                <span id="dropdown-user-id" class="font-mono text-xs truncate max-w-[110px]">--</span>
+                                                <button id="copy-user-id-btn" class="text-gray-400 hover:text-blue-600 transition" title="Copy User ID">
+                                                    <i class="fas fa-copy text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Logout Section -->
+                                <div class="py-1">
+                                    <button id="dropdown-logout-button" class="group flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition" role="menuitem">
+                                        <i class="fas fa-sign-out-alt mr-3 group-hover:animate-pulse"></i>
+                                        Sign Out
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content Layout -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+
+            <!-- Hero/Welcome Section -->
+            <section class="mb-12 grid grid-cols-1 gap-8 animate-fade-in">
+                <div class="bg-white rounded-xl p-8 shadow-2xl border-l-4 border-blue-500 flex flex-col justify-center">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">
+                        Welcome, <span class="text-blue-600" id="main-welcome-email">Nursing Scholar.</span>
+                    </h2>
+                    <p class="text-gray-600 text-lg max-w-2xl font-normal">
+                        Your professional learning journey begins here. Access your curriculum modules and track your progress toward certification.
+                    </p>
+                </div>
+            </section>
+            
+            <!-- ENROLLMENT STATUS SECTION (Conditional Rendering - Flow or Status) -->
+            <section id="enrollment-flow-container" class="mb-16 max-w-4xl mx-auto animate-fade-in">
+                <div id="enrollment-flow-content" class="bg-white rounded-xl p-8 border border-gray-200 shadow-lg">
+                    
+                    <!-- Chronological Step Indicator -->
+                    <div class="flex justify-center items-center mb-6 space-x-4">
+                        <div id="step-indicator-1" class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold text-sm transition-all duration-300 bg-blue-500">1</div>
+                        <div class="w-12 h-0.5 bg-gray-300"></div>
+                        <div id="step-indicator-2" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 font-bold text-sm transition-all duration-300">2</div>
+                        <div class="w-12 h-0.5 bg-gray-300"></div>
+                        <div id="step-indicator-3" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 font-bold text-sm transition-all duration-300">3</div>
+                    </div>
+                    
+                    <div id="enrollment-views">
+
+                        <!-- STEP 1: WELCOME/INTRODUCTION -->
+                        <div id="enroll-step-1" class="enrollment-step text-center">
+                            <div class="inline-block p-4 bg-blue-100 rounded-full shadow-md mb-4">
+                                <i class="fas fa-university text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Semester Enrollment Required</h3>
+                            <p class="text-gray-600 mt-2 max-w-xl mx-auto mb-6">
+                                Start your official 4-month program enrollment. We will confirm your course selection and activate your progress tracker.
+                            </p>
+                            <button onclick="window.setEnrollmentStep(2)" class="bg-blue-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 font-bold text-lg transform hover:scale-[1.02] active:scale-95 btn-primary">
+                                Start Course Selection <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- STEP 2: COURSE SELECTION -->
+                        <div id="enroll-step-2" class="enrollment-step hidden">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Step 2: Select Your Semesters</h3>
+                            
+                            <form id="enrollment-form" class="space-y-4 max-w-md mx-auto">
+                                <p class="text-gray-600 text-sm mb-4 border-b pb-2">Select the foundation semesters you need for the upcoming term. This enrollment lasts 4 months.</p>
+                                
+                                <!-- Semester 1 Checkbox -->
+                                <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+                                    <input id="enroll-module-1" type="checkbox" value="module-1" checked class="enrollment-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <label for="enroll-module-1" class="ml-3 text-lg font-medium text-gray-900">Semester 1: Fundamentals of Nursing</label>
+                                </div>
+                                
+                                <!-- Semester 2 Checkbox -->
+                                <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+                                    <input id="enroll-module-2" type="checkbox" value="module-2" class="enrollment-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <label for="enroll-module-2" class="ml-3 text-lg font-medium text-gray-900">Semester 2: MedicalSurgical I</label>
+                                </div>
+
+                                <!-- Semester 3 Checkbox -->
+                                <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+                                    <input id="enroll-module-3" type="checkbox" value="module-3" class="enrollment-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <label for="enroll-module-3" class="ml-3 text-lg font-medium text-gray-900">Semester 3: MedicalSurgical II</label>
+                                </div>
+
+                                <div class="pt-4 flex justify-between space-x-3">
+                                    <button type="button" onclick="window.setEnrollmentStep(1)" class="w-1/3 bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-bold transition hover:bg-gray-400">
+                                        <i class="fas fa-chevron-left mr-2"></i> Back
+                                    </button>
+                                    <button type="submit" class="w-2/3 bg-blue-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 font-bold text-lg transform hover:scale-[1.02] active:scale-95 btn-primary">
+                                        Complete Enrollment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                          <!-- STEP 3: CONFIRMATION/PROCESSING -->
+                        <div id="enroll-step-3" class="enrollment-step hidden text-center">
+                            <div class="inline-block p-4 bg-green-100 rounded-full shadow-md mb-4">
+                                <i id="processing-icon" class="fas fa-spinner fa-pulse text-4xl text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Enrollment Processing...</h3>
+                            <p class="text-gray-600 mt-2 mb-6 max-w-xl mx-auto">
+                                Please wait while your semester selections are finalized and your progress tracker is initialized.
+                            </p>
+                            <button id="processing-button" disabled class="bg-gray-400 text-white px-8 py-3 rounded-lg font-bold text-lg w-full sm:w-auto btn-disabled">
+                                Loading Dashboard...
+                            </button>
+                        </div>
+
+                        <!-- EMPTY DIV: The old enrolled-status-view is removed as its data is now in the dropdown. -->
+                        <div id="enrolled-status-view" class="hidden"></div>
+
+                    </div> <!-- /#enrollment-views -->
+                </div> <!-- /#enrollment-flow-content -->
+            </section>
+            
+            <!-- Semesters Content Section -->
+            <section id="semesters-content" class="pt-8 max-w-4xl mx-auto">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4 flex justify-between items-center">
+                    <span>Curriculum Semesters</span>
+                    <span id="lock-badge" class="hidden text-sm font-medium bg-gray-200 text-gray-600 px-3 py-1 rounded-full"><i class="fas fa-lock mr-1"></i> Enrollment Required</span>
+                </h2>
+                
+                <div class="space-y-4" id="module-list">
+                    
+                    <!-- Semester 1 -->
+                    <div data-module-id="module-1" class="module-card bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out p-5 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                        <div class="flex items-start sm:items-center space-x-4 flex-grow mb-4 sm:mb-0">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3 flex-shrink-0">
+                                <i class="fas fa-book-medical text-2xl"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-extrabold text-gray-900">Semester 1: Fundamentals</h3>
+                                <div class="flex items-center justify-between mt-1">
+                                    <p class="text-gray-500 text-sm">Fundamentals of Nursing and Health Assessment.</p>
+                                    <span id="progress-text-module-1" class="font-bold text-blue-600 text-sm ml-4">0%</span>
+                                </div>
+                                <div class="w-full h-2 mt-2 bg-gray-200 rounded-full">
+                                    <div id="progress-bar-module-1" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 pl-0 sm:pl-6">
+                            <button onclick="window.launchModule('module-1', 'SemesterOne.html')" class="launch-btn bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-semibold text-sm transform active:scale-95 w-full sm:w-auto">
+                                Launch <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Semester 2 -->
+                    <div data-module-id="module-2" class="module-card bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out p-5 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                        <div class="flex items-start sm:items-center space-x-4 flex-grow mb-4 sm:mb-0">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3 flex-shrink-0">
+                                <i class="fas fa-notes-medical text-2xl"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-extrabold text-gray-900">Semester 2: MedicalSurgical I</h3>
+                                <div class="flex items-center justify-between mt-1">
+                                    <p class="text-gray-500 text-sm">MedicalSurgical I, Pharmacology, and Mental Health.</p>
+                                    <span id="progress-text-module-2" class="font-bold text-blue-600 text-sm ml-4">0%</span>
+                                </div>
+                                <div class="w-full h-2 mt-2 bg-gray-200 rounded-full">
+                                    <div id="progress-bar-module-2" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 pl-0 sm:pl-6">
+                            <button onclick="window.launchModule('module-2', 'SemesterTwo.html')" class="launch-btn bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-semibold text-sm transform active:scale-95 w-full sm:w-auto">
+                                Launch <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Semester 3 -->
+                    <div data-module-id="module-3" class="module-card bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out p-5 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                        <div class="flex items-start sm:items-center space-x-4 flex-grow mb-4 sm:mb-0">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3 flex-shrink-0">
+                                <i class="fas fa-kit-medical text-2xl"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-extrabold text-gray-900">Semester 3: MedicalSurgical II</h3>
+                                <div class="flex items-center justify-between mt-1">
+                                    <p class="text-gray-500 text-sm">MedicalSurgical II and Mother/Baby.</p>
+                                    <span id="progress-text-module-3" class="font-bold text-blue-600 text-sm ml-4">0%</span>
+                                </div>
+                                <div class="w-full h-2 mt-2 bg-gray-200 rounded-full">
+                                    <div id="progress-bar-module-3" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 pl-0 sm:pl-6">
+                            <button onclick="window.launchModule('module-3', 'SemesterThree.html')" class="launch-btn bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 font-semibold text-sm transform active:scale-95 w-full sm:w-auto">
+                                Launch <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Locked Semester 4 (Not available for enrollment yet) -->
+                    <div data-module-id="module-4" class="module-card bg-gray-50 rounded-xl shadow-md p-5 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between opacity-70 cursor-not-allowed">
+                        <div class="flex items-start sm:items-center space-x-4 flex-grow mb-4 sm:mb-0">
+                            <div class="bg-gray-200 text-gray-500 rounded-lg p-3 flex-shrink-0">
+                                <i class="fas fa-user-shield text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-extrabold text-gray-600">Semester 4: Professional Nursing</h3>
+                                <p class="text-gray-500 text-sm mt-1">Leadership and Professional Practice.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
+                                <i class="fas fa-lock mr-1 text-yellow-500 text-[8px]"></i> Unavailable
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Locked NCLEX/HESI Prep (Not available for enrollment yet) -->
+                     <div data-module-id="nclex-prep" class="module-card bg-gray-50 rounded-xl shadow-md p-5 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between opacity-70 cursor-not-allowed">
+                        <div class="flex items-start sm:items-center space-x-4 flex-grow mb-4 sm:mb-0">
+                            <div class="bg-gray-200 text-gray-500 rounded-lg p-3 flex-shrink-0">
+                                <i class="fas fa-brain text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-extrabold text-gray-600">NCLEX/HESI Review</h3>
+                                <p class="text-gray-500 text-sm mt-1">Comprehensive review and practice questions.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300">
+                                <i class="fas fa-lock mr-1 text-yellow-500 text-[8px]"></i> Unavailable
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="bg-white border-t border-gray-200 text-gray-500 py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:flex md:justify-between md:items-center">
+                <p class="text-sm mb-4 md:mb-0 font-medium">&copy; <span id="current-year"></span> AlliedRNPrep. All Rights Reserved.</p>
+                <div class="flex justify-center space-x-8">
+                    <a href="/AlliedRNPrep/TOS.html" class="hover:text-blue-600 text-sm transition duration-300 font-medium">Privacy Policy</a>
+                    <a href="/AlliedRNPrep/TOS.html" class="hover:text-blue-600 text-sm transition duration-300 font-medium">Terms of Service</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK and Authentication Logic (Restored Configuration) -->
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged,
+            sendPasswordResetEmail,
+            setPersistence,
+            browserLocalPersistence,
+            browserSessionPersistence
+        } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+        // Firebase configuration (EXACTLY as provided in the original working code)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj6SkqR0iNxNTRMA3x7qske9cmZ6pwpV8",
+            authDomain: "vsrep-92201.firebaseapp.com",
+            projectId: "vsrep-92201",
+            storageBucket: "vsrep-92201.appspot.com",
+            messagingSenderId: "833328760520",
+            appId: "1:833328760520:web:c25191e71a3ae31a55c7fd",
+            measurementId: "G-WQKB2E7CLH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- Utility Functions for UI/UX ---
+
+        function displayCustomAlert(message, isSuccess = false) {
+            const modal = document.getElementById('custom-alert-modal');
+            const contentBox = document.getElementById('alert-content-box');
+            const messageText = document.getElementById('alert-message-text');
+            const title = contentBox.querySelector('h3');
+            const icon = title.querySelector('i');
+
+            messageText.textContent = message;
+
+            if (isSuccess) {
+                title.classList.replace('text-red-600', 'text-green-600');
+                icon.classList.replace('fa-exclamation-circle', 'fa-check-circle');
+                title.textContent = "Success";
+            } else {
+                title.classList.replace('text-green-600', 'text-red-600');
+                icon.classList.replace('fa-check-circle', 'fa-exclamation-circle');
+                title.textContent = "Error";
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                contentBox.classList.remove('scale-95', 'opacity-0');
+                contentBox.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        document.getElementById('alert-close-button').addEventListener('click', () => {
+            const modal = document.getElementById('custom-alert-modal');
+            const contentBox = document.getElementById('alert-content-box');
+
+            contentBox.classList.remove('scale-100', 'opacity-100');
+            contentBox.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        });
+
+        // --- Data Management (Local Storage) ---
+        const USER_DATA_KEY = 'rnprep_user_data_v3';
+        
+        // Initial state structure
+        let userData = {
+            isEnrolled: false,
+            enrollmentDate: null,
+            progress: {}
+        };
+        
+        // Enrollment Step State
+        let currentEnrollmentStep = 1; 
+
+        // Load data from storage
+        function loadUserData() {
+            const savedData = localStorage.getItem(USER_DATA_KEY);
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData && typeof parsedData.isEnrolled === 'boolean' && typeof parsedData.progress === 'object') {
+                          userData = parsedData;
+                    }
+                } catch (e) {
+                    console.error("Data parse error, resetting to default state.", e);
+                }
+            }
+            
+            // Set up event listeners for the enrollment flow
+            document.getElementById('enrollment-form').addEventListener('submit', handleEnrollmentSubmit);
+            
+            updateDashboardState();
+        }
+
+        // Save data to storage
+        function saveUserData() {
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+            updateDashboardState();
+        }
+
+        // --- Business Logic & Flow Control ---
+        
+        // Made global to fix ReferenceError
+        window.setEnrollmentStep = function(step) {
+            currentEnrollmentStep = step;
+            const steps = document.querySelectorAll('.enrollment-step');
+            
+            steps.forEach(s => s.classList.add('hidden'));
+            document.getElementById(`enroll-step-${step}`).classList.remove('hidden');
+
+            // Update Chronological Indicators
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                if (i <= step) {
+                    indicator.classList.add('bg-blue-600', 'text-white');
+                    indicator.classList.remove('bg-gray-300', 'text-gray-600');
+                } else {
+                    indicator.classList.remove('bg-blue-600', 'text-white');
+                    indicator.classList.add('bg-gray-300', 'text-gray-600');
+                }
+            }
+        }
+        
+        function handleEnrollmentSubmit(e) {
+             e.preventDefault();
+             const selectedModules = [];
+             document.querySelectorAll('.enrollment-checkbox:checked').forEach(checkbox => {
+                 selectedModules.push(checkbox.value);
+             });
+             
+             if (selectedModules.length === 0) {
+                 displayCustomAlert("Please select at least one module for enrollment.");
+                 return;
+             }
+
+             console.log("Enrollment Submitted. Modules selected:", selectedModules); // Debug Log
+             enrollUser(selectedModules);
+             
+             // Move to Step 3 (Processing/Confirmation) and auto-reload
+             window.setEnrollmentStep(3); 
+        }
+
+        // Function: Enrollment
+        function enrollUser(selectedModuleIds) {
+            const now = new Date();
+            userData.isEnrolled = true;
+            userData.enrollmentDate = now.toISOString();
+
+            // Initialize progress only for selected modules
+            userData.progress = {};
+            selectedModuleIds.forEach(moduleId => {
+                if (['module-1', 'module-2', 'module-3'].includes(moduleId)) {
+                    userData.progress[moduleId] = 0; // Initialize progress to 0%
+                }
+            });
+            console.log("User data saved successfully to localStorage:", userData); // Debug Log
+            saveUserData();
+        }
+
+        // Function: Launch Module & Track Progress
+        // Made global to fix ReferenceError
+        window.launchModule = function(moduleId, url) {
+            if (!userData.isEnrolled) {
+                displayCustomAlert("Please enroll in the program to access this content.");
+                return;
+            }
+
+            // Check if the specific module was selected/is enrolled
+            if (userData.progress[moduleId] === undefined) {
+                displayCustomAlert("You are not currently enrolled in this semester.");
+                return;
+            }
+
+            // Tracking Logic: Increment by 5% on launch, cap at 100%
+            let current = userData.progress[moduleId] || 0;
+            if (current < 100) {
+                let increment = 5; 
+                userData.progress[moduleId] = Math.min(100, current + increment);
+                saveUserData();
+            }
+
+            // Simulated Navigation
+            console.log(`Navigating to ${url}... Progress saved for ${moduleId}. New Progress: ${userData.progress[moduleId]}%`);
+            // In a real app with multiple files, this is where navigation happens: window.location.href = url;
+        }
+
+        // Function: Update UI based on state
+        function updateDashboardState() {
+            const enrollmentFlowContainer = document.getElementById('enrollment-flow-container');
+            const dropdownEnrollmentDetails = document.getElementById('dropdown-enrollment-details');
+            const lockBadge = document.getElementById('lock-badge');
+            const moduleListContainer = document.getElementById('module-list');
+            const userInfoToggle = document.getElementById('user-info-toggle');
+
+            // Hide all enrollment views initially
+            document.querySelectorAll('.enrollment-step').forEach(s => s.classList.add('hidden'));
+
+            // 1. Handle Enrollment Flow/Status Display
+            if (userData.isEnrolled) {
+                // If enrolled, check if we are on the confirmation screen (Step 3)
+                if (currentEnrollmentStep === 3) {
+                    enrollmentFlowContainer.classList.remove('hidden');
+                    // Step 3 shows, and JavaScript handles the auto-reload below
+                    console.log("Enrollment flow complete. Initiating dashboard reload.");
+                    setTimeout(() => { 
+                        // Simulate moving to main dashboard view after processing
+                        currentEnrollmentStep = 4; // Use a value > 3 to indicate finished state
+                        saveUserData(); // This triggers a new updateDashboardState call
+                    }, 2000);
+                    
+                } else {
+                    // Enrollment complete: Hide flow and show modules
+                    enrollmentFlowContainer.classList.add('hidden');
+                    lockBadge.classList.add('hidden');
+                    userInfoToggle.classList.remove('hidden');
+                    dropdownEnrollmentDetails.classList.remove('hidden');
+
+                    // Render Dates/Status in Dropdown
+                    if (userData.enrollmentDate) {
+                        const enrollDate = new Date(userData.enrollmentDate);
+                        const expireDate = new Date(enrollDate);
+                        expireDate.setMonth(expireDate.getMonth() + 4); // 4 month term
+
+                        const statusElement = document.getElementById('dropdown-status-display');
+                        const expirationElement = document.getElementById('dropdown-expiration-date');
+                        const enrollmentDateElement = document.getElementById('dropdown-enrollment-date');
+                        
+                        enrollmentDateElement.textContent = enrollDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        expirationElement.textContent = expireDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        
+                        // Expiration Logic for Status
+                        if (new Date() > expireDate) {
+                            statusElement.textContent = "EXPIRED";
+                            statusElement.classList.replace('text-green-700', 'text-red-700');
+                            expirationElement.classList.add('font-extrabold', 'text-red-700');
+                        } else {
+                            statusElement.textContent = "Active Student";
+                            statusElement.classList.replace('text-red-700', 'text-green-700');
+                            expirationElement.classList.remove('font-extrabold', 'text-red-700');
+                        }
+                    }
+
+                    // Unlock Module List container
+                    moduleListContainer.classList.remove('opacity-50');
+                }
+
+            } else {
+                // Not Enrolled: Show enrollment flow starting at current step (usually 1)
+                enrollmentFlowContainer.classList.remove('hidden');
+                lockBadge.classList.remove('hidden');
+                userInfoToggle.classList.add('hidden');
+                dropdownEnrollmentDetails.classList.add('hidden'); // Hide enrollment section in dropdown
+
+                moduleListContainer.classList.add('opacity-50');
+                
+                window.setEnrollmentStep(currentEnrollmentStep);
+            }
+
+            // 2. Handle Module Status and Progress
+            const allModules = ['module-1', 'module-2', 'module-3', 'module-4', 'nclex-prep']; 
+            
+            allModules.forEach(moduleId => {
+                const isEnrolledInModule = userData.progress.hasOwnProperty(moduleId);
+                const currentProgress = userData.progress[moduleId] || 0;
+
+                const card = document.querySelector(`.module-card[data-module-id="${moduleId}"]`);
+                const bar = document.getElementById(`progress-bar-${moduleId}`);
+                const text = document.getElementById(`progress-text-${moduleId}`);
+                const btn = card ? card.querySelector('.launch-btn') : null;
+
+                if (!card) return; 
+
+                if (userData.isEnrolled && isEnrolledInModule) {
+                    // Module is selected and active
+                    card.classList.remove('opacity-70', 'cursor-not-allowed', 'bg-gray-50');
+                    card.classList.add('bg-white', 'shadow-lg', 'hover:shadow-xl');
+
+                    if (btn) {
+                        btn.classList.remove('btn-disabled', 'bg-gray-400');
+                        btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Launch <i class="fas fa-chevron-right ml-1"></i>';
+                    }
+                    
+                    // Update progress
+                    if (bar) bar.style.width = `${currentProgress}%`;
+                    if (text) text.textContent = `${currentProgress}%`;
+
+                } else if (userData.isEnrolled && !isEnrolledInModule && ['module-1', 'module-2', 'module-3'].includes(moduleId)) {
+                    // Module is available for enrollment but NOT selected (locked by choice)
+                    card.classList.add('opacity-70', 'cursor-not-allowed', 'bg-gray-50');
+                    card.classList.remove('bg-white', 'shadow-lg', 'hover:shadow-xl');
+
+                    if (btn) {
+                        btn.classList.add('btn-disabled', 'bg-gray-400');
+                        btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-lock mr-2"></i> Not Selected';
+                    }
+                    if (bar) bar.style.width = `0%`;
+                    if (text) text.textContent = `0%`;
+                } 
+                // Modules 4/NCLEX are permanently locked/unavailable and retain their initial markup state.
+            });
+        }
+
+
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const appContent = document.getElementById('app-content');
+        const authEmailInput = document.getElementById('auth-email');
+        const authPasswordInput = document.getElementById('auth-password');
+        const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
+        const mainAuthButton = document.getElementById('main-auth-button');
+        const authMessage = document.getElementById('auth-message');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const rememberMeCheckbox = document.getElementById('remember-me-checkbox');
+        const showLoginButton = document.getElementById('show-login');
+        const showSignupButton = document.getElementById('show-signup');
+        const confirmPasswordGroup = document.getElementById('confirm-password-group');
+        const mainWelcomeEmail = document.getElementById('main-welcome-email');
+        
+        // Dropdown Elements
+        const userInfoToggle = document.getElementById('user-info-toggle');
+        const userInfoDropdown = document.getElementById('user-info-dropdown');
+        const dropdownUserEmail = document.getElementById('dropdown-user-email');
+        const dropdownUserId = document.getElementById('dropdown-user-id');
+        const dropdownLogoutButton = document.getElementById('dropdown-logout-button');
+        const copyUserIdBtn = document.getElementById('copy-user-id-btn');
+
+
+        let isLoginMode = true;
+
+        // --- Auth Functions ---
+
+        function setAuthMode(mode) {
+            isLoginMode = (mode === 'login');
+            
+            const activeClasses = ['bg-blue-500', 'text-white', 'shadow-md', 'font-bold'];
+            const inactiveClasses = ['bg-transparent', 'text-gray-600', 'font-medium'];
+
+            if (isLoginMode) {
+                showLoginButton.classList.add(...activeClasses);
+                showLoginButton.classList.remove(...inactiveClasses);
+                showSignupButton.classList.add(...inactiveClasses);
+                showSignupButton.classList.remove(...activeClasses);
+                
+                showLoginButton.textContent = 'Login';
+                showSignupButton.textContent = 'Sign Up';
+
+                mainAuthButton.innerHTML = '<i class="fas fa-arrow-right-to-bracket mr-2"></i> Log In';
+                confirmPasswordGroup.classList.add('hidden');
+                forgotPasswordLink.classList.remove('hidden');
+            } else {
+                showSignupButton.classList.add(...activeClasses);
+                showSignupButton.classList.remove(...inactiveClasses);
+                showLoginButton.classList.add(...inactiveClasses);
+                showLoginButton.classList.remove(...activeClasses);
+                
+                showLoginButton.textContent = 'Login';
+                showSignupButton.textContent = 'Sign Up';
+                
+                mainAuthButton.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Register Account';
+                confirmPasswordGroup.classList.remove('hidden');
+                forgotPasswordLink.classList.add('hidden');
+            }
+            displayAuthMessage('');
+        }
+
+        function displayAuthMessage(message, isSuccess = false) {
+            authMessage.textContent = message;
+            authMessage.className = `mt-6 text-center text-sm font-medium min-h-[20px] ${isSuccess ? 'text-blue-600' : 'text-red-600'}`;
+        }
+
+        function toggleDropdown() {
+            const isHidden = userInfoDropdown.classList.contains('hidden');
+            if (isHidden) {
+                userInfoDropdown.classList.remove('hidden');
+                userInfoToggle.setAttribute('aria-expanded', 'true');
+            } else {
+                userInfoDropdown.classList.add('hidden');
+                userInfoToggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function updateUI(user) {
+            if (user) {
+                authContainer.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                
+                // Update header elements
+                userInfoToggle.classList.remove('hidden');
+                dropdownUserEmail.textContent = user.email || 'N/A';
+                dropdownUserId.textContent = user.uid || 'N/A';
+
+                // Update welcome message
+                if (user.email) {
+                    mainWelcomeEmail.textContent = user.email.split('@')[0];
+                } else {
+                    mainWelcomeEmail.textContent = 'Nursing Scholar.';
+                }
+
+                // If enrollment processing finished (step 4), hide flow container entirely
+                if (currentEnrollmentStep > 3 && userData.isEnrolled) {
+                    document.getElementById('enrollment-flow-container').classList.add('hidden');
+                } else if (!userData.isEnrolled) {
+                    // Force step 1 if logged in but not enrolled
+                    window.setEnrollmentStep(1);
+                }
+
+
+            } else {
+                authContainer.classList.remove('hidden');
+                appContent.classList.add('hidden');
+                userInfoToggle.classList.add('hidden');
+                userInfoDropdown.classList.add('hidden'); // Close dropdown on logout
+                
+                // Clear local data on log out
+                localStorage.removeItem(USER_DATA_KEY);
+                userData = { isEnrolled: false, enrollmentDate: null, progress: {} };
+                currentEnrollmentStep = 1;
+
+                // Re-initialize state views
+                updateDashboardState();
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            updateUI(user);
+        });
+
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            const rememberMe = rememberMeCheckbox.checked;
+
+            if (!email || !password) {
+                displayAuthMessage('Please enter both email and password.', false);
+                return;
+            }
+
+            try {
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                
+                if (isLoginMode) {
+                    displayAuthMessage('Logging in...', true);
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const confirmPassword = authConfirmPasswordInput.value;
+                    if (password !== confirmPassword) {
+                        displayAuthMessage('Passwords do not match.', false);
+                        return;
+                    }
+                    if (password.length < 6) {
+                        displayAuthMessage('Password must be at least 6 characters.', false);
+                        return;
+                    }
+                    displayAuthMessage('Creating account...', true);
+                    await createUserWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                console.error("Authentication Error:", error);
+                let errorMessage = "An authentication error occurred.";
+                if (error.code === 'auth/wrong-password') {
+                    errorMessage = "Invalid password. Please try again.";
+                } else if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    errorMessage = "No user found with that email or invalid credentials.";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "This email is already registered.";
+                } else {
+                    errorMessage = error.message.replace('Firebase: Error (auth/', '').replace(').', '');
+                }
+                displayAuthMessage("Error: " + errorMessage, false);
+            }
+        });
+
+        dropdownLogoutButton.addEventListener('click', async () => {
+            try { await signOut(auth); } catch (error) { console.error("Logout Error:", error); }
+        });
+
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            if (!email) {
+                displayAuthMessage('Enter email to reset password.', false);
+                return;
+            }
+            try {
+                displayAuthMessage('Sending reset link...', true);
+                await sendPasswordResetEmail(auth, email);
+                displayAuthMessage(`Password reset link sent to ${email}`, true);
+            } catch (error) {
+                let errorMessage = error.message.replace('Firebase: ', '');
+                displayAuthMessage("Error: " + errorMessage, false);
+            }
+        });
+
+        // Toggle UI
+        showLoginButton.addEventListener('click', () => setAuthMode('login'));
+        showSignupButton.addEventListener('click', () => setAuthMode('signup'));
+
+        // Dropdown Toggle
+        userInfoToggle.addEventListener('click', toggleDropdown);
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!userInfoDropdown.classList.contains('hidden') && 
+                !userInfoToggle.contains(event.target) && 
+                !userInfoDropdown.contains(event.target)) {
+                userInfoDropdown.classList.add('hidden');
+                userInfoToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Copy User ID functionality (using deprecated but reliable execCommand for iframe compatibility)
+        copyUserIdBtn.addEventListener('click', () => {
+            const userIdText = dropdownUserId.textContent;
+            if (userIdText && userIdText !== '--') {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = userIdText;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                try {
+                    document.execCommand('copy');
+                    displayCustomAlert('User ID copied to clipboard!', true);
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    displayCustomAlert('Failed to copy ID. Please try manually.', false);
+                }
+                document.body.removeChild(tempInput);
+            }
+        });
+
+
+        // Password Toggle
+        document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                const targetId = e.target.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    e.target.classList.remove('fa-eye');
+                    e.target.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    e.target.classList.remove('fa-eye-slash');
+                    e.target.classList.add('fa-eye');
+                }
+            });
+        });
+        
+        // --- Initialization ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setAuthMode('login');
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            loadUserData();
+        });
+    </script>
 </body>
 </html>
