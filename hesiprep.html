@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HESI Prep Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex overflow-hidden">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity" onclick="toggleMobileMenu()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center px-8 border-b border-slate-50">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-blue-200 shadow-lg">
+                <span class="text-white font-bold text-lg">H</span>
+            </div>
+            <span class="text-xl font-bold text-slate-800 tracking-tight">HESI<span class="text-blue-600">Prep</span></span>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto no-scrollbar">
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Menu</p>
+            
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-blue-50 text-blue-700 shadow-sm">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                Overview
+            </button>
+            
+            <button onclick="switchTab('modules')" id="nav-modules" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                Study Modules
+            </button>
+            
+            <button onclick="switchTab('practice')" id="nav-practice" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                <i data-lucide="activity" class="w-5 h-5"></i>
+                Practice Exams
+                <span class="ml-auto bg-orange-100 text-orange-600 text-[10px] font-bold px-2 py-0.5 rounded-full">NEW</span>
+            </button>
+            
+            <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                Study Plan
+            </button>
+            
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                Settings
+            </button>
+        </nav>
+
+        <!-- User Profile Snippet -->
+        <div class="p-4 border-t border-slate-100">
+            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors group">
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 overflow-hidden">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">Alex Student</p>
+                    <p class="text-xs text-slate-500 truncate">Pro Member</p>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-slate-500"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        
+        <!-- Top Header -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 z-30 sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                
+                <!-- Search Bar -->
+                <div class="hidden md:flex items-center bg-slate-100 rounded-full px-4 py-2 w-64 focus-within:ring-2 focus-within:ring-blue-100 focus-within:bg-white transition-all">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-2"></i>
+                    <input type="text" placeholder="Search topics..." class="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-400 text-slate-700">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-full transition-colors">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
+                <div class="h-8 w-[1px] bg-slate-200 mx-1"></div>
+                <div class="hidden md:block text-right">
+                    <p class="text-xs font-bold text-slate-700">Next Exam</p>
+                    <p class="text-[10px] text-slate-500">Oct 24, 2025</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto bg-slate-50 p-6 lg:p-10 scroll-smooth" id="main-scroll-area">
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="space-y-8 fade-in">
+                    <!-- Header Section -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-800">Welcome back, Future Nurse! 👋</h1>
+                            <p class="text-slate-500">You're on a 5-day study streak. Keep preparing for the HESI A2!</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button class="bg-white text-slate-600 px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium hover:bg-slate-50 transition-colors">
+                                Customize Layout
+                            </button>
+                            <button onclick="switchTab('modules')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">
+                                Resume Learning
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between hover:shadow-md transition-shadow">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium mb-1">Study Time</p>
+                                <h3 class="text-2xl font-bold text-slate-800">12h 30m</h3>
+                                <p class="text-xs font-medium mt-2 flex items-center text-green-600">
+                                    ↑ 12% <span class="text-slate-400 ml-1">vs last week</span>
+                                </p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl">
+                                <i data-lucide="clock" class="w-6 h-6 text-slate-600"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between hover:shadow-md transition-shadow">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium mb-1">Questions Done</p>
+                                <h3 class="text-2xl font-bold text-slate-800">845</h3>
+                                <p class="text-xs font-medium mt-2 flex items-center text-green-600">
+                                    ↑ 8% <span class="text-slate-400 ml-1">vs last week</span>
+                                </p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl">
+                                <i data-lucide="target" class="w-6 h-6 text-slate-600"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between hover:shadow-md transition-shadow">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium mb-1">Avg. Score</p>
+                                <h3 class="text-2xl font-bold text-slate-800">78%</h3>
+                                <p class="text-xs font-medium mt-2 flex items-center text-red-500">
+                                    ↓ 2% <span class="text-slate-400 ml-1">vs last week</span>
+                                </p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl">
+                                <i data-lucide="award" class="w-6 h-6 text-slate-600"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start justify-between hover:shadow-md transition-shadow">
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium mb-1">Readiness</p>
+                                <h3 class="text-2xl font-bold text-slate-800">Intermediate</h3>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl">
+                                <i data-lucide="activity" class="w-6 h-6 text-slate-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <!-- Left Column: Subjects -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-lg font-bold text-slate-800">Your Subjects</h2>
+                                <button onclick="switchTab('modules')" class="text-blue-600 text-sm font-medium hover:underline">View All</button>
+                            </div>
+                            <div id="subjects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Subjects Injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Activity & Goals -->
+                        <div class="space-y-8">
+                            <!-- Recent Activity -->
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                <h2 class="text-lg font-bold text-slate-800 mb-4">Recent Activity</h2>
+                                <div id="activity-feed" class="space-y-6">
+                                    <!-- Activity Injected via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Daily Goal -->
+                            <div class="bg-gradient-to-br from-indigo-600 to-blue-700 p-6 rounded-2xl shadow-lg text-white relative overflow-hidden">
+                                <div class="absolute top-0 right-0 p-4 opacity-10">
+                                    <i data-lucide="target" class="w-24 h-24"></i>
+                                </div>
+                                <h3 class="text-lg font-bold mb-2 relative z-10">Daily Goal</h3>
+                                <p class="text-blue-100 text-sm mb-4 relative z-10">Complete 3 topics to reach your daily target.</p>
+                                <div class="flex items-end gap-2 mb-2 relative z-10">
+                                    <span class="text-3xl font-bold">1</span>
+                                    <span class="text-blue-200 text-sm mb-1">/ 3 topics</span>
+                                </div>
+                                <div class="w-full bg-blue-900/30 h-1.5 rounded-full overflow-hidden relative z-10">
+                                    <div class="h-full bg-white w-1/3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODULES VIEW -->
+                <div id="view-modules" class="hidden space-y-8 fade-in">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-800">All Study Modules</h1>
+                            <p class="text-slate-500">Master all 8 sections of the HESI A2 exam.</p>
+                        </div>
+                        <div class="flex items-center bg-white border border-slate-200 rounded-lg px-3 py-2 gap-2">
+                             <i data-lucide="filter" class="w-4 h-4 text-slate-400"></i>
+                             <select class="bg-transparent text-sm text-slate-600 outline-none">
+                                <option>All Subjects</option>
+                                <option>Sciences</option>
+                                <option>English</option>
+                                <option>Math</option>
+                             </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="all-modules-grid">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+                <!-- UNDER CONSTRUCTION VIEW (Generic for other tabs) -->
+                <div id="view-placeholder" class="hidden flex flex-col items-center justify-center h-[60vh] text-slate-400 fade-in">
+                    <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                        <i data-lucide="hammer" class="w-10 h-10 text-slate-300"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-600">Section In Progress</h2>
+                    <p class="max-w-md text-center mt-2">We are currently curating high-yield HESI questions for this section. Check back soon!</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- LOGIC -->
+    <script>
+        // HESI A2 Focused Data
+        const subjects = [
+            { id: 1, title: 'Anatomy & Physiology', category: 'Science', progress: 45, color: 'bg-rose-500', text: 'text-rose-500', icon: 'stethoscope', totalTopics: 12, completedTopics: 5 },
+            { id: 2, title: 'Mathematics', category: 'Math', progress: 72, color: 'bg-blue-500', text: 'text-blue-500', icon: 'calculator', totalTopics: 8, completedTopics: 6 },
+            { id: 3, title: 'Reading Comprehension', category: 'English', progress: 15, color: 'bg-emerald-500', text: 'text-emerald-500', icon: 'book-open', totalTopics: 6, completedTopics: 1 },
+            { id: 4, title: 'Biology', category: 'Science', progress: 0, color: 'bg-teal-500', text: 'text-teal-500', icon: 'microscope', totalTopics: 10, completedTopics: 0 },
+            { id: 5, title: 'Vocabulary', category: 'English', progress: 30, color: 'bg-purple-500', text: 'text-purple-500', icon: 'brain', totalTopics: 5, completedTopics: 1 },
+            { id: 6, title: 'Chemistry', category: 'Science', progress: 0, color: 'bg-orange-500', text: 'text-orange-500', icon: 'flask-conical', totalTopics: 8, completedTopics: 0 },
+            { id: 7, title: 'Grammar', category: 'English', progress: 10, color: 'bg-indigo-500', text: 'text-indigo-500', icon: 'pen-tool', totalTopics: 7, completedTopics: 1 },
+        ];
+
+        const recentActivity = [
+            { id: 1, action: 'Completed Quiz', subject: 'A&P: Cardiovascular System', time: '2 hours ago', score: '85%' },
+            { id: 2, action: 'Started Module', subject: 'Math: Ratios & Proportions', time: 'Yesterday', score: null },
+            { id: 3, action: 'Practice Test', subject: 'Reading Comp: Main Ideas', time: '2 days ago', score: '92%' },
+        ];
+
+        // Functions
+        function renderSubjects() {
+            // Render Dashboard Grid (Top 4)
+            const dashboardGrid = document.getElementById('subjects-grid');
+            dashboardGrid.innerHTML = subjects.slice(0, 4).map(s => createSubjectCard(s)).join('');
+
+            // Render All Modules Grid
+            const modulesGrid = document.getElementById('all-modules-grid');
+            modulesGrid.innerHTML = subjects.map(s => createSubjectCard(s, true)).join('');
+        }
+
+        function createSubjectCard(s, fullDetails = false) {
+            return `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 group hover:border-blue-200 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 rounded-xl ${s.color} bg-opacity-10">
+                            <i data-lucide="${s.icon}" class="w-6 h-6 ${s.text}"></i>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400">
+                            ${s.progress}%
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
+                        ${s.title}
+                    </h3>
+                    <p class="text-slate-500 text-sm mb-4">
+                        ${s.category} • ${s.completedTopics} / ${s.totalTopics} Topics
+                    </p>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                            class="h-full ${s.color} transition-all duration-500" 
+                            style="width: ${s.progress}%"
+                        ></div>
+                    </div>
+                    ${fullDetails ? `
+                    <div class="mt-4 pt-4 border-t border-slate-50 flex justify-end">
+                        <button class="text-xs font-semibold text-blue-600 hover:text-blue-700">Continue Study →</button>
+                    </div>` : ''}
+                </div>
+            `;
+        }
+
+        function renderActivity() {
+            const container = document.getElementById('activity-feed');
+            container.innerHTML = recentActivity.map((item, index) => `
+                <div class="flex gap-4 relative">
+                    ${index !== recentActivity.length - 1 ? '<div class="absolute left-2.5 top-8 bottom-[-24px] w-0.5 bg-slate-100"></div>' : ''}
+                    <div class="w-5 h-5 rounded-full bg-blue-100 border-2 border-white shadow-sm flex-shrink-0 mt-1"></div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-800">${item.action}</p>
+                        <p class="text-xs text-slate-500 mb-1">${item.subject}</p>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">
+                                ${item.time}
+                            </span>
+                            ${item.score ? `<span class="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Score: ${item.score}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                // Open
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                // Close
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tabId) {
+            // Update Menu Styles
+            document.querySelectorAll('.nav-item').forEach(el => {
+                // Reset to default
+                el.classList.remove('bg-blue-50', 'text-blue-700', 'shadow-sm');
+                el.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-700');
+                
+                // Update Icons
+                const icon = el.querySelector('i');
+                if(icon) {
+                    icon.classList.remove('text-blue-600');
+                    icon.classList.add('text-slate-400');
+                }
+            });
+
+            // Set Active
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if(activeNav) {
+                activeNav.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-700');
+                activeNav.classList.add('bg-blue-50', 'text-blue-700', 'shadow-sm');
+                
+                const activeIcon = activeNav.querySelector('i');
+                if(activeIcon) {
+                    activeIcon.classList.remove('text-slate-400');
+                    activeIcon.classList.add('text-blue-600');
+                }
+            }
+
+            // Switch Views Logic
+            const views = {
+                dashboard: document.getElementById('view-dashboard'),
+                modules: document.getElementById('view-modules'),
+                placeholder: document.getElementById('view-placeholder')
+            };
+
+            // Hide all first
+            Object.values(views).forEach(el => el.classList.add('hidden'));
+
+            // Show selected
+            if (tabId === 'dashboard') {
+                views.dashboard.classList.remove('hidden');
+            } else if (tabId === 'modules') {
+                views.modules.classList.remove('hidden');
+            } else {
+                views.placeholder.classList.remove('hidden');
+            }
+
+            // Close mobile menu if open
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
+                toggleMobileMenu();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSubjects();
+            renderActivity();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
