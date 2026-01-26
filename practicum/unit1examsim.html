@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bg-custom-dark {
+            background-color: #1f2937;
+        }
+        .text-custom-dark {
+            color: #1f2937;
+        }
+        .bg-custom-gray {
+            background-color: #e5e7eb;
+        }
+        .text-custom-gray {
+            color: #9ca3af;
+        }
+        .btn-orange {
+            background-color: #f97316;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c;
+        }
+        .btn-blue {
+            background-color: #3b82f6;
+        }
+        .btn-blue:hover {
+            background-color: #2563eb;
+        }
+        .nav-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-item.bg-gray-200:hover {
+            background-color: #d1d5db;
+        }
+        .nav-item.answered {
+            background-color: #d1d5db; /* A subdued color for answered questions */
+            color: #374151; /* Darker text for readability */
+        }
+        .nav-item.answered::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 12px;
+            height: 12px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Using a box-shadow to simulate a checkmark */
+            box-shadow: 0 0 0 2px #10b981, 
+                        inset 0 0 0 1px white,
+                        inset 2px 2px 0 0 white,
+                        inset -2px 2px 0 0 white;
+            transform: rotate(-45deg);
+        }
+        .nav-item.active {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered {
+            background-color: #3b82f6;
+            color: white;
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        .nav-item.active.answered::after {
+            background-color: white;
+            box-shadow: 0 0 0 2px white,
+                        inset 0 0 0 1px #10b981,
+                        inset 2px 2px 0 0 #10b981,
+                        inset -2px 2px 0 0 #10b981;
+        }
+
+        .radio-btn, .check-btn {
+            display: none;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f3f4f6;
+        }
+        .option-label .option-letter {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Changed from rounded-0.25rem to fully rounded */
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: all 0.2s;
+        }
+        .radio-btn:checked + .option-label,
+        .check-btn:checked + .option-label {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .radio-btn:checked + .option-label .option-letter,
+        .check-btn:checked + .option-label .option-letter {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .strikethrough {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .review-box {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .correct-answer {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .loading-animation, .grade-screen, .rationale-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3b82f6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Header - Custom design based on image -->
+    <header id="header" class="bg-custom-dark text-white p-4 flex items-center justify-between shadow-md hidden">
+        <div class="flex items-center space-x-6">
+            <div class="font-bold">ARP</div>
+            <div class="hidden sm:block font-medium">Allied RN Prep</div>
+            <div class="hidden sm:block text-gray-400">Medical Surgical II Unit 1 Exam</div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6a.75.75 0 00.957.703l4.084-1.714a.75.75 0 00-.597-1.42l-3.375 1.416V6z" clip-rule="evenodd" />
+                </svg>
+                <span id="timer" class="font-semibold">02:00:00</span>
+            </div>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">EXAM CONTROLS</button>
+            <button class="px-4 py-1.5 border rounded-md border-gray-600 text-sm font-medium hover:bg-gray-700">TOOL KIT</button>
+        </div>
+    </header>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="w-full h-full flex flex-col justify-center items-center text-center p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">NCLEX-Style Exam Engine</h1>
+        <p class="text-lg text-gray-600 mb-8">Click 'Start Exam' to begin your 2-hour practice test.</p>
+        <button id="start-btn" class="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Start Exam</button>
+    </div>
+
+    <!-- Main Content Area - Updated to a three-column layout -->
+    <div id="main-content" class="flex flex-1 overflow-hidden hidden">
+        <!-- Left Sidebar Navigation -->
+        <aside class="w-20 bg-white p-4 flex flex-col items-center border-r border-gray-200 overflow-y-auto">
+            <div class="mb-4 text-xs text-gray-500">FILTER ></div>
+            <div id="nav-questions" class="flex flex-col space-y-4 w-full items-center">
+                <!-- Question navigation items will be injected here -->
+            </div>
+        </aside>
+
+        <!-- Question Section -->
+        <main class="flex-1 flex overflow-hidden">
+            <div id="question-container" class="flex-1 p-8 overflow-y-auto flex flex-col justify-between">
+                <!-- Question will be injected here -->
+            </div>
+            
+            <!-- Right Sidebar placeholder -->
+            <div class="hidden md:flex items-center justify-center bg-white border-l border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Screen -->
+    <div id="review-screen" class="flex-1 p-8 overflow-y-auto hidden">
+        <h2 class="text-2xl font-bold mb-6">Exam Review</h2>
+        <div id="review-questions" class="space-y-8">
+            <!-- Missed questions review will be injected here -->
+        </div>
+        <div class="mt-8 text-center">
+            <button id="end-review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">End Review</button>
+        </div>
+    </div>
+    
+    <!-- Submission Animation Screen -->
+    <div id="loading-animation" class="loading-animation hidden">
+        <div class="spinner"></div>
+        <p class="mt-4 text-xl text-gray-700 font-semibold">Submitting Exam...</p>
+    </div>
+
+    <!-- Final Grade Screen -->
+    <div id="grade-screen" class="grade-screen hidden">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-11/12 md:w-1/2 mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-custom-dark">Exam Submitted Successfully!</h2>
+            <p class="text-lg text-gray-600 mb-2">Your final grade is:</p>
+            <div class="text-6xl font-extrabold text-blue-600 mb-8" id="final-grade"></div>
+            <button id="restart-btn" class="px-6 py-3 btn-blue text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105">Restart Exam</button>
+        </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <footer id="footer" class="bg-white p-4 flex items-center justify-between border-t border-gray-200 shadow-md hidden">
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-600">
+            <span id="question-counter">1 OF 11 QUESTIONS</span>
+            <span class="hidden sm:block text-xs">VERSION 5.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="previous-btn" class="px-6 py-2 rounded-lg font-semibold text-gray-700 transition cursor-not-allowed opacity-50">Previous</button>
+            <button id="next-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-blue-500 transition-transform transform hover:scale-105">Next</button>
+            <button id="submit-exam-btn" class="px-6 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-transform transform hover:scale-105 hidden">Submit Exam</button>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data and State ---
+        // NOTE: This quiz data has been truncated to 2 questions for testing.
+        const quizData = [
+          {
+    "questionText": "A medical‑surgical unit has increasing fall rates and low patient satisfaction scores. The charge nurse decides to involve bedside nurses, UAP, and physical therapy in a rapid‑cycle project to test hourly rounding and revise the fall‑risk protocol. This action best reflects which leadership concept?",
+    "options": {
+      "A": "Maintaining control through top‑down decision‑making",
+      "B": "Applying complexity science and systems thinking",
+      "C": "Using laissez‑faire leadership to promote autonomy",
+      "D": "Focusing solely on individual nurse performance"
+    },
+    "correctAnswer": "B",
+    "rationale": "Involving multiple disciplines, testing changes, and focusing on patterns and processes reflects complexity science and systems thinking rather than top‑down or hands‑off leadership.",
+    "section": "Leadership Concepts",
+    "type": "mc"
+  },
+  {
+    "questionText": "A novice RN says, 'Leaders are the ones with titles who tell everyone what to do.' Which response by the nurse educator best differentiates leading from managing?",
+    "options": {
+      "A": "“Leaders create a vision and influence others; managers focus on planning, budgeting, and staffing.”",
+      "B": "“Leaders give orders, and managers carry them out.”",
+      "C": "“Leaders focus on tasks, and managers focus on relationships.”",
+      "D": "“Leaders avoid change, while managers drive innovation.”"
+    },
+    "correctAnswer": "A",
+    "rationale": "Leading emphasizes vision, influence, and change, whereas managing emphasizes planning, organizing, budgeting, and staffing to achieve goals.",
+    "section": "Leadership vs Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "On a busy unit, a staff nurse consistently anticipates patient needs, speaks up about safety concerns, offers evidence‑based suggestions, and supports unit decisions even when not in charge. Which role is MOST evident?",
+    "options": {
+      "A": "Manager",
+      "B": "Transformational leader",
+      "C": "Effective follower",
+      "D": "Autocratic leader"
+    },
+    "correctAnswer": "C",
+    "rationale": "Effective followers are proactive, speak up about safety and quality, participate in decisions, and support agreed‑upon plans, even without a formal title.",
+    "section": "Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "The unit council is redesigning bedside shift report to support the Quintuple Aim. Which outcome MOST directly reflects the aim of 'improving the work life of healthcare providers'?",
+    "options": {
+      "A": "Decreased hospital readmission rates",
+      "B": "Higher HCAHPS communication scores",
+      "C": "Reduced per‑patient cost of care",
+      "D": "Fewer reports of burnout and moral distress among nurses"
+    },
+    "correctAnswer": "D",
+    "rationale": "The Quintuple Aim includes improving the work life and well‑being of healthcare providers; reduced burnout directly reflects this dimension.",
+    "section": "Healthcare Goals",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new nurse manager wants to apply complexity science on a long‑term care unit. Which action is MOST consistent with this approach?",
+    "options": {
+      "A": "Standardizing every interaction to eliminate variation",
+      "B": "Allowing information to flow in multiple directions and encouraging staff to test small changes",
+      "C": "Making all decisions personally to prevent errors",
+      "D": "Focusing only on individual performance evaluations"
+    },
+    "correctAnswer": "B",
+    "rationale": "Complexity science views organizations as complex adaptive systems; leaders facilitate rich communication, learning, and small tests of change rather than rigid control.",
+    "section": "Complexity Science",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager leads a hospital‑wide falls initiative by sharing a compelling vision, recognizing staff contributions, and encouraging bedside nurses to design and test solutions. This behavior BEST illustrates which leadership style?",
+    "options": {
+      "A": "Transactional leadership",
+      "B": "Transformational leadership",
+      "C": "Autocratic leadership",
+      "D": "Laissez‑faire leadership"
+    },
+    "correctAnswer": "B",
+    "rationale": "Transformational leaders inspire a shared vision, empower staff, and recognize contributions to achieve higher levels of performance and engagement.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff RN says, 'Administration decides everything; nothing I say will change our readmission rates.' Which response by the leader BEST promotes empowered followership?",
+    "options": {
+      "A": "“That’s just how healthcare is; focus on your own assignment.”",
+      "B": "“You can join the readmission task force so your observations from the bedside shape our plan.”",
+      "C": "“If you don’t like it, you can transfer to another unit.”",
+      "D": "“Administration has more data than we do, so we should trust their decisions.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Inviting the nurse into shared decision‑making and problem‑solving supports empowered, proactive followership and distributed leadership.",
+    "section": "Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "During a COVID‑19 surge, many new graduates are hired quickly. Which leadership action by the charge nurse best supports patient safety in this complex, rapidly changing situation?",
+    "options": {
+      "A": "Assigning new graduates the sickest patients to accelerate learning",
+      "B": "Pairing new graduates with experienced preceptors and using brief huddles to reassess assignments",
+      "C": "Allowing new graduates to work independently to build confidence",
+      "D": "Avoiding changes to assignments, even when acuity increases"
+    },
+    "correctAnswer": "B",
+    "rationale": "Complexity and high acuity require real‑time reassessment, strong teamwork, and adequate supervision of less experienced staff to maintain safety.",
+    "section": "Safety & Complexity",
+    "type": "mc"
+  },
+  {
+    "questionText": "Two units are blaming each other for delayed discharges. Which action by the nurse leader MOST supports interprofessional collaboration and systems thinking?",
+    "options": {
+      "A": "Sending an email reminding staff to “stop complaining and just discharge on time”",
+      "B": "Calling each unit manager separately to assign blame",
+      "C": "Bringing representatives from both units together to map the discharge process and identify bottlenecks",
+      "D": "Asking physicians to manage all discharge issues"
+    },
+    "correctAnswer": "C",
+    "rationale": "Joint process mapping engages stakeholders in understanding the whole system and co‑creating solutions, a key collaborative and systems‑thinking strategy.",
+    "section": "Interprofessional Collaboration",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff nurse says, 'I’m just a floor nurse; strategic planning is for administrators.' Which reply by the nurse educator is MOST accurate?",
+    "options": {
+      "A": "“Strategic planning is only required at the executive level.”",
+      "B": "“Bedside nurses implement but do not contribute to strategic plans.”",
+      "C": "“Direct‑care nurses are expected to participate in quality initiatives and unit‑level planning that align with the organization’s strategy.”",
+      "D": "“Strategic planning has little impact on day‑to‑day patient care.”"
+    },
+    "correctAnswer": "C",
+    "rationale": "Contemporary practice expects direct‑care nurses to participate in shared governance, quality improvement, and unit projects that support organizational strategic goals.",
+    "section": "Professional Roles",
+    "type": "mc"
+  },
+          {
+    "questionText": "You are charge nurse for the shift. Which activity is primarily a management function rather than a leadership function?",
+    "options": {
+      "A": "Inspiring staff to embrace a new vision for patient‑family–centered care",
+      "B": "Challenging the status quo regarding hospital visitation policies",
+      "C": "Creating the staffing assignment and adjusting it as patient acuity changes",
+      "D": "Advocating at the state level for legislation to improve health equity"
+    },
+    "correctAnswer": "C",
+    "rationale": "Management focuses on planning, organizing, and staffing to meet daily operational needs, such as making and adjusting assignments based on acuity.",
+    "section": "Leadership vs Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "An RN administers the wrong dose of a high‑alert medication, then documents that the ordered dose was given. Which legal issue is MOST directly involved?",
+    "options": {
+      "A": "Whistleblowing",
+      "B": "Negligence only",
+      "C": "Malpractice and potential unprofessional conduct",
+      "D": "Corporate liability"
+    },
+    "correctAnswer": "C",
+    "rationale": "Giving the wrong dose and falsifying documentation may meet elements of malpractice (duty, breach, causation, damages) and constitute unprofessional conduct under the nurse practice act.",
+    "section": "Legal Issues",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which situation best illustrates all four elements of malpractice: duty, breach of duty, causation, and damages?",
+    "options": {
+      "A": "A nurse forgets to document intake, but the patient is discharged without complications.",
+      "B": "A nurse ignores an order to monitor blood glucose, the patient becomes hypoglycemic and seizes, and requires ICU care.",
+      "C": "A nurse gives a medication 10 minutes late with no adverse effects.",
+      "D": "A nurse refuses a floating assignment to another unit."
+    },
+    "correctAnswer": "B",
+    "rationale": "There is a duty (monitor glucose), breach (failure to monitor), causation (unrecognized hypoglycemia), and damages (seizure and ICU stay), fulfilling all malpractice elements.",
+    "section": "Legal Issues",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse posts a photo of an unusual wound on a “closed” social media group; the patient’s face is not visible, but the unit name and time are mentioned. This behavior is best described as:",
+    "options": {
+      "A": "Acceptable as long as the name is omitted",
+      "B": "A breach of confidentiality and patient privacy",
+      "C": "Protected whistleblowing",
+      "D": "An example of beneficence"
+    },
+    "correctAnswer": "B",
+    "rationale": "Sharing identifiable clinical information in any forum without authorization violates patient privacy and confidentiality, even if the name is removed.",
+    "section": "Ethics & Confidentiality",
+    "type": "mc"
+  },
+  {
+    "questionText": "A competent adult refuses a life‑saving blood transfusion for religious reasons. Which ethical principle should most guide the nurse’s actions?",
+    "options": {
+      "A": "Justice",
+      "B": "Autonomy",
+      "C": "Beneficence",
+      "D": "Fidelity"
+    },
+    "correctAnswer": "B",
+    "rationale": "Autonomy supports a competent patient’s right to make informed decisions, including refusing life‑saving treatment, even when the nurse believes treatment is beneficial.",
+    "section": "Ethics & Confidentiality",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager is told that a staff nurse smells strongly of alcohol, has slurred speech, and is about to start a shift. The manager ignores the report, and later the nurse injures a patient. The manager is MOST at risk for:",
+    "options": {
+      "A": "Personal liability for negligence",
+      "B": "Only corporate liability",
+      "C": "Only vicarious liability",
+      "D": "No liability, because the nurse caused the harm"
+    },
+    "correctAnswer": "A",
+    "rationale": "A reasonably prudent manager would investigate and remove the impaired nurse from duty; failure to act may be negligence by the manager (breach of duty to protect patients).",
+    "section": "Legal Issues",
+    "type": "mc"
+  },
+  {
+    "questionText": "In which situation is the nurse REQUIRED to breach confidentiality and report information?",
+    "options": {
+      "A": "A competent patient refuses insulin against medical advice.",
+      "B": "A patient reveals a past minor theft with no current risk.",
+      "C": "A patient threatens to seriously harm a specific person and appears capable of doing so.",
+      "D": "A patient requests that the nurse not tell the family about a terminal diagnosis."
+    },
+    "correctAnswer": "C",
+    "rationale": "Mandatory reporting and duty to warn may apply when there is a credible threat of serious harm to identifiable others; protecting safety overrides confidentiality in such cases.",
+    "section": "Ethics & Confidentiality",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse in a compact state provides telenursing advice to a client whose primary residence is in another compact state. Which nurse practice act governs this episode of care?",
+    "options": {
+      "A": "The state where the hospital headquarters is located",
+      "B": "The state where the nurse is physically located",
+      "C": "The state where the client legally resides",
+      "D": "The original state that issued the nurse’s first license"
+    },
+    "correctAnswer": "C",
+    "rationale": "Under the Nurse Licensure Compact, the governing nurse practice act is that of the patient’s state of residence for telehealth practice.",
+    "section": "Legal Issues",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient scheduled for bronchoscopy says, “I don’t really understand the risks or other options.” The consent form is signed. What is the nurse’s BEST action?",
+    "options": {
+      "A": "Ask the patient to sign again after the procedure.",
+      "B": "Explain the procedure in detail and have the patient sign a new consent form.",
+      "C": "Notify the provider that the patient has questions and request that the provider further explain before proceeding.",
+      "D": "Tell the patient the doctor would not order anything unsafe."
+    },
+    "correctAnswer": "C",
+    "rationale": "The provider is responsible for obtaining informed consent; the nurse must advocate by ensuring the patient’s questions are answered and understanding is adequate before proceeding.",
+    "section": "Professional Roles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff nurse reports unsafe prescribing by a physician through the hospital’s internal reporting system. Soon after, the nurse is terminated for “complaining too much.” Which law or protection MOST directly applies?",
+    "options": {
+      "A": "Respondeat superior",
+      "B": "Whistleblower protections",
+      "C": "Corporate liability",
+      "D": "Indemnification"
+    },
+    "correctAnswer": "B",
+    "rationale": "Whistleblower laws protect individuals who, in good faith, report unsafe, illegal, or unethical practices from retaliation such as unjust termination.",
+    "section": "Legal Issues",
+    "type": "mc"
+  },
+          {
+    "questionText": "A nurse manager knowingly assigns a new RN—who has not been trained in ventilator management—to a patient requiring complex ventilator care. The patient is injured when alarms are not managed correctly. Which doctrine MOST likely applies to the manager and organization?",
+    "options": {
+      "A": "Nurse licensure compact",
+      "B": "Indemnification",
+      "C": "Respondeat superior (vicarious liability)",
+      "D": "Corporate liability for negligent assignment"
+    },
+    "correctAnswer": "D",
+    "rationale": "Corporate liability includes failing to ensure competent staffing; knowingly assigning beyond competence can create corporate and managerial liability for negligent assignment and supervision.",
+    "section": "Legal & Corporate Liability",
+    "type": "mc"
+  },
+  {
+    "questionText": "A competent adult in the ICU refuses further dialysis despite family objections and a grim prognosis. Which combination of actions best demonstrates respect for autonomy and veracity?",
+    "options": {
+      "A": "Encouraging the family to override the patient’s wishes",
+      "B": "Telling the patient 'you’ll be fine' to reduce anxiety",
+      "C": "Clearly explaining the consequences of refusal and honoring the patient’s decision",
+      "D": "Asking the ethics committee to force treatment"
+    },
+    "correctAnswer": "C",
+    "rationale": "Veracity requires honest information about risks and outcomes; autonomy requires honoring a competent patient’s informed decision, even when family or staff disagree.",
+    "section": "Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse researcher is obtaining consent from participants with limited health literacy. Which strategy MOST supports valid informed consent?",
+    "options": {
+      "A": "Providing a lengthy written consent form at a college reading level",
+      "B": "Asking participants to sign first, then answering questions later",
+      "C": "Using plain language, teach‑back, and visual aids to explain the study",
+      "D": "Relying on family members to interpret and explain the consent"
+    },
+    "correctAnswer": "C",
+    "rationale": "Informed consent requires that information be understandable; plain language, teach‑back, and appropriate aids help ensure comprehension, especially with limited health literacy.",
+    "section": "Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is unsure whether a situation is primarily an ethical issue or a legal issue. Which statement is MOST accurate and useful for prioritizing action?",
+    "options": {
+      "A": "“If no law is involved, the situation is not important.”",
+      "B": "“Legal requirements set the minimum standard; ethical principles may require a higher level of practice.”",
+      "C": "“Ethics and law are identical, so either source can be used interchangeably.”",
+      "D": "“Ethical concerns should always override statutes and regulations.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Laws provide minimum standards to protect the public; ethical principles often call for a higher standard of professional behavior beyond simple legal compliance.",
+    "section": "Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse wants to decrease CAUTIs on a medical unit using evidence‑based practice. Which PICOT question is BEST?",
+    "options": {
+      "A": "“Do catheters cause CAUTIs?”",
+      "B": "“In hospitalized adults with urinary catheters, does a nurse‑driven removal protocol compared with usual care reduce CAUTI rates over 6 months?”",
+      "C": "“Why are CAUTIs a problem?”",
+      "D": "“Should we care more about catheter care on our unit?”"
+    },
+    "correctAnswer": "B",
+    "rationale": "A good PICOT question defines Population, Intervention, Comparison, Outcome, and Time; a nurse‑driven removal protocol vs usual care with CAUTI rates over time meets this format.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff RN says, 'EBP just means reading one article and changing practice.' Which response by the educator is MOST accurate?",
+    "options": {
+      "A": "“EBP is whatever the most experienced nurse prefers.”",
+      "B": "“EBP combines best research evidence, clinical expertise, and patient preferences to guide decisions.”",
+      "C": "“EBP is only required for graduate‑prepared nurses.”",
+      "D": "“EBP means following the same routine we’ve always used.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Evidence‑based practice integrates current best evidence with clinical expertise and patient values, not just a single article or tradition.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "Within the i‑PARIHS implementation framework, which example best represents the 'context' domain?",
+    "options": {
+      "A": "The strength of the research supporting an early‑mobility protocol",
+      "B": "The bedside nurses’ skills and beliefs about early mobility",
+      "C": "The unit’s culture, leadership support, and resources for change",
+      "D": "The characteristics of the patient population (e.g., age, diagnosis)"
+    },
+    "correctAnswer": "C",
+    "rationale": "In i‑PARIHS, 'context' refers to the setting in which change is implemented, including culture, leadership, priorities, and available resources.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A leader is deciding which evidence‑based guideline to implement first. Which factor MOST strongly predicts successful implementation?",
+    "options": {
+      "A": "The length of the guideline",
+      "B": "Degree of alignment with unit culture, workflows, and leadership support",
+      "C": "Whether it was developed at a famous hospital",
+      "D": "The number of authors on the guideline"
+    },
+    "correctAnswer": "B",
+    "rationale": "Successful implementation depends heavily on contextual fit—how well the change aligns with local culture, workflows, and leadership priorities and support.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A unit implements an evidence‑based fall‑prevention bundle, but fall rates do not improve. What should the nurse leader assess FIRST?",
+    "options": {
+      "A": "Whether staff understand the hospital’s mission statement",
+      "B": "The consistency and fidelity with which the bundle components are actually being carried out",
+      "C": "Whether new uniforms improve morale",
+      "D": "If staff like the appearance of the new documentation forms"
+    },
+    "correctAnswer": "B",
+    "rationale": "Before judging the intervention ineffective, leaders must evaluate implementation fidelity—whether staff are consistently delivering all components as intended.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse uses data extracted from thousands of electronic health records to identify patterns in 30‑day readmissions for heart failure. Which statement best describes this practice?",
+    "options": {
+      "A": "It is anecdotal evidence.",
+      "B": "It is expert opinion.",
+      "C": "It is use of big data analytics to inform practice change.",
+      "D": "It is qualitative research."
+    },
+    "correctAnswer": "C",
+    "rationale": "Aggregating and analyzing large, complex datasets from EHRs to identify patterns and guide improvements is characteristic of big data in healthcare.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+          {
+    "questionText": "Staff express “change fatigue” and say, “These EBP projects never last; we’ll be back to the old way soon.” Which leadership action is MOST effective to address this barrier?",
+    "options": {
+      "A": "Ignoring comments so negativity does not spread",
+      "B": "Imposing strict discipline on staff who resist",
+      "C": "Involving staff in adapting the protocol, providing feedback on early outcome data, and recognizing small wins",
+      "D": "Cancelling the project to reduce stress"
+    },
+    "correctAnswer": "C",
+    "rationale": "Engaging staff in adaptation, sharing early outcome data, and celebrating incremental success builds ownership and counters cynicism about prior unsuccessful changes.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse compares multiple randomized controlled trials and clinical guidelines on pressure‑injury prevention, then considers patient preferences and unit resources before choosing an approach. This reflects which EBP step?",
+    "options": {
+      "A": "Formulating the PICOT question",
+      "B": "Critically appraising and integrating the evidence",
+      "C": "Disseminating results",
+      "D": "Writing a research proposal"
+    },
+    "correctAnswer": "B",
+    "rationale": "Reviewing the quality of evidence, then integrating it with clinical judgment and patient values, is the critical appraisal and integration step in EBP.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "During implementation of a sepsis bundle, the nurse champion monitors the percentage of eligible patients who receive lactate levels and antibiotics within the recommended time frame. These are BEST described as:",
+    "options": {      "A": "Outcome measures",
+      "B": "Process measures",
+      "C": "Balancing measures",
+      "D": "Qualitative measures"
+    },
+    "correctAnswer": "B",
+    "rationale": "Process measures track whether key components of an intervention are delivered as intended (e.g., timely labs and antibiotics), distinct from clinical outcomes like mortality.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "After successfully reducing CAUTIs with a new protocol, the unit wants to sustain the improvement. Which strategy is MOST appropriate?",
+    "options": {
+      "A": "Stop monitoring rates once they improve",
+      "B": "Embed the protocol into policies, orientation, and audit‑and‑feedback cycles",
+      "C": "Allow each nurse to choose whether to follow the protocol",
+      "D": "Rotate the protocol on and off every few months"
+    },
+    "correctAnswer": "B",
+    "rationale": "Sustaining change requires integrating it into standard policies, ongoing education, and regular feedback so the new practice becomes the norm.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A bedside RN says, “Research and EBP are for APRNs and professors, not staff nurses.” What is the BEST response?",
+    "options": {
+      "A": "“That used to be true, but now EBP is optional for everyone.”",
+      "B": "“Direct‑care nurses are expected to ask clinical questions, use evidence, and participate in practice changes at the bedside.”",
+      "C": "“Only nurse managers need to understand EBP.”",
+      "D": "“You can ignore EBP if your patients are satisfied.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Contemporary standards expect all professional nurses to participate in EBP by questioning practice, using evidence, and helping translate evidence into care.",
+    "section": "Professional Roles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A multi‑site system wants a single, evidence‑based pressure‑injury protocol, but each unit insists “we do it differently here.” This challenge MOST directly reflects which i‑PARIHS component?",
+    "options": {
+      "A": "Innovation",
+      "B": "Recipients",
+      "C": "Facilitation",
+      "D": "Context"
+    },
+    "correctAnswer": "D",
+    "rationAnswer": "Differences in local norms, routines, and “how we do things” are contextual issues that affect how easily a standard protocol can be adopted across settings.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A charge nurse reacts defensively to feedback, then later recognizes the feedback was accurate and feels embarrassed. This pattern suggests a need for growth primarily in:",
+    "options": {
+      "A": "Technical competence",
+      "B": "Emotional intelligence and self‑awareness",
+      "C": "Time‑management skills",
+      "D": "Knowledge of policies"
+    },
+    "correctAnswer": "B",
+    "rationale": "Recognizing one’s emotional reactions only after the fact and reacting defensively indicates limited self‑awareness and emotional self‑regulation.",
+    "section": "Emotional Intelligence",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader practices brief reflective journaling after each shift about difficult interactions and personal reactions. This strategy is MOST likely to strengthen:",
+    "options": {
+      "A": "Psychomotor skills",
+      "B": "Self‑awareness and reflective practice",
+      "C": "Knowledge of pathophysiology",
+      "D": "Delegation of tasks"
+    },
+    "correctAnswer": "B",
+    "rationale": "Intentional reflection on experiences and emotions builds insight into one’s values, triggers, and patterns, a key component of self‑awareness.",
+    "section": "Emotional Intelligence",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff RN recognizes that certain demanding family interactions trigger irritation and seeks mentorship on responding constructively. This best demonstrates:",
+    "options": {
+      "A": "Denial of emotional responses",
+      "B": "Moral distress",
+      "C": "Emotional intelligence and personal insight",
+      "D": "Laissez‑faire behavior"
+    },
+    "correctAnswer": "C",
+    "rationale": "Noticing emotional triggers and proactively seeking strategies to respond more effectively reflects emotional intelligence and personal insight.",
+    "section": "Emotional Intelligence",
+    "type": "mc"
+  },
+  {
+    "questionText": "A preceptor asks a new nurse, “What values are most important to you as a nurse, and how do they show up in your care?” This question primarily supports development of:",
+    "options": {
+      "A": "Task delegation",
+      "B": "Authentic leadership grounded in personal values",
+      "C": "Technical skills",
+      "D": "Policy compliance"
+    },
+    "correctAnswer": "B",
+    "rationale": "Exploring core values and their behavioral expression helps develop authenticity and congruence between beliefs and actions, central to authentic leadership.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+          {
+    "questionText": "A nurse consistently speaks up about unsafe staffing levels and inadequate PPE despite fear of being labeled “difficult.” This behavior best reflects:",
+    "options": {
+      "A": "Incivility",
+      "B": "Moral courage",
+      "C": "Avoidance",
+      "D": "Laissez‑faire leadership"
+    },
+    "correctAnswer": "B",
+    "rationale": "Moral courage is the willingness to speak up and act according to ethical principles despite risk or fear, especially about patient safety and staff well‑being.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "An emotionally intelligent leader responding to a staff error would MOST likely:",
+    "options": {
+      "A": "Publicly criticize the nurse to deter future errors",
+      "B": "Ignore emotions and focus only on the policy violation",
+      "C": "Explore what happened, acknowledge the nurse’s feelings, and focus on learning and system improvement",
+      "D": "Immediately suspend the nurse without discussion"
+    },
+    "correctAnswer": "C",
+    "rationale": "Emotional intelligence includes recognizing and managing emotions, using empathy, and focusing on learning and system factors rather than blame alone.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which behavior is MOST consistent with “courageous followership”?",
+    "options": {
+      "A": "Always agreeing with the leader to maintain harmony",
+      "B": "Quietly refusing to follow any new policy",
+      "C": "Supporting the leader’s goals while also challenging unsafe or unethical decisions",
+      "D": "Avoiding involvement in unit decisions"
+    },
+    "correctAnswer": "C",
+    "rationale": "Courageous followers both support leaders and are willing to question or challenge actions that threaten ethics, safety, or quality.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse reports feeling “stuck and apathetic” and disengaged from improvement efforts. Which self‑reflection question is MOST likely to help re‑engage the nurse?",
+    "options": {
+      "A": "“Whose fault is this?”",
+      "B": "“What originally drew me to nursing, and how can I reconnect with that purpose in my current role?”",
+      "C": "“How can I avoid any extra responsibilities?”",
+      "D": "“How can I prove others are wrong about this unit?”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Revisiting one’s purpose and values can help restore meaning and motivation, a key aspect of gaining personal insight and resilience.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader wants to strengthen authenticity and trust with staff. Which action is MOST appropriate?",
+    "options": {
+      "A": "Avoid sharing any personal experiences",
+      "B": "Consistently align words and actions, admit mistakes, and invite honest feedback",
+      "C": "Maintain strict distance and never acknowledge personal limitations",
+      "D": "Make all decisions independently to appear strong"
+    },
+    "correctAnswer": "B",
+    "rationale": "Authentic leaders demonstrate congruence between values and behavior, admit errors, and invite feedback, which builds trust and credibility.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new graduate nurse frequently engages in harsh self‑criticism after minor mistakes and begins to doubt their ability to practice. Which strategy best facilitates professional resilience?",
+    "options": {
+      "A": "Ignoring feedback from others",
+      "B": "Using structured reflection to identify what was learned and planning one improvement step for next time",
+      "C": "Focusing on others’ errors instead",
+      "D": "Working extra shifts to “prove” competence"
+    },
+    "correctAnswer": "B",
+    "rationale": "Constructive reflection that focuses on learning and specific improvement steps supports growth and resilience better than harsh self‑criticism.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "During handoff using SBAR, which statement belongs in the “Assessment” component?",
+    "options": {
+      "A": "“Mr. Lee, 68, admitted with pneumonia yesterday.”",
+      "B": "“Over the last 4 hours, his respiratory rate increased from 20 to 30, and his SpO₂ fell to 88% on 4 L.”",
+      "C": "“I think he may be developing sepsis and needs evaluation for higher level of care.”",
+      "D": "“I recommend obtaining lactate, blood cultures, and a rapid response consult.”"
+    },
+    "correctAnswer": "C",
+    "rationale": "In SBAR, “Assessment” is the nurse’s interpretation or conclusion about the situation (e.g., concern for sepsis), not just raw data or recommendations.",
+    "section": "Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "During change‑of‑shift, a nurse reports, “He’s fine; nothing much happened,” without vital signs, pain score, or key events. This breakdown most directly threatens which safety priority?",
+    "options": {
+      "A": "Reducing restraint use",
+      "B": "Standardizing handoff communication to prevent errors",
+      "C": "Preventing surgical site infections",
+      "D": "Managing healthcare costs"
+    },
+    "correctAnswer": "B",
+    "rationale": "Incomplete, non‑structured handoff is a known contributor to errors; standardizing handoff communication is a National Patient Safety Goal.",
+    "section": "Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with limited English proficiency nods “yes” to discharge instructions delivered in English. Which action best promotes effective communication and safety?",
+    "options": {
+      "A": "Proceed with discharge because the patient nodded",
+      "B": "Ask a family member to interpret complex teaching",
+      "C": "Use a qualified medical interpreter and ask the patient to teach back key instructions",
+      "D": "Provide printed materials in English only"
+    },
+    "correctAnswer": "C",
+    "rationale": "Using trained interpreters and teach‑back improves understanding, reduces disparities, and promotes safe care for patients with language barriers.",
+    "section": "Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse frequently receives eye‑rolling, sighs, and sarcastic remarks from a coworker when asking for help. This behavior is BEST described as:",
+    "options": {
+      "A": "Constructive feedback",
+      "B": "Lateral violence or incivility",
+      "C": "Appropriate conflict management",
+      "D": "Whistleblowing"
+    },
+    "correctAnswer": "B",
+    "rationale": "Repeated rude, dismissive, or undermining behaviors among peers constitute incivility or lateral violence and harm the work environment and safety.",
+    "section": "Workplace Culture",
+    "type": "mc"
+  },
+          {
+    "questionText": "Two nurses disagree about the best timing to pilot bedside rounds but share the goal of improving patient safety. This conflict is BEST categorized as:",
+    "options": {
+      "A": "Intrapersonal conflict",
+      "B": "Interpersonal conflict about goals",
+      "C": "Interpersonal conflict about approaches",
+      "D": "Organizational conflict about policy"
+    },
+    "correctAnswer": "C",
+    "rationale": "The nurses share the same goal (safety) but differ on how to achieve it, making this an interpersonal conflict about approaches rather than goals.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse decides to “let it go” when a usually respectful colleague snaps during a code and later appears remorseful. This MOST appropriately uses which conflict‑handling mode?",
+    "options": {
+      "A": "Competing",
+      "B": "Avoiding",
+      "C": "Accommodating",
+      "D": "Collaborating"
+    },
+    "correctAnswer": "B",
+    "rationale": "Briefly withdrawing or postponing confrontation for trivial or temporary issues, or when emotions are high, can be an appropriate use of avoidance.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager facilitates a meeting where both sides fully explore their concerns, identify a shared goal, and co‑create a plan that addresses the most important needs of everyone involved. Which mode of conflict management is used?",
+    "options": {
+      "A": "Competing",
+      "B": "Avoiding",
+      "C": "Compromising",
+      "D": "Collaborating"
+    },
+    "correctAnswer": "D",
+    "rationale": "Collaboration seeks a win‑win solution that satisfies key concerns of all parties, often requiring time, openness, and creativity.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new nurse prefers to accommodate in most conflicts “to keep the peace.” Which long‑term risk is MOST associated with overuse of accommodation?",
+    "options": {
+      "A": "Improved self‑esteem",
+      "B": "Others viewing the nurse as assertive and fair",
+      "C": "Resentment, feeling used, and loss of influence",
+      "D": "Increased trust in the nurse’s leadership"
+    },
+    "correctAnswer": "C",
+    "rationale": "Over‑accommodating can lead to feeling unvalued and used, with decreased influence and potential burnout or disengagement.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse witnesses a physician loudly belittling another nurse in front of the team. Which immediate bystander action is MOST appropriate?",
+    "options": {
+      "A": "Say nothing to avoid escalating the situation",
+      "B": "Publicly insult the physician in return",
+      "C": "Calmly interrupt and redirect: “Let’s step aside to discuss this; our focus needs to stay on the patient.”",
+      "D": "Leave the area so as not to be involved"
+    },
+    "correctAnswer": "C",
+    "rationale": "Effective bystander intervention involves interrupting harmful behavior, protecting the target, and maintaining a focus on professional, patient‑centered communication.",
+    "section": "Workplace Culture",
+    "type": "mc"
+  },
+  {
+    "questionText": "A recurring medication error is traced to inconsistent handoff between units. Which structured communication strategy is MOST appropriate to implement?",
+    "options": {
+      "A": "Informal hallway conversations",
+      "B": "SBAR‑based standardized handoff with read‑back",
+      "C": "Allowing each nurse to give report in their own style",
+      "D": "Only documenting in the EHR without verbal report"
+    },
+    "correctAnswer": "B",
+    "rationale": "Standardized tools like SBAR, combined with read‑back, reduce miscommunication and are recommended for safe handoff.",
+    "section": "Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is experiencing intrapersonal conflict about floating to a COVID‑19 unit—feeling torn between fear for personal safety and duty to patients. What should the nurse do FIRST?",
+    "options": {
+      "A": "Ignore feelings and proceed without reflection",
+      "B": "Reflect on personal values, fears, and obligations, and seek guidance from a mentor or leader",
+      "C": "Immediately refuse without discussion",
+      "D": "Post frustrations on social media"
+    },
+    "correctAnswer": "B",
+    "rationale": "Intrapersonal conflict requires self‑reflection about values and fears; seeking support helps align actions with ethical and professional responsibilities.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader wants to reduce the impact of VUCA (volatility, uncertainty, complexity, ambiguity) on communication errors. Which intervention is MOST appropriate?",
+    "options": {
+      "A": "Discouraging questions during busy times",
+      "B": "Implementing brief, structured huddles and clear escalation pathways",
+      "C": "Allowing each provider to choose any communication style",
+      "D": "Eliminating written policies to promote flexibility"
+    },
+    "correctAnswer": "B",
+    "rationale": "In volatile, complex environments, structured huddles, shared mental models, and clear escalation processes help reduce ambiguity and miscommunication.",
+    "section": "Communication",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which task is MOST appropriate to delegate to an experienced UAP for a stable post‑operative patient?",
+    "options": {
+      "A": "Initial admission assessment",
+      "B": "Teaching use of the incentive spirometer",
+      "C": "Assisting the patient with ambulation to the bathroom for the first time, following RN instructions",
+      "D": "Adjusting the IV opioid infusion rate"
+    },
+    "correctAnswer": "C",
+    "rationale": "UAP can perform tasks such as ambulation with appropriate instructions and supervision; assessment, teaching, and IV titration require an RN.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse delegates vital signs for a new admission to a UAP without verifying the UAP’s competence or discussing how to report abnormal findings. Which “Right” of delegation is violated FIRST?",
+    "options": {
+      "A": "Right task",
+      "B": "Right circumstance",
+      "C": "Right person",
+      "D": "Right direction/communication"
+    },
+    "correctAnswer": "D",
+    "rationale": "Failing to give clear directions about expectations and reporting violates the right direction/communication; competence of the person must also be validated, but communication is the immediate gap.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+          {
+    "questionText": "The RN tells a UAP, “Admit the new surgical patient and complete the nursing assessment so I can sign it later.” What is the MOST critical problem with this delegation?",
+    "options": {
+      "A": "The RN is delegating within the UAP’s usual role.",
+      "B": "The RN is delegating nursing assessment and judgment outside the UAP’s scope.",
+      "C": "The UAP refused to accept the task.",
+      "D": "The RN plans to review the assessment."
+    },
+    "correctAnswer": "B",
+    "rationale": "Nursing assessment and judgment are core RN functions that cannot be delegated to UAP; delegation must remain within the delegatee’s authorized role and competence.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "After delegating a blood glucose check to a UAP, which RN action best demonstrates accountability?",
+    "options": {
+      "A": "Assuming normal results unless notified",
+      "B": "Asking another nurse to review the results",
+      "C": "Confirming that the glucose was done, reviewing the value, and acting on abnormal results",
+      "D": "Telling the provider the UAP is responsible for any errors"
+    },
+    "correctAnswer": "C",
+    "rationale": "The RN retains overall accountability, must verify completion, interpret the result, and implement appropriate nursing actions or notifications.",
+    "section": "Accountability",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which nursing activity can NEVER be delegated to UAP or LPN/LVN?",
+    "options": {
+      "A": "Turning a stable patient every 2 hours",
+      "B": "Collecting a routine urine specimen",
+      "C": "Performing the initial comprehensive assessment and nursing diagnosis",
+      "D": "Assisting with feeding a stable patient without swallowing issues"
+    },
+    "correctAnswer": "C",
+    "rationale": "Initial comprehensive assessment, nursing diagnosis, and clinical judgment are RN‑only functions and cannot be delegated.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A UAP states, “I’ve never done post‑op ambulation by myself before; I’m not sure I can do it safely.” What is the RN’s BEST response?",
+    "options": {
+      "A": "“You’ll be fine; just try your best.”",
+      "B": "“I’ll show you how and supervise you the first time, then we’ll evaluate your comfort level.”",
+      "C": "“Refusing a task is insubordination.”",
+      "D": "“I’ll assign you something else and never ask you again.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "The RN should respect the delegatee’s expressed limits, provide needed training and supervision, and then evaluate competence, consistent with safe delegation.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse is consistently staying late, completing all basic care personally, and rarely delegating to experienced UAP “because it’s faster if I do it myself.” This pattern most clearly represents:",
+    "options": {
+      "A": "Effective delegation",
+      "B": "Overdelegation",
+      "C": "Underdelegation",
+      "D": "Improper delegation"
+    },
+    "correctAnswer": "C",
+    "rationale": "Underdelegation occurs when the nurse retains too many tasks, often due to mistrust or discomfort, leading to inefficiency and potential burnout.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A UAP is assigned to ambulate six patients in a short period; the RN notices the UAP rushed and skipped safety checks. Which delegation problem is MOST likely occurring?",
+    "options": {
+      "A": "Right task violated",
+      "B": "Right circumstance violated due to excessive workload",
+      "C": "Right person violated",
+      "D": "Right supervision violated"
+    },
+    "correctAnswer": "B",
+    "rationale": "The circumstance is inappropriate when workload or time pressure makes it difficult to perform the delegated task safely and thoroughly.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "The RN allows a home‑care aide to reinsert a dislodged gastrostomy tube because “she did it before in the nursing home,” and the patient later develops peritonitis. Which concepts are MOST directly violated? (Select all that apply)",
+    "options": {
+      "A": "Right task",
+      "B": "Right person",
+      "C": "Right direction/communication",
+      "D": "Right supervision",
+      "E": "Right circumstance"
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Reinserting a G‑tube is not an appropriate task for a nonlicensed aide (right task, right person), requires close RN control and supervision, and is unsafe in a home setting (circumstance).",
+    "section": "Delegation",
+    "type": "sata"
+  },
+  {
+    "questionText": "Using a situational leadership approach, which scenario best illustrates the “telling” style for delegation?",
+    "options": {
+      "A": "An expert UAP and RN jointly plan the best way to organize care.",
+      "B": "The RN gives detailed step‑by‑step instructions and close supervision to a novice UAP performing post‑op ambulation for the first time.",
+      "C": "The RN asks an experienced UAP to decide how to prioritize care.",
+      "D": "The RN avoids providing any direction to encourage independence."
+    },
+    "correctAnswer": "B",
+    "rationale": "The “telling” style involves high direction and low relationship when the delegatee is inexperienced and needs clear instructions and close supervision.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with a history of stroke and dysphagia is confused and requires assistance with meals. The RN delegates feeding to a UAP and later learns the patient aspirated. Which key element should have been assessed BEFORE delegating?",
+    "options": {
+      "A": "The patient’s insurance coverage",
+      "B": "The UAP’s comfort with the patient’s family",
+      "C": "The patient’s swallowing status and need for close observation",
+      "D": "Whether the patient likes the UAP"
+    },
+    "correctAnswer": "C",
+    "rationale": "Patient acuity and risks—such as dysphagia and aspiration risk—are critical in determining whether feeding can safely be delegated.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which factor would MOST strongly indicate that a task should NOT be delegated to UAP?",
+    "options": {
+      "A": "The task is routine and has a predictable outcome.",
+      "B": "The task requires ongoing nursing assessment and critical decision‑making.",
+      "C": "The unit is short‑staffed.",
+      "D": "The UAP has expressed interest in learning the skill."
+    },
+    "correctAnswer": "B",
+    "rationale": "Tasks requiring nursing judgment, ongoing assessment, or critical decision‑making cannot be delegated, regardless of staffing or interest.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+          {
+    "questionText": "A nurse leader is implementing the National Guidelines for Nursing Delegation on a unit. Which organizational responsibility is PRIORITY?",
+    "options": {
+      "A": "Allowing each RN to decide individually what can be delegated",
+      "B": "Developing policies that specify what nursing responsibilities can be delegated, to whom, and under what circumstances, and providing competency validation",
+      "C": "Requiring UAP to delegate tasks to each other",
+      "D": "Eliminating documentation requirements related to delegated tasks"
+    },
+    "correctAnswer": "B",
+    "rationale": "Employer/nurse leader responsibilities include clear delegation policies, education, and documented competency validation to support safe delegation and public protection.",
+    "section": "Delegation Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A delegatee completes a delegated task but documentation is late and incomplete. What is the RN’s BEST action?",
+    "options": {
+      "A": "Ignore the issue if the patient is stable",
+      "B": "Remind the delegatee documentation is optional",
+      "C": "Provide feedback, clarify expectations for timely, complete documentation, and follow up on future performance",
+      "D": "Document for the delegatee"
+    },
+    "correctAnswer": "C",
+    "rationale": "The RN must ensure accurate, timely documentation, provide feedback about gaps, and reinforce expectations to protect patient safety and legal standards.",
+    "section": "Delegation Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new graduate nurse is anxious about delegating to older, highly experienced UAPs. Which coaching question from the preceptor best supports growth as an effective delegator?",
+    "options": {
+      "A": "“Why are you afraid of them?”",
+      "B": "“How can you avoid delegating so they won’t be upset?”",
+      "C": "“What do you know about their competencies, and how can you clearly communicate expectations while still showing respect?”",
+      "D": "“Can you let them decide which nursing responsibilities they will take over?”"
+    },
+    "correctAnswer": "C",
+    "rationale": "Effective delegation requires understanding delegatee competence and using clear, respectful communication; coaching should build these skills and confidence.",
+    "section": "Delegation Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A hospital plans a falls‑reduction project using Lewin’s change model. Which activity is part of the UNFREEZING stage?",
+    "options": {
+      "A": "Embedding the new fall protocol into policy and orientation",
+      "B": "Communicating fall‑rate data to staff and creating dissatisfaction with current practice",
+      "C": "Stabilizing the new practice as the standard of care",
+      "D": "Rewarding units with low fall rates after the change"
+    },
+    "correctAnswer": "B",
+    "rationale": "Unfreezing involves creating awareness of the need for change, often by sharing data and challenging the status quo to motivate movement.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "During the MOVING (change) stage of Lewin’s model, which leader behavior is MOST effective?",
+    "options": {
+      "A": "Avoiding feedback to prevent resistance",
+      "B": "Providing training, coaching, and problem‑solving support as staff test the new process",
+      "C": "Withdrawing from the unit so staff can change independently",
+      "D": "Focusing only on writing policies"
+    },
+    "correctAnswer": "B",
+    "rationale": "In the moving stage, leaders actively support implementation through education, coaching, and addressing barriers as staff adopt new behaviors.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Before implementing bedside shift report, a nurse leader conducts a force‑field analysis. Which is an example of a RESTRAINING force?",
+    "options": {
+      "A": "Evidence that bedside report improves safety",
+      "B": "Staff enthusiasm about involving patients",
+      "C": "Concerns about discussing sensitive information at the bedside",
+      "D": "Alignment with the hospital’s patient‑centered care goals"
+    },
+    "correctAnswer": "C",
+    "rationale": "Restraining forces are barriers or concerns that oppose change, such as worries about privacy during bedside report.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A unit piloted a new barcode medication system, but after the pilot ended, staff returned to old practices. Which change‑management element was MOST likely weak?",
+    "options": {
+      "A": "Unfreezing",
+      "B": "Moving",
+      "C": "Refreezing (stabilizing the change)",
+      "D": "Force‑field analysis"
+    },
+    "correctAnswer": "C",
+    "rationale": "Refreezing is the process of integrating and stabilizing the change into routines, policies, and culture; failure here leads to regression to old habits.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff nurse identifies frequent delays in medication administration and helps design a new med‑delivery workflow that reduces delays. This nurse is primarily functioning in which role?",
+    "options": {
+      "A": "Passive follower",
+      "B": "Change agent",
+      "C": "Laissez‑faire leader",
+      "D": "Whistleblower"
+    },
+    "correctAnswer": "B",
+    "rationale": "A change agent actively identifies issues, designs, and helps implement improvements in processes and outcomes.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which statement best differentiates planned change from unplanned change in healthcare?",
+    "options": {
+      "A": "Planned change is always easy; unplanned change is always difficult.",
+      "B": "Planned change is intentional and goal‑oriented; unplanned change is reactive and occurs in response to unexpected events.",
+      "C": "Planned change never meets resistance; unplanned change always fails.",
+      "D": "Planned change does not involve staff; unplanned change does."
+    },
+    "correctAnswer": "B",
+    "rationale": "Planned change is deliberate, with defined goals and strategies; unplanned change arises in response to crises or unforeseen events, often with less control.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader wants to align a unit improvement project with the organization’s strategic plan. Which FIRST question should the leader ask?",
+    "options": {
+      "A": "“How many staff oppose this change?”",
+      "B": "“What are our organization’s strategic priorities, and how does this project support them?”",
+      "C": "“Which interventions will be easiest to implement?”",
+      "D": "“How can we avoid collecting outcome data?”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Strategic alignment begins with understanding the organization’s priorities and ensuring the unit project directly contributes to those goals.",
+    "section": "Strategic Alignment",
+    "type": "mc"
+  }
+                ];
+
+        let currentQuestionIndex = 0;
+        let shuffledQuizData = [];
+        let userAnswers = [];
+        let flaggedQuestions = Array(quizData.length).fill(false);
+        let timeLeft = 7200; // 2 hours in seconds
+        let timerInterval;
+
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+        const header = document.getElementById('header');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const navQuestionsContainer = document.getElementById('nav-questions');
+        const questionContainer = document.getElementById('question-container');
+        const reviewScreen = document.getElementById('review-screen');
+        const reviewQuestionsContainer = document.getElementById('review-questions');
+        const nextBtn = document.getElementById('next-btn');
+        const previousBtn = document.getElementById('previous-btn');
+        const submitExamBtn = document.getElementById('submit-exam-btn');
+        const endReviewBtn = document.getElementById('end-review-btn');
+        const timerDisplay = document.getElementById('timer');
+        const questionCounter = document.getElementById('question-counter');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const gradeScreen = document.getElementById('grade-screen');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- Core Functions ---
+
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Starts the 2-hour exam timer.
+         */
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                } else {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Updates the timer display with the remaining time in HH:MM:SS format.
+         */
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            if (timerDisplay) {
+                timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        /**
+         * Renders the current question and its options.
+         */
+        function renderQuestion() {
+            if (currentQuestionIndex >= shuffledQuizData.length) {
+                submitExam();
+                return;
+            }
+
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (questionContainer) {
+                questionContainer.innerHTML = '';
+                const questionHtml = document.createElement('div');
+                questionHtml.className = 'bg-white p-8 rounded-lg shadow-sm flex flex-col h-full';
+
+                questionHtml.innerHTML = `
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xl font-bold">Question #${currentQuestionIndex + 1} of ${shuffledQuizData.length}</span>
+                            <button id="flag-btn" class="px-4 py-2 rounded-lg text-sm text-white btn-orange font-semibold">
+                                ${flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4 text-sm font-medium text-gray-500">
+                        <span class="mr-2">^</span> Which is the correct answer?
+                    </div>
+                    <h3 class="text-2xl font-bold mb-6">${questionData.questionText}</h3>
+                    <div class="text-sm font-medium text-gray-500 mb-4">Answers A - F</div>
+                    <div id="options-container" class="space-y-4 flex-1"></div>
+                `;
+                
+                const optionsContainer = questionHtml.querySelector('#options-container');
+
+                const optionLetters = Object.keys(questionData.options);
+                optionLetters.forEach(letter => {
+                    const optionText = questionData.options[letter];
+                    const isMultipleChoice = questionData.type === 'mc';
+                    const inputType = isMultipleChoice ? 'radio' : 'checkbox';
+                    const inputName = isMultipleChoice ? 'answer' : `answer-${currentQuestionIndex}`;
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'flex items-center space-x-2';
+                    optionDiv.innerHTML = `
+                        <input type="${inputType}" id="option-${letter}" name="${inputName}" value="${letter}" class="${isMultipleChoice ? 'radio-btn' : 'check-btn'}">
+                        <label for="option-${letter}" class="option-label">
+                            <span class="option-letter">${letter}</span>
+                            <span class="flex-1">${optionText}</span>
+                            <button class="strikethrough-btn p-1 rounded-full hover:bg-gray-100 transition" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.822a1.012 1.012 0 010 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.577-3.01-9.964-7.822z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </label>
+                    `;
+                    optionsContainer.appendChild(optionDiv);
+                });
+
+                questionContainer.appendChild(questionHtml);
+            }
+            
+            // Add event listeners for strike-through
+            document.querySelectorAll('.strikethrough-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent label click
+                    const label = e.target.closest('label');
+                    const textSpan = label.querySelector('span:nth-child(2)');
+                    textSpan.classList.toggle('strikethrough');
+                });
+            });
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', () => {
+                    flaggedQuestions[currentQuestionIndex] = !flaggedQuestions[currentQuestionIndex];
+                    flagBtn.textContent = flaggedQuestions[currentQuestionIndex] ? 'UNFLAG QUESTION' : 'FLAG QUESTION';
+                    updateNavigationSidebar();
+                });
+            }
+
+            // Restore previous answer selection
+            if (userAnswers[currentQuestionIndex]) {
+                const savedAnswers = userAnswers[currentQuestionIndex];
+                if (Array.isArray(savedAnswers)) {
+                    savedAnswers.forEach(answer => {
+                        const input = document.getElementById(`option-${answer}`);
+                        if (input) input.checked = true;
+                    });
+                }
+            }
+
+            updateNavigationSidebar();
+            updateQuestionCounter();
+            updateButtonStates();
+        }
+
+        /**
+         * Updates the left navigation sidebar with current question status.
+         */
+        function updateNavigationSidebar() {
+            if (navQuestionsContainer) {
+                navQuestionsContainer.innerHTML = '';
+                shuffledQuizData.forEach((_, i) => {
+                    const isAnswered = userAnswers[i] && userAnswers[i].length > 0;
+                    const navItem = document.createElement('div');
+                    navItem.className = `nav-item ${isAnswered ? 'answered' : 'bg-gray-200 text-gray-600'} ${i === currentQuestionIndex ? 'active' : ''}`;
+                    navItem.textContent = i + 1;
+                    navItem.onclick = () => {
+                        saveUserAnswer();
+                        currentQuestionIndex = i;
+                        renderQuestion();
+                    };
+                    navQuestionsContainer.appendChild(navItem);
+                });
+            }
+        }
+
+        /**
+         * Updates the question counter in the footer.
+         */
+        function updateQuestionCounter() {
+            if (questionCounter) {
+                questionCounter.textContent = `${currentQuestionIndex + 1} OF ${shuffledQuizData.length} QUESTIONS`;
+            }
+        }
+
+        /**
+         * Manages the enabled/disabled/visible state of footer buttons.
+         */
+        function updateButtonStates() {
+            if (previousBtn) {
+                if (currentQuestionIndex === 0) {
+                    previousBtn.disabled = true;
+                    previousBtn.classList.add('cursor-not-allowed', 'opacity-50');
+                } else {
+                    previousBtn.disabled = false;
+                    previousBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+                }
+            }
+
+            if (nextBtn && submitExamBtn) {
+                if (currentQuestionIndex === shuffledQuizData.length - 1) {
+                    nextBtn.classList.add('hidden');
+                    submitExamBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.remove('hidden');
+                    submitExamBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        /**
+         * Collects user's answer(s) for the current question.
+         */
+        function saveUserAnswer() {
+            const questionData = shuffledQuizData[currentQuestionIndex];
+            if (!questionData) return;
+            let selectedAnswers = [];
+            if (questionData.type === 'mc') {
+                const selectedRadio = document.querySelector(`input[name="answer"]:checked`);
+                if (selectedRadio) {
+                    selectedAnswers.push(selectedRadio.value);
+                }
+            } else if (questionData.type === 'sata') {
+                const selectedCheckboxes = document.querySelectorAll(`input[name="answer-${currentQuestionIndex}"]:checked`);
+                selectedCheckboxes.forEach(checkbox => {
+                    selectedAnswers.push(checkbox.value);
+                });
+            }
+            userAnswers[currentQuestionIndex] = selectedAnswers;
+        }
+
+        /**
+         * Renders the review screen with missed questions.
+         */
+        function renderReviewScreen() {
+            if (mainContent) mainContent.classList.add('hidden');
+            if (reviewScreen) reviewScreen.classList.remove('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+
+            if (!reviewQuestionsContainer) return;
+            reviewQuestionsContainer.innerHTML = '';
+            
+            const missedQuestions = [];
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let isCorrect = false;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    isCorrect = userAnswer[0] === correctAnswer;
+                } else if (question.type === 'sata') {
+                    const correctSet = new Set(question.correctAnswer);
+                    const userSet = new Set(userAnswer);
+                    isCorrect = correctSet.size === userSet.size && [...correctSet].every(item => userSet.has(item));
+                }
+
+                if (!isCorrect) {
+                    missedQuestions.push({ question, index });
+                }
+            });
+
+            if (missedQuestions.length === 0) {
+                reviewQuestionsContainer.innerHTML = `<div class="p-6 text-center text-lg text-gray-700 bg-green-100 rounded-lg border border-green-300">Great job! You answered all questions correctly.</div>`;
+            } else {
+                missedQuestions.forEach(({ question, index }) => {
+                    const userAnswer = userAnswers[index] || [];
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-box';
+                    let optionsHtml = '';
+
+                    Object.keys(question.options).forEach(letter => {
+                        const isUserSelected = userAnswer.includes(letter);
+                        let correctAnswers = question.correctAnswer;
+                        if (!Array.isArray(correctAnswers)) {
+                            correctAnswers = [correctAnswers];
+                        }
+                        const isCorrectAnswer = correctAnswers.includes(letter);
+                        
+                        let optionClasses = 'p-3 rounded-lg border flex items-center space-x-3';
+                        if (isCorrectAnswer) {
+                            optionClasses += ' correct-answer';
+                        }
+                        if (isUserSelected && !isCorrectAnswer) {
+                            optionClasses += ' incorrect-answer';
+                        }
+
+                        optionsHtml += `
+                            <div class="${optionClasses}">
+                                <span class="option-letter bg-gray-300 rounded-full">${letter}</span>
+                                <span>${question.options[letter]}</span>
+                            </div>
+                        `;
+                    });
+
+                    reviewItem.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">Question #${index + 1}: ${question.questionText}</h3>
+                        <div class="space-y-2 mb-4">
+                            ${optionsHtml}
+                        </div>
+                        <div class="p-4 bg-gray-100 rounded-lg">
+                            <h4 class="font-semibold text-lg">Rationale:</h4>
+                            <p class="text-gray-700">${question.rationale}</p>
+                        </div>
+                    `;
+                    reviewQuestionsContainer.appendChild(reviewItem);
+                });
+            }
+        }
+
+        /**
+         * Calculates the final grade based on user answers.
+         * @returns {number} The final grade percentage.
+         */
+        function calculateGrade() {
+            let totalScore = 0;
+            const totalQuestions = shuffledQuizData.length;
+
+            shuffledQuizData.forEach((question, index) => {
+                const userAnswer = userAnswers[index] || [];
+                let questionScore = 0;
+
+                if (question.type === 'mc') {
+                    const correctAnswer = Array.isArray(question.correctAnswer) ? question.correctAnswer[0] : question.correctAnswer;
+                    if (userAnswer[0] === correctAnswer) {
+                        questionScore = 1;
+                    }
+                } else if (question.type === 'sata') {
+                    const correctAnswers = new Set(question.correctAnswer);
+                    const userSelections = new Set(userAnswer);
+                    
+                    const hasIncorrect = [...userSelections].some(selection => !correctAnswers.has(selection));
+
+                    if (!hasIncorrect && userSelections.size > 0) {
+                        questionScore = userSelections.size / correctAnswers.size;
+                    }
+                }
+                totalScore += questionScore;
+            });
+
+            return Math.round((totalScore / totalQuestions) * 100);
+        }
+        
+        /**
+         * Handles the end of the exam review, showing a submission animation and grade.
+         */
+        function handleFinalSubmit() {
+            if (reviewScreen) reviewScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Calculating Grade...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                const finalGrade = calculateGrade();
+                if (finalGradeDisplay) finalGradeDisplay.textContent = `${finalGrade}%`;
+                if (gradeScreen) gradeScreen.classList.remove('hidden');
+            }, 2000); // 2-second animation
+        }
+
+        /**
+         * Submits the exam, stops the timer, and shows the review screen.
+         */
+        function submitExam() {
+            clearInterval(timerInterval);
+            saveUserAnswer();
+            renderReviewScreen();
+        }
+
+        /**
+         * Starts the quiz after the initial start screen.
+         */
+        function startQuiz() {
+            if (startScreen) startScreen.classList.add('hidden');
+            if (loadingAnimation) loadingAnimation.classList.remove('hidden');
+            document.querySelector('body').style.overflow = 'hidden';
+
+            const loadingText = document.querySelector('#loading-animation p');
+            if (loadingText) {
+                loadingText.textContent = 'Starting Exam...';
+            }
+
+            setTimeout(() => {
+                if (loadingAnimation) loadingAnimation.classList.add('hidden');
+                if (header) header.classList.remove('hidden');
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (footer) footer.classList.remove('hidden');
+                document.querySelector('body').style.overflow = '';
+                
+                shuffleArray(quizData);
+                shuffledQuizData = quizData.slice(0, 85);
+                userAnswers = Array(shuffledQuizData.length).fill([]);
+                startTimer();
+                renderQuestion();
+            }, 2000); // 2-second animation
+        }
+
+        // --- Event Listeners ---
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                saveUserAnswer();
+                if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                }
+            });
+        }
+        
+        if (previousBtn) {
+            previousBtn.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    saveUserAnswer();
+                    currentQuestionIndex--;
+                    renderQuestion();
+                }
+            });
+        }
+
+        if (submitExamBtn) {
+            submitExamBtn.addEventListener('click', submitExam);
+        }
+        
+        if (endReviewBtn) {
+            endReviewBtn.addEventListener('click', handleFinalSubmit);
+        }
+        
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+        
+        if (startBtn) {
+            startBtn.addEventListener('click', startQuiz);
+        }
+
+    </script>
+
+</body>
+</html>
+          
+          
+          
