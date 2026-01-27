@@ -184,15 +184,15 @@
                 <i class="fa-solid fa-user-nurse text-6xl text-[#003057]"></i>
             </div>
             <h1 class="text-4xl font-bold text-gray-800 mb-2">NCLEX-RN Practice Exam</h1>
-            <p class="text-gray-600 mb-8">Simulation Mode: 75 Questions (Demo limited) | 2 Hours</p>
+            <p class="text-gray-600 mb-8">Simulation Mode: Random Selection | 2 Hours</p>
             
             <div class="bg-blue-50 p-6 rounded-lg text-left mb-8 border border-blue-100">
                 <h3 class="font-bold text-blue-900 mb-2">Instructions:</h3>
                 <ul class="list-disc pl-5 space-y-2 text-sm text-blue-800">
                     <li>This exam mimics the real interface.</li>
+                    <li>Questions are randomly selected from the bank.</li>
                     <li>You cannot go back to previous questions.</li>
                     <li>A calculator is available in the toolbar.</li>
-                    <li>Comprehensive analytics provided upon completion.</li>
                 </ul>
             </div>
 
@@ -302,8 +302,6 @@
             <button class="calc-btn text-red-500" onclick="calcClear()">C</button>
             <button class="calc-btn" onclick="calcAppend('/')">/</button>
             <button class="calc-btn" onclick="calcAppend('*')">x</button>
-            <button class="calc-btn" onclick="calcBackspace()"><i class="fa-solid fa-delete-left"></i></button>
-            
             <button class="calc-btn" onclick="calcAppend('7')">7</button>
             <button class="calc-btn" onclick="calcAppend('8')">8</button>
             <button class="calc-btn" onclick="calcAppend('9')">9</button>
@@ -321,13 +319,15 @@
             
             <button class="calc-btn" onclick="calcAppend('0')" style="grid-column: span 2;">0</button>
             <button class="calc-btn" onclick="calcAppend('.')">.</button>
+            
+            <button class="calc-btn" onclick="calcBackspace()"><i class="fa-solid fa-delete-left"></i></button>
         </div>
     </div>
 
     <script>
-        // --- DATA ENGINE UPDATED TO NEW JSON STRUCTURE ---
+        // --- DATA ENGINE ---
         const EXAM_DATA = [
-           {
+ {
 "questionText": "The charge nurse on a medical–surgical unit receives the following shift report. Which patient should the nurse assess personally before delegating any related tasks to unlicensed nursing personnel (UAP)?",
 "options": {
 "A": "A stable older adult 3 days postoperative hip replacement requiring assistance to the chair",
@@ -2100,9 +2100,10 @@
     "section": "Evidence-Based Practice",
     "type": "sata"
   }
-        ];
+  ];
 
         // --- STATE MANAGEMENT ---
+        let shuffledQuestions = []; // Array to hold randomized questions
         let currentQuestionIndex = 0;
         let userAnswers = {}; // { qIndex: ['A'] or ['A', 'B'] }
         let flaggedQuestions = {}; // { qIndex: boolean }
@@ -2122,17 +2123,34 @@
 
         // --- EXAM LOGIC ---
 
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
         function initExam() {
+            // Randomization Logic
+            shuffledQuestions = [...EXAM_DATA];
+            shuffleArray(shuffledQuestions);
+            
+            // Set limit to 50 questions
+            shuffledQuestions = shuffledQuestions.slice(0, 50);
+
             startScreen.classList.add('hidden');
             examInterface.classList.remove('hidden');
-            qTotalDisplay.textContent = EXAM_DATA.length;
+            
+            // Use shuffledQuestions length
+            qTotalDisplay.textContent = shuffledQuestions.length;
             startTimer();
             loadQuestion(0);
         }
 
         function loadQuestion(index) {
             currentQuestionIndex = index;
-            const data = EXAM_DATA[index];
+            // Access from shuffled array
+            const data = shuffledQuestions[index];
             qCurrentDisplay.textContent = index + 1;
             
             // Disable Next button until interaction
@@ -2216,7 +2234,7 @@
         };
 
         nextBtn.addEventListener('click', () => {
-            if (currentQuestionIndex < EXAM_DATA.length - 1) {
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
                 loadQuestion(currentQuestionIndex + 1);
             } else {
                 finishExam();
@@ -2253,7 +2271,8 @@
             const reviewList = document.getElementById('review-list');
             reviewList.innerHTML = '';
 
-            EXAM_DATA.forEach((q, idx) => {
+            // Iterate over shuffledQuestions to match the order taken
+            shuffledQuestions.forEach((q, idx) => {
                 // Handle Section/Category
                 const section = q.section || "General";
                 if (!categoryStats[section]) categoryStats[section] = { correct: 0, total: 0 };
@@ -2279,33 +2298,64 @@
                 const statusIcon = isCorrect ? '<i class="fa-solid fa-check text-green-600"></i>' : '<i class="fa-solid fa-xmark text-red-600"></i>';
                 const flagIcon = flaggedQuestions[idx] ? '<i class="fa-solid fa-flag text-red-500 mr-2" title="Flagged"></i>' : '';
                 
+                // Build Options HTML for Review
+                let optionsHtml = '<div class="space-y-2 mb-4">';
+                Object.keys(q.options).forEach(key => {
+                    const text = q.options[key];
+                    const isUserSelected = userAns.includes(key);
+                    const isCorrectOption = correctArr.includes(key);
+                    
+                    let optionClass = "p-3 border rounded-md flex items-start text-sm";
+                    let icon = "";
+
+                    if (isCorrectOption) {
+                        optionClass += " bg-green-100 border-green-500 text-green-900 font-medium";
+                        icon = '<i class="fa-solid fa-check text-green-600 ml-auto mt-1"></i>';
+                    } else if (isUserSelected) { // Selected but wrong
+                        optionClass += " bg-red-50 border-red-400 text-red-900";
+                        icon = '<i class="fa-solid fa-xmark text-red-600 ml-auto mt-1"></i>';
+                    } else {
+                        optionClass += " bg-white border-gray-200 text-gray-500";
+                    }
+
+                    optionsHtml += `
+                        <div class="${optionClass}">
+                            <span class="font-bold mr-3 min-w-[1.5rem]">${key}.</span>
+                            <span class="flex-1">${text}</span>
+                            ${icon}
+                        </div>
+                    `;
+                });
+                optionsHtml += '</div>';
+
                 const div = document.createElement('div');
                 div.className = `p-6 ${statusClass}`;
                 
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
+                    <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center">
                             ${flagIcon}
-                            <span class="font-bold text-gray-700">Question ${idx + 1}</span>
-                            <span class="ml-3 text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">${section}</span>
+                            <span class="font-bold text-gray-700 text-lg">Question ${idx + 1}</span>
+                            <span class="ml-3 text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full uppercase tracking-wide font-bold">${section}</span>
                         </div>
-                        <span>${statusIcon}</span>
+                        <div class="text-2xl">${statusIcon}</div>
                     </div>
-                    <p class="mb-4 text-gray-800">${q.questionText}</p>
-                    <div class="text-sm bg-white p-4 rounded border border-gray-200">
-                        <div class="mb-2"><span class="font-bold text-gray-600">Your Answer:</span> ${userAns.join(', ') || 'None'}</div>
-                        <div class="mb-2"><span class="font-bold text-green-600">Correct Answer:</span> ${correctArr.join(', ')}</div>
-                        <div class="mt-3 pt-3 border-t border-gray-100">
-                            <span class="font-bold text-[#003057]">Rationale:</span>
-                            <p class="text-gray-600 mt-1">${q.rationale}</p>
-                        </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-900 font-medium text-lg mb-4 leading-relaxed">${q.questionText}</p>
+                        ${optionsHtml}
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg border-l-4 border-[#003057] shadow-sm">
+                        <h4 class="font-bold text-[#003057] mb-2 text-sm uppercase tracking-wider">Rationale</h4>
+                        <p class="text-gray-700 leading-relaxed">${q.rationale}</p>
                     </div>
                 `;
                 reviewList.appendChild(div);
             });
 
             // Render Charts
-            const scorePercent = Math.round((totalCorrect / EXAM_DATA.length) * 100);
+            const scorePercent = Math.round((totalCorrect / shuffledQuestions.length) * 100);
             document.getElementById('final-score-percent').textContent = scorePercent + '%';
             
             const passFailText = document.getElementById('pass-fail-text');
@@ -2317,7 +2367,7 @@
                 passFailText.className = "mt-2 font-bold text-lg text-red-600";
             }
 
-            renderDoughnutChart(totalCorrect, EXAM_DATA.length - totalCorrect);
+            renderDoughnutChart(totalCorrect, shuffledQuestions.length - totalCorrect);
             renderBarChart(categoryStats);
         }
 
@@ -2457,3 +2507,4 @@
     </script>
 </body>
 </html>
+
