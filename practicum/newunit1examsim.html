@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Testing Engine | NCLEX/HESI Mode</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #003057; /* Pearson/NCLEX Blue */
+            --secondary-blue: #007ac9;
+            --accent-orange: #f58220;
+            --bg-gray: #f0f2f5;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+            user-select: none; /* Prevent cheating/copying */
+        }
+
+        /* --- Header & Toolbars --- */
+        .exam-header {
+            background-color: var(--primary-blue);
+            height: 60px;
+        }
+
+        .exam-toolbar {
+            background-color: #e5e7eb;
+            border-bottom: 1px solid #d1d5db;
+        }
+
+        /* --- Question Area --- */
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* --- Options --- */
+        .option-row {
+            transition: all 0.2s;
+        }
+        .option-row:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Custom Radio/Checkbox Styling to look like legacy exam software */
+        input[type="radio"], input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #6b7280;
+            background: white;
+            margin-right: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        input[type="radio"] { border-radius: 50%; }
+        input[type="checkbox"] { border-radius: 4px; }
+
+        input[type="radio"]:checked {
+            border-color: var(--primary-blue);
+            background: white;
+        }
+        input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px; height: 10px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+        }
+
+        input[type="checkbox"]:checked {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+        }
+
+        /* --- Calculator --- */
+        #calculator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 260px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            z-index: 50;
+            border-radius: 4px;
+            display: none; /* Hidden by default */
+        }
+        .calc-display {
+            background: white;
+            border: 1px solid #888;
+            height: 40px;
+            margin: 10px;
+            text-align: right;
+            padding: 5px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.5rem;
+            overflow: hidden;
+        }
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            padding: 0 10px 10px 10px;
+        }
+        .calc-btn {
+            background: white;
+            border: 1px solid #aaa;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .calc-btn:active { background: #ccc; }
+        .calc-btn.op { background: #f0f0f0; color: var(--primary-blue); }
+        .calc-btn.eq { background: var(--secondary-blue); color: white; border-color: #005a9e; }
+        .calc-header {
+            background: linear-gradient(to bottom, #fff, #ccc);
+            padding: 5px 10px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #999;
+        }
+
+        /* --- Analytics & Review --- */
+        .category-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #e0f2fe;
+            color: #0369a1;
+            margin-bottom: 8px;
+        }
+
+        .correct-answer-box {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+        }
+        .incorrect-answer-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* --- Utilities --- */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-8">
+        <div class="max-w-2xl text-center">
+            <div class="mb-6 flex justify-center">
+                <i class="fa-solid fa-user-nurse text-6xl text-[#003057]"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">NCLEX-RN Practice Exam</h1>
+            <p class="text-gray-600 mb-8">Simulation Mode: 75 Questions (Demo limited) | 2 Hours</p>
+            
+            <div class="bg-blue-50 p-6 rounded-lg text-left mb-8 border border-blue-100">
+                <h3 class="font-bold text-blue-900 mb-2">Instructions:</h3>
+                <ul class="list-disc pl-5 space-y-2 text-sm text-blue-800">
+                    <li>This exam mimics the real interface.</li>
+                    <li>You cannot go back to previous questions.</li>
+                    <li>A calculator is available in the toolbar.</li>
+                    <li>Comprehensive analytics provided upon completion.</li>
+                </ul>
+            </div>
+
+            <button id="start-btn" class="px-10 py-3 bg-[#003057] text-white font-bold rounded shadow-lg hover:bg-[#001f3f] transition transform active:scale-95">
+                BEGIN EXAM
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN EXAM INTERFACE -->
+    <div id="exam-interface" class="hidden flex flex-col h-full w-full">
+        
+        <!-- Header -->
+        <header class="exam-header flex items-center justify-between px-6 text-white shadow-md z-10">
+            <div class="font-semibold text-lg tracking-wide">NCLEX-RN Simulator</div>
+            <div class="flex items-center space-x-6 text-sm font-mono">
+                <div><span id="q-current">1</span> of <span id="q-total">--</span></div>
+                <div class="bg-black/20 px-3 py-1 rounded">
+                    Time Remaining: <span id="timer">02:00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="exam-toolbar px-6 py-2 flex items-center justify-end space-x-4 shadow-sm">
+            <button onclick="toggleCalculator()" class="flex items-center space-x-2 text-gray-700 hover:text-black px-3 py-1 hover:bg-gray-200 rounded transition">
+                <i class="fa-solid fa-calculator"></i>
+                <span class="text-xs font-bold uppercase">Calculator</span>
+            </button>
+            <button id="flag-btn" onclick="toggleFlag()" class="flex items-center space-x-2 text-gray-700 hover:text-black px-3 py-1 hover:bg-gray-200 rounded transition group">
+                <i id="flag-icon" class="fa-regular fa-flag group-hover:text-red-500"></i>
+                <span id="flag-text" class="text-xs font-bold uppercase group-hover:text-red-500">Flag for Review</span>
+            </button>
+        </div>
+
+        <!-- Question Content -->
+        <main class="flex-1 overflow-y-auto bg-white">
+            <div class="max-w-5xl mx-auto p-8 md:p-12">
+                <div id="question-container" class="fade-in">
+                    <!-- Dynamic Content Injected Here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="bg-[#e5e7eb] border-t border-gray-300 p-4 flex justify-end items-center space-x-4">
+            <button id="next-btn" class="px-8 py-2 bg-[#003057] text-white font-bold rounded shadow hover:bg-[#002244] disabled:opacity-50 disabled:cursor-not-allowed transition">
+                NEXT <i class="fa-solid fa-chevron-right ml-2 text-xs"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- ANALYTICS DASHBOARD (Result Screen) -->
+    <div id="analytics-screen" class="hidden absolute inset-0 bg-[#f8fafc] overflow-y-auto z-40">
+        <div class="max-w-6xl mx-auto p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-8 pb-4 border-b">Exam Performance Review</h1>
+            
+            <!-- Top Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Score Card -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+                    <h3 class="text-gray-500 font-medium uppercase text-xs mb-2">Overall Score</h3>
+                    <div class="relative h-32 w-32">
+                        <canvas id="scoreChart"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span id="final-score-percent" class="text-3xl font-bold text-[#003057]">0%</span>
+                        </div>
+                    </div>
+                    <p id="pass-fail-text" class="mt-2 font-bold text-lg"></p>
+                </div>
+
+                <!-- Weakness Analysis -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 col-span-2">
+                    <h3 class="text-gray-500 font-medium uppercase text-xs mb-4">Performance by Client Needs Category</h3>
+                    <div class="h-48">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Question Review -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <h3 class="font-bold text-gray-700">Detailed Item Review</h3>
+                </div>
+                <div id="review-list" class="divide-y divide-gray-100">
+                    <!-- Dynamic Review Items -->
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center pb-10">
+                <button onclick="location.reload()" class="px-6 py-3 bg-[#003057] text-white rounded font-bold hover:bg-[#001f3f]">
+                    Take New Exam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALCULATOR WIDGET -->
+    <div id="calculator">
+        <div class="calc-header" id="calc-header">
+            <span class="text-xs font-bold text-gray-600">Calculator</span>
+            <button onclick="toggleCalculator()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="calc-display" id="calc-display">0</div>
+        <div class="calc-grid">
+            <button class="calc-btn text-red-500" onclick="calcClear()">C</button>
+            <button class="calc-btn" onclick="calcAppend('/')">/</button>
+            <button class="calc-btn" onclick="calcAppend('*')">x</button>
+            <button class="calc-btn" onclick="calcBackspace()"><i class="fa-solid fa-delete-left"></i></button>
+            
+            <button class="calc-btn" onclick="calcAppend('7')">7</button>
+            <button class="calc-btn" onclick="calcAppend('8')">8</button>
+            <button class="calc-btn" onclick="calcAppend('9')">9</button>
+            <button class="calc-btn op" onclick="calcAppend('-')">-</button>
+            
+            <button class="calc-btn" onclick="calcAppend('4')">4</button>
+            <button class="calc-btn" onclick="calcAppend('5')">5</button>
+            <button class="calc-btn" onclick="calcAppend('6')">6</button>
+            <button class="calc-btn op" onclick="calcAppend('+')">+</button>
+            
+            <button class="calc-btn" onclick="calcAppend('1')">1</button>
+            <button class="calc-btn" onclick="calcAppend('2')">2</button>
+            <button class="calc-btn" onclick="calcAppend('3')">3</button>
+            <button class="calc-btn eq" style="grid-row: span 2;" onclick="calcCalculate()">=</button>
+            
+            <button class="calc-btn" onclick="calcAppend('0')" style="grid-column: span 2;">0</button>
+            <button class="calc-btn" onclick="calcAppend('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ENGINE UPDATED TO NEW JSON STRUCTURE ---
+        const EXAM_DATA = [
+           {
+"questionText": "The charge nurse on a medical–surgical unit receives the following shift report. Which patient should the nurse assess personally before delegating any related tasks to unlicensed nursing personnel (UAP)?",
+"options": {
+"A": "A stable older adult 3 days postoperative hip replacement requiring assistance to the chair",
+"B": "A middle‑aged patient with dysphagia whose lunch tray has just arrived",
+"C": "A young adult receiving routine vital signs every 4 hours after appendectomy",
+"D": "A stable patient requiring morning hygiene care and linen change"
+},
+"correctAnswer": "B",
+"rationale": "Dysphagia is a high‑risk condition for aspiration. Feeding an at‑risk patient is not 'routine' for UAP; it requires nursing assessment, judgment, and supervision. Helping with ambulation, hygiene, and routine vitals in stable patients is safely delegable.",
+"section": "Delegation",
+"type": "mc"
+},
+{
+"questionText": "An RN preceptor is working with a novice nurse who frequently avoids confronting a physician about inconsistent postoperative pain orders. Which initial action by the RN best promotes both patient safety and the novice nurse’s development?",
+"options": {
+"A": "Confront the physician alone and tell the novice nurse to observe silently",
+"B": "Instruct the novice nurse to submit an anonymous incident report instead of speaking up",
+"C": "Role‑play the conversation with the novice nurse, then jointly speak with the physician",
+"D": "Reassign the patient to a more experienced nurse who is comfortable with conflict"
+},
+"correctAnswer": "C",
+"rationale": "Effective followers are expected to speak up and advocate. Role‑playing then jointly approaching the physician protects the patient while building the novice’s moral courage and communication competence.",
+"section": "Conflict & Followership",
+"type": "mc"
+},
+{
+"questionText": "A nurse manager is planning a unit‑based change using rapid, small tests of change to improve discharge teaching compliance. Which characteristic best matches Complex Adaptive System principles?",
+"options": {
+"A": "Designing one comprehensive, organization‑wide protocol before any trial",
+"B": "Implementing top‑down policies without frontline input",
+"C": "Testing a small change with a subset of patients, then adapting based on feedback",
+"D": "Requiring all staff to complete mandatory online modules before any practice changes"
+},
+"correctAnswer": "C",
+"rationale": "Complex Adaptive Science favors local adaptation, iterative learning, and frontline involvement. Testing small changes (PDSA cycles) relies on lived experience and ongoing adaptation rather than linear, prescriptive rollouts.",
+"section": "Change Management",
+"type": "mc"
+},
+{
+"questionText": "A staff nurse is asked to float from a medical–surgical unit to a step‑down unit. Which assignment is most appropriate for the nurse manager to give this floated nurse?",
+"options": {
+"A": "A fresh postoperative patient requiring frequent titration of vasoactive IV drips",
+"B": "A stable patient 2 days post‑MI on oral medications and continuous telemetry",
+"C": "A patient on noninvasive ventilation requiring frequent adjustments to settings",
+"D": "A hemodynamically unstable patient awaiting transfer to the ICU"
+},
+"correctAnswer": "B",
+"rationale": "Managers must match patient needs to the floated nurse’s usual skill set. Assigning stable patients with less technological complexity (like oral meds and telemetry) reduces liability compared to high-acuity tasks like IV titration.",
+"section": "Legal & Safe Staffing",
+"type": "mc"
+},
+{
+"questionText": "Which statement by the RN to an experienced UAP reflects unsafe delegation according to the National Guidelines for Nursing Delegation?",
+"options": {
+"A": "“Please obtain orthostatic vital signs on Mr. H. and report any dizziness or significant BP drop to me immediately.”",
+"B": "“Please record intake and output for Ms. J. and let me know if her urine is less than 30 mL/hr.”",
+"C": "“Assess Mr. L.’s abdominal pain level after his PCA dose and decide if he needs another dose.”",
+"D": "“Help Ms. R. ambulate with her walker; if she reports shortness of breath, return her to bed and notify me.”"
+},
+"correctAnswer": "C",
+"rationale": "Nursing judgment and critical decision‑making (like assessing pain levels and deciding on medication doses) cannot be delegated; the RN retains accountability for those clinical decisions.",
+"section": "Delegation",
+"type": "mc"
+},
+{
+"questionText": "A postoperative patient refuses to sign the consent form for a blood transfusion for religious reasons, despite understanding the risks. Which is the priority action?",
+"options": {
+"A": "Document the refusal and notify the provider of the patient’s decision",
+"B": "Explain that the hospital could be liable if the patient refuses treatment",
+"C": "Ask the family to convince the patient to accept the transfusion",
+"D": "Sign the consent as a witness because the provider already explained the risks"
+},
+"correctAnswer": "A",
+"rationale": "Informed consent includes the right to informed refusal. The nurse’s role is to document the refusal and inform the provider without coercing the patient or undermining their autonomy.",
+"section": "Ethics & Autonomy",
+"type": "mc"
+},
+{
+"questionText": "A nurse leader notices increased moral distress among staff. Which action best addresses moral distress and aligns with the role of a nurse manager?",
+"options": {
+"A": "Tell staff that moral distress is unavoidable and encourage them to develop 'thicker skin'",
+"B": "Provide education on ethical principles and facilitate access to ethics committee consultations",
+"C": "Rotate all staff away from such patients to avoid repeated exposure",
+"D": "Instruct staff not to verbalize their ethical concerns in front of families"
+},
+"correctAnswer": "B",
+"rationale": "Education and ethics committee access are key strategies to reduce moral distress. Leadership is expected to acknowledge and address the ethical climate rather than dismissing or avoiding the issue.",
+"section": "Ethics",
+"type": "mc"
+},
+{
+"questionText": "An agency nurse appears unfamiliar with a PCA pump and has programmed it incorrectly. Which action best reduces corporate and personal liability?",
+"options": {
+"A": "Assume the agency is solely liable and allow the nurse to continue after a brief reminder",
+"B": "Immediately send the nurse home, but do not notify the agency to avoid conflict",
+"C": "Reassign the nurse to tasks within clearly validated competence and notify the agency of concerns",
+"D": "Allow the nurse to continue using the PCA pump if another RN double‑checks occasionally"
+},
+"correctAnswer": "C",
+"rationale": "Under 'apparent agency,' hospitals can be liable for temporary staff. Managers must ensure competence, provide orientation, and document a proactive response by reassigning the nurse and notifying the agency.",
+"section": "Legal Issues",
+"type": "mc"
+},
+{
+"questionText": "A UAP offers to feed a patient with documented dysphagia. Which nurse response best reflects safe delegation and awareness of malpractice risk?",
+"options": {
+"A": "“That’s fine; feeding is always appropriate for UAPs as long as they’re trained.”",
+"B": "“I’ll complete his feeding myself because of his swallowing risk; you can assist with other patients’ meals.”",
+"C": "“Go ahead and feed him, but call me if he coughs or chokes during the meal.”",
+"D": "“Ask another UAP to feed him, since they may have more feeding experience.”"
+},
+"correctAnswer": "B",
+"rationale": "High-risk conditions like dysphagia make 'routine' tasks like feeding non-delegable. The RN must personally manage feeding to monitor for aspiration and intervene immediately.",
+"section": "Legal & Delegation",
+"type": "mc"
+},
+{
+"questionText": "A nurse is implementing a new evidence‑based falls prevention bundle. Which behavior best demonstrates the nurse’s role in translating evidence into practice?",
+"options": {
+"A": "Waiting to change any practice until all long‑term outcome data are published",
+"B": "Relying solely on personal experience to determine which bundle components to use",
+"C": "Participating in collecting unit falls data and providing feedback on barriers to implementation",
+"D": "Delegating all aspects of the bundle to UAPs since it focuses on 'basic care'"
+},
+"correctAnswer": "C",
+"rationale": "Implementation is contextual; staff should participate in data collection and feedback loops to adapt evidence to the bedside. Passive waiting or relying on anecdote is contrary to EBP principles.",
+"section": "Evidence-Based Practice",
+"type": "mc"
+},
+{
+"questionText": "A manager observes a physician verbally abusing early‑career nurses. Which action is most appropriate to improve unit culture and patient outcomes?",
+"options": {
+"A": "Encourage new nurses to avoid that physician whenever possible",
+"B": "Implement a zero‑tolerance policy for verbal abuse and provide training in bystander intervention",
+"C": "Suggest that new nurses toughen up because verbal abuse is typical",
+"D": "Ask experienced nurses to shield new nurses by taking over all communication"
+},
+"correctAnswer": "B",
+"rationale": "Verbal abuse correlates with lower safety. Leaders should create a zero-tolerance culture and equip staff with tools like TeamSTEPPS or bystander training to address incivility.",
+"section": "Communication & Culture",
+"type": "mc"
+},
+{
+"questionText": "A nurse leader is chairing a team deadlocked over a new protocol. Which behavior best reflects a collaborating conflict‑management style?",
+"options": {
+"A": "Postponing the decision indefinitely to avoid upsetting either side",
+"B": "Splitting the difference so each side gives up something important",
+"C": "Exploring each discipline’s underlying goals to co‑create a solution that meets key needs",
+"D": "Using positional authority to impose the protocol supported by nursing"
+},
+"correctAnswer": "C",
+"rationale": "Collaboration involves co‑designing integrative solutions that meet the core needs of all parties. This style is assertive and cooperative, focusing on long-term relationships.",
+"section": "Conflict Management",
+"type": "mc"
+},
+{
+"questionText": "A direct care nurse consistently questions unsafe workarounds. What is the most important implication for leadership development?",
+"options": {
+"A": "Informal leaders should avoid challenging systems to maintain harmony",
+"B": "Effective followership behaviors form the foundation for authentic leadership roles",
+"C": "Only nurses with formal titles should participate in system redesign initiatives",
+"D": "Emotional intelligence is irrelevant when questioning unsafe practices"
+},
+"correctAnswer": "B",
+"rationale": "Effective followers who challenge unsafe practices and support goals often transition into authentic leaders. Leadership is a shared, fluid concept where informal roles are crucial.",
+"section": "Personal Insight",
+"type": "mc"
+},
+{
+"questionText": "A nurse is reviewing a research article to decide whether to implement a new UTI prevention protocol. Which step aligns best with EBP principles?",
+"options": {
+"A": "Implement the intervention immediately because it worked in another hospital",
+"B": "Critically appraise the study’s design and consider local context before recommending adoption",
+"C": "Ask the most experienced nurse whether they think the intervention is helpful",
+"D": "Wait until the intervention is mandated by a regulatory agency"
+},
+"correctAnswer": "B",
+"rationale": "EBP requires critical appraisal of design and validity combined with clinical expertise and local context. Blind adoption or waiting for mandates bypasses proactive clinical judgment.",
+"section": "Research & EBP",
+"type": "mc"
+},
+{
+"questionText": "A strategic plan for a new surgical service shows physician resistance and leadership turnover. Which conclusion is most accurate?",
+"options": {
+"A": "The presence of a competitor alone is sufficient reason to abandon the project",
+"B": "Leadership turnover and physician resistance reduce readiness and must be addressed",
+"C": "Negative physician attitudes can be ignored if finances support expansion",
+"D": "The environmental scan is complete and does not need further information"
+},
+"correctAnswer": "B",
+"rationale": "Readiness for change includes leadership stability and stakeholder buy-in. Barriers like staff opposition and turnover reduce the likelihood of success and must be managed proactively.",
+"section": "Strategic Planning",
+"type": "mc"
+},
+{
+"questionText": "Several staff 'go along to get along,' but complain privately about unsafe practices. Which developmental strategy is most appropriate?",
+"options": {
+"A": "Reinforce that followers should not question leaders",
+"B": "Provide structured forums (e.g., shared governance councils) where staff voice concerns",
+"C": "Assign these staff to less complex patients to minimize risk",
+"D": "Encourage staff to submit anonymous complaints"
+},
+"correctAnswer": "B",
+"rationale": "Ineffective followers often complain without engaging. Development requires creating shared governance structures where open, evidence-based dialogue is the expectation.",
+"section": "Followership",
+"type": "mc"
+},
+{
+"questionText": "During an emergency, a nurse delegated vitals but didn't specify reportable parameters. The UAP failed to report a BP drop. What contributed most to this unsafe delegation?",
+"options": {
+"A": "The nurse’s decision to delegate vital‑sign measurement",
+"B": "The lack of clear, specific communication about parameters requiring reporting",
+"C": "The UAP’s performance of tasks within their routine job description",
+"D": "The absence of written organizational policies on delegation"
+},
+"correctAnswer": "B",
+"rationale": "Safe delegation requires two-way, clear communication. The nurse must specify exactly what thresholds require immediate reporting; failing to do so is a classic delegation error.",
+"section": "Delegation",
+"type": "mc"
+},
+{
+"questionText": "Which activity best strengthens emotional intelligence (EI) for a nurse being mentored into a leadership role?",
+"options": {
+"A": "Focusing primarily on improving standardized test scores",
+"B": "Practicing regular reflective journaling about personal triggers and responses",
+"C": "Limiting feedback from staff to avoid overthinking",
+"D": "Relying solely on clinical knowledge and technical skills in evaluations"
+},
+"correctAnswer": "B",
+"rationale": "EI involves self-awareness and self-management. Reflective journaling about interactions and triggers targets these domains directly, whereas technical skills relate to cognitive ability.",
+"section": "Personal Insight",
+"type": "mc"
+},
+{
+"questionText": "A manager implements TeamSTEPPS training to improve RN–UAP communication. Which outcome indicates the intervention is effective?",
+"options": {
+"A": "Increased number of formal conflict reports",
+"B": "Decreased patient falls and improved perceptions of teamwork",
+"C": "Higher staff turnover among UAPs",
+"D": "More unreported near‑miss events"
+},
+"correctAnswer": "B",
+"rationale": "Improved teamwork and communication are evidence-based methods for reducing clinical errors like falls and pressure injuries, while also boosting job satisfaction.",
+"section": "Communication",
+"type": "mc"
+},
+{
+"questionText": "A long‑term care unit has frequent ED transfers. Which action best reflects adaptive leadership in a Complex Adaptive System?",
+"options": {
+"A": "Continue the 'when in doubt, send them out' approach",
+"B": "Convene an interdisciplinary team to examine patterns and co‑create protocols",
+"C": "Ask individual nurses to independently decide whether to send patients out",
+"D": "Focus exclusively on reducing the cost of transfers"
+},
+"correctAnswer": "B",
+"rationale": "Adaptive leaders in complex systems use bottom-up change and relationship-building. Examining patterns with multiple stakeholders allows for shared interpretation and system-wide improvement.",
+"section": "Leadership",
+"type": "mc"
+},
+{
+"questionText": "The charge nurse is making assignments on a medical–surgical unit that uses a shared governance model and is on the Magnet journey. Which assignment most clearly reflects the integration of shared governance and effective followership?",
+"options": {
+"A": "Assigning all newly admitted high‑acuity patients to the most experienced RN, without discussion",
+"B": "Asking a novice RN to chair the unit council alone to “develop leadership,” without support",
+"C": "Scheduling a council‑designated “evidence champion” RN to pilot a new falls protocol and report back to the council",
+"D": "Having the nurse manager unilaterally select which evidence‑based projects the staff will implement this quarter"
+},
+"correctAnswer": "C",
+"rationale": "Shared governance emphasizes staff ownership of practice decisions. Option C uses a council-chosen RN (effective follower/informal leader) to pilot a protocol and report back for shared decision-making, reflecting both ownership and accountability.",
+"section": "Governance & Followership",
+"type": "mc"
+},
+{
+"questionText": "A novice nurse scores high on “accommodation” and “avoidance” on a conflict assessment and admits to avoiding confronting colleagues about med shortcuts. Which coaching question best moves the nurse toward safer practice?",
+"options": {
+"A": "“How could you delay addressing the issue so everyone has cooled down?”",
+"B": "“In what situations is it worth risking discomfort to protect patient safety, and how might you respond more assertively there?”",
+"C": "“What compromises could you make so the other nurse feels more comfortable?”",
+"D": "“How can you make sure you never confront colleagues directly about their practice?”"
+},
+"correctAnswer": "B",
+"rationale": "Overuse of avoidance leads to unresolved safety issues. Effective advocacy requires assertive behavior. This question links discomfort to patient safety and invites the nurse to plan an assertive response.",
+"section": "Conflict Management",
+"type": "mc"
+},
+{
+"questionText": "A nurse manager notes that, despite repeated in‑service sessions on delegation, nurses still underdelegate and complain of burnout. Which underlying factor most likely explains persistent underdelegation?",
+"options": {
+"A": "Delegates’ refusal to accept any responsibility for patient care tasks",
+"B": "Nurses’ fear of loss of control and lack of trust in delegatees’ abilities",
+"C": "Strict nurse practice acts that prohibit delegation in acute care",
+"D": "Lack of a shared governance structure in the organization"
+},
+"correctAnswer": "B",
+"rationale": "The delegation chapter identifies fear of loss of control and lack of trust in others' performance as the primary causes of underdelegation, even when policies and personnel are available.",
+"section": "Delegation",
+"type": "mc"
+},
+{
+"questionText": "A nurse manager in a VUCA environment wants to apply Complex Adaptive Science to reduce central line infections. Which action is most consistent with this framework?",
+"options": {
+"A": "Creating a detailed, unchangeable central line protocol based solely on expert opinion",
+"B": "Limiting data access to leadership, to avoid “overwhelming” frontline staff",
+"C": "Forming a cross‑disciplinary team to identify patterns and test small, real‑time changes in practice",
+"D": "Assigning one infection‑control “expert” to make all decisions and inform staff of solutions"
+},
+"correctAnswer": "C",
+"rationale": "Complex Adaptive Science emphasizes relationships, broad participation, and co-creation. Forming an interdisciplinary team to analyze patterns and pilot changes aligns with this relational, adaptive approach.",
+"section": "Leadership",
+"type": "mc"
+},
+{
+"questionText": "A nurse manager in long‑term care introduces INTERACT tools (Stop and Watch, SBAR) and embeds an APRN. Why did this reduce avoidable transfers and polypharmacy?",
+"options": {
+"A": "It centralizes all decisions in the APRN, decreasing staff input",
+"B": "It adds more documentation steps, discouraging staff from reporting early changes",
+"C": "It distributes assessment and communication across the team, improving early recognition and collaborative decision‑making",
+"D": "It triggers automatic transfers whenever Stop and Watch is completed"
+},
+"correctAnswer": "C",
+"rationale": "Standardized tools like INTERACT and APRN support enhance early recognition of condition changes and foster collaborative treatment within the facility rather than reactive transfers.",
+"section": "Communication",
+"type": "mc"
+},
+{
+"questionText": "A nurse leader is using George’s model to build authentic leadership. Which action best reflects this approach in day‑to‑day staff interactions?",
+"options": {
+"A": "Emulating the communication style of the previous nurse manager to appear more “leader‑like”",
+"B": "Sharing personal values about patient advocacy with the staff and inviting discussion on how these align with unit practices",
+"C": "Delegating all emotionally difficult conversations to the assistant manager to maintain distance",
+"D": "Enforcing strict adherence to policies, regardless of staff feedback"
+},
+"correctAnswer": "B",
+"rationale": "Authentic leadership is based on core values, honesty, and connectedness. Sharing values and facilitating a values-based dialogue aligns with George's dimensions of purpose, heart, and relationships.",
+"section": "Leadership",
+"type": "mc"
+},
+{
+"questionText": "A nurse manager with high emotional intelligence (EI) is most likely to demonstrate which behavior when a new policy creates staff anxiety and anger?",
+"options": {
+"A": "Ignoring staff emotions and focusing only on task completion",
+"B": "Recognizing staff frustration, inviting open discussion, and managing personal reactions to stay solution‑focused",
+"C": "Sending an email reminding staff that change is mandatory and resistance will be disciplined",
+"D": "Avoiding the topic until staff “get used to it”"
+},
+"correctAnswer": "B",
+"rationale": "EI involves self-management and relationship management. Recognizing others' emotions and regulating one's own response to build constructive solutions reflects all four pillars of EI.",
+"section": "Leadership",
+"type": "mc"
+},
+{
+"questionText": "A nurse cares for a patient with a right‑sided MI and the provider orders metoprolol IV, which the nurse knows may be harmful. Which response best demonstrates moral courage?",
+"options": {
+"A": "Administer the medication as ordered to avoid conflict and document “per MD order.”",
+"B": "Refuse to administer the medication, state the clinical concern, and request a cardiology consult or alternative order",
+"C": "Ask a colleague to carry out the order so the nurse does not have to be involved",
+"D": "Ignore the order and simply do not give the drug, without notifying anyone"
+},
+"correctAnswer": "B",
+"rationale": "Moral courage is speaking up for what is right despite fear. Advocacy requires refusal of harmful orders and appropriate escalation, which is the hallmark of an effective follower and leader.",
+"section": "Professionalism & Ethics",
+"type": "mc"
+},
+{
+"questionText": "A new RN works with a very competent UAP on their first shift together. According to the Situational Leadership Model, what is the best way for the RN to delegate vital signs?",
+"options": {
+"A": "Provide detailed instructions on each step and remain at the bedside",
+"B": "Tell the UAP, “Just do what you usually do; I don’t need updates”",
+"C": "Discuss the UAP's usual process, share reporting expectations, and agree on check-in times",
+"D": "Avoid delegating vitals until they have worked together for several weeks"
+},
+"correctAnswer": "C",
+"rationale": "In Situational Leadership, when ability is high but the relationship is new, a 'participating' style is best. This involves clarifying expectations and mutual conditions of performance.",
+"section": "Delegation",
+"type": "mc"
+},
+{
+"questionText": "Which task is most appropriate for a medical–surgical RN to delegate to an experienced UAP under the Five Rights of Delegation?",
+"options": {
+"A": "Teaching a newly diagnosed diabetic patient how to self‑administer insulin",
+"B": "Assessing lung sounds in a patient with new onset shortness of breath",
+"C": "Obtaining orthostatic vital signs on a stable post‑operative patient per unit protocol and reporting abnormalities",
+"D": "Adjusting oxygen flow rate for a patient whose oxygen saturation has dropped to 86%"
+},
+"correctAnswer": "C",
+"rationale": "UAPs can perform routine, non-complex tasks that do not require clinical judgment. Vitals on a stable patient fit this criteria, whereas teaching, assessing, and titration require the nursing process.",
+"section": "Delegation",
+"type": "mc"
+},
+  {
+    "questionText": "A step‑down charge nurse is triaging tasks at shift change. Which situation requires the RN to withhold delegation to a highly experienced UAP despite severe staffing shortages?",
+    "options": {
+      "A": "Continuous bladder irrigation on a stable post‑TURP patient with clear yellow output and established flow rate",
+      "B": "Assisting a stable post‑stroke patient with right‑sided weakness to a chair using a gait belt",
+      "C": "Obtaining the first set of vital signs on a newly admitted patient with GI bleeding who just arrived from the ED",
+      "D": "Performing routine blood glucose checks on long‑term diabetic patients per unit protocol"
+    },
+    "correctAnswer": "C",
+    "rationale": "Initial assessment of a newly admitted, potentially unstable patient (GI bleed) is part of the RN’s non‑delegable responsibilities in assessment, clinical reasoning, and determination of acuity.[file:2][file:6] Even if the actual task is 'vital signs,' this first set informs triage and care planning and must be interpreted in real time by the RN.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new graduate RN on a medical–surgical unit reports, “I don’t delegate catheter care to UAPs because if anything goes wrong, I’ll get sued.” Which response by the nurse preceptor best aligns with the National Guidelines for Nursing Delegation?",
+    "options": {
+      "A": "“You’re right; if you delegate and there’s harm, the UAP is the only one liable, not the hospital.”",
+      "B": "“Delegation is optional; you can refuse to delegate if you’re uncomfortable, regardless of unit needs.”",
+      "C": "“You remain accountable for outcomes, but safe delegation is expected when the UAP is competent and you provide clear direction and supervision.”",
+      "D": "“To avoid liability, only delegate tasks that require no training, such as making beds or stocking supplies.”"
+    },
+    "correctAnswer": "C",
+    "rationale": "The RN retains accountability for overall outcomes but is expected to delegate appropriately within the Nurse Practice Act, organizational policy, and the Five Rights, including verifying competence and providing direction and supervision.[file:2][file:6] Avoiding all delegation contributes to underdelegation and burnout, not safety.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager in long‑term care is revising delegation policies after a wrongful‑death case related to tube‑feeding misplacement by a CNA. Which proposed policy change most directly reduces both individual and corporate liability?",
+    "options": {
+      "A": "Allowing experienced CNAs to reinstitute gastrostomy tubes only if they worked previously in a hospital setting",
+      "B": "Requiring RNs to document that they verbally reminded CNAs about high‑risk tasks at the start of each shift",
+      "C": "Limiting CNAs to tasks within their job description and validated competencies, and requiring RN assessment before any high‑risk enteral procedure",
+      "D": "Mandating that all CNAs sign an annual waiver accepting full legal responsibility for delegated tasks"
+    },
+    "correctAnswer": "C",
+    "rationale": "Delegation beyond education and validated competency, especially high‑risk enteral procedures, creates malpractice risk for the RN and corporate liability for the agency.[file:2][file:6] Policies must restrict delegatees to validated competencies and reinforce the RN’s duty to assess and retain judgment for high‑risk care.",
+    "section": "Legal & Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "An RN is working with an agency nurse who is unfamiliar with the institution’s electronic MAR and keeps asking others to cosign late entries. Which action by the nurse manager best reflects understanding of apparent agency and corporate liability?",
+    "options": {
+      "A": "Instruct permanent staff to closely monitor the agency nurse but make no formal changes to assignments",
+      "B": "Temporarily assign the agency nurse only to non‑medication tasks after rapid competency review and notify the agency of gaps",
+      "C": "Ask the agency nurse to sign a form accepting all liability for documentation errors at this facility",
+      "D": "Allow the agency nurse to continue giving medications because the agency, not the hospital, is liable for errors"
+    },
+    "correctAnswer": "B",
+    "rationale": "Under apparent agency, patients reasonably assume the nurse is a hospital employee, so the hospital shares liability.[file:2] Managers must ensure competence, modify duties to match proven skills, and communicate concerns to the agency rather than allow unsafe practice.",
+    "section": "Legal Issues",
+    "type": "mc"
+  },
+  {
+    "questionText": "A night‑shift RN delegates hourly rounding to a UAP on a high‑fall‑risk patient and says, “Let me know if anything is wrong.” The patient later falls after repeatedly trying to get to the bathroom. Which factor most clearly represents improper delegation?",
+    "options": {
+      "A": "Rounding was delegated to a UAP rather than retained by the RN",
+      "B": "The RN failed to specify exact reportable behaviors or parameters during delegation",
+      "C": "The UAP did not document each rounding check in real time",
+      "D": "The RN did not ask the family to stay overnight with the patient"
+    },
+    "correctAnswer": "B",
+    "rationale": "Safe delegation requires precise, two‑way communication about what to do, what to observe, and what findings require immediate reporting.[file:6] Vague phrases (“if anything is wrong”) are a classic violation of the 'right direction/communication' and contribute directly to unsafe outcomes.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager is assigning patients on a mixed medical–surgical unit. Which assignment represents an unsafe match between patient needs and provider’s usual scope based on legal staffing principles?",
+    "options": {
+      "A": "Experienced LPN assigned to a stable postoperative day‑3 cholecystectomy patient needing oral medications and dressing changes",
+      "B": "Agency RN with unknown ICU experience assigned to titrate multiple vasoactive drips on a fresh post‑CABG patient",
+      "C": "Experienced float RN from telemetry assigned to manage continuous telemetry on a stable pneumonia patient",
+      "D": "UAP assigned to assist multiple stable post‑op patients with ambulation using gait belts"
+    },
+    "correctAnswer": "B",
+    "rationale": "Managers must not assign high‑acuity, high‑risk tasks like complex vasoactive titration to nurses whose competence in that context is unknown, especially temporary staff, because this raises direct and corporate liability.[file:2][file:6] Competence must be validated before such assignments.",
+    "section": "Legal & Safe Staffing",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader is implementing TeamSTEPPS training to address near‑miss medication errors involving RNs and UAPs. Which staff behavior best shows that the unit is moving toward a safer Complex Adaptive System response rather than a linear, blame‑focused one?",
+    "options": {
+      "A": "Punishing individual UAPs who fail to report subtle patient changes related to medications",
+      "B": "Creating a shared huddle where RNs and UAPs review patterns in near misses and co‑design communication check‑backs",
+      "C": "Requiring RNs to submit written incident reports without providing feedback on outcomes",
+      "D": "Limiting medication administration discussions to pharmacists and prescribers only"
+    },
+    "correctAnswer": "B",
+    "rationale": "Complex Adaptive Science emphasizes broad participation, pattern recognition, and relationship‑based co‑creation of solutions.[file:1] TeamSTEPPS huddles using check‑backs engage frontline staff, share information widely, and transform near‑miss data into iterative change rather than blame.[file:5]",
+    "section": "Communication & CAS",
+    "type": "mc"
+  },
+  {
+    "questionText": "A novice nurse consistently avoids calling providers, saying, “They get angry; I just try to work around orders quietly.” Which coaching question best integrates emotional intelligence (EI) and effective followership development?",
+    "options": {
+      "A": "“What makes you feel personally attacked when a provider raises their voice?”",
+      "B": "“When have you felt moral distress after staying silent, and how could you channel that discomfort into a respectful safety conversation next time?”",
+      "C": "“Would you feel better if your manager always spoke to the provider for you?”",
+      "D": "“Which providers can you completely avoid contacting by using workarounds?”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Effective followers use moral courage to speak up, and EI requires recognizing emotions, linking them to values, and planning self‑managed, assertive responses.[file:3][file:5] Exploring moral distress and converting it into a concrete advocacy plan directly targets safer practice.",
+    "section": "Personal Insight & EI",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader using George’s authentic leadership model wants to strengthen team trust after a contentious policy change. Which action best reflects authentic leadership rather than image‑management?",
+    "options": {
+      "A": "Adopting the communication style of the previous manager to maintain continuity",
+      "B": "Openly discussing personal values about patient safety, acknowledging staff concerns about the policy, and co‑creating unit norms that align with those values",
+      "C": "Delegating all emotionally charged conversations about the policy to the assistant manager",
+      "D": "Enforcing strict adherence to the policy while avoiding any discussion of values to remain 'neutral'"
+    },
+    "correctAnswer": "B",
+    "rationale": "Authentic leadership emphasizes self‑awareness, alignment with core values, transparency, and relational connectedness.[file:3] Inviting dialogue about shared values and co‑creating practice norms shows authenticity, not performance of a role.",
+    "section": "Leadership",
+    "type": "mc"
+  },
+  {
+    "questionText": "During a rapid response, the RN orders a UAP, “Get vitals now,” but does not specify thresholds. The UAP later reports a BP of 82/48 only after 20 minutes. Which nursing action at the time of delegation would have most reduced malpractice risk?",
+    "options": {
+      "A": "Asking another RN to check the patient’s blood pressure first",
+      "B": "Explaining, “If systolic BP is below 90 or the patient appears more confused, call me immediately before finishing other tasks.”",
+      "C": "Telling the UAP, “You are responsible for monitoring the patient’s condition while I talk with the provider.”",
+      "D": "Asking the UAP to document all vital signs before reporting back"
+    },
+    "correctAnswer": "B",
+    "rationale": "Delegation requires explicit parameters for urgent reporting and clear lines of communication; failure to specify thresholds is an improper delegation error linked to liability.[file:2][file:6] Defining a systolic cutoff and observable changes operationalizes the 'right direction/communication.'",
+    "section": "Delegation & Legal",
+    "type": "mc"
+  },
+  {
+    "questionText": "A direct‑care nurse on a Magnet journey unit frequently leads debriefings after code events, asks evidence‑based questions about protocols, and has no formal title. Which leadership implication is most accurate?",
+    "options": {
+      "A": "Their behaviors should be limited to bedside tasks until they receive an official leadership role",
+      "B": "They exemplify informal, authentic leadership emerging from effective followership and should be supported as a council or project leader",
+      "C": "They should avoid council work to prevent diverting time from direct care",
+      "D": "Their involvement in debriefings may undermine the authority of formal leaders"
+    },
+    "correctAnswer": "B",
+    "rationale": "Effective followers who challenge systems constructively and facilitate learning often become authentic leaders in shared governance environments like Magnet hospitals.[file:1][file:3] Supporting them in formal council roles leverages this leadership capacity.",
+    "section": "Governance & Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "A unit‑based quality council is planning a falls‑reduction initiative in a VUCA environment with frequent staffing changes. Which strategy best reflects Complex Adaptive Science for implementing change?",
+    "options": {
+      "A": "Mandating a single, rigid falls protocol for all hospital units without piloting",
+      "B": "Piloting a simplified hourly‑rounding script on one shift, collecting frontline feedback, and iterating the process before spread",
+      "C": "Relying solely on quarterly hospital‑wide fall‑rate dashboards to guide unit practice",
+      "D": "Limiting participation in the initiative to nurse managers and senior executives"
+    },
+    "correctAnswer": "B",
+    "rationale": "Complex Adaptive Science favors simple rules, local adaptation, real‑time data, and iterative tests of change at the point of care (e.g., small PDSA cycles).[file:1][file:7] Frontline involvement allows patterns to emerge and be refined rather than imposing rigid top‑down protocols.",
+    "section": "Change Management & CAS",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager notices some staff consistently 'go along' in meetings but later sabotage implementation of an evidence‑based skin‑care protocol. Which leadership intervention best addresses this ineffective followership pattern?",
+    "options": {
+      "A": "Reprimand staff individually for not speaking up during meetings",
+      "B": "Establish a shared governance workgroup where staff must bring data and proposed alternatives to any objections",
+      "C": "Exclude silent staff from future change discussions to streamline decisions",
+      "D": "Direct charge nurses to simply enforce compliance with no discussion"
+    },
+    "correctAnswer": "B",
+    "rationale": "Ineffective followers complain or undermine without engaging; shared governance structures that require evidence and active participation help convert passive agreement into responsible, evidence‑based voice.[file:1][file:3] This builds ownership rather than silence or sabotage.",
+    "section": "Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "An RN with strong technical skills but low self‑awareness asks how to prepare for future management roles. Which developmental activity is most tightly linked to building emotional intelligence for leadership?",
+    "options": {
+      "A": "Completing additional pharmacology continuing‑education modules each month",
+      "B": "Engaging in scheduled reflective journaling about daily interactions, triggers, and responses, then setting specific behavior change goals",
+      "C": "Requesting to avoid emotionally intense assignments to prevent burnout",
+      "D": "Tracking unit fall rates and pressure injuries for the monthly dashboard"
+    },
+    "correctAnswer": "B",
+    "rationale": "EI centers on self‑awareness, self‑management, social awareness, and relationship management.[file:3] Reflective journaling about triggers and responses is a direct method for enhancing insight and deliberate behavior change, a prerequisite for authentic leadership.",
+    "section": "Personal Insight & EI",
+    "type": "mc"
+  },
+  {
+    "questionText": "A UAP questions an RN’s instruction to keep a confused, restrained patient’s side rails up x4 “for safety,” saying, “That seems risky for entrapment.” Which RN response best models effective followership development and a healthy safety culture?",
+    "options": {
+      "A": "“Side rails are always safer for confused patients; just follow the order.”",
+      "B": "“Thank you for speaking up—let’s review the restraint and fall policy together and reassess if side rails x4 are appropriate.”",
+      "C": "“Discuss your concerns with the charge nurse; I’ve already made the decision.”",
+      "D": "“Document that you disagreed so you’re covered legally, but keep the rails up.”"
+    },
+    "correctAnswer": "B",
+    "rationale": "Encouraging questioning of potentially unsafe practices and jointly reviewing policy promotes effective followership and psychological safety, both critical for preventing harm.[file:1][file:3] Dismissing the concern undermines a high‑reliability culture.",
+    "section": "Professionalism & Safety Culture",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager is reviewing a near‑miss where a CNA independently 'taught' a new ostomy patient how to change the appliance, leading to confusion and skin breakdown. Which principle is most important for the manager to reinforce?",
+    "options": {
+      "A": "Teaching is within the CNA’s scope as long as written materials are provided",
+      "B": "Patient education that requires assessment of readiness and evaluation of learning is an RN responsibility and should not be delegated",
+      "C": "Teaching is safe to delegate if the RN later signs off on the documentation",
+      "D": "Teaching is appropriate for CNAs when the patient is stable and motivated"
+    },
+    "correctAnswer": "B",
+    "rationale": "Complex, individualized teaching includes assessment, planning, and evaluation—core components of the nursing process that cannot be delegated to unlicensed personnel.[file:2][file:6] Failing to distinguish task performance from teaching contributes to malpractice risk.",
+    "section": "Delegation & Education",
+    "type": "mc"
+  },
+  {
+    "questionText": "During a contentious discussion about implementing a new electronic health record, a nurse leader wants to use collaboration as a conflict‑management style. Which behavior best demonstrates true collaboration rather than compromise?",
+    "options": {
+      "A": "Splitting the difference on go‑live dates so each side concedes something",
+      "B": "Temporarily postponing the change to avoid further conflict",
+      "C": "Using positional authority to enforce the implementation timeline",
+      "D": "Surfacing underlying goals of each group and co‑designing a phased rollout that meets safety, workflow, and training needs",
+      "E": "Allowing the most senior physicians to decide how the system will work"
+    },
+    "correctAnswer": "D",
+    "rationale": "Collaboration is both assertive and cooperative, seeking integrative solutions that meet key needs of all parties by exploring underlying interests and co‑creating plans.[file:5] Compromise splits differences; collaboration redesigns the solution space.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse experiences ongoing moral distress over providing aggressive treatment to a terminally ill patient whose stated values conflict with the family’s wishes. Which manager action best addresses moral distress at a systems level?",
+    "options": {
+      "A": "Encouraging the nurse to 'accept that this is part of the job'",
+      "B": "Facilitating an ethics consult and offering unit‑level education on ethical principles and moral resilience",
+      "C": "Reassigning the nurse permanently away from all end‑of‑life patients",
+      "D": "Advising the nurse to avoid sharing concerns with colleagues to prevent negativity"
+    },
+    "correctAnswer": "B",
+    "rationale": "Moral distress is mitigated by ethics education, structured support, and access to ethics consultation, not by avoidance or silencing.[file:2] Managerial roles include shaping the ethical climate and providing formal avenues to address value conflicts.",
+    "section": "Ethics & Leadership",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse reviewing an article on a sepsis early‑warning algorithm notes that the study was done in a large academic ICU, while their hospital is a small community facility with limited telemetry. Which next step is most consistent with evidence‑based practice and implementation science?",
+    "options": {
+      "A": "Adopt the algorithm exactly as published to maintain fidelity to the research",
+      "B": "Conclude the findings are not applicable because the setting is different",
+      "C": "Critically appraise the study’s rigor, then convene a team to adapt the algorithm to local resources and workflow before piloting",
+      "D": "Wait for a regulatory body to mandate use of a specific sepsis tool"
+    },
+    "correctAnswer": "C",
+    "rationale": "EBP requires critical appraisal plus consideration of context, then adaptation and testing in the local setting using implementation frameworks like i‑PARIHS rather than blind adoption or rejection.[file:4] Team‑based adaptation aligns with translational science principles.",
+    "section": "Research & EBP",
+    "type": "mc"
+  },
+  {
+    "questionText": "During strategic planning, data show rising central‑line infections and high nurse turnover on one unit. Which conclusion best reflects readiness‑for‑change principles?",
+    "options": {
+      "A": "Financial resources alone are sufficient to ensure success of a CLABSI‑reduction initiative",
+      "B": "Leadership instability and turnover are barriers that must be addressed for sustainable infection‑prevention changes to succeed",
+      "C": "Because evidence‑based CLABSI bundles exist, local culture does not affect implementation",
+      "D": "Turnover will automatically decrease once infection rates improve"
+    },
+    "correctAnswer": "B",
+    "rationale": "Readiness for change depends on leadership stability, stakeholder engagement, and culture, not just evidence or money.[file:1][file:7] High turnover and resistance undermine implementation unless proactively managed within the strategic plan.",
+    "section": "Strategic Planning & Change",
+    "type": "mc"
+  },
+{
+    "questionText": "A charge nurse notices frequent delays in starting antibiotics and inconsistent communication during rounds. The nurse manager wants to apply principles from complexity science/complex adaptive systems to improve care. Which TWO actions best reflect this approach? (Select all that apply.)",
+    "options": {
+      "A": "Rewrite the antibiotic protocol and mandate staff compliance with progressive discipline",
+      "B": "Convene a mixed group of nurses, physicians, and case managers to map how orders interact",
+      "C": "Ask a respected nurse to pilot an informal “communication huddle” and share what emerges",
+      "D": "Prohibit any bed changes after 1500 to reduce unpredictability",
+      "E": "Assign an assistant manager to personally approve all new orders"
+    },
+    "correctAnswer": ["B", "C"],
+    "rationale": "Complex adaptive systems emphasize patterns, relationships, and bottom‑up co‑creation of adaptive solutions instead of top‑down control of isolated steps.",
+    "section": "Complexity Science",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse cares for a patient with signs of right‑ventricular MI. The resident orders IV metoprolol. Which behavior best illustrates emotional intelligence and moral courage?",
+    "options": {
+      "A": "Silently withhold the drug, document “not given,” and hope the resident doesn’t notice",
+      "B": "Administer the dose as ordered, then complete an incident report",
+      "C": "Calmly state the concern using clinical rationale and request reconsideration or cardiology consult",
+      "D": "Ask another nurse to call the provider so the nurse can avoid confrontation"
+    },
+    "correctAnswer": "C",
+    "rationale": "EI involves managing emotions and relationships, while moral courage is speaking up for patient safety despite discomfort or power gradients.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "Two ICU nurses disagree about a patient transfer. One favors transfer; the other opposes it on safety grounds. Which response best reflects collaborating?",
+    "options": {
+      "A": "“I’m charge; the patient is going. We’ll do the transfer now.”",
+      "B": "“You care more about this than I do, so we’ll keep the patient here.”",
+      "C": "“Let’s list the patient’s current risks and supports and jointly ask the intensivist and step‑down charge to join us in deciding what is safest.”",
+      "D": "“We’re both busy; let’s split the difference and transfer at midnight.”"
+    },
+    "correctAnswer": "C",
+    "rationale": "Collaboration seeks a win‑win by fully exploring concerns and jointly designing a solution that best meets safety and care goals.",
+    "section": "Conflict Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new graduate reports that a senior nurse frequently rolls her eyes and ignores questions. Which TWO actions by the manager best align with evidence-based recommendations for managing incivility? (Select all that apply.)",
+    "options": {
+      "A": "Tell the new nurse, “You just need a thicker skin”",
+      "B": "Review the zero‑tolerance policy and meet with the senior nurse for feedback",
+      "C": "Arrange bystander‑intervention and civility training for the unit",
+      "D": "Move the new nurse to a different unit permanently",
+      "E": "Ask the new nurse to confront the senior nurse alone"
+    },
+    "correctAnswer": ["B", "C"],
+    "rationale": "Leaders must set clear behavioral expectations and provide structural support; minimizing or off‑loading the victim perpetuates a toxic culture.",
+    "section": "Workplace Culture",
+    "type": "sata"
+  },
+  {
+    "questionText": "An RN in acute rehab plans care for four patients. Which assignment represents a breach of the Five Rights of Delegation?",
+    "options": {
+      "A": "Asking the UAP to ambulate a stable post‑stroke patient with a gait belt",
+      "B": "Asking the UAP to obtain orthostatic blood pressures on a patient with recent syncope",
+      "C": "Asking the UAP to teach a newly diagnosed diabetic how to draw up insulin using a return demonstration",
+      "D": "Asking the UAP to assist an elderly patient with dementia to the bathroom"
+    },
+    "correctAnswer": "C",
+    "rationale": "Patient teaching and evaluation require nursing judgment and cannot be delegated, even to experienced UAPs.",
+    "section": "Delegation",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager learns that a UAP fed a dysphagic patient alone, leading to aspiration pneumonia. Skills validation hadn’t been done for two years. Which parties may be exposed to liability? (Select all that apply.)",
+    "options": {
+      "A": "The UAP, for negligent performance",
+      "B": "The RN who delegated feeding without ensuring competency",
+      "C": "The nurse manager, for failing to verify staff competence",
+      "D": "The hospital, for corporate negligence in training",
+      "E": "No one, because the UAP is not licensed"
+    },
+    "correctAnswer": ["A", "B", "C", "D"],
+    "rationale": "Vicarious and corporate liability can extend responsibility from staff to supervisors and the institution when negligent training contributes to harm.",
+    "section": "Legal Issues",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse posts on social media: “Rough night—drunk driver with a shattered pelvis near Highway 19. Hope his family learns something.” Why is this problematic?",
+    "options": {
+      "A": "It is allowed if the nurse does not list the hospital’s name",
+      "B": "It may violate privacy and confidentiality by sharing identifiable clinical information",
+      "C": "It is acceptable because no name or photo is included",
+      "D": "It is covered by free‑speech protections"
+    },
+    "correctAnswer": "B",
+    "rationale": "HIPAA prohibits sharing identifiable clinical details or disparaging content about patients on social media, even without names.",
+    "section": "Ethics & Confidentiality",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse wants to evaluate whether structured bedside education reduces 30‑day readmissions for heart-failure patients compared with usual care. Which is the best PICOT‑D question?",
+    "options": {
+      "A": "“Do heart‑failure patients like teaching better than handouts?”",
+      "B": "“In adults with heart failure (P), how does structured bedside education (I), compared with usual teaching (C), affect 30‑day readmissions (O) within 3 months (T), using EHR readmission data (D)?”",
+      "C": "“Does more education improve outcomes for heart‑failure patients?”",
+      "D": "“Can teaching plus data reduce costs on the unit?”"
+    },
+    "correctAnswer": "B",
+    "rationale": "A proper PICOT-D question specifies population, intervention, comparison, outcome, time frame, and the digital data source.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A CNS is implementing a CAUTI bundle using the i‑PARIHS framework. One unit has strong teamwork, while another has high turnover. What is the most important implication?",
+    "options": {
+      "A": "The same in‑service will work equally well on both units",
+      "B": "The unit with weaker context will need more intensive facilitation and tailored strategies",
+      "C": "Success depends only on research evidence, not local context",
+      "D": "Implementation should be abandoned on the lower‑performing unit"
+    },
+    "correctAnswer": "B",
+    "rationale": "The i-PARIHS framework emphasizes that innovation, recipients, context, and facilitation interact; weak context demands stronger facilitation.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "In an HRO, a therapist sees a physician skip hand hygiene but hesitates to speak up to the 'chief.' Which leadership initiative best targets this power‑distance barrier?",
+    "options": {
+      "A": "Posting hand‑hygiene reminder signs only in staff bathrooms",
+      "B": "Leadership rounds that publicly recognize staff who issue safety “stop the line” calls regardless of hierarchy",
+      "C": "Asking staff to submit anonymous reports instead of speaking up",
+      "D": "Creating a policy that only nurses can question physicians"
+    },
+    "correctAnswer": "B",
+    "rationale": "High Reliability Organizations work to flatten hierarchy for safety issues and reinforce cross‑checks from any team member.",
+    "section": "Communication",
+    "type": "mc"
+  },
+{
+    "questionText": "A nurse manager notices that staff morale is declining and turnover is increasing. The manager begins holding weekly meetings to discuss unit goals, recognizes nurses publicly for excellent patient outcomes, and encourages staff to propose creative solutions to workflow problems. Which leadership style is the nurse manager demonstrating?",
+    "options": {
+      "A": "Transactional leadership",
+      "B": "Transformational leadership",
+      "C": "Laissez-faire leadership",
+      "D": "Autocratic leadership"
+    },
+    "correctAnswer": "B",
+    "rationale": "Transformational leaders inspire and motivate by creating a shared vision, recognizing contributions, and encouraging creativity and innovation.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A hospital system is redesigning care delivery to align with the Quintuple Aim. Which goals are part of the Quintuple Aim? (Select all that apply.)",
+    "options": {
+      "A": "Enhancing patient experience",
+      "B": "Improving population health",
+      "C": "Reducing per capita cost of care",
+      "D": "Increasing provider work hours",
+      "E": "Improving work life of healthcare providers",
+      "F": "Advancing health equity"
+    },
+    "correctAnswer": ["A", "B", "C", "E", "F"],
+    "rationale": "The original Triple Aim includes experience, population health, and cost; the Quintuple Aim adds provider well-being and health equity.",
+    "section": "Healthcare Goals",
+    "type": "sata"
+  },
+  {
+    "questionText": "A staff nurse routinely prepares for unit meetings, reviews data on falls and infections, asks clarifying questions, and respectfully challenges decisions that do not align with patient safety. Which description best fits this nurse’s behavior?",
+    "options": {
+      "A": "Ineffective follower",
+      "B": "Passive follower",
+      "C": "Effective follower",
+      "D": "Autocratic leader"
+    },
+    "correctAnswer": "C",
+    "rationale": "Effective followers are engaged, think critically, offer evidence-based input, and courageously question or champion leaders to support safe, high-quality care.",
+    "section": "Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse frequently complains about staffing and new protocols at the nurses’ station, refuses to attend shared governance meetings, and states, “It doesn’t matter what I say; leadership will do what they want.” Which term best describes this behavior?",
+    "options": {
+      "A": "Effective follower",
+      "B": "Ineffective follower",
+      "C": "Informal leader",
+      "D": "Authentic leader"
+    },
+    "correctAnswer": "B",
+    "rationale": "Ineffective followers are static, rely on leaders for all direction, communicate mainly through complaining, and rarely offer constructive solutions.",
+    "section": "Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader openly admits when she does not know something, seeks staff input before decisions, consistently acts according to her stated values, and focuses on what is “the right thing to do” for patients and staff. Which leadership approach is she demonstrating?",
+    "options": {
+      "A": "Servant leadership",
+      "B": "Authentic leadership",
+      "C": "Laissez-faire leadership",
+      "D": "Transactional leadership"
+    },
+    "correctAnswer": "B",
+    "rationale": "Authentic leadership centers on self-awareness, acting consistently with personal and professional values, honest communication, and building trust through genuineness.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "During a tense code debrief, one nurse becomes defensive when feedback is given. Another acknowledges her own stress, listens carefully, validates others’ feelings, and suggests specific improvements. The second nurse shows strength in which domain?",
+    "options": {
+      "A": "Technical competence",
+      "B": "Emotional intelligence",
+      "C": "Laissez-faire style",
+      "D": "Trait leadership"
+    },
+    "correctAnswer": "B",
+    "rationale": "Emotional intelligence includes self-awareness, self-management, social awareness, and relationship management to handle emotions constructively.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse receives an order for a medication that is contraindicated for a patient’s current condition. After the physician insists it is correct, the nurse escalates to the charge nurse and chain of command to protect the patient. This best exemplifies which concept?",
+    "options": {
+      "A": "Role conflict",
+      "B": "Moral courage",
+      "C": "Ineffective followership",
+      "D": "Situational leadership"
+    },
+    "correctAnswer": "B",
+    "rationale": "Moral courage is the willingness to speak up and act on ethical concerns, despite fear of rejection or negative consequences, to prevent harm.",
+    "section": "Professionalism & Ethics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse manager is implementing a new falls prevention bundle. She begins by sharing fall data, asking staff for input, and challenging the belief that current practices are “good enough.” According to Lewin, which stage of planned change is this?",
+    "options": {
+      "A": "Unfreezing",
+      "B": "Moving",
+      "C": "Refreezing",
+      "D": "Stabilizing"
+    },
+    "correctAnswer": "A",
+    "rationale": "Unfreezing involves creating awareness of the need for change, challenging the status quo, and preparing people to move away from current behaviors.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "After staff agree on the need to reduce falls, the unit trials bed alarms, hourly rounding, and fall-risk signage, providing education and coaching at the bedside. Which Lewin stage is this?",
+    "options": {
+      "A": "Unfreezing",
+      "B": "Moving",
+      "C": "Refreezing",
+      "D": "Evaluating"
+    },
+    "correctAnswer": "B",
+    "rationale": "The moving stage focuses on implementing new behaviors or processes through education, participation, and practical strategies.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Six months after implementing a falls bundle, the unit adds fall-prevention steps to orientation checklists, embeds elements in policy, and recognizes staff for low fall rates. Which Lewin stage does this illustrate?",
+    "options": {
+      "A": "Unfreezing",
+      "B": "Moving",
+      "C": "Refreezing",
+      "D": "Regression"
+    },
+    "correctAnswer": "C",
+    "rationale": "Refreezing is the stabilization and “hardwiring” of new practices into policies, routines, and culture so the change is sustained.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which behaviors are consistent with an effective follower on a busy medical-surgical unit? (Select all that apply.)",
+    "options": {
+      "A": "Completes required tasks but avoids speaking in huddles",
+      "B": "Uses evidence-based feedback to suggest improvements",
+      "C": "Collaborates with leaders rather than using passive-aggressive behaviors",
+      "D": "Alters safety procedures for personal convenience",
+      "E": "Demonstrates accountability to the team effort"
+    },
+    "correctAnswer": ["B", "C", "E"],
+    "rationale": "Effective followers offer knowledge, collaborate, use evidence-based feedback, and demonstrate accountability.",
+    "section": "Followership",
+    "type": "sata"
+  },
+  {
+    "questionText": "On a high-functioning ICU, the charge nurse frequently asks bedside nurses, “What are you seeing?” and adjusts plans based on their input. This dynamic best reflects which concept?",
+    "options": {
+      "A": "Dictatorial leadership",
+      "B": "Hierarchical communication",
+      "C": "Leader–follower partnership",
+      "D": "Solo leadership"
+    },
+    "correctAnswer": "C",
+    "rationale": "Modern views emphasize a reciprocal relationship based on trust, open communication, and shared accountability.",
+    "section": "Governance & Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "During hospital strategic planning, nurses analyze internal quality data and external factors like community health needs. This activity corresponds to which component of the strategic planning process?",
+    "options": {
+      "A": "Vision and mission development",
+      "B": "Environmental scan and SWOT analysis",
+      "C": "Refreezing",
+      "D": "Individual performance appraisal"
+    },
+    "correctAnswer": "B",
+    "rationale": "Strategic planning begins with environmental scanning and SWOT analysis to identify internal and external factors shaping strategy.",
+    "section": "Strategic Planning",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse wants to reduce catheter-associated urinary tract infections (CAUTI) and frames a PICOT question. Which is the BEST example of a well-built PICOT question?",
+    "options": {
+      "A": "“Do catheters cause infections?”",
+      "B": "“In adult inpatients with indwelling urinary catheters, how does a nurse-driven removal protocol compared with usual care affect CAUTI rates during hospitalization?”",
+      "C": "“Why do patients get CAUTIs in the hospital?”",
+      "D": "“How can we improve our CAUTI numbers?”"
+    },
+    "correctAnswer": "B",
+    "rationale": "A good PICOT includes a defined population, intervention, comparison, outcome, and timeframe in measurable terms.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse leader is explaining the difference between evidence-based practice (EBP) and quality improvement (QI) to staff. Which statements are accurate? (Select all that apply.)",
+    "options": {
+      "A": "EBP focuses on integrating research evidence, clinical expertise, and patient preferences.",
+      "B": "QI uses local data to improve processes and outcomes within a specific organization.",
+      "C": "EBP and QI are identical and always require IRB approval.",
+      "D": "QI often uses existing evidence and standardized indicators to guide changes.",
+      "E": "EBP never changes local processes."
+    },
+    "correctAnswer": ["A", "B", "D"],
+    "rationale": "EBP integrates best evidence/expertise/values; QI uses local data to improve specific organizational processes.",
+    "section": "Evidence-Based Practice",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse educator finds that many nurses feel overwhelmed by database searching. Which organizational strategy would BEST address this barrier?",
+    "options": {
+      "A": "Expect nurses to learn EBP independently on their own time",
+      "B": "Provide structured EBP workshops, librarian support, and protected time for project work",
+      "C": "Limit EBP activities to CNSs and nurse researchers",
+      "D": "Require staff to read one research article per year"
+    },
+    "correctAnswer": "B",
+    "rationale": "Infrastructure support, expert assistance, and dedicated time are essential for improving EBP competence in a clinical setting.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new graduate describes her shift as “chaotic”—patients admit and discharge rapidly, and staffing changes midshift. This kind of environment is best described by which acronym?",
+    "options": {
+      "A": "SWOT",
+      "B": "VUCA (volatile, uncertain, complex, ambiguous)",
+      "C": "PICOT",
+      "D": "SMART"
+    },
+    "correctAnswer": "B",
+    "rationale": "VUCA highlights volatility, uncertainty, complexity, and ambiguity, which characterizes the high-intensity healthcare environment.",
+    "section": "Complexity Science",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which behaviors by a nurse manager demonstrate strong emotional intelligence (EI)? (Select all that apply.)",
+    "options": {
+      "A": "Acknowledging feeling stressed during a surge but calmly prioritizing tasks",
+      "B": "Ignoring staff emotions and stating, “Just do your job”",
+      "C": "Noticing tension between two nurses and facilitating a private conversation",
+      "D": "Making major changes without asking for staff input",
+      "E": "Adjusting communication style when speaking with a novice versus an expert nurse"
+    },
+    "correctAnswer": ["A", "C", "E"],
+    "rationale": "Strong EI is shown through self-management, social awareness, and relationship management.",
+    "section": "Professionalism & Ethics",
+    "type": "sata"
+  },
+  {
+    "questionText": "A staff nurse volunteers to lead a workgroup on improving discharge teaching. She is enthusiastic, persists despite obstacles, and credits the team for successes. These behaviors best align with which role?",
+    "options": {
+      "A": "Laggard",
+      "B": "Change agent",
+      "C": "External consultant",
+      "D": "Ineffective follower"
+    },
+    "correctAnswer": "B",
+    "rationale": "Change agents take initiative beyond their formal role, generate enthusiasm, and maintain a commitment to a better way of practice.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A unit has successfully reduced CLABSI rates. Which actions will BEST help sustain (“refreeze”) this improvement? (Select all that apply.)",
+    "options": {
+      "A": "Embedding bundle elements into policy, checklists, and orientation",
+      "B": "Stopping data collection once rates are low",
+      "C": "Providing ongoing audit-and-feedback on bundle compliance",
+      "D": "Recognizing individuals and teams for consistent adherence",
+      "E": "Allowing each nurse to “do it their own way”"
+    },
+    "correctAnswer": ["A", "C", "D"],
+    "rationale": "Sustaining change requires systems integration (hardwiring), constant measurement/feedback, and social reinforcement.",
+    "section": "Change Management",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) has a nursing goal of 'Client will maintain skin integrity.' Which outcome indicator best demonstrates achievement of this goal?",
+    "options": {
+      "A": "Skin remains intact with no signs of breakdown or redness.",
+      "B": "Client reports decreased thirst.",
+      "C": "Urine output increases to 100 mL/hour.",
+      "D": "Client's weight decreases by 1 kg."
+    },
+    "correctAnswer": "A",
+    "rationale": "Maintaining skin integrity means the skin remains intact without breakdown or redness, which directly addresses the nursing goal. Decreased thirst and increased urine output/weight loss are related to fluid balance, not directly skin integrity, although fluid balance improvement contributes to skin health.",
+    "section": "Evaluation of Outcomes",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is assessing a client with extracellular volume excess (ECV excess) and notes a rapid, shallow respiratory rate. The nurse should analyze this cue as the body's attempt to:",
+    "options": {
+      "A": "Conserve oxygen.",
+      "B": "Compensate for metabolic alkalosis.",
+      "C": "Increase carbon dioxide excretion due to pulmonary congestion.",
+      "D": "Reduce the work of breathing."
+    },
+    "correctAnswer": "C",
+    "rationale": "In ECV excess with pulmonary congestion, fluid in the lungs impairs gas exchange, leading to hypoxemia and potentially hypercapnia. A rapid, shallow respiratory rate is the body's attempt to increase alveolar ventilation and excrete more carbon dioxide, compensating for the impaired gas exchange. It's not primarily to conserve oxygen or compensate for metabolic alkalosis, and while it's an attempt to breathe, it's often ineffective at reducing the overall work of breathing in severe cases.",
+    "section": "NCJMM: Analyze Cues",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following conditions is most likely to cause extracellular volume excess (ECV excess) due to increased aldosterone secretion?",
+    "options": {
+      "A": "Addison's disease.",
+      "B": "Diabetes mellitus.",
+      "C": "Cushing's syndrome.",
+      "D": "Hypothyroidism."
+    },
+    "correctAnswer": "C",
+    "rationale": "Cushing's syndrome involves excessive cortisol, which has mineralocorticoid effects similar to aldosterone, leading to increased sodium and water reabsorption and subsequent ECV excess. Addison's disease involves adrenal insufficiency, leading to fluid deficit. Diabetes mellitus and hypothyroidism do not directly cause ECV excess through increased aldosterone.",
+    "section": "Causes",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is preparing to administer a prescribed intravenous fluid to a client with extracellular volume excess (ECV excess). The order is for 'Dextrose 5% in 0.45% Sodium Chloride.' The nurse should:",
+    "options": {
+      "A": "Administer the fluid as ordered, as it is a hypotonic solution.",
+      "B": "Question the order, as this solution is hypertonic and will worsen edema.",
+      "C": "Administer the fluid slowly, monitoring for signs of fluid overload.",
+      "D": "Question the order, as this solution will add to the extracellular volume."
+    },
+    "correctAnswer": "D",
+    "rationale": "Dextrose 5% in 0.45% Sodium Chloride (D5 1/2 NS) is hypertonic in the bag but becomes hypotonic in the body as dextrose is metabolized. However, it still contains sodium, which will contribute to the extracellular volume, especially in a client already experiencing ECV excess. The primary goal is to restrict sodium and water. Therefore, this solution should be questioned as it adds to the problem. While it's not as problematic as 0.9% NaCl, it's generally avoided in ECV excess.",
+    "section": "Nursing Management: Fluid Restriction",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) reports difficulty sleeping due to coughing and shortness of breath when lying flat. Which nursing intervention should the nurse prioritize to improve the client's comfort and rest?",
+    "options": {
+      "A": "Administering a cough suppressant.",
+      "B": "Encouraging the client to sleep in a recliner or with several pillows.",
+      "C": "Providing warm liquids before bedtime.",
+      "D": "Limiting fluid intake only during the day."
+    },
+    "correctAnswer": "B",
+    "rationale": "Difficulty sleeping due to coughing and shortness of breath when lying flat (orthopnea) is a common symptom of ECV excess. Encouraging the client to sleep in a recliner or with several pillows elevates the upper body, reducing venous return to the heart and decreasing pulmonary congestion, thereby improving breathing and allowing for rest. Cough suppressants don't address the underlying cause. Warm liquids might add to fluid volume. Limiting fluid only during the day is insufficient for a 24-hour restriction.",
+    "section": "Nursing Management: Comfort and Respiratory Support",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is assessing a client with extracellular volume excess (ECV excess). Which of the following physical assessment findings would the nurse expect to observe? (Select all that apply)",
+    "options": {
+      "A": "Increased skin turgor.",
+      "B": "Pitting edema.",
+      "C": "Flat neck veins.",
+      "D": "Crackles on lung auscultation.",
+      "E": "Sudden increase in body weight."
+    },
+    "correctAnswer": ["B", "D", "E"],
+    "rationale": "Pitting edema, crackles on lung auscultation (due to pulmonary edema), and a sudden increase in body weight are classic signs of ECV excess. Increased skin turgor is not a typical sign (skin turgor may be normal or slightly decreased due to stretched skin, but not increased). Flat neck veins indicate fluid deficit, not excess.",
+    "section": "Clinical Manifestations",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) is prescribed a sodium-restricted diet. The nurse should educate the client that the primary reason for this restriction is to:",
+    "options": {
+      "A": "Prevent hyperkalemia.",
+      "B": "Reduce fluid retention.",
+      "C": "Lower blood glucose levels.",
+      "D": "Improve cholesterol levels."
+    },
+    "correctAnswer": "B",
+    "rationale": "Sodium restriction is crucial in ECV excess because sodium causes the body to retain water. By limiting sodium intake, the body's tendency to hold onto excess fluid is reduced, thereby helping to alleviate fluid overload. It is not primarily for hyperkalemia, blood glucose, or cholesterol.",
+    "section": "Nursing Management: Dietary",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is reviewing the intake and output (I&O) record for a client with extracellular volume excess (ECV excess). Which finding would indicate effective treatment?",
+    "options": {
+      "A": "Intake equals output.",
+      "B": "Intake is greater than output.",
+      "C": "Output is significantly greater than intake.",
+      "D": "Output is less than intake."
+    },
+    "correctAnswer": "C",
+    "rationale": "For a client with ECV excess, the goal of treatment is to remove excess fluid from the body. Therefore, an effective treatment plan would result in output being significantly greater than intake, indicating net fluid loss. Intake equaling output would mean no change in fluid balance, and intake greater than output or output less than intake would indicate worsening fluid retention.",
+    "section": "Evaluation of Outcomes",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) has experienced a 5 kg weight loss over 3 days. The nurse should interpret this finding as:",
+    "options": {
+      "A": "A sign of worsening malnutrition.",
+      "B": "An expected and positive response to treatment.",
+      "C": "Indicating the need to increase fluid intake.",
+      "D": "A sign of developing diabetes insipidus."
+    },
+    "correctAnswer": "B",
+    "rationale": "A 5 kg (approximately 11 lbs) weight loss over 3 days in a client with ECV excess indicates significant fluid excretion and is an expected and positive response to treatment, demonstrating the effectiveness of diuretics and fluid/sodium restrictions. It is not a sign of malnutrition, does not indicate a need to increase fluid intake (unless the client becomes dehydrated, which would be assessed by other parameters), and is unrelated to diabetes insipidus.",
+    "section": "Evaluation of Outcomes",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is educating a client with extracellular volume excess (ECV excess) about medication adherence. The client states, 'I feel better, so I stopped taking my water pill.' The nurse should analyze this statement as indicating:",
+    "options": {
+      "A": "The client's condition has resolved.",
+      "B": "The client understands their medication's effect.",
+      "C": "A need for further education on the importance of continued therapy.",
+      "D": "The client is experiencing a side effect of the medication."
+    },
+    "correctAnswer": "C",
+    "rationale": "Stopping diuretics ('water pills') prematurely because symptoms improve is a common misconception and can lead to rapid re-accumulation of fluid. This statement indicates a need for further education on the chronic nature of ECV excess and the importance of continued medication adherence, even when feeling better, to prevent recurrence of symptoms. It does not mean the condition has resolved, or that the client understands the medication's effect.",
+    "section": "Patient Education",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) is at risk for skin breakdown. Which nursing intervention is most appropriate to prevent this complication?",
+    "options": {
+      "A": "Massaging bony prominences every 4 hours.",
+      "B": "Using a donut-shaped cushion for pressure relief.",
+      "C": "Implementing a turning schedule of at least every 2 hours.",
+      "D": "Applying alcohol-based lotions to dry skin."
+    },
+    "correctAnswer": "C",
+    "rationale": "Edematous skin is fragile and susceptible to pressure injury. Implementing a turning schedule of at least every 2 hours (or more frequently if needed) is crucial to relieve pressure on vulnerable areas. Massaging bony prominences is contraindicated as it can cause deep tissue injury. Donut-shaped cushions can increase pressure around the hole. Alcohol-based lotions dry the skin and should be avoided.",
+    "section": "Nursing Management: Skin Care",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is teaching a client with extracellular volume excess (ECV excess) about managing thirst while on fluid restriction. Which of the following strategies would the nurse recommend? (Select all that apply)",
+    "options": {
+      "A": "Chewing gum or hard candy.",
+      "B": "Rinsing the mouth with cold water.",
+      "C": "Eating salty snacks to stimulate saliva.",
+      "D": "Brushing teeth frequently.",
+      "E": "Consuming ice chips (within fluid allowance)."
+    },
+    "correctAnswer": ["A", "B", "D", "E"],
+    "rationale": "Chewing gum/hard candy, rinsing the mouth with cold water, frequent oral hygiene (brushing teeth), and consuming ice chips (while accounting for their volume) are effective strategies to manage thirst within a fluid restriction. Eating salty snacks would worsen thirst and ECV excess.",
+    "section": "Patient Education",
+    "type": "sata"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) has a history of liver cirrhosis. The nurse understands that cirrhosis contributes to ECV excess primarily through:",
+    "options": {
+      "A": "Increased production of clotting factors.",
+      "B": "Impaired synthesis of albumin.",
+      "C": "Decreased portal vein pressure.",
+      "D": "Enhanced renal blood flow."
+    },
+    "correctAnswer": "B",
+    "rationale": "Liver cirrhosis impairs the liver's ability to synthesize albumin, a major plasma protein. Low albumin levels (hypoalbuminemia) decrease plasma oncotic pressure, causing fluid to shift from the intravascular space into the interstitial space (edema) and peritoneal cavity (ascites), contributing to ECV excess. The other options are incorrect or opposite effects of cirrhosis.",
+    "section": "Causes",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is caring for a client with extracellular volume excess (ECV excess) who is experiencing severe dyspnea. The nurse observes the client using accessory muscles to breathe. Which NCJMM function is the nurse primarily demonstrating by recognizing this observation?",
+    "options": {
+      "A": "Generate Solutions.",
+      "B": "Analyze Cues.",
+      "C": "Recognize Cues.",
+      "D": "Prioritize Hypotheses."
+    },
+    "correctAnswer": "C",
+    "rationale": "Recognizing the use of accessory muscles is a direct observation of a physical cue. This falls under the 'Recognize Cues' function, which involves gathering and filtering information from various sources (in this case, visual assessment). Analyzing cues would be interpreting what this cue means (e.g., increased work of breathing, respiratory distress).",
+    "section": "NCJMM: Recognize Cues",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client with extracellular volume excess (ECV excess) is receiving a diuretic. The nurse should assess for which of the following signs of effective diuresis?",
+    "options": {
+      "A": "Increased blood pressure.",
+      "B": "Decreased skin turgor.",
+      "C": "Increased urine specific gravity.",
+      "D": "Reduction in body weight."
+    },
+    "correctAnswer": "D",
+    "rationale": "A reduction in body weight is the most objective and sensitive indicator of fluid loss and effective diuresis. Increased blood pressure is not a sign of effective diuresis for ECV excess. Decreased skin turgor would indicate dehydration (over-diuresis). Increased urine specific gravity would indicate concentrated urine, not effective diuresis (which produces dilute urine).",
+    "section": "Evaluation of Outcomes",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is teaching a client with extracellular volume excess (ECV excess) about managing their fluid intake. The client asks, 'Why can't I just drink whatever I want if I take my water pill?' The nurse's best response explains that:",
+    "options": {
+      "A": "Diuretics are only effective if you drink very little fluid.",
+      "B": "Too much fluid can still overwhelm your body's ability to excrete it, even with medication.",
+      "C": "The 'water pill' only removes sodium, not water.",
+      "D": "Fluid restriction is only for clients who are not taking medication."
+    },
+    "correctAnswer": "B",
+    "rationale": "Even with diuretics, excessive fluid intake can overwhelm the body's ability to excrete it, leading to persistent or worsening ECV excess. Diuretics help, but they have limits. The 'water pill' removes both sodium and water. Fluid restriction is often a necessary adjunct to medication.",
+    "section": "Patient Education",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse assesses a client one hour after delivery and finds her perineal pad saturated and the fundus boggy. After calling for assistance, the nurse’s immediate priority action is to:",
+    "options": {
+      "A": "Start an IV bolus of Lactated Ringer's solution.",
+      "B": "Administer a blood transfusion.",
+      "C": "Initiate fundal massage until the uterus is firm.",
+      "D": "Elevate the client's legs to improve venous return."
+    },
+    "correctAnswer": "C",
+    "rationale": "The immediate priority for postpartum hemorrhage due to uterine atony (boggy fundus) is to mechanically stimulate the uterus to contract via vigorous fundal massage. This is the fastest, most effective way to address the cause of bleeding.",
+    "section": "Postpartum Hemorrhage Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which medication is the first-line pharmacologic treatment used for the prevention and treatment of postpartum hemorrhage caused by uterine atony?",
+    "options": {
+      "A": "Methylergonovine maleate (Methergine)",
+      "B": "Carboprost tromethamine (Hemabate)",
+      "C": "Oxytocin (Pitocin)",
+      "D": "Misoprostol (Cytotec)"
+    },
+    "correctAnswer": "C",
+    "rationale": "Oxytocin (Pitocin) is the primary medication used immediately after delivery to promote sustained uterine contractions and prevent/treat uterine atony, often given as an IV infusion.",
+    "section": "PPH Medications",
+    "type": "mc"
+  },
+  {
+    "questionText": "To help prevent mastitis in a breastfeeding client, the nurse should teach the client to prioritize:",
+    "options": {
+      "A": "Applying ice packs to the breasts after every feeding.",
+      "B": "Increasing her intake of dairy products.",
+      "C": "Ensuring complete emptying of the breasts with each feeding.",
+      "D": "Decreasing the frequency of breastfeeding to every six hours."
+    },
+    "correctAnswer": "C",
+    "rationale": "Mastitis is often caused by milk stasis, which allows bacteria to enter the milk duct. Complete emptying of the breast, either by nursing or pumping, prevents stasis and is the most critical preventative measure.",
+    "section": "Mastitis Prevention",
+    "type": "mc"
+  },
+  {
+    "questionText": "A client calls the clinic reporting a localized, painful, red, and swollen area on her right breast, accompanied by a fever of $101.5^{\circ} \text{F}$. She is $3$ weeks postpartum and breastfeeding. The nurse should advise the client to:",
+    "options": {
+      "A": "Stop breastfeeding immediately and switch to formula.",
+      "B": "Apply warm compresses and continue to breastfeed frequently, starting with the affected breast.",
+      "C": "Pump the breast instead of nursing until the infection clears.",
+      "D": "Switch to a tighter-fitting bra to restrict milk flow."
+    },
+    "correctAnswer": "B",
+    "rationale": "The client is showing classic signs of mastitis. Treatment involves heat (warm compresses) and, critically, continued and complete emptying of the breast. Starting with the affected breast helps to ensure better drainage. Cessation of breastfeeding can worsen stasis and infection.",
+    "section": "Mastitis Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "When providing discharge teaching about contraception to a breastfeeding client, which method should the nurse recommend as the most appropriate first choice?",
+    "options": {
+      "A": "Combined oral contraceptives (COCs)",
+      "B": "Progestin-only pills (Minipill)",
+      "C": "Intrauterine device (IUD) with copper",
+      "D": "Contraceptive patch"
+    },
+    "correctAnswer": "B",
+    "rationale": "Estrogen-containing methods (COCs and the patch) can suppress lactation and decrease milk supply. Progestin-only pills are the preferred hormonal method during breastfeeding as they do not affect milk production.",
+    "section": "Postpartum Contraception",
+    "type": "mc"
+  },
+  {
+    "questionText": "According to Rubin's phases of maternal role attainment, the mother is primarily focused on meeting her own immediate needs, such as sleep and food, during which phase?",
+    "options": {
+      "A": "Letting-Go phase",
+      "B": "Taking-In phase",
+      "C": "Taking-Hold phase",
+      "D": "Attachment phase"
+    },
+    "correctAnswer": "B",
+    "rationale": "The Taking-In phase is the first phase, lasting $1$ to $2$ days, where the mother is largely dependent on others, focused on her own physical recovery, and repeatedly talks about her birth experience.",
+    "section": "Maternal Role Attainment",
+    "type": "mc"
+  },
+  {
+    "questionText": "A mother is demonstrating interest in learning infant care skills, asking for assistance with a baby bath, and expressing anxiety about caring for her infant independently. The nurse recognizes this mother is most likely in which of Rubin's phases?",
+    "options": {
+      "A": "Letting-Go phase",
+      "B": "Attachment phase",
+      "C": "Taking-In phase",
+      "D": "Taking-Hold phase"
+    },
+    "correctAnswer": "D",
+    "rationale": "The Taking-Hold phase is characterized by the mother becoming independent, concerned about her own mothering ability, and eager to learn and assume responsibility for infant care.",
+    "section": "Maternal Role Attainment",
+    "type": "mc"
+  },
+  {
+    "questionText": "Where should the nurse expect to palpate the fundus $10$ days after an uncomplicated vaginal delivery?",
+    "options": {
+      "A": "At the level of the umbilicus.",
+      "B": "$5 \text{ cm}$ below the umbilicus.",
+      "C": "Not palpable abdominally.",
+      "D": "$2 \text{ fingerbreadths}$ above the symphysis pubis."
+    },
+    "correctAnswer": "C",
+    "rationale": "The fundus descends about $1 \text{ cm}$ (or $1 \text{ fingerbreadth}$) per day. By the $10$th to $14$th day, it has descended into the true pelvis and is no longer palpable abdominally.",
+    "section": "Uterine Involution",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is preparing to administer Rho(D) immune globulin (RhoGAM) to a client. Which condition must be met for this administration to be appropriate?",
+    "options": {
+      "A": "The client is $\text{Rh-positive}$ and the baby is $\text{Rh-negative}$.",
+      "B": "The client is $\text{Rh-negative}$ and the Coombs test is positive.",
+      "C": "The client is $\text{Rh-negative}$ and the baby is $\text{Rh-positive}$ with a negative direct Coombs test.",
+      "D": "The client is $\text{Rh-positive}$ and the baby is $\text{Rh-positive}$."
+    },
+    "correctAnswer": "C",
+    "rationale": "RhoGAM is given to an $\text{Rh-negative}$ mother to prevent her from developing antibodies to the $\text{Rh-positive}$ red blood cells of her baby. A negative Coombs test ensures sensitization has not yet occurred.",
+    "section": "Rh Incompatibility/RhoGAM",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which nursing implication is most important when a patient expresses interest in using a new herbal product?",
+    "options": {
+      "A": "Advise them to start immediately and see if it works.",
+      "B": "Encourage them to research online for positive testimonials.",
+      "C": "Instruct them to discuss it with their healthcare provider before starting.",
+      "D": "Tell them it's likely safe if it's sold in a health food store."
+    },
+    "correctAnswer": "C",
+    "rationale": "Patients should always discuss new herbal products with their healthcare provider before starting to identify potential interactions, contraindications, or adverse effects and to ensure it's appropriate for their health condition.",
+    "section": "Complementary and Alternative Therapies",
+    "type": "mc"
+  },
+  {
+    "questionText": "An older adult patient is prescribed a medication that is highly water-soluble. Due to age-related physiological changes, the nurse should anticipate a potential for:",
+    "options": {
+      "A": "Decreased drug concentration due to increased body water.",
+      "B": "Increased drug concentration due to decreased total body water.",
+      "C": "Faster metabolism in the liver.",
+      "D": "Slower absorption from the GI tract."
+    },
+    "correctAnswer": "B",
+    "rationale": "As people age, total body water decreases. For water-soluble drugs, a reduced volume of distribution means the drug will be more concentrated in the remaining body water, potentially leading to higher plasma concentrations and increased risk of toxicity.",
+    "section": "Geriatric Considerations",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following describes a key nursing implication related to polypharmacy in older adults?",
+    "options": {
+      "A": "Routinely adding new medications to address minor symptoms.",
+      "B": "Encouraging the patient to keep medications from previous illnesses.",
+      "C": "Educating the patient and family on medication purpose, dosage, and side effects.",
+      "D": "Discouraging any discussion about medication concerns with the provider."
+    },
+    "correctAnswer": "C",
+    "rationale": "Comprehensive education for the patient and family about each medication's purpose, correct dosage, administration, and potential side effects is crucial to improve adherence and identify issues related to polypharmacy.",
+    "section": "Polypharmacy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient reports using opioids primarily to avoid withdrawal symptoms. They deny significant cravings or loss of control over use. The nurse recognizes this as a primary indicator of:",
+    "options": {
+      "A": "Tolerance.",
+      "B": "Physical dependence.",
+      "C": "Psychological dependence.",
+      "D": "Mild substance use disorder."
+    },
+    "correctAnswer": "B",
+    "rationale": "Using a substance specifically to avoid or relieve withdrawal symptoms is a hallmark sign of physical dependence, where the body has adapted to the presence of the drug.",
+    "section": "Drugs in Substance Use Disorder",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which of the following are common long-term effects of chronic tobacco (nicotine) use? Select all that apply.",
+    "options": {
+      "A": "Increased risk of chronic obstructive pulmonary disease (COPD)",
+      "B": "Increased risk of lung cancer",
+      "C": "Peripheral vascular disease",
+      "D": "Improved sense of smell and taste",
+      "E": "Reduced risk of osteoporosis"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "Chronic tobacco use is a leading cause of COPD, lung cancer, and peripheral vascular disease. It impairs, rather than improves, sense of smell and taste, and increases the risk of osteoporosis.",
+    "section": "Drugs in Substance Use Disorder",
+    "type": "sata"
+  },
+  {
+    "questionText": "A patient presents with severe chest pain, paranoia, and a feeling of insects crawling under their skin (formication). The nurse suspects acute intoxication with:",
+    "options": {
+      "A": "Alcohol",
+      "B": "Opioids",
+      "C": "Cocaine/Methamphetamine",
+      "D": "Cannabis"
+    },
+    "correctAnswer": "C",
+    "rationale": "Severe chest pain (due to vasoconstriction/arrhythmias), paranoia, and formication (tactile hallucinations) are classic and dangerous signs of acute stimulant intoxication, particularly with cocaine or methamphetamine.",
+    "section": "Drugs in Substance Use Disorder",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is preparing to administer a medication. The nurse understands that 'pharmacokinetics' refers to the study of:",
+    "options": {
+      "A": "How the drug affects the body.",
+      "B": "How the body affects the drug.",
+      "C": "Drug interactions at receptor sites.",
+      "D": "The therapeutic effects of drugs."
+    },
+    "correctAnswer": "B",
+    "rationale": "Pharmacokinetics is the study of drug movement through the body, encompassing absorption, distribution, metabolism, and excretion (ADME) – essentially, what the body does to the drug.",
+    "section": "Pharmacokinetics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is prescribed a medication with a very narrow therapeutic index. The nurse should prioritize monitoring for which of the following?",
+    "options": {
+      "A": "Only the desired therapeutic effect.",
+      "B": "Only the common side effects.",
+      "C": "Both therapeutic and early signs of toxicity.",
+      "D": "Patient's dietary intake only."
+    },
+    "correctAnswer": "C",
+    "rationale": "For drugs with a narrow therapeutic index, the margin between therapeutic and toxic doses is small. Therefore, it is critical to monitor for both the desired therapeutic effects and any early signs of toxicity to ensure the drug remains within a safe and effective range.",
+    "section": "Pharmacokinetics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient develops a severe, widespread rash and blistering of the skin, accompanied by fever and mucous membrane involvement, after starting a new anti-seizure medication. The nurse recognizes this as a life-threatening adverse drug reaction known as:",
+    "options": {
+      "A": "Common side effect.",
+      "B": "Drug toxicity.",
+      "C": "Stevens-Johnson Syndrome (SJS).",
+      "D": "Drug-nutrient interaction."
+    },
+    "correctAnswer": "C",
+    "rationale": "Stevens-Johnson Syndrome (SJS) is a rare but severe and life-threatening adverse drug reaction, often triggered by certain medications (like anti-seizure drugs), characterized by widespread blistering, rash, and mucous membrane involvement.",
+    "section": "Pharmacodynamics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A drug that binds to a receptor and prevents the binding of other drugs or endogenous substances, without producing a response itself, is known as a(n):",
+    "options": {
+      "A": "Full agonist",
+      "B": "Partial agonist",
+      "C": "Antagonist",
+      "D": "Inverse agonist"
+    },
+    "correctAnswer": "C",
+    "rationale": "An antagonist is a drug that binds to a receptor but does not activate it. Instead, it blocks the binding and action of agonists at that receptor site.",
+    "section": "Pharmacodynamics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is taking Warfarin (Coumadin). The nurse advises the patient to avoid consuming large, inconsistent amounts of which food due to its high Vitamin K content?",
+    "options": {
+      "A": "Oranges",
+      "B": "Broccoli",
+      "C": "Potatoes",
+      "D": "Chicken breast"
+    },
+    "correctAnswer": "B",
+    "rationale": "Broccoli, along with other green leafy vegetables, is high in Vitamin K. Inconsistent intake of Vitamin K can significantly impact the effectiveness of Warfarin, which works by interfering with Vitamin K-dependent clotting factors.",
+    "section": "Drug-Nutrient Interactions",
+    "type": "mc"
+  },
+  {
+    "questionText": "Which herbal supplement is often used for its immune-stimulating properties, but should be used cautiously in patients with autoimmune diseases?",
+    "options": {
+      "A": "Valerian",
+      "B": "Echinacea",
+      "C": "Ginseng",
+      "D": "Ginger"
+    },
+    "correctAnswer": "B",
+    "rationale": "Echinacea is commonly used to boost the immune system. However, in patients with autoimmune diseases, stimulating the immune system could potentially exacerbate their condition, so it should be used with caution and under medical advice.",
+    "section": "Complementary and Alternative Therapies",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is teaching an older adult patient about managing their medications. Which statement by the patient indicates effective understanding of polypharmacy management?",
+    "options": {
+      "A": "“I only take medications prescribed by one doctor.”",
+      "B": "“I keep all my medications in a single, unlabeled container.”",
+      "C": "“I review my medication list with my doctor at every appointment.”",
+      "D": "“I stop taking medications if I feel better without telling my doctor.”"
+    },
+    "correctAnswer": "C",
+    "rationale": "Regularly reviewing the entire medication list with a healthcare provider is a crucial strategy to manage polypharmacy, identify potential issues, and ensure all medications are still necessary and appropriate. The other options describe unsafe practices or misunderstandings.",
+    "section": "Polypharmacy",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient with a history of intravenous drug use is admitted to the hospital. The nurse should assess for which physical findings related to this route of administration? Select all that apply.",
+    "options": {
+      "A": "Track marks",
+      "B": "Cellulitis at injection sites",
+      "C": "Collapsed veins",
+      "D": "Jaundice",
+      "E": "Oral thrush"
+    },
+    "correctAnswer": ["A", "B", "C"],
+    "rationale": "Intravenous drug use can lead to localized complications such as track marks (scarring along veins), cellulitis (skin infection) at injection sites, and collapsed veins due to repeated trauma. Jaundice could indicate liver issues (e.g., hepatitis from shared needles), and oral thrush might be seen in immunocompromised individuals, but track marks, cellulitis, and collapsed veins are direct physical findings of the IV route.",
+    "section": "Drugs in Substance Use Disorder",
+    "type": "sata"
+  },
+  {
+    "questionText": "A patient is admitted with a suspected overdose of a central nervous system depressant. The nurse's priority assessment should focus on:",
+    "options": {
+      "A": "Pupil size and reactivity.",
+      "B": "Gastrointestinal motility.",
+      "C": "Respiratory rate and depth.",
+      "D": "Skin integrity."
+    },
+    "correctAnswer": "C",
+    "rationale": "Central nervous system depressant overdose (e.g., opioids, benzodiazepines, alcohol) primarily causes respiratory depression, which can be life-threatening. Therefore, assessing respiratory rate and depth is the highest priority.",
+    "section": "Drugs in Substance Use Disorder",
+    "type": "mc"
+  },
+  {
+    "questionText": "The nurse is preparing to administer a medication. The nurse understands that 'excretion' is the process by which the drug is:",
+    "options": {
+      "A": "Broken down into metabolites.",
+      "B": "Moved from the bloodstream to tissues.",
+      "C": "Eliminated from the body.",
+      "D": "Absorbed into the bloodstream."
+    },
+    "correctAnswer": "C",
+    "rationale": "Excretion is the final stage of pharmacokinetics, involving the removal of drugs and their metabolites from the body, primarily via the kidneys in urine or via the liver in bile/feces.",
+    "section": "Pharmacokinetics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is prescribed a medication that has a short half-life and a narrow therapeutic index. The nurse anticipates that this drug will require:",
+    "options": {
+      "A": "Once-daily dosing and minimal monitoring.",
+      "B": "Infrequent dosing and routine monitoring.",
+      "C": "Frequent dosing and close therapeutic drug monitoring.",
+      "D": "High initial doses and no follow-up."
+    },
+    "correctAnswer": "C",
+    "rationale": "A short half-life necessitates frequent dosing to maintain therapeutic levels. A narrow therapeutic index requires close monitoring (e.g., peak and trough levels) to ensure efficacy while avoiding toxicity. Combining these characteristics means the drug requires both frequent administration and intensive monitoring.",
+    "section": "Pharmacokinetics",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient experiences an unexpected, uncharacteristic reaction to a medication that is not an allergic reaction or a typical side effect. This type of unpredictable drug response is known as a(n):",
+    "options": {
+      "A": "Drug toxicity",
+      "B": "Idiosyncratic reaction",
+      "C": "Therapeutic effect",
+      "D": "Adverse drug interaction"
+    },
+    "correctAnswer": "B",
+    "rationale": "An idiosyncratic reaction is an uncommon drug response resulting from a genetic predisposition. It is neither an allergic reaction nor a predictable side effect, but an individual, unpredictable reaction.",
+    "section": "Pharmacodynamics",
+    "type": "mc"
+  },
+    {
+    "questionText": "A nurse is preparing to administer guaifenesin to a patient with a productive cough. The nurse understands the primary purpose of this medication is to:",
+    "options": {
+      "A": "Suppress the cough reflex.",
+      "B": "Thin respiratory secretions.",
+      "C": "Reduce nasal congestion.",
+      "D": "Bronchodilate the airways."
+    },
+    "correctAnswer": "B",
+    "rationale": "Guaifenesin is an expectorant that works by thinning respiratory secretions, making them easier to cough up. It does not suppress cough, reduce congestion, or bronchodilate.",
+    "section": "Gas Exchange: Upper Respiratory",
+    "type": "mc"
+  },
+  {
+    "questionText": "A patient is prescribed pseudoephedrine for nasal congestion. The nurse should assess for which contraindication before administering this medication?",
+    "options": {
+      "A": "History of asthma.",
+      "B": "Hypotension.",
+      "C": "Narrow-angle glaucoma.",
+      "D": "Diabetes insipidus."
+    },
+    "correctAnswer": "C",
+    "rationale": "Pseudoephedrine is a sympathomimetic that can cause vasoconstriction and mydriasis (pupil dilation), which can worsen narrow-angle glaucoma. It is contraindicated in patients with severe hypertension or coronary artery disease, but hypotension is not a contraindication.",
+    "section": "Gas Exchange: Upper Respiratory",
+    "type": "mc"
+  },
+{
+    "questionText": "A CNO is recruiting a nurse leader to turn around a chronically underperforming unit with low engagement and high turnover. Which candidate description best matches a transformational rather than trait‑based view of leadership?",
+    "options": {
+      "A": "“Born leader,” highly charismatic, described as having a natural authority presence in every setting",
+      "B": "Known for strictly enforcing policies and monitoring adherence to detailed procedures",
+      "C": "Has a track record of involving staff in redesign, linking unit work to purpose, and increasing professional development participation",
+      "D": "Quiet, reserved leader who prefers to work alone on schedules and budgets"
+    },
+    "correctAnswer": "C",
+    "rationale": "Transformational leadership focuses on inspiring followers, intellectual stimulation, and developing others to higher motivation and morality, rather than relying on innate traits or rigid command-and-control compliance.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A new nurse manager wants to strengthen basic management on a busy surgical unit. Which actions align directly with Bleich’s tasks of management? (Select all that apply.)",
+    "options": {
+      "A": "Identifying who “owns” the preoperative checklist process and clarifying their responsibilities",
+      "B": "Informally telling staff to “do your best” without specifying workload expectations",
+      "C": "Using workload data to compare nurse‑to‑patient ratios and adjust staffing patterns",
+      "D": "Eliminating barriers such as broken equipment and missing supplies that delay care",
+      "E": "Assuming competent staff will self‑organize without formal division of work"
+    },
+    "correctAnswer": ["A", "C", "D"],
+    "rationale": "Bleich’s tasks include identifying process ownership, measuring workload equity with data, and eliminating barriers to care. Vague expectations or a lack of structure contradict these management principles.",
+    "section": "Management Functions",
+    "type": "sata"
+  },
+  {
+    "questionText": "A staff nurse consistently follows policies, offers evidence‑based suggestions in huddles, and takes reasonable risks to challenge inefficient workflows. Which statement best reflects this nurse’s role according to Bleich’s tasks of followership?",
+    "options": {
+      "A": "The nurse is overstepping by questioning established processes",
+      "B": "The nurse is performing passive followership focused on obedience",
+      "C": "The nurse is fulfilling expected followership by being accountable, adding value, and taking principled risks",
+      "D": "The nurse’s actions are only appropriate in a formal leadership position"
+    },
+    "correctAnswer": "C",
+    "rationale": "Bleich’s followership tasks include individual accountability, offering knowledge/skills, providing evidence-based feedback, and taking reasonable risks to improve system design.",
+    "section": "Followership",
+    "type": "mc"
+  },
+  {
+    "questionText": "Candidate X has strong budgeting skills but becomes defensive with feedback. Candidate Y scores high on emotional intelligence and is known for building trusting relationships. Which candidate is more likely to exhibit transformational leadership behaviors over time?",
+    "options": {
+      "A": "Candidate X, because technical and financial skills are primary determinants",
+      "B": "Candidate Y, because emotional intelligence strongly predicts transformational leadership in nurse managers",
+      "C": "Both equally, because leadership style is unrelated to emotional intelligence",
+      "D": "Neither, because transformational leadership is an innate trait, not developed"
+    },
+    "correctAnswer": "B",
+    "rationale": "Research indicates that emotional intelligence (specifically self-awareness and relationship management) is a powerful predictor of transformational leadership behaviors in nursing.",
+    "section": "Leadership Styles",
+    "type": "mc"
+  },
+  {
+    "questionText": "A nurse experiences moral distress after witnessing repeated near‑misses that are never reported. Which actions best demonstrate moral courage? (Select all that apply.)",
+    "options": {
+      "A": "Quietly altering personal practice but avoiding any discussion of the problem",
+      "B": "Requesting an ethics consult or safety huddle to openly analyze patterns and risks",
+      "C": "Using respectful, factual language to raise concerns with the nurse manager",
+      "D": "Asking a colleague to speak up instead so the nurse can avoid potential conflict",
+      "E": "Documenting concerns through established incident‑reporting or escalation mechanisms"
+    },
+    "correctAnswer": ["B", "C", "E"],
+    "rationale": "Moral courage involves standing up for ethical principles using appropriate professional channels and clear communication, despite the fear of conflict or negative consequences.",
+    "section": "Professionalism & Ethics",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse representative is reviewing the environmental scan for a new palliative care unit. Which finding most clearly represents an internal weakness rather than an external threat?",
+    "options": {
+      "A": "Regional shortage of palliative‑care–trained physicians",
+      "B": "Increasing local population of older adults with multi‑morbidities",
+      "C": "Limited palliative‑care education among current nursing staff and lack of clinical champions",
+      "D": "New federal reimbursement incentives for community‑based palliative services"
+    },
+    "correctAnswer": "C",
+    "rationale": "Internal weaknesses refer to factors within the organization's control, such as staff education levels and culture. External threats involve market forces, demographics, or regulations outside the organization.",
+    "section": "Strategic Planning",
+    "type": "mc"
+  },
+  {
+    "questionText": "A group is evaluating readiness to add a bariatric surgical service. Which factors most clearly reduce the likelihood of success and must be addressed first? (Select all that apply.)",
+    "options": {
+      "A": "Strong positive cash flow and adequate reserves",
+      "B": "Medical staff expressing strong negative views about starting the service",
+      "C": "Existing ORs already at peak capacity Monday–Friday",
+      "D": "A newly hired surgeon interested in building a bariatric practice",
+      "E": "Imminent retirement of an experienced director with inexperienced unit managers"
+    },
+    "correctAnswer": ["B", "C", "E"],
+    "rationale": "Lack of physician buy-in, physical capacity constraints, and unstable leadership are restraining forces that significantly reduce organizational readiness for a major service expansion.",
+    "section": "Strategic Planning",
+    "type": "sata"
+  },
+  {
+    "questionText": "A nurse leader is responding to a sudden EHR outage that disrupts all documentation and medication processes. Which description best characterizes this situation?",
+    "options": {
+      "A": "Planned change that can be addressed sequentially through unfreezing‑moving‑refreezing",
+      "B": "Unplanned change that requires adaptive responses informed by complexity theory",
+      "C": "Minor incremental change with minimal system interdependence",
+      "D": "Routine tactical adjustment and not considered “change” in the strategic sense"
+    },
+    "correctAnswer": "B",
+    "rationale": "An unexpected system failure is an unplanned change. It requires the agile, decentralized problem-solving and adaptive responses characteristic of complexity theory.",
+    "section": "Change Management",
+    "type": "mc"
+  },
+  {
+    "questionText": "A staff nurse reads one small trial showing a novel dressing reduces pressure injuries and wants immediate adoption. Which response by the leader is most consistent with EBP principles?",
+    "options": {
+      "A": "Approve the change based on the single study to avoid delaying innovation",
+      "B": "Decline the change and continue current practice indefinitely",
+      "C": "Guide the nurse to formulate a PICOT question and search for systematic reviews and practice guidelines",
+      "D": "Ask the nurse to trial the dressing on one patient without any outcome tracking"
+    },
+    "correctAnswer": "C",
+    "rationale": "EBP requires synthesis of high-level evidence (like systematic reviews) and clinical expertise, rather than immediate adoption based on a single, isolated study.",
+    "section": "Evidence-Based Practice",
+    "type": "mc"
+  },
+  {
+    "questionText": "A system wants to understand which fall‑prevention strategies work best cross-unit. Which approaches reflect practice‑based evidence and big‑data use? (Select all that apply.)",
+    "options": {
+      "A": "Mining the EHR for large samples of patients, comparing fall rates across units using different bundles",
+      "B": "Excluding all non‑randomized data and relying only on classic RCTs from the literature",
+      "C": "Involving frontline nurses and other stakeholders in interpreting system‑level fall patterns",
+      "D": "Using multi‑site observational data to assess whether outcomes are consistent in various real‑world settings",
+      "E": "Refusing to use EHR data because of concerns about “too much information”"
+    },
+    "correctAnswer": ["A", "C", "D"],
+    "rationale": "Practice-based evidence uses large, real-world datasets and stakeholder participation to assess interventions in varied settings, moving beyond the strict constraints of traditional RCTs.",
+    "section": "Evidence-Based Practice",
+    "type": "sata"
+  }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // { qIndex: ['A'] or ['A', 'B'] }
+        let flaggedQuestions = {}; // { qIndex: boolean }
+        let timerInterval;
+        let timeRemaining = 7200; // 2 hours
+
+        // --- DOM ELEMENTS ---
+        const startScreen = document.getElementById('start-screen');
+        const examInterface = document.getElementById('exam-interface');
+        const analyticsScreen = document.getElementById('analytics-screen');
+        const questionContainer = document.getElementById('question-container');
+        const nextBtn = document.getElementById('next-btn');
+        const timerDisplay = document.getElementById('timer');
+        const qCurrentDisplay = document.getElementById('q-current');
+        const qTotalDisplay = document.getElementById('q-total');
+        const startBtn = document.getElementById('start-btn');
+
+        // --- EXAM LOGIC ---
+
+        function initExam() {
+            startScreen.classList.add('hidden');
+            examInterface.classList.remove('hidden');
+            qTotalDisplay.textContent = EXAM_DATA.length;
+            startTimer();
+            loadQuestion(0);
+        }
+
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const data = EXAM_DATA[index];
+            qCurrentDisplay.textContent = index + 1;
+            
+            // Disable Next button until interaction
+            nextBtn.disabled = true;
+            if(userAnswers[index] && userAnswers[index].length > 0) nextBtn.disabled = false;
+
+            // Determine if SATA or MC
+            const isSATA = data.type === 'sata';
+            const inputType = isSATA ? 'checkbox' : 'radio';
+            const instruction = isSATA ? '<span class="text-sm font-bold text-gray-500 block mt-2">[Select All That Apply]</span>' : '';
+
+            // Update Flag UI for this question
+            updateFlagButton(flaggedQuestions[index]);
+
+            let html = `
+                <div class="mb-6">
+                    <h2 class="question-text mt-2">${data.questionText}</h2>
+                    ${instruction}
+                </div>
+                <div class="space-y-3">
+            `;
+
+            // Loop through options object keys
+            Object.keys(data.options).forEach(key => {
+                const text = data.options[key];
+                const isChecked = userAnswers[index] && userAnswers[index].includes(key);
+                html += `
+                    <label class="option-row flex items-start p-3 border border-gray-300 rounded cursor-pointer select-none">
+                        <input type="${inputType}" name="answer" value="${key}" 
+                               onchange="handleSelection(${index}, '${key}', '${data.type}')"
+                               ${isChecked ? 'checked' : ''}>
+                        <span class="text-gray-800"><span class="font-bold mr-2 text-gray-600">${key}.</span>${text}</span>
+                    </label>
+                `;
+            });
+
+            html += `</div>`;
+            questionContainer.innerHTML = html;
+        }
+
+        window.toggleFlag = function() {
+            const currentState = !!flaggedQuestions[currentQuestionIndex];
+            const newState = !currentState;
+            flaggedQuestions[currentQuestionIndex] = newState;
+            updateFlagButton(newState);
+        };
+
+        function updateFlagButton(isFlagged) {
+            const btn = document.getElementById('flag-btn');
+            const icon = document.getElementById('flag-icon');
+            const text = document.getElementById('flag-text');
+
+            if (isFlagged) {
+                icon.className = "fa-solid fa-flag text-red-600";
+                text.innerText = "UNFLAG";
+                text.className = "text-xs font-bold uppercase text-red-600";
+            } else {
+                icon.className = "fa-regular fa-flag group-hover:text-red-500";
+                text.innerText = "FLAG FOR REVIEW";
+                text.className = "text-xs font-bold uppercase group-hover:text-red-500";
+            }
+        }
+
+        window.handleSelection = function(qIndex, optId, type) {
+            if (!userAnswers[qIndex]) userAnswers[qIndex] = [];
+
+            if (type === 'mc') {
+                userAnswers[qIndex] = [optId];
+            } else {
+                // SATA Logic
+                const currentArr = userAnswers[qIndex];
+                if (currentArr.includes(optId)) {
+                    userAnswers[qIndex] = currentArr.filter(id => id !== optId);
+                } else {
+                    userAnswers[qIndex].push(optId);
+                }
+            }
+
+            // Enable Next button if at least one thing is selected
+            nextBtn.disabled = userAnswers[qIndex].length === 0;
+        };
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < EXAM_DATA.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                finishExam();
+            }
+        });
+
+        startBtn.addEventListener('click', initExam);
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const hrs = Math.floor(timeRemaining / 3600);
+                const mins = Math.floor((timeRemaining % 3600) / 60);
+                const secs = timeRemaining % 60;
+                timerDisplay.textContent = 
+                    `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) finishExam();
+            }, 1000);
+        }
+
+        // --- ANALYTICS ENGINE ---
+
+        function finishExam() {
+            clearInterval(timerInterval);
+            examInterface.classList.add('hidden');
+            analyticsScreen.classList.remove('hidden');
+            generateReport();
+        }
+
+        function generateReport() {
+            let totalCorrect = 0;
+            const categoryStats = {};
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+
+            EXAM_DATA.forEach((q, idx) => {
+                // Handle Section/Category
+                const section = q.section || "General";
+                if (!categoryStats[section]) categoryStats[section] = { correct: 0, total: 0 };
+                categoryStats[section].total++;
+
+                // Handle Correct Answer Format (String vs Array)
+                let correctArr = Array.isArray(q.correctAnswer) ? q.correctAnswer : [q.correctAnswer];
+                
+                // Check Answer
+                const userAns = userAnswers[idx] || [];
+                // Sort both arrays for string comparison
+                const sortedUser = [...userAns].sort().toString();
+                const sortedCorrect = [...correctArr].sort().toString();
+                const isCorrect = sortedUser === sortedCorrect;
+
+                if (isCorrect) {
+                    totalCorrect++;
+                    categoryStats[section].correct++;
+                }
+
+                // Render Review Item
+                const statusClass = isCorrect ? 'correct-answer-box' : 'incorrect-answer-box';
+                const statusIcon = isCorrect ? '<i class="fa-solid fa-check text-green-600"></i>' : '<i class="fa-solid fa-xmark text-red-600"></i>';
+                const flagIcon = flaggedQuestions[idx] ? '<i class="fa-solid fa-flag text-red-500 mr-2" title="Flagged"></i>' : '';
+                
+                const div = document.createElement('div');
+                div.className = `p-6 ${statusClass}`;
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center">
+                            ${flagIcon}
+                            <span class="font-bold text-gray-700">Question ${idx + 1}</span>
+                            <span class="ml-3 text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">${section}</span>
+                        </div>
+                        <span>${statusIcon}</span>
+                    </div>
+                    <p class="mb-4 text-gray-800">${q.questionText}</p>
+                    <div class="text-sm bg-white p-4 rounded border border-gray-200">
+                        <div class="mb-2"><span class="font-bold text-gray-600">Your Answer:</span> ${userAns.join(', ') || 'None'}</div>
+                        <div class="mb-2"><span class="font-bold text-green-600">Correct Answer:</span> ${correctArr.join(', ')}</div>
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <span class="font-bold text-[#003057]">Rationale:</span>
+                            <p class="text-gray-600 mt-1">${q.rationale}</p>
+                        </div>
+                    </div>
+                `;
+                reviewList.appendChild(div);
+            });
+
+            // Render Charts
+            const scorePercent = Math.round((totalCorrect / EXAM_DATA.length) * 100);
+            document.getElementById('final-score-percent').textContent = scorePercent + '%';
+            
+            const passFailText = document.getElementById('pass-fail-text');
+            if(scorePercent >= 75) {
+                passFailText.textContent = "Probability of Passing: HIGH";
+                passFailText.className = "mt-2 font-bold text-lg text-green-600";
+            } else {
+                passFailText.textContent = "Probability of Passing: LOW";
+                passFailText.className = "mt-2 font-bold text-lg text-red-600";
+            }
+
+            renderDoughnutChart(totalCorrect, EXAM_DATA.length - totalCorrect);
+            renderBarChart(categoryStats);
+        }
+
+        function renderDoughnutChart(correct, incorrect) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            // Destroy existing chart if it exists to avoid duplication glitches
+            if (window.scoreChartInstance) window.scoreChartInstance.destroy();
+
+            window.scoreChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correct', 'Incorrect'],
+                    datasets: [{
+                        data: [correct, incorrect],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderBarChart(stats) {
+            const labels = Object.keys(stats);
+            const data = labels.map(cat => Math.round((stats[cat].correct / stats[cat].total) * 100));
+            
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            // Destroy existing chart if it exists
+            if (window.catChartInstance) window.catChartInstance.destroy();
+
+            window.catChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Mastery %',
+                        data: data,
+                        backgroundColor: '#003057',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- CALCULATOR LOGIC ---
+        let calcExpression = "";
+        const calcDisplay = document.getElementById('calc-display');
+        const calcElement = document.getElementById('calculator');
+
+        window.toggleCalculator = function() {
+            if (calcElement.style.display === 'block') {
+                calcElement.style.display = 'none';
+            } else {
+                calcElement.style.display = 'block';
+            }
+        };
+
+        window.calcAppend = function(val) {
+            calcExpression += val;
+            calcDisplay.innerText = calcExpression;
+        };
+
+        window.calcClear = function() {
+            calcExpression = "";
+            calcDisplay.innerText = "0";
+        };
+
+        window.calcBackspace = function() {
+            calcExpression = calcExpression.slice(0, -1);
+            calcDisplay.innerText = calcExpression || "0";
+        };
+
+        window.calcCalculate = function() {
+            try {
+                // Use Function constructor for safer eval
+                const result = new Function('return ' + calcExpression)();
+                
+                // Format: Max 4 decimal places
+                const formatted = Math.round(result * 10000) / 10000;
+                
+                calcDisplay.innerText = formatted;
+                calcExpression = String(formatted);
+            } catch (e) {
+                calcDisplay.innerText = "Error";
+                calcExpression = "";
+            }
+        };
+
+        // Draggable Calculator
+        const dragHeader = document.getElementById("calc-header");
+        let isDragging = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        dragHeader.addEventListener("mousedown", dragStart);
+        document.addEventListener("mouseup", dragEnd);
+        document.addEventListener("mousemove", drag);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+            if (e.target === dragHeader || e.target.parentNode === dragHeader) {
+                isDragging = true;
+            }
+        }
+
+        function dragEnd(e) {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                xOffset = currentX;
+                yOffset = currentY;
+                setTranslate(currentX, currentY, calcElement);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        }
+
+    </script>
+</body>
+</html>
