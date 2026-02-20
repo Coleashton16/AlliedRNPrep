@@ -3,134 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Health | Professional Resource Hub</title>
+    <title>AlliedRNPrep | Mental Health Nursing</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Lucide Icons (Replacing Feather Icons for Modernity) -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6', /* Medical Teal */
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        navy: {
+                            50: '#f4f6f8',
+                            100: '#e2e7ec',
+                            200: '#c6d1d9',
+                            300: '#9cb1be',
+                            400: '#6c8b9f',
+                            500: '#4e6f85',
+                            600: '#3d586d',
+                            700: '#32485a',
+                            800: '#2c3c4b',
+                            900: '#1a2634', /* Deep Institutional Navy */
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 0 1px rgba(226, 231, 236, 1), 0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                        'card-hover': '0 0 0 1px rgba(13, 148, 136, 0.3), 0 10px 15px -3px rgba(0, 0, 0, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        /* Base styles and modern, deep background */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9; /* Slate-100 */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8fafc;
+            overflow-x: hidden;
         }
 
-        /* Styles for the active unit tab (Teal color scheme) */
+        /* Clean, subtle background pattern */
+        .bg-institutional {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.5;
+        }
+
+        /* Smooth transitions */
+        .card-transition {
+            transition: all 0.25s ease;
+        }
+
+        /* Tab Styles */
         .tab-active {
-            color: #0d9488; /* Teal-600 */
-            border-bottom: 3px solid #0d9488; /* Teal-600 indicator */
-            font-weight: 600;
+            color: #14b8a6; /* brand-500 */
+            border-bottom: 2px solid #14b8a6;
+            background-color: #f0fdfa; /* brand-50 */
         }
         
-        /* Content transition for a fluent feel */
         .content-section {
             display: none;
-            animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: fadeIn 0.4s ease-out;
         }
         .content-section.active {
             display: block;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Ensure smooth icon replacement for Lucide */
-        .lucide { display: inline; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="text-slate-700">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col relative selection:bg-brand-200 selection:text-brand-900">
 
-    <!-- Top Navigation Bar (Deep Slate) -->
-    <nav class="sticky top-0 z-40 bg-slate-800 shadow-xl">
+    <!-- SUBTLE BACKGROUND -->
+    <div class="bg-institutional"></div>
+
+    <!-- NAVBAR (Portal Style) -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo and Site Title -->
-                <div class="flex-shrink-0">
-                    <a href="#" class="flex items-center gap-2 text-xl font-extrabold text-teal-400">
-                        <i data-lucide="brain-circuit" class="w-6 h-6 text-teal-500"></i>
-                        <span>Mental Health Focus</span>
+            <div class="flex justify-between h-20 items-center">
+                
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-lg bg-navy-900 text-white flex items-center justify-center shadow-md group-hover:bg-brand-600 transition-colors">
+                        <i class="fa-solid fa-user-nurse text-lg"></i>
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <h1 class="font-extrabold text-xl text-navy-900 tracking-tight leading-none group-hover:text-brand-700 transition-colors">Allied<span class="text-brand-600">RN</span>Prep</h1>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Student Portal</p>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Links (Semester Two Active) -->
+                <div class="hidden md:flex items-center gap-8 px-8 border-l border-r border-slate-100 mx-6 flex-1">
+                    <a href="index.html" class="text-slate-500 hover:text-navy-900 font-bold text-sm flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-house text-xs"></i> Dashboard
+                    </a>
+                    <a href="SemesterOne.html" class="text-slate-500 hover:text-navy-900 font-bold text-sm flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-1 text-xs"></i> Semester One
+                    </a>
+                    <a href="SemesterTwo.html" class="text-brand-600 font-bold text-sm flex items-center gap-2 border-b-2 border-brand-500 py-7">
+                        <i class="fa-solid fa-2 text-xs"></i> Semester Two
+                    </a>
+                    <a href="SemesterThree.html" class="text-slate-500 hover:text-navy-900 font-bold text-sm flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-3 text-xs"></i> Semester Three
                     </a>
                 </div>
-                <!-- Desktop Menu Links -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="index.html" class="text-slate-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
-                        <i data-lucide="grid-3x3" class="w-4 h-4"></i> Dashboard
-                    </a>
-                    <a href="Calendar.html" class="text-slate-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
-                        <i data-lucide="calendar-check" class="w-4 h-4"></i> Schedule
-                    </a>
-                    <a href="AcademicSupportResourcesConsentAndTOS.html" class="text-slate-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> Policies
-                    </a>
-                    <a href="https://www.vsrep.org/anonymous-reporting-form" target="_blank" rel="noopener noreferrer" class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-md">
-                        <i data-lucide="bell-ring" class="w-4 h-4"></i> Report Incident
-                    </a>
+
+                <!-- User Actions / Mobile Menu Toggle -->
+                <div class="flex items-center gap-5">
+                    <div class="hidden md:flex flex-col items-end">
+                        <span class="text-sm font-bold text-navy-900">Student</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                            <span class="text-xs text-slate-500 font-medium">Session Active</span>
+                        </div>
+                    </div>
+                    <button id="mobile-menu-button" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 text-navy-900 hover:bg-slate-200 transition-colors">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
                 </div>
-                <!-- Mobile Hamburger Button -->
-                <button id="mobile-menu-button" class="md:hidden text-white hover:text-teal-400 transition-colors">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
             </div>
         </div>
     </nav>
-    
-    <!-- Mobile Menu Drawer (Hidden by default) -->
-    <div id="mobile-menu-drawer" class="fixed inset-0 z-30 bg-slate-900/90 backdrop-blur-sm hidden md:hidden">
-        <div class="absolute top-0 right-0 w-64 h-full bg-slate-800 p-6 shadow-2xl">
-            <button id="close-menu-button" class="absolute top-4 right-4 text-white hover:text-teal-400">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <nav class="flex flex-col space-y-4 pt-10">
-                <a href="index.html" class="text-xl font-medium text-white hover:text-teal-400 transition-colors">Dashboard</a>
-                <a href="Calendar.html" class="text-xl font-medium text-white hover:text-teal-400 transition-colors">Schedule</a>
-                <a href="AcademicSupportResourcesConsentAndTOS.html" class="text-xl font-medium text-white hover:text-teal-400 transition-colors">Policies</a>
-                <a href="https://www.vsrep.org/anonymous-reporting-form" target="_blank" rel="noopener noreferrer" class="text-xl font-medium text-red-400 hover:text-red-500 transition-colors">Report Incident</a>
-            </nav>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu-drawer" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden">
+        <div class="absolute top-0 right-0 w-72 h-full bg-white shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <span class="font-bold text-navy-900">Menu</span>
+                <button id="close-menu-button" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+                <a href="index.html" class="flex items-center gap-3 text-slate-600 font-semibold p-3 rounded-lg hover:bg-slate-50">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
+                </a>
+                <a href="SemesterOne.html" class="flex items-center gap-3 text-slate-600 font-semibold p-3 rounded-lg hover:bg-slate-50">
+                    <i class="fa-solid fa-1 w-5 text-center"></i> Semester One
+                </a>
+                <a href="SemesterTwo.html" class="flex items-center gap-3 text-brand-600 bg-brand-50 font-semibold p-3 rounded-lg">
+                    <i class="fa-solid fa-2 w-5 text-center"></i> Semester Two
+                </a>
+                <a href="SemesterThree.html" class="flex items-center gap-3 text-slate-600 font-semibold p-3 rounded-lg hover:bg-slate-50">
+                    <i class="fa-solid fa-3 w-5 text-center"></i> Semester Three
+                </a>
+            </div>
         </div>
     </div>
 
-
-    <!-- Main Content Area (Centralized) -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         
-        <!-- Hero Banner (Simplified and Focused) -->
-        <header class="bg-white p-8 md:p-10 rounded-2xl shadow-xl border-t-4 border-teal-500 mb-8">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Mental Health Nursing Resources
+        <!-- Hero Section -->
+        <header class="mb-10 text-center md:text-left">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-2">
+                    <a href="SemesterTwo.html" class="text-sm font-semibold text-slate-500 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrow-left"></i> Semester Two
+                    </a>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    <span class="text-sm font-semibold text-brand-600">NUR 203</span>
+                </div>
+                <!-- Using Emerald for Mental Health as established in SemesterTwo.html -->
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-bold uppercase tracking-wider border border-emerald-100">
+                    <i class="fa-solid fa-brain"></i> Psychiatric Core
+                </div>
+            </div>
+            
+            <h1 class="text-3xl md:text-4xl font-extrabold text-navy-900 tracking-tight mb-3">
+                Mental Health Nursing
             </h1>
-            <p class="mt-2 text-lg text-slate-500">
+            <p class="text-lg text-slate-600 max-w-3xl leading-relaxed font-medium">
                 Your central platform for mastering psychiatric nursing, therapeutic communication, and behavioral health disorders.
             </p>
         </header>
 
-        <!-- Unit Navigation (Horizontal Tabs) -->
-        <nav class="bg-white rounded-t-xl border-b border-slate-200 shadow-md">
-            <div id="unit-navigation" class="flex flex-wrap border-b border-slate-200">
-                <!-- Unit tabs will be dynamically populated here -->
+        <!-- Unit Navigation (Tabs) -->
+        <div class="bg-white rounded-xl shadow-card mb-8 overflow-hidden">
+            <div id="unit-navigation" class="flex flex-wrap border-b border-slate-100 bg-slate-50/50">
+                <!-- Dynamic Tabs Injected Here -->
             </div>
-        </nav>
+        </div>
 
-        <!-- Content Pane -->
-        <main id="content-container" class="bg-white p-6 sm:p-8 rounded-b-xl shadow-xl min-h-[60vh] border-t-0">
-            <!-- Content sections will be rendered here -->
-        </main>
-    </div>
+        <!-- Content Area -->
+        <div id="content-container" class="min-h-[400px]">
+            <!-- Dynamic Content Injected Here -->
+        </div>
+
+    </main>
 
     <!-- Footer -->
-    <footer class="text-center mt-12 py-8 bg-slate-800 text-slate-400">
-        <p class="text-sm">&copy; 2025 Cole Ashton VSREP. All rights reserved. | Professional Academic Resources.</p>
+    <footer class="mt-auto py-8 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 text-slate-500">
+                <i class="fa-solid fa-user-nurse text-lg"></i>
+                <span class="font-bold text-sm text-navy-900">AlliedRNPrep</span>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">&copy; <span id="year"></span> AlliedRNPrep.</p>
+        </div>
     </footer>
 
     <script>
@@ -142,7 +249,7 @@
                     title: 'Unit 1',
                     fullTitle: 'Unit 1: Foundational Concepts & Theories',
                     subtitle: 'An introduction to psychiatric nursing, ethical considerations, and therapeutic communication techniques.',
-                    icon: 'package-plus',
+                    icon: 'fa-box-open',
                     resources: []
                 },
                 {
@@ -150,13 +257,13 @@
                     title: 'Unit 2',
                     fullTitle: 'Unit 2: Addiction, Cognition, and Development',
                     subtitle: 'Focusing on substance use disorders, cognitive impairments (Delirium/Dementia), and psychosocial development.',
-                    icon: 'gauge',
+                    icon: 'fa-head-side-virus',
                     resources: [
-                        { type: 'learn', title: 'Unit 2 Learning Module', description: 'A comprehensive module covering all topics in this unit.', icon: 'book-open-check', link: 'mentalhealthunit2learningmodule.html' },
-                        { type: 'learn', title: 'Drug Mastery Module', description: 'Learn key psychotropic medications relevant to Unit 2 topics.', icon: 'pill', link: 'mentalhealthunit2drugmodule.html' },
-                        { type: 'exam', title: 'Development SDE', description: 'Diagnostic exam on developmental theories and milestones.', icon: 'users-2', link: 'mentalhealthdevelopment.html' },
-                        { type: 'exam', title: 'Cognition SDE', description: 'Assess your knowledge of cognitive disorders and nursing care.', icon: 'cpu', link: 'mentalhealthcognitionsde.html' },
-                        { type: 'exam', title: 'Addiction SDE', description: 'Test your understanding of substance use disorders and withdrawal management.', icon: 'coffee', link: 'mentalhealthaddictionsde.html' }
+                        { type: 'learn', title: 'Unit 2 Learning Module', description: 'A comprehensive module covering all topics in this unit.', icon: 'fa-book-open', link: 'mentalhealthunit2learningmodule.html' },
+                        { type: 'learn', title: 'Drug Mastery Module', description: 'Learn key psychotropic medications relevant to Unit 2 topics.', icon: 'fa-pills', link: 'mentalhealthunit2drugmodule.html' },
+                        { type: 'exam', title: 'Development SDE', description: 'Diagnostic exam on developmental theories and milestones.', icon: 'fa-child-reaching', link: 'mentalhealthdevelopment.html' },
+                        { type: 'exam', title: 'Cognition SDE', description: 'Assess your knowledge of cognitive disorders and nursing care.', icon: 'fa-brain', link: 'mentalhealthcognitionsde.html' },
+                        { type: 'exam', title: 'Addiction SDE', description: 'Test your understanding of substance use disorders and withdrawal management.', icon: 'fa-prescription-bottle-medical', link: 'mentalhealthaddictionsde.html' }
                     ]
                 },
                 {
@@ -164,172 +271,121 @@
                     title: 'Final Prep',
                     fullTitle: 'Comprehensive Final Exam Preparation',
                     subtitle: 'A review platform covering all major mental health disorders and interventions.',
-                    icon: 'award',
+                    icon: 'fa-trophy',
                     resources: [
-                        { type: 'final', title: 'Final Exam Simulation', description: 'A full-length, comprehensive practice exam to prepare you for the final.', icon: 'graduation-cap', link: 'mentalhealthfinalexamsim.html' }
+                        { type: 'final', title: 'Final Exam Simulation', description: 'A full-length, comprehensive practice exam to prepare you for the final.', icon: 'fa-graduation-cap', link: 'mentalhealthfinalexamsim.html' }
                     ]
                 }
             ]
         };
 
-        // --- DYNAMIC RENDERING & LOGIC ---
+        // --- DYNAMIC RENDERING ---
         document.addEventListener('DOMContentLoaded', () => {
             const navContainer = document.getElementById('unit-navigation');
             const contentContainer = document.getElementById('content-container');
-            
-            // Mobile menu logic
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // Mobile Menu Logic
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const closeMenuButton = document.getElementById('close-menu-button');
             const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
 
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenuDrawer.classList.remove('hidden');
-            });
+            mobileMenuButton.addEventListener('click', () => mobileMenuDrawer.classList.remove('hidden'));
+            closeMenuButton.addEventListener('click', () => mobileMenuDrawer.classList.add('hidden'));
 
-            closeMenuButton.addEventListener('click', () => {
-                mobileMenuDrawer.classList.add('hidden');
-            });
-
-
-            const createResourceCard = (resource) => {
-                const typeStyles = {
-                    // Using Indigo/Pink palette for Mental Health for a calm, yet focused look
-                    exam: { bg: 'bg-indigo-50', border: 'border-indigo-300', iconColor: 'text-indigo-600', ring: 'ring-indigo-400' },
-                    learn: { bg: 'bg-teal-50', border: 'border-teal-300', iconColor: 'text-teal-600', ring: 'ring-teal-400' },
-                    game: { bg: 'bg-amber-50', border: 'border-amber-300', iconColor: 'text-amber-600', ring: 'ring-amber-400' },
-                    final: { bg: 'bg-red-50', border: 'border-red-300', iconColor: 'text-red-600', ring: 'ring-red-400' }
-                };
-                const styles = typeStyles[resource.type] || typeStyles.learn;
-
-                return `
-                    <a href="${resource.link}" target="_blank" rel="noopener noreferrer" 
-                        class="group block p-5 rounded-xl border transition-all duration-300 
-                                transform-gpu hover:-translate-y-0.5 shadow-md hover:shadow-xl
-                                ${styles.bg} ${styles.border} hover:border-slate-400
-                                hover:ring-2 ring-offset-2 ring-opacity-50 ${styles.ring}">
-                        <div class="flex items-start gap-4">
-                            <div class="p-3 rounded-full ${styles.iconColor} bg-white ring-1 ring-slate-100 shadow-inner">
-                                <i data-lucide="${resource.icon}" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-extrabold text-slate-800 group-hover:text-slate-900 break-words transition-colors">${resource.title}</h4>
-                                <p class="text-sm text-slate-500 mt-1 break-words">${resource.description}</p>
-                            </div>
-                        </div>
-                    </a>`;
-            };
-            
-            // Clear existing content before populating
-            navContainer.innerHTML = '';
-            contentContainer.innerHTML = '';
-
-            courseData.units.forEach((unit) => {
-                // Horizontal Tab Link Generation
-                const navLink = document.createElement('a');
-                navLink.href = `#${unit.id}`;
+            // Render Tabs and Content
+            courseData.units.forEach((unit, index) => {
+                // 1. Create Tab
+                const navLink = document.createElement('button');
                 navLink.dataset.target = unit.id;
-                navLink.className = 'tab-link text-slate-600 px-6 py-3 text-base font-medium transition-all duration-200 hover:text-teal-600';
-                navLink.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="${unit.icon}" class="w-4 h-4"></i>${unit.title}</span>`;
+                navLink.className = `tab-link flex items-center gap-2 px-6 py-4 text-sm font-bold text-slate-500 hover:text-brand-600 transition-all border-b-2 border-transparent w-full md:w-auto justify-center md:justify-start ${index === 0 ? 'tab-active' : ''}`;
+                navLink.innerHTML = `<i class="fa-solid ${unit.icon}"></i> ${unit.title}`;
                 navContainer.appendChild(navLink);
 
-                // Content Section Generation
+                // 2. Create Section
                 const section = document.createElement('section');
                 section.id = unit.id;
-                section.className = 'content-section';
+                section.className = `content-section ${index === 0 ? 'active' : ''}`;
                 
-                let contentHTML = `<div class="mb-8 p-6 rounded-lg bg-slate-50 border border-slate-200">
-                    <h2 class="text-3xl font-extrabold text-slate-900">${unit.fullTitle}</h2>
-                    <p class="text-slate-600 mt-2">${unit.subtitle}</p>
-                </div>`;
+                let contentHTML = `
+                    <div class="mb-8 p-6 rounded-xl bg-white shadow-card">
+                        <h2 class="text-2xl font-bold text-navy-900">${unit.fullTitle}</h2>
+                        <p class="text-slate-500 mt-2 text-sm leading-relaxed">${unit.subtitle}</p>
+                    </div>`;
 
                 if (unit.resources.length > 0) {
-                    const learningModules = unit.resources.filter(r => r.type === 'learn');
-                    const games = unit.resources.filter(r => r.type === 'game');
                     const exams = unit.resources.filter(r => r.type === 'exam');
-                    const finalExams = unit.resources.filter(r => r.type === 'final');
-                    let resourcesHTML = '';
+                    const learn = unit.resources.filter(r => r.type === 'learn');
+                    const finals = unit.resources.filter(r => r.type === 'final');
 
-                    const createSection = (title, icon, items) => {
-                        if (items.length === 0) return '';
-                        const iconColor = { 
-                            'Learning Modules': 'text-teal-600', 
-                            'Games & Simulations': 'text-amber-600',
-                            'Diagnostic Exams': 'text-indigo-600', 
-                            'Final Exam Prep': 'text-red-600' 
-                        }[title] || 'text-slate-600';
-                        const iconType = {
-                            'Learning Modules': 'book-open',
-                            'Games & Simulations': 'gamepad-2',
-                            'Diagnostic Exams': 'clipboard-check',
-                            'Final Exam Prep': 'award'
-                        }[title] || 'target';
-
-                        return `
-                            <div class="mb-10">
-                                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-3 mb-5 pb-2 border-b-2 border-slate-100">
-                                    <i data-lucide="${iconType}" class="w-6 h-6 ${iconColor}"></i><span>${title} (${items.length})</span>
-                                </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">${items.map(createResourceCard).join('')}</div>
-                            </div>`;
-                    };
-                    
-                    resourcesHTML += createSection('Diagnostic Exams', 'clipboard-check', exams);
-                    resourcesHTML += createSection('Learning Modules', 'book-open', learningModules);
-                    resourcesHTML += createSection('Final Exam Prep', 'award', finalExams); 
-                    resourcesHTML += createSection('Games & Simulations', 'gamepad-2', games);
-                    
-                    contentHTML += resourcesHTML;
+                    contentHTML += renderResourceGrid('Learning Modules', 'fa-book-open', 'text-teal-600', 'bg-teal-50', 'border-teal-100', learn);
+                    contentHTML += renderResourceGrid('Diagnostic Exams', 'fa-clipboard-check', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-100', exams);
+                    contentHTML += renderResourceGrid('Final Exam Prep', 'fa-award', 'text-rose-600', 'bg-rose-50', 'border-rose-100', finals);
                 } else {
                     contentHTML += `
-                        <div class="text-center py-16 px-6 bg-slate-50 rounded-xl border border-dashed border-slate-300 shadow-inner">
-                            <i data-lucide="folder-open" class="w-16 h-16 mx-auto text-slate-300"></i>
-                            <h3 class="mt-6 text-xl font-semibold text-slate-700">No Resources Available Yet</h3>
-                            <p class="mt-2 text-slate-500">Materials for this unit are being prepared. Check back soon!</p>
+                        <div class="text-center py-16 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                                <i class="fa-regular fa-folder-open text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-600">No Resources Yet</h3>
+                            <p class="text-slate-500 text-sm mt-1">Content for this unit is coming soon.</p>
                         </div>`;
                 }
+
                 section.innerHTML = contentHTML;
                 contentContainer.appendChild(section);
             });
-            
-            const navLinks = document.querySelectorAll('.tab-link');
-            const contentSections = document.querySelectorAll('.content-section');
 
-            const switchTab = (targetId) => {
-                navLinks.forEach(link => {
-                    link.classList.remove('tab-active');
-                    if (link.dataset.target === targetId) {
-                        link.classList.add('tab-active');
-                    }
-                });
-                contentSections.forEach(section => section.classList.toggle('active', section.id === targetId));
-                
-                // Re-initiate Lucide icons after content is visible
-                lucide.createIcons();
-            };
+            // Tab Switching Logic
+            const tabs = document.querySelectorAll('.tab-link');
+            const sections = document.querySelectorAll('.content-section');
 
             navContainer.addEventListener('click', (e) => {
-                const link = e.target.closest('.tab-link');
-                if (link) {
-                    e.preventDefault();
-                    const targetId = link.dataset.target;
-                    history.pushState(null, null, `#${targetId}`);
-                    switchTab(targetId);
-                }
-            });
+                const btn = e.target.closest('.tab-link');
+                if (!btn) return;
 
-            // Handle initial load and browser back/forward
-            window.addEventListener('popstate', () => {
-                const initialTab = window.location.hash.substring(1) || courseData.units[0].id;
-                switchTab(initialTab);
-            });
+                // Update UI
+                tabs.forEach(t => t.classList.remove('tab-active'));
+                btn.classList.add('tab-active');
 
-            // Initial switch on page load
-            const initialTab = window.location.hash.substring(1) || courseData.units[0].id;
-            switchTab(initialTab);
-            
-            // Initial Lucide icon replacement for the entire page
-            lucide.createIcons();
+                // Switch Content
+                const targetId = btn.dataset.target;
+                sections.forEach(sec => {
+                    sec.classList.remove('active');
+                    if (sec.id === targetId) sec.classList.add('active');
+                });
+            });
         });
+
+        // Helper to render resource grids
+        function renderResourceGrid(title, iconClass, colorClass, bgClass, borderClass, items) {
+            if (items.length === 0) return '';
+            
+            const cards = items.map(item => `
+                <a href="${item.link}" class="group block p-5 rounded-xl bg-white shadow-card card-transition hover:shadow-card-hover hover:-translate-y-1">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 rounded-lg ${bgClass} ${colorClass} group-hover:bg-opacity-80 transition-colors">
+                            <i class="fa-solid ${item.icon} text-lg"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-navy-900 group-hover:text-brand-600 transition-colors">${item.title}</h4>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">${item.description}</p>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+
+            return `
+                <div class="mb-10">
+                    <h3 class="text-lg font-bold text-navy-900 flex items-center gap-2 mb-4">
+                        <i class="fa-solid ${iconClass} ${colorClass}"></i> ${title}
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        ${cards}
+                    </div>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
