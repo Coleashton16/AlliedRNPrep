@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlliedRNPrep | Med Surg I</title>
+    <title>AlliedRNPrep | Medical Surgical Nursing I</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,39 +21,38 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Inter"', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                     },
                     colors: {
                         brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9', /* Sky Blue - Platform Standard */
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6', /* Medical Teal */
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
                         },
-                        // Sky Blue specific for MedSurg I accent
-                        accent: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                        },
-                        slate: {
-                            850: '#1e293b',
+                        navy: {
+                            50: '#f4f6f8',
+                            100: '#e2e7ec',
+                            200: '#c6d1d9',
+                            300: '#9cb1be',
+                            400: '#6c8b9f',
+                            500: '#4e6f85',
+                            600: '#3d586d',
+                            700: '#32485a',
+                            800: '#2c3c4b',
+                            900: '#1a2634', /* Deep Institutional Navy */
                         }
                     },
-                    animation: {
-                        'float': 'float 20s infinite ease-in-out',
-                        'float-delayed': 'float 25s infinite ease-in-out reverse',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '33%': { transform: 'translate(30px, -50px) rotate(10deg)' },
-                            '66%': { transform: 'translate(-20px, 20px) rotate(-5deg)' },
-                        }
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 0 1px rgba(226, 231, 236, 1), 0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                        'card-hover': '0 0 0 1px rgba(13, 148, 136, 0.3), 0 10px 15px -3px rgba(0, 0, 0, 0.08)',
                     }
                 }
             }
@@ -60,69 +61,31 @@
 
     <style>
         body {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             overflow-x: hidden;
         }
 
-        /* --- MODERN ANIMATED BACKGROUND --- */
-        .bg-animation-wrapper {
+        /* Clean, subtle background pattern */
+        .bg-institutional {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            inset: 0;
             z-index: -1;
-            overflow: hidden;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.5;
         }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            z-index: -1;
-        }
-
-        .orb-1 {
-            top: -10%;
-            left: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: #bae6fd; /* Sky-200 */
-            animation: float 25s infinite;
-        }
-
-        .orb-2 {
-            bottom: -20%;
-            right: -10%;
-            width: 60vw;
-            height: 60vw;
-            background: #e0f2fe; /* Light Sky */
-            animation: float-delayed 30s infinite;
-        }
-
-        /* Glassmorphism Panel */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* Smooth transitions */
+        .card-transition {
+            transition: all 0.25s ease;
         }
 
         /* Tab Styles */
         .tab-active {
-            color: #0284c7; /* Sky-600 */
-            border-bottom: 3px solid #0284c7;
-            background-color: #f0f9ff;
+            color: #14b8a6; /* brand-500 */
+            border-bottom: 2px solid #14b8a6;
+            background-color: #f0fdfa; /* brand-50 */
         }
         
         .content-section {
@@ -137,81 +100,142 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col relative">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col relative selection:bg-brand-200 selection:text-brand-900">
 
-    <!-- BACKGROUND -->
-    <div class="bg-animation-wrapper">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-    </div>
+    <!-- SUBTLE BACKGROUND -->
+    <div class="bg-institutional"></div>
 
-    <!-- NAVBAR -->
-    <nav class="glass-nav sticky top-0 z-50">
+    <!-- NAVBAR (Portal Style) -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 
                 <!-- Logo -->
                 <a href="index.html" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    <div class="w-10 h-10 rounded-lg bg-navy-900 text-white flex items-center justify-center shadow-md group-hover:bg-brand-600 transition-colors">
+                        <i class="fa-solid fa-user-nurse text-lg"></i>
                     </div>
-                    <div>
-                        <h1 class="font-extrabold text-2xl text-slate-800 tracking-tight leading-none">Allied<span class="text-brand-600">RN</span></h1>
-                        <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Med Surg I</p>
+                    <div class="flex flex-col justify-center">
+                        <h1 class="font-extrabold text-xl text-navy-900 tracking-tight leading-none group-hover:text-brand-700 transition-colors">Allied<span class="text-brand-600">RN</span>Prep</h1>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Student Portal</p>
                     </div>
                 </a>
 
-                <!-- Navigation -->
-                <div class="flex items-center gap-4">
-                    <a href="SemesterTwo.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:text-brand-600 hover:bg-white/50 transition-all border border-transparent hover:border-slate-200">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span class="hidden md:inline">Back to Semester 2</span>
+                <!-- Desktop Navigation Links (Semester Two Active) -->
+                <div class="hidden md:flex items-center gap-8 px-8 border-l border-r border-slate-100 mx-6 flex-1">
+                    <a href="index.html" class="text-slate-500 hover:text-navy-900 font-bold text-sm flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-house text-xs"></i> Dashboard
                     </a>
+                    <a href="SemesterOne.html" class="text-slate-500 hover:text-navy-900 font-bold text-sm flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-1 text-xs"></i> Semester One
+                    </a>
+                    <a href="SemesterTwo.html" class="text-brand-600 font-bold text-sm flex items-center gap-2 border-b-2 border-brand-500 py-7">
+                        <i class="fa-solid fa-2 text-xs"></i> Semester Two
+                    </a>
+                    <a href="SemesterThree.html" class="text-slate-500 hover:text-navy-900 font-bold text-sm flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-3 text-xs"></i> Semester Three
+                    </a>
+                </div>
+
+                <!-- User Actions / Mobile Menu Toggle -->
+                <div class="flex items-center gap-5">
+                    <div class="hidden md:flex flex-col items-end">
+                        <span class="text-sm font-bold text-navy-900">Student</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                            <span class="text-xs text-slate-500 font-medium">Session Active</span>
+                        </div>
+                    </div>
+                    <button id="mobile-menu-button" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 text-navy-900 hover:bg-slate-200 transition-colors">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu-drawer" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden">
+        <div class="absolute top-0 right-0 w-72 h-full bg-white shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <span class="font-bold text-navy-900">Menu</span>
+                <button id="close-menu-button" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+                <a href="index.html" class="flex items-center gap-3 text-slate-600 font-semibold p-3 rounded-lg hover:bg-slate-50">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
+                </a>
+                <a href="SemesterOne.html" class="flex items-center gap-3 text-slate-600 font-semibold p-3 rounded-lg hover:bg-slate-50">
+                    <i class="fa-solid fa-1 w-5 text-center"></i> Semester One
+                </a>
+                <a href="SemesterTwo.html" class="flex items-center gap-3 text-brand-600 bg-brand-50 font-semibold p-3 rounded-lg">
+                    <i class="fa-solid fa-2 w-5 text-center"></i> Semester Two
+                </a>
+                <a href="SemesterThree.html" class="flex items-center gap-3 text-slate-600 font-semibold p-3 rounded-lg hover:bg-slate-50">
+                    <i class="fa-solid fa-3 w-5 text-center"></i> Semester Three
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN CONTENT -->
     <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         
         <!-- Hero Section -->
-        <header class="mb-10 text-center md:text-left bg-white/60 backdrop-blur-sm p-8 rounded-2xl border border-white shadow-sm">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-100 text-accent-600 text-xs font-bold uppercase tracking-wide mb-4 border border-accent-200">
-                <i class="fa-solid fa-stethoscope"></i> Clinical Core
+        <header class="mb-10 text-center md:text-left">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-2">
+                    <a href="SemesterTwo.html" class="text-sm font-semibold text-slate-500 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrow-left"></i> Semester Two
+                    </a>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    <span class="text-sm font-semibold text-brand-600">NUR 201</span>
+                </div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-sky-50 text-sky-700 text-[11px] font-bold uppercase tracking-wider border border-sky-100">
+                    <i class="fa-solid fa-stethoscope"></i> Clinical Core
+                </div>
             </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            
+            <h1 class="text-3xl md:text-4xl font-extrabold text-navy-900 tracking-tight mb-3">
                 Medical Surgical Nursing I
             </h1>
-            <p class="text-lg text-slate-600 max-w-3xl leading-relaxed">
+            <p class="text-lg text-slate-600 max-w-3xl leading-relaxed font-medium">
                 Master foundational clinical challenges with structured learning modules, realistic exam simulations, and interactive tools for adult health.
             </p>
         </header>
 
         <!-- Unit Navigation (Tabs) -->
-        <div class="bg-white/80 backdrop-blur rounded-xl border border-slate-200 shadow-sm mb-8 overflow-hidden">
-            <div id="unit-navigation" class="flex flex-wrap border-b border-slate-100">
-                <!-- Dynamic Tabs -->
+        <div class="bg-white rounded-xl shadow-card mb-8 overflow-hidden">
+            <div id="unit-navigation" class="flex flex-wrap border-b border-slate-100 bg-slate-50/50">
+                <!-- Dynamic Tabs Injected Here -->
             </div>
         </div>
 
         <!-- Content Area -->
         <div id="content-container" class="min-h-[400px]">
-            <!-- Dynamic Content -->
+            <!-- Dynamic Content Injected Here -->
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-slate-200 bg-white/50 backdrop-blur-sm py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
-            <p>&copy; <span id="year"></span> AlliedRNPrep. All Rights Reserved.</p>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-brand-600 transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-brand-600 transition-colors">Terms of Service</a>
+    <footer class="mt-auto py-8 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 text-slate-500">
+                <i class="fa-solid fa-user-nurse text-lg"></i>
+                <span class="font-bold text-sm text-navy-900">AlliedRNPrep</span>
             </div>
+            <p class="text-slate-400 text-sm font-medium">&copy; <span id="year"></span> AlliedRNPrep.</p>
         </div>
     </footer>
 
@@ -234,7 +258,7 @@
                     subtitle: 'Focusing on critical physiological processes of respiratory function, glucose control, and endocrine health.',
                     icon: 'fa-lungs',
                     resources: [
-                        { type: 'exam', title: 'Gas Exchange Exemplar Diagnostic', description: 'A diagnostic exam focusing on key respiratory exemplar conditions.', icon: 'fa-microscope', link: 'MedSurg Gas Exchange Exemplar SDE.html' },
+                        { type: 'exam', title: 'Gas Exchange Diagnostic', description: 'A diagnostic exam focusing on key respiratory exemplar conditions.', icon: 'fa-microscope', link: 'MedSurg Gas Exchange Exemplar SDE.html' },
                         { type: 'learn', title: 'Exemplars Module', description: 'An interactive module covering various gas exchange exemplars.', icon: 'fa-layer-group', link: 'MedSurg Gas Exchange Exemplars Learning Module.html' },
                         { type: 'learn', title: 'Gas Exchange Module', description: 'Comprehensive learning module on the principles of gas exchange.', icon: 'fa-book-open', link: 'MedSurg Gas Exchange Learning Module.html' },
                         { type: 'exam', title: 'Gas Exchange SDE', description: 'Test your knowledge with this self-diagnostic exam.', icon: 'fa-clipboard-list', link: 'MedSurg Gas Exchange SDE new.html' },
@@ -249,7 +273,7 @@
                     subtitle: 'Examining the body\'s integrated responses: Perfusion, Clotting, Inflammation, and Infection.',
                     icon: 'fa-shield-virus',
                     resources: [
-                        { type: 'learn', title: 'Perfusion Learning Module', description: 'Learn about cardiovascular perfusion and related disorders.', icon: 'fa-heart-pulse', link: 'MedSurg Perfusion Learning Module.html' },
+                        { type: 'learn', title: 'Perfusion Module', description: 'Learn about cardiovascular perfusion and related disorders.', icon: 'fa-heart-pulse', link: 'MedSurg Perfusion Learning Module.html' },
                         { type: 'exam', title: 'Perfusion Diagnostic', description: 'Test your knowledge on perfusion concepts and patient assessment.', icon: 'fa-heart-circle-check', link: 'medsurgperfusionsde.html' },
                         { type: 'learn', title: 'Inflammation Module', description: 'Explore the inflammatory response, healing, and clinical implications.', icon: 'fa-fire', link: 'medsurginflammationlearningmodule.html' },
                         { type: 'learn', title: 'Infection Module', description: 'An overview of infectious processes, sepsis, and nursing care.', icon: 'fa-virus-slash', link: 'medsurginfectionlearningmodule.html' },
@@ -276,12 +300,20 @@
             const contentContainer = document.getElementById('content-container');
             document.getElementById('year').textContent = new Date().getFullYear();
 
+            // Mobile Menu Logic
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMenuButton = document.getElementById('close-menu-button');
+            const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
+
+            mobileMenuButton.addEventListener('click', () => mobileMenuDrawer.classList.remove('hidden'));
+            closeMenuButton.addEventListener('click', () => mobileMenuDrawer.classList.add('hidden'));
+
             // Render Tabs and Content
             courseData.units.forEach((unit, index) => {
                 // 1. Create Tab
                 const navLink = document.createElement('button');
                 navLink.dataset.target = unit.id;
-                navLink.className = `tab-link flex items-center gap-2 px-6 py-4 text-sm font-semibold text-slate-500 hover:text-accent-600 transition-all border-b-2 border-transparent w-full md:w-auto justify-center md:justify-start ${index === 0 ? 'tab-active' : ''}`;
+                navLink.className = `tab-link flex items-center gap-2 px-6 py-4 text-sm font-bold text-slate-500 hover:text-brand-600 transition-all border-b-2 border-transparent w-full md:w-auto justify-center md:justify-start ${index === 0 ? 'tab-active' : ''}`;
                 navLink.innerHTML = `<i class="fa-solid ${unit.icon}"></i> ${unit.title}`;
                 navContainer.appendChild(navLink);
 
@@ -291,9 +323,9 @@
                 section.className = `content-section ${index === 0 ? 'active' : ''}`;
                 
                 let contentHTML = `
-                    <div class="mb-8 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm">
-                        <h2 class="text-2xl font-bold text-slate-800">${unit.fullTitle}</h2>
-                        <p class="text-slate-500 mt-2">${unit.subtitle}</p>
+                    <div class="mb-8 p-6 rounded-xl bg-white shadow-card">
+                        <h2 class="text-2xl font-bold text-navy-900">${unit.fullTitle}</h2>
+                        <p class="text-slate-500 mt-2 text-sm leading-relaxed">${unit.subtitle}</p>
                     </div>`;
 
                 if (unit.resources.length > 0) {
@@ -306,10 +338,12 @@
                     contentHTML += renderResourceGrid('Final Exam Prep', 'fa-award', 'text-rose-600', 'bg-rose-50', 'border-rose-100', finals);
                 } else {
                     contentHTML += `
-                        <div class="text-center py-20 bg-white/50 rounded-2xl border-2 border-dashed border-slate-200">
-                            <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-4"></i>
-                            <h3 class="text-lg font-semibold text-slate-600">No Resources Yet</h3>
-                            <p class="text-slate-400 text-sm">Content for this unit is coming soon.</p>
+                        <div class="text-center py-16 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                                <i class="fa-regular fa-folder-open text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-600">No Resources Yet</h3>
+                            <p class="text-slate-500 text-sm mt-1">Content for this unit is coming soon.</p>
                         </div>`;
                 }
 
@@ -317,7 +351,7 @@
                 contentContainer.appendChild(section);
             });
 
-            // Logic
+            // Tab Switching Logic
             const tabs = document.querySelectorAll('.tab-link');
             const sections = document.querySelectorAll('.content-section');
 
@@ -338,19 +372,19 @@
             });
         });
 
-        // Helper to render grids
+        // Helper to render resource grids
         function renderResourceGrid(title, iconClass, colorClass, bgClass, borderClass, items) {
             if (items.length === 0) return '';
             
             const cards = items.map(item => `
-                <a href="${item.link}" class="group block p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md card-hover transition-all">
+                <a href="${item.link}" class="group block p-5 rounded-xl bg-white shadow-card card-transition hover:shadow-card-hover hover:-translate-y-1">
                     <div class="flex items-start gap-4">
-                        <div class="p-3 rounded-lg ${bgClass} ${colorClass} group-hover:scale-110 transition-transform duration-300">
-                            <i class="fa-solid ${item.icon}"></i>
+                        <div class="p-3 rounded-lg ${bgClass} ${colorClass} group-hover:bg-opacity-80 transition-colors">
+                            <i class="fa-solid ${item.icon} text-lg"></i>
                         </div>
-                        <div>
-                            <h4 class="font-bold text-slate-800 group-hover:text-brand-600 transition-colors">${item.title}</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">${item.description}</p>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-navy-900 group-hover:text-brand-600 transition-colors">${item.title}</h4>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">${item.description}</p>
                         </div>
                     </div>
                 </a>
@@ -358,7 +392,7 @@
 
             return `
                 <div class="mb-10">
-                    <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2 mb-4">
+                    <h3 class="text-lg font-bold text-navy-900 flex items-center gap-2 mb-4">
                         <i class="fa-solid ${iconClass} ${colorClass}"></i> ${title}
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
