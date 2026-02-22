@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Identity in Nursing</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // --- Mock Authentication Setup ---
+        const mockAuth = {
+            onAuthStateChanged: (callback) => {
+                setTimeout(() => callback({ uid: 'nursing-student-101' }), 100);
+                return () => {}; 
+            },
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'nursing-student-101' } }),
+        };
+
+        // --- Content & Data Structure ---
+        const contentData = {
+            'identity-foundations': {
+                title: 'Foundations & Attributes',
+                color: 'from-blue-500 to-cyan-500',
+                description: 'Define professional identity and explore its core attributes and theoretical basis.',
+                steps: [
+                    { id: 'def-scope', title: 'Definition & Scope', type: 'text', content: `<strong>What is Professional Identity?</strong><br>Professional identity in nursing goes far beyond simply holding a license. It is defined as a sense of oneself, in relation to others, that is influenced by the characteristics, norms, and values of the nursing discipline. It results in an individual thinking, acting, and feeling like a nurse.<br><br><strong>The Scope of Identity Formation:</strong><br>Developing this identity is a continuous, dynamic process. It is forged through a combination of:<br>- <strong>Real and Simulated Experiences:</strong> Hands-on patient care and realistic clinical simulations.<br>- <strong>Reflection:</strong> Pausing to analyze experiences, responses, and feelings.<br>- <strong>Role Modeling:</strong> Observing and learning from experienced professional colleagues and mentors.` },
+                    { id: 'attributes', title: 'The Five Attributes', type: 'text', content: `Professional identity is characterized by specific attributes that define clinical judgment and professional behavior:<br><br><strong>1. Doing:</strong> Incorporates the societal and professional codes and standards that are part of the nursing discipline. It is the consensus of how a nurse behaves and functions.<br><strong>2. Being:</strong> The personal or psychological view of the nurse professional. It means doing the right thing even when no one is looking, motivated by a personal desire to be a good nurse.<br><strong>3. Acting Ethically:</strong> Doing the right thing based on deeply ingrained professional values, rather than just following rules. It is living the ethics of the profession.<br><strong>4. Flourishing:</strong> Transformational growth. It is moving past the initial stages of learning to a place of sustainable, continuous professional development and deep satisfaction.<br><strong>5. Changing Identities:</strong> Recognizing that identity formation involves reworking one's previous identity. You are transitioning from who you were before nursing school to integrating the "nurse" into your core self.` },
+                    { id: 'theories', title: 'Theoretical Underpinnings', type: 'text', content: `Several psychological and educational theories explain how we form our professional identity:<br><br>- <strong>Erikson’s Theory of Psychosocial Development:</strong> Identity versus role confusion is a key stage; successfully navigating this leads to a strong sense of self.<br>- <strong>Piaget’s Theory of Cognitive Development:</strong> How we process and assimilate new professional knowledge into our worldview.<br>- <strong>Kohlberg’s Theory of Moral Development:</strong> Progressing from rule-following to acting on universal ethical principles.<br>- <strong>Bandura’s Social Learning Theory:</strong> Learning through observation, imitation, and modeling (why role models are so crucial).<br>- <strong>Mezirow’s Transformational Learning Theory:</strong> Changing our frames of reference by critically reflecting on our assumptions and beliefs.<br>- <strong>Crigger and Godfrey’s Theory:</strong> Specifically addresses professional transformation in nursing, emphasizing stepping up to the responsibilities of the discipline.` },
+                    { id: 'foundations-quiz', title: 'Foundations Quiz', type: 'quiz',
+                        questions: [
+                            { question: "Which attribute of professional identity represents 'doing the right thing even when no one is looking'?", options: ["Doing", "Being", "Flourishing", "Changing Identities"], correctAnswer: "Being" },
+                            { question: "According to Bandura's Social Learning Theory, how do nursing students primarily learn professional behaviors?", options: ["Through strict memorization of codes", "By observing and imitating professional role models", "By independently reading ethical textbooks", "Through trial and error without guidance"], correctAnswer: "By observing and imitating professional role models" },
+                        ]
+                    }
+                ]
+            },
+            'identity-professionalism': {
+                title: 'Professionalism in Action',
+                color: 'from-indigo-500 to-purple-600',
+                description: 'Explore the daily application of professionalism, PLO 4, and CLO 4.1.',
+                steps: [
+                    { id: 'clo-application', title: 'CLO 4.1: Professionalism Elements', type: 'text', content: `As outlined in <strong>Course Learning Outcome (CLO) 4.1</strong>, taking part in professionalism involves demonstrating specific behaviors in both the classroom and clinical environments. These are non-negotiable standards of practice:<br><br>- <strong>Accountability:</strong> Owning your actions and their consequences. It means answering for the care you provide and the decisions you make.<br>- <strong>Punctuality:</strong> Arriving on time is a sign of respect for your colleagues, your patients, and the profession. It ensures safe handoffs and continuity of care.<br>- <strong>Responsibility:</strong> Fulfilling your duties reliably, thoroughly, and safely.<br>- <strong>Honesty:</strong> Truthfulness in documentation, communication, and reporting errors. An honest environment fosters a culture of safety.<br>- <strong>Patient Advocacy:</strong> Protecting the patient's rights, health, and safety. It means speaking up for the patient when they cannot speak for themselves.` },
+                    { id: 'fostering-identity', title: 'Fostering Your Identity', type: 'text', content: `How do you actively build and nurture your professional identity? Nursing requires intentional interventions:<br><br><strong>1. Value Debriefing and Feedback:</strong> Actively seek and gracefully accept constructive criticism from role models and clinical instructors.<br><strong>2. Engage in Reflection:</strong> Use journaling or quiet contemplation after clinical shifts to process what went well and what challenged your values.<br><strong>3. Adopt the Identity Actively:</strong> Consciously choose to embody the traits of a professional nurse, even when it is difficult.<br><strong>4. Understand Your Responsibilities:</strong> Be accountable for your own learning. Nursing is a lifelong commitment to education.<br><strong>5. Build Relationships:</strong> Connect with peers, interdisciplinary team members, and mentors.<br><strong>6. Develop Self-Care Habits:</strong> You cannot pour from an empty cup. Personal wellness is essential to professional flourishing.<br><strong>7. Embrace Patient Experiences:</strong> Every patient interaction is an opportunity to refine your clinical judgment and nursing identity.` },
+                    { id: 'prof-quiz', title: 'Professionalism Quiz', type: 'quiz',
+                        questions: [
+                            { question: "A student nurse makes a medication error but immediately reports it to the charge nurse and the physician. Which elements of professionalism (CLO 4.1) is the student primarily demonstrating?", options: ["Punctuality and Empathy", "Accountability and Honesty", "Flourishing and Reflection", "Sympathy and Doing"], correctAnswer: "Accountability and Honesty" },
+                            { question: "Which intervention is highly recommended for processing complex clinical experiences and fostering professional identity?", options: ["Ignoring the experience to reduce stress", "Gossiping with peers", "Engaging in structured reflection and debriefing", "Avoiding similar patients in the future"], correctAnswer: "Engaging in structured reflection and debriefing" },
+                        ]
+                    }
+                ]
+            },
+            'identity-lateral-violence': {
+                title: 'Lateral/Horizontal Violence',
+                color: 'from-rose-500 to-red-600',
+                description: 'Understand, identify, and combat hostility in the healthcare environment.',
+                steps: [
+                    { id: 'lv-definition', title: 'What is Lateral Violence?', type: 'text', content: `<strong>Definition:</strong> Horizontal or Lateral Violence is hostile or aggressive behavior by an individual or members of a group towards other group members (nurse-on-nurse aggression). While usually non-physical, it causes profound psychological or emotional damage.<br><br>Historically, this has been referred to as <em>"Nurses eating their young."</em><br><br><strong>Variety of Behaviors:</strong><br>- Unintentional, thoughtless acts.<br>- Purposeful, intentional, destructive acts meant to harm, intimidate, or humiliate.<br>- Ranges from random instances to a pattern of repeated behaviors.<br>- In its extreme form, lateral violence manifests as workplace <strong>bullying</strong>.` },
+                    { id: 'lv-behaviors', title: 'Recognizing the Behaviors', type: 'text', content: `Lateral violence can be subtle or overt. Common manifestations include:<br><br>- Malicious gossiping and spreading rumors.<br>- Belittling gestures (e.g., eye-rolling, heavy sighing).<br>- Constant, destructive criticism instead of constructive feedback.<br>- Social isolation or giving the "silent treatment."<br>- Micro-managing or hovering over a competent nurse.<br>- Overloading with work, often with menial tasks, or demanding unattainable goals.<br>- Withholding critical information necessary for patient care.<br>- Sabotage or "setting someone up to fail."<br>- Scapegoating and backstabbing.` },
+                    { id: 'lv-impact', title: 'The Impact of Violence', type: 'text', content: `The consequences of a toxic work environment ripple outward:<br><br><strong>Affects on the Victim (Often new graduates or float nurses):</strong><br>Anxiety, depression, sleep disorders, burnout, feelings of isolation, and fear of losing their job or career.<br><br><strong>Affects on Nursing Students:</strong><br>Disrupts student-faculty relationships, creates problematic learning environments, increases stress, causes lost learning opportunities, and severely alters the formation of a positive Professional Identity.<br><br><strong>Affects on Patient Care (The Most Critical Impact):</strong><br>Lateral violence interferes with effective team communication. Nurses stressed by a hostile environment are significantly <strong>more likely to make errors</strong>. Furthermore, it undermines patient trust when negative actions are witnessed or sensed by patients and families.` },
+                    { id: 'lv-solutions', title: 'Leadership, Staff, & Solutions', type: 'text', content: `Combating lateral violence requires a multi-tiered approach.<br><br><strong>Staff Responsibility:</strong><br>Nurses must be empowered to speak up. Do not side with or encourage the bully. Bring incidents immediately to the attention of management. The present generation of nurses is responsible for stopping the cycle.<br><br><strong>Leadership Responsibility:</strong><br>Nurse leaders must adopt and fully support <strong>zero-tolerance policies</strong> for abuse. They must encourage feedback and serve as exemplary role models.<br><br><strong>National Organizations & Safety Culture:</strong><br>- The <strong>ANA</strong> affirms all nurses have the right to work in environments free of abusive behavior.<br>- <strong>The Joint Commission</strong> requires health care institutions to have codes of conduct and mechanisms for reporting disruptive behavior.<br>- <strong>Just Culture / Culture of Safety:</strong> The ultimate goal is an environment that encourages open, respectful communication to ensure the provision of safe patient care without fear of retribution.` },
+                    { id: 'lv-quiz', title: 'Lateral Violence Quiz', type: 'quiz',
+                        questions: [
+                            { question: "What is the most critical consequence of lateral violence in the healthcare setting?", options: ["Increased overtime costs", "Nurses are more likely to make errors, negatively impacting patient care", "Slight decreases in employee morale", "Changes in shift scheduling"], correctAnswer: "Nurses are more likely to make errors, negatively impacting patient care" },
+                            { question: "A senior nurse consistently rolls her eyes and sighs loudly when a new graduate asks a question. This behavior is an example of:", options: ["Constructive feedback", "A Just Culture", "Lateral/Horizontal violence", "Transformational flourishing"], correctAnswer: "Lateral/Horizontal violence" },
+                        ]
+                    }
+                ]
+            },
+            'identity-ethics': {
+                title: 'Ethics & Moral Distress',
+                color: 'from-emerald-500 to-teal-600',
+                description: 'Apply legal and ethical standards (PLO 4) to nursing practice.',
+                steps: [
+                    { id: 'ethics-intro', title: 'Ethics vs. Morality vs. Law', type: 'text', content: `Meeting <strong>PLO 4</strong> requires employing legal and ethical standards of nursing conduct during all interactions.<br><br>- <strong>Morality:</strong> An accepted set of social standards that guide behavior.<br>- <strong>Ethics:</strong> The study or examination of morality through a variety of different approaches. How you respond to an ethical situation reflects your core values and professional identity.<br>- <strong>Law:</strong> The <em>minimum</em> standard of behavior to which all members of society are held. In nursing, legal standards include clinical standards of care, liability, negligence, and malpractice.<br><br>Ethics encompass Bioethics (biological sciences/tech), Clinical ethics (decisions made at the bedside), and Research ethics.` },
+                    { id: 'ethical-principles', title: 'Core Ethical Principles', type: 'text', content: `As healthcare providers, our standard of behavior is guided by universal ethical principles:<br><br><strong>1. Respect for Persons (Autonomy):</strong> Acknowledging the right of individuals to make their own choices about their healthcare.<br><strong>2. Non-maleficence:</strong> The fundamental duty to "do no harm."<br><strong>3. Beneficence:</strong> The obligation to act in ways that benefit the patient; promoting good.<br><strong>4. Justice:</strong> Treating all patients fairly and equitably, ensuring fair distribution of resources.<br><strong>5. Fidelity:</strong> Keeping promises, maintaining trust, and being loyal to patients and your professional code.` },
+                    { id: 'decision-making', title: 'Decision Making & Theories', type: 'text', content: `Nurses make critical ethical decisions daily regarding informed consent, human dignity, restraints, quality of life, and end-of-life care. We view these through different ethical lenses (Theories):<br><br>- <strong>Ethics of Duty (Deontology):</strong> The right thing to do based on moral duties and rules, regardless of the outcome.<br>- <strong>Ethics of Consequence (Teleology/Utilitarianism):</strong> Doing the greatest good for the greatest number of people.<br>- <strong>Ethics of Character (Virtue Ethics):</strong> Based on life experiences and a willingness to reflect on our actions; what a "good nurse" would do.<br>- <strong>Ethics of Relationship:</strong> Focuses on the nature and obligation inherent in human relationships and caring.` },
+                    { id: 'moral-distress', title: 'Moral Distress', type: 'text', content: `<strong>What is Moral Distress?</strong><br>Moral distress occurs when you know the ethically appropriate action to take, but you are unable to act upon it. You are forced to act contrary to your personal and professional values due to internal or external constraints.<br><br><strong>Common Triggers:</strong><br>- End-of-life situations (prolonging the dying process with inappropriate, painful measures).<br>- Working with incompetent or impaired practitioners.<br>- Staffing patterns that severely limit the ability to provide safe care (understaffing).<br><br><strong>Consequences:</strong><br>Unresolved moral distress results in frustration, anger, guilt, anxiety, emotional withdrawal, self-blame, and high rates of nurse turnover. Building professional resilience and utilizing institutional ethics committees are vital interventions.` },
+                    { id: 'ethics-quiz', title: 'Ethics Quiz', type: 'quiz',
+                        questions: [
+                            { question: "A nurse recognizes that a patient's pain medication dosage is unsafe, but feels pressured by the physician to give it anyway. The nurse decides to withhold the medication and report the concern. Which ethical principle is primarily guiding the nurse's action?", options: ["Justice", "Fidelity", "Non-maleficence", "Ethics of Consequence"], correctAnswer: "Non-maleficence" },
+                            { question: "A nurse knows that a critically ill patient wishes to be made a DNR, but the family and physician insist on full interventions. The nurse feels deep anxiety and guilt over providing painful treatments. This nurse is experiencing:", options: ["Lateral violence", "Moral distress", "Ethics of Duty", "Role confusion"], correctAnswer: "Moral distress" },
+                        ]
+                    }
+                ]
+            },
+            'identity-case-studies': {
+                title: 'Clinical Case Studies',
+                color: 'from-amber-500 to-orange-500',
+                description: 'Apply your knowledge of professional identity, ethics, and lateral violence.',
+                steps: [
+                    { id: 'case-1', title: 'Case Study: The Morning Handoff', type: 'case_study', case: {
+                        scenario: `You are a new nurse who has recently completed orientation on a busy Labor and Delivery unit. You worked all night, attending several difficult births and helping with a few admissions. You feel proud of the comprehensive, safe care you provided. It’s now 0700 and time to give handoff to the day shift. <br><br>As you begin your well-planned, chronological report to the senior day nurse, she interrupts you repeatedly with rapid-fire questions about minor details, sighs loudly, and rolls her eyes when you check your notes. As you leave the unit, instead of feeling the joy of the night's work, you feel demeaned, inadequate, and anxious about returning for your next shift.`,
+                        question: "What phenomenon is occurring in this scenario, and what is the nurse's professional responsibility (based on CLO 4.1)?",
+                        options: [
+                            "Constructive criticism; the new nurse needs to study harder and be more prepared.",
+                            "Horizontal/Lateral Violence; the new nurse should speak up, report the behavior to management, and not accept this as 'normal'.",
+                            "Moral distress; the new nurse should request to be transferred to another unit immediately.",
+                            "Ethics of Consequence; the senior nurse is ensuring patient safety through rigorous questioning."
+                        ],
+                        correctAnswer: "Horizontal/Lateral Violence; the new nurse should speak up, report the behavior to management, and not accept this as 'normal'.",
+                        explanation: "This is a classic example of Horizontal/Lateral violence (belittling gestures, eye-rolling, interrupting to intimidate). According to professional standards (CLO 4.1) and a Culture of Safety, the victim has a responsibility to advocate for a safe environment by not accepting the behavior and reporting it to a manager so it can be addressed."
+                    }},
+                    { id: 'case-2', title: 'Case Study: The Understaffed Shift', type: 'case_study', case: {
+                        scenario: `Mark is an experienced ICU nurse. Tonight, the unit is severely short-staffed due to sick calls. Mark is assigned to care for three highly unstable patients instead of the standard maximum of two. Throughout the shift, Mark is running from room to room. He provides all the life-saving medications and interventions, but he does not have time to turn his patients properly to prevent bedsores, nor does he have time to hold the hand of a dying patient whose family cannot be there. <br><br>Driving home, Mark feels a profound sense of guilt, anger, and self-blame because he could not provide the holistic, high-quality care he knows is right.`,
+                        question: "What is Mark experiencing, and what attribute of professional identity is being challenged?",
+                        options: [
+                            "Burnout; his attribute of 'Changing Identities' is challenged.",
+                            "Lateral Violence; his attribute of 'Doing' is challenged.",
+                            "Moral Distress; his attribute of 'Being' (desire to be a good nurse) is challenged by systemic constraints.",
+                            "A lack of accountability; his attribute of 'Acting Ethically' is challenged."
+                        ],
+                        correctAnswer: "Moral Distress; his attribute of 'Being' (desire to be a good nurse) is challenged by systemic constraints.",
+                        explanation: "Mark is experiencing Moral Distress. He knows the ethically and clinically correct way to care for his patients (turning them, providing emotional support), but external constraints (severe understaffing) force him to act contrary to his values. This directly challenges his attribute of 'Being'—his psychological view of wanting to be a good, compassionate nurse."
+                    }}
+                ]
+            }
+        };
+
+        const preAssessmentQuizData = [
+            { moduleId: 'identity-foundations', question: "Professional identity develops primarily through which of the following mechanisms?", options: ["Memorizing hospital policies", "Real/simulated experiences, reflection, and role modeling", "Completing multiple choice exams quickly", "Working exclusively independently without peer interaction"], correctAnswer: "Real/simulated experiences, reflection, and role modeling" },
+            { moduleId: 'identity-foundations', question: "Which developmental theorist focuses on the concept of 'identity versus role confusion'?", options: ["Piaget", "Kohlberg", "Erikson", "Bandura"], correctAnswer: "Erikson" },
+            { moduleId: 'identity-professionalism', question: "A nurse notices a peer bypassing a safety check on an IV pump. The nurse confronts the peer and reports the incident to ensure patient safety. Which aspect of CLO 4.1 is this nurse demonstrating?", options: ["Punctuality", "Patient Advocacy and Accountability", "Flourishing", "Changing Identities"], correctAnswer: "Patient Advocacy and Accountability" },
+            { moduleId: 'identity-lateral-violence', question: "Why is lateral violence a direct threat to patient safety?", options: ["It causes nurses to take too much vacation time.", "Nurses stressed by hostility are significantly more likely to make medical errors.", "It increases the cost of hospital supplies.", "It causes patients to stay in the hospital longer purely for observation."], correctAnswer: "Nurses stressed by hostility are significantly more likely to make medical errors." },
+            { moduleId: 'identity-ethics', question: "The ethical principle that obligates the nurse to 'do no harm' is called:", options: ["Beneficence", "Fidelity", "Non-maleficence", "Autonomy"], correctAnswer: "Non-maleficence" }
+        ];
+
+        // --- Helper Functions ---
+        const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+        // --- Components ---
+
+        const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [feedback, setFeedback] = useState(null);
+            const [answers, setAnswers] = useState([]);
+
+            const currentQuestion = questions[currentQuestionIndex];
+
+            const handleOptionSelect = (option) => {
+                if (feedback && !isPreAssessment) return;
+                setSelectedOption(option);
+            };
+
+            const handlePreAssessmentNext = () => {
+                if (selectedOption === null) return;
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                setAnswers(updatedAnswers);
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null);
+                } else {
+                    onComplete(updatedAnswers);
+                }
+            };
+            
+            const handleRegularQuizSubmit = () => {
+                if (selectedOption === null) return;
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                setFeedback(isCorrect ? 'correct' : 'incorrect');
+            };
+
+            const handleRegularQuizNext = () => {
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                const finalAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    setAnswers(finalAnswers);
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null);
+                    setFeedback(null);
+                } else {
+                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    onComplete({ score: finalScore, total: questions.length });
+                }
+            };
+
+            return (
+                <div className="p-5 md:p-8 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                        <h4 className="font-bold text-lg text-brand-700">Knowledge Check</h4>
+                        <span className="text-sm font-medium text-gray-500">Question {currentQuestionIndex + 1} of {questions.length}</span>
+                    </div>
+                    <p className="font-semibold text-xl text-gray-800 mb-6 leading-snug">{currentQuestion.question}</p>
+                    <div className="space-y-3">
+                        {currentQuestion.options.map((option, index) => {
+                            const isSelected = selectedOption === option;
+                            const isCorrectOption = option.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                            let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700';
+
+                            if (feedback && !isPreAssessment) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm';
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-rose-50 border-rose-500 text-rose-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-brand-50 border-brand-500 text-brand-800 shadow-sm';
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => handleOptionSelect(option)}
+                                    className={cn('p-4 rounded-xl border-2 cursor-pointer transition-all duration-200', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+                                            isCorrectOption ? 
+                                            <svg className="w-6 h-6 text-emerald-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> : 
+                                            <svg className="w-6 h-6 text-rose-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        )}
+                                        <span className="flex-1 text-base">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-8 flex justify-end">
+                        {isPreAssessment ? (
+                             <button
+                                onClick={handlePreAssessmentNext}
+                                disabled={selectedOption === null}
+                                className="px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                            </button>
+                        ) : (
+                            <>
+                            {!feedback ? (
+                                <button
+                                    onClick={handleRegularQuizSubmit}
+                                    disabled={selectedOption === null}
+                                    className="px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Submit Answer
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleRegularQuizNext}
+                                    className="px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:bg-brand-700 transition-colors flex items-center gap-2"
+                                >
+                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                                </button>
+                            )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+            const [results, setResults] = useState(null);
+
+            const handleQuizComplete = (finalAnswers) => {
+                const moduleResults = {};
+                finalAnswers.forEach(answer => {
+                    const { moduleId } = answer.question;
+                    if (!moduleResults[moduleId]) {
+                        moduleResults[moduleId] = { correct: 0, total: 0 };
+                    }
+                    if (answer.isCorrect) {
+                        moduleResults[moduleId].correct++;
+                    }
+                    moduleResults[moduleId].total++;
+                });
+
+                const completedModules = [];
+                for (const moduleId in moduleResults) {
+                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+                        completedModules.push(moduleId);
+                    }
+                }
+                setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+                onComplete(completedModules);
+            };
+
+            if (results) {
+                return (
+                    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-40 p-4 animate-fade-in">
+                        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl w-full text-center border border-gray-100">
+                            <div className="w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-10 h-10 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
+                            <p className="text-lg text-gray-600 mb-8">
+                                You correctly answered <span className="font-bold text-brand-600">{results.correct}</span> out of {results.total} questions.
+                            </p>
+                            
+                            {results.completedModules.length > 0 ? (
+                                <div className="mb-8">
+                                    <p className="text-emerald-700 font-semibold mb-4 text-left">You've demonstrated mastery in these areas and they have been marked complete:</p>
+                                    <ul className="list-disc list-inside text-left bg-emerald-50 border border-emerald-100 p-5 rounded-xl text-emerald-800">
+                                        {results.completedModules.map(id => <li key={id} className="mb-1">{contentData[id].title}</li>)}
+                                    </ul>
+                                </div>
+                            ) : (
+                                <div className="mb-8 bg-amber-50 border border-amber-100 p-5 rounded-xl">
+                                    <p className="text-amber-800 font-semibold">Great effort! We recommend reviewing all modules to build a strong foundation in Professional Identity.</p>
+                                </div>
+                            )}
+                            <button
+                                onClick={onExit}
+                                className="px-8 py-3 bg-brand-600 text-white font-bold rounded-xl shadow-md hover:bg-brand-700 transition-colors w-full sm:w-auto"
+                            >
+                                Enter Learning Dashboard
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-40 p-4 overflow-y-auto">
+                    <div className="max-w-3xl w-full py-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-gray-800">Diagnostic Assessment</h2>
+                            <p className="text-gray-500 mt-2">Let's see what you already know about Professional Identity.</p>
+                        </div>
+                        <Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+                    </div>
+                </div>
+            );
+        };
+
+        const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+            let totalCompletedSteps = 0;
+            let totalPossibleSteps = 0;
+
+            Object.entries(contentData).forEach(([moduleId, module]) => {
+                totalPossibleSteps += module.steps.length;
+                const moduleProgress = progress[moduleId] || {};
+                Object.values(moduleProgress).forEach(stepProgress => {
+                    if (stepProgress.completed) totalCompletedSteps++;
+                });
+            });
+
+            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+            return (
+                <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+                    <header className="mb-10 text-center mt-4">
+                        <div className="inline-flex items-center justify-center gap-3 mb-4 bg-white px-6 py-2 rounded-full shadow-sm border border-gray-100">
+                            <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                            <span className="text-sm font-bold tracking-widest text-brand-800 uppercase">NURS 400 Core Module</span>
+                        </div>
+                        <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Professional Identity</h1>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Master the core attributes, legal and ethical standards, and behaviors required to think, act, and feel like a professional nurse.</p>
+                    </header>
+
+                    {overallPercentage === 0 && (
+                        <div className="mb-10 flex justify-center">
+                            <button
+                                onClick={onStartPreAssessment}
+                                className="group relative px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-brand-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="relative flex items-center gap-3">
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    <span className="text-lg">Take Diagnostic Quiz to Skip Ahead</span>
+                                </div>
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="mb-10 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">Course Progress</h3>
+                                <p className="text-sm text-gray-500">{totalCompletedSteps} of {totalPossibleSteps} activities completed</p>
+                            </div>
+                            {overallPercentage > 0 && (
+                                <button onClick={onResetProgress} className="text-sm text-rose-500 hover:text-rose-700 font-medium transition-colors flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-lg">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                    Reset Progress
+                                </button>
+                            )}
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                            <div
+                                className="bg-gradient-to-r from-brand-500 to-indigo-500 h-full rounded-full transition-all duration-700 ease-out"
+                                style={{ width: `${overallPercentage}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+                        {Object.entries(contentData).map(([id, module]) => {
+                            const moduleProgress = progress[id] || {};
+                            const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+                            const totalSteps = module.steps.length;
+                            const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+                            const isCompleted = completedCount === totalSteps;
+
+                            return (
+                                <div
+                                    key={id}
+                                    onClick={() => onSelectModule(id)}
+                                    className={cn(
+                                        "bg-white rounded-3xl border transition-all duration-300 cursor-pointer group flex flex-col overflow-hidden relative",
+                                        isCompleted ? "border-emerald-200 shadow-md hover:shadow-lg" : "border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-brand-300"
+                                    )}
+                                >
+                                    <div className={cn("h-2 w-full bg-gradient-to-r", module.color)}></div>
+                                    <div className="p-6 sm:p-8 flex flex-col h-full relative z-10">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className={cn("p-4 rounded-2xl bg-gradient-to-br text-white shadow-md", module.color)}>
+                                                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    {id === 'identity-foundations' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />}
+                                                    {id === 'identity-professionalism' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />}
+                                                    {id === 'identity-lateral-violence' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />}
+                                                    {id === 'identity-ethics' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />}
+                                                    {id === 'identity-case-studies' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />}
+                                                </svg>
+                                            </div>
+                                            {isCompleted ? (
+                                                <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-sm font-bold">
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                                    Done
+                                                </div>
+                                            ) : (
+                                                <div className="relative w-12 h-12">
+                                                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                        <path className="text-gray-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                                                        <path className="text-brand-500" strokeDasharray={`${percentage}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                                                    </svg>
+                                                    <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">{Math.round(percentage)}%</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-3">{module.title}</h3>
+                                        <p className="text-gray-600 text-sm mb-6 flex-grow leading-relaxed">{module.description}</p>
+                                        
+                                        <div className="mt-auto flex items-center justify-between text-brand-600 font-semibold group-hover:text-brand-800">
+                                            <span>{isCompleted ? 'Review Module' : 'Start Learning'}</span>
+                                            <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                        </div>
+                                    </div>
+                                    {isCompleted && <div className="absolute inset-0 bg-emerald-50 opacity-10 pointer-events-none"></div>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        const CaseStudy = ({ caseData, onComplete }) => {
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+
+            const handleSelect = (option) => {
+                if (selectedAnswer) return;
+                setSelectedAnswer(option);
+                if (option.toLowerCase() === caseData.correctAnswer.toLowerCase()) {
+                    onComplete();
+                }
+            };
+
+            return (
+                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="bg-amber-50 border-b border-amber-100 p-6 md:p-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <h4 className="font-bold text-xl text-amber-900">Clinical Scenario</h4>
+                        </div>
+                        <p className="text-amber-900 leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+                    </div>
+                    <div className="p-6 md:p-8">
+                        <p className="font-bold text-xl text-gray-800 mb-6">{caseData.question}</p>
+                        <div className="space-y-3">
+                            {caseData.options.map((option, idx) => {
+                                const isSelected = selectedAnswer === option;
+                                const isCorrect = option.toLowerCase() === caseData.correctAnswer.toLowerCase();
+                                const showFeedback = selectedAnswer !== null;
+
+                                let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700';
+                                if (showFeedback) {
+                                    if (isCorrect) optionClass = 'bg-emerald-50 border-emerald-500 text-emerald-800';
+                                    else if (isSelected && !isCorrect) optionClass = 'bg-rose-50 border-rose-500 text-rose-800';
+                                } else if (isSelected) {
+                                    optionClass = 'bg-brand-50 border-brand-500 text-brand-800';
+                                }
+
+                                return (
+                                    <div
+                                        key={idx}
+                                        onClick={() => handleSelect(option)}
+                                        className={cn('p-4 rounded-xl border-2 cursor-pointer transition-all duration-200', optionClass)}
+                                    >
+                                        <div className="flex items-center">
+                                            {showFeedback && (
+                                                isCorrect ? <svg className="w-6 h-6 text-emerald-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> : 
+                                                (isSelected && <svg className="w-6 h-6 text-rose-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>)
+                                            )}
+                                            <span className="flex-1 text-base font-medium">{option}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {selectedAnswer && (
+                            <div className="mt-8 p-6 bg-brand-50 rounded-xl border border-brand-100 animate-fade-in">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <svg className="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <h5 className="font-bold text-brand-900 text-lg">Instructor Rationale</h5>
+                                </div>
+                                <p className="text-base text-brand-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const StaticContentStep = ({ step, onComplete }) => {
+            useEffect(() => {
+                onComplete();
+            }, []);
+
+            return (
+                <div className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-strong:text-gray-900 prose-li:text-gray-600 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+                    <div dangerouslySetInnerHTML={{ __html: step.content }} />
+                </div>
+            );
+        };
+
+        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center transform animate-fade-in border border-gray-100">
+                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg className="w-12 h-12 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 className="text-3xl font-bold text-gray-900 mb-4">Module Mastered!</h3>
+                        <p className="text-lg text-gray-600 mb-8">Excellent work. You've successfully completed all activities in this section.</p>
+                        <div className="flex flex-col gap-3">
+                            {hasNextModule ? (
+                                <>
+                                <button
+                                    onClick={onNextModule}
+                                    className="px-6 py-4 bg-brand-600 text-white text-lg font-bold rounded-xl shadow-md hover:bg-brand-700 transition-colors w-full"
+                                >
+                                    Continue to Next Module
+                                </button>
+                                <button
+                                    onClick={onClose}
+                                    className="px-6 py-4 bg-gray-50 text-gray-700 text-lg font-bold rounded-xl hover:bg-gray-100 transition-colors w-full"
+                                >
+                                    Back to Dashboard
+                                </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={onClose}
+                                    className="px-6 py-4 bg-brand-600 text-white text-lg font-bold rounded-xl shadow-md hover:bg-brand-700 transition-colors w-full"
+                                >
+                                    Return to Dashboard
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+            const [activeStep, setActiveStep] = useState(0);
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+            const handleStepComplete = useCallback((stepId, data = {}) => {
+                onProgressUpdate(module.id, stepId, { completed: true, ...data });
+            }, [onProgressUpdate, module.id]);
+
+            const moduleProgress = progress[module.id] || {};
+            const allStepsCompletedInModule = module.steps.every(step => moduleProgress[step.id]?.completed);
+
+            const handleNextStep = () => {
+                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
+                    setIsCompletionModalOpen(true);
+                } else if (activeStep < module.steps.length - 1) {
+                    setActiveStep(activeStep + 1);
+                }
+            };
+
+            const handlePrevStep = () => {
+                if (activeStep > 0) setActiveStep(activeStep - 1);
+            };
+
+            const currentStep = module.steps[activeStep];
+
+            const renderStepContent = (step) => {
+                if (!step) return null;
+                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+                switch (step.type) {
+                    case 'text': return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study': return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz': return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    default: return <p>Unknown step type.</p>;
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 bg-gray-50 flex flex-col z-20">
+                    <header className="bg-white border-b border-gray-200 px-4 h-16 flex items-center justify-between z-30 flex-shrink-0">
+                        <div className="flex items-center w-1/3">
+                            <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors py-2 px-3 rounded-lg hover:bg-gray-100 -ml-2">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                <span className="hidden sm:inline font-medium text-sm">Dashboard</span>
+                            </button>
+                        </div>
+                        <div className="flex-1 text-center truncate px-4">
+                            <h2 className="text-lg font-bold text-gray-900 truncate">{module.title}</h2>
+                        </div>
+                        <div className="flex items-center justify-end w-1/3">
+                            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            </button>
+                        </div>
+                    </header>
+
+                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 lg:hidden"></div>}
+                    
+                    <div className="flex flex-1 overflow-hidden relative">
+                        {/* Sidebar Navigation */}
+                        <aside className={cn(
+                            "bg-white border-r border-gray-200 w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out absolute lg:static h-full z-50 lg:translate-x-0 shadow-2xl lg:shadow-none",
+                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        )}>
+                            <div className="p-6 border-b border-gray-100">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Learning Path</h3>
+                                <p className="text-gray-900 font-semibold">{module.title}</p>
+                            </div>
+                            <nav className="p-4 space-y-2 overflow-y-auto flex-1">
+                                {module.steps.map((step, index) => {
+                                    const isCompleted = moduleProgress[step.id]?.completed;
+                                    const isActive = activeStep === index;
+                                    
+                                    return (
+                                        <button
+                                            key={step.id}
+                                            onClick={() => { setActiveStep(index); setIsSidebarOpen(false); }}
+                                            className={cn(
+                                                'w-full text-left p-4 rounded-xl flex items-start gap-4 transition-all duration-200',
+                                                isActive ? 'bg-brand-50 border border-brand-200 shadow-sm' : 'hover:bg-gray-50 border border-transparent'
+                                            )}
+                                        >
+                                            <div className="mt-0.5 w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                                                {isCompleted ? (
+                                                    <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                                        <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                    </div>
+                                                ) : (
+                                                    <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold", isActive ? "border-brand-600 text-brand-600" : "border-gray-300 text-gray-400")}>
+                                                        {index + 1}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <span className={cn("block text-sm font-medium", isActive ? "text-brand-900" : "text-gray-700")}>{step.title}</span>
+                                                <span className="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">{step.type.replace('_', ' ')}</span>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </nav>
+                        </aside>
+
+                        {/* Main Content Area */}
+                        <main className="flex-1 overflow-y-auto scroll-smooth">
+                            <div className="max-w-4xl mx-auto p-4 sm:p-8 pb-32">
+                                <div className="mb-8">
+                                    <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider rounded-full mb-3">
+                                        Step {activeStep + 1} of {module.steps.length}
+                                    </span>
+                                    <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">{currentStep.title}</h3>
+                                </div>
+                                
+                                {renderStepContent(currentStep)}
+
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-12 pt-8 border-t border-gray-200">
+                                    <button
+                                        onClick={handlePrevStep}
+                                        disabled={activeStep === 0}
+                                        className="w-full sm:w-auto px-6 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        Previous Step
+                                    </button>
+
+                                    <button
+                                        onClick={handleNextStep}
+                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+                                        className="w-full sm:w-auto px-8 py-3 bg-brand-600 text-white font-bold rounded-xl shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        {activeStep === module.steps.length - 1 ? 'Complete Module' : 'Continue to Next Step'}
+                                        {activeStep !== module.steps.length - 1 && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                    
+                    <CompletionModal
+                        isOpen={isCompletionModalOpen}
+                        onClose={() => { setIsCompletionModalOpen(false); onBack(); }}
+                        onNextModule={() => { setIsCompletionModalOpen(false); onNextModule(); }}
+                        hasNextModule={hasNextModule}
+                    />
+                </div>
+            );
+        };
+
+        function App() {
+            const [currentModuleId, setCurrentModuleId] = useState(null);
+            const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+            const [userId, setUserId] = useState(null);
+            const [progress, setProgress] = useState({});
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            useEffect(() => {
+                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+                    if (user) setUserId(user.uid);
+                    setIsAuthReady(true);
+                });
+                return () => unsubscribe();
+            }, []);
+
+            useEffect(() => {
+                if (!isAuthReady || !userId) return;
+                const storedProgress = localStorage.getItem(`nursing-identity-module-${userId}`);
+                if (storedProgress) {
+                    try { setProgress(JSON.parse(storedProgress)); } 
+                    catch (e) { setProgress({}); }
+                }
+            }, [isAuthReady, userId]);
+
+            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+                if (!isAuthReady || !userId) return;
+                setProgress(currentProgress => {
+                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+                    const newStepProgress = { ...currentStepProgress, ...data };
+                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) return currentProgress;
+                    const newProgress = { ...currentProgress, [moduleId]: { ...(currentProgress[moduleId] || {}), [stepId]: newStepProgress } };
+                    localStorage.setItem(`nursing-identity-module-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [isAuthReady, userId]);
+
+            const handlePreAssessmentComplete = (completedModuleIds) => {
+                const newProgress = { ...progress };
+                completedModuleIds.forEach(moduleId => {
+                    const module = contentData[moduleId];
+                    if (module) {
+                        newProgress[moduleId] = {};
+                        module.steps.forEach(step => { newProgress[moduleId][step.id] = { completed: true }; });
+                    }
+                });
+                setProgress(newProgress);
+                localStorage.setItem(`nursing-identity-module-${userId}`, JSON.stringify(newProgress));
+            };
+
+            const handleResetProgress = useCallback(() => {
+                if (!isAuthReady || !userId) return;
+                setProgress({});
+                localStorage.removeItem(`nursing-identity-module-${userId}`);
+            }, [isAuthReady, userId]);
+
+            const handleNextModule = useCallback(() => {
+                const moduleIds = Object.keys(contentData);
+                const currentIndex = moduleIds.indexOf(currentModuleId);
+                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+                    setCurrentModuleId(moduleIds[currentIndex + 1]);
+                } else {
+                    setCurrentModuleId(null);
+                }
+            }, [currentModuleId]);
+
+            const selectedModule = currentModuleId && contentData[currentModuleId] ? { ...contentData[currentModuleId], id: currentModuleId } : null;
+            const moduleIds = Object.keys(contentData);
+            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+            if (!isAuthReady) return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div></div>;
+
+            return (
+                <div className="bg-gray-50 min-h-screen font-sans text-gray-900 selection:bg-brand-200 selection:text-brand-900">
+                    {isPreAssessmentActive ? (
+                        <PreAssessmentQuiz onComplete={handlePreAssessmentComplete} onExit={() => setIsPreAssessmentActive(false)} />
+                    ) : selectedModule ? (
+                        <LearningModule
+                            key={selectedModule.id}
+                            module={selectedModule}
+                            onBack={() => setCurrentModuleId(null)}
+                            progress={progress}
+                            onProgressUpdate={handleProgressUpdate}
+                            onNextModule={handleNextModule}
+                            hasNextModule={hasNextModule}
+                        />
+                    ) : (
+                        <Dashboard 
+                            onSelectModule={setCurrentModuleId} 
+                            progress={progress} 
+                            onResetProgress={handleResetProgress}
+                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
