@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlliedRNPrep - Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            user-select: none; /* Mimic secure browser anti-copy */
+        }
+        .exam-header {
+            background-color: #1e3a8a; /* Dark blue feel */
+        }
+        .sidebar-item.completed {
+            background-color: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .sidebar-item.active {
+            background-color: #bfdbfe;
+            color: #1e3a8a;
+            font-weight: bold;
+            border-left: 4px solid #1d4ed8;
+        }
+        .sidebar-item.upcoming {
+            color: #374151;
+            cursor: not-allowed;
+        }
+        
+        /* Custom radio/checkbox styles for better UI */
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: white;
+        }
+        .option-label:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+        }
+        .option-label.selected {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+        .option-input {
+            margin-top: 0.25rem;
+            margin-right: 1rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+        }
+        
+        /* Hide scrollbar for a cleaner app feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="absolute inset-0 bg-gray-100 z-50 flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-2xl w-full text-center border-t-8 border-blue-900">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">AlliedRNPrep Secure Browser</h1>
+            <p class="text-gray-500 mb-6 border-b pb-4">Nursing Assessment: Quiz 1 & 2</p>
+            
+            <div class="text-left bg-blue-50 p-4 rounded text-blue-900 mb-6 text-sm">
+                <h3 class="font-bold mb-2"><i class="fas fa-shield-alt mr-2"></i>Exam Rules & Information</h3>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li><strong>Forward Moving ONLY:</strong> Once you advance to the next question, you CANNOT return to previous questions.</li>
+                    <li><strong>No Backtracking:</strong> The 'Previous' button is disabled as per exam policy.</li>
+                    <li><strong>Grading:</strong> Your grade and rationales will only be visible upon final submission.</li>
+                    <li><strong>Security:</strong> Copy/paste and right-click have been disabled.</li>
+                    <li>There are 54 questions in this assessment.</li>
+                </ul>
+            </div>
+            
+            <button id="btn-start" class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md text-lg transition shadow-md">
+                Acknowledge & Start Exam
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN EXAM UI (Hidden initially) -->
+    <div id="exam-ui" class="hidden h-full flex flex-col">
+        <!-- Header -->
+        <header class="exam-header text-white px-4 py-3 flex justify-between items-center shadow-md z-10">
+            <div class="flex items-center space-x-4">
+                <div class="font-bold text-xl tracking-wider"><i class="fas fa-laptop-medical mr-2"></i>AlliedRNPrep</div>
+                <div class="text-sm border-l border-blue-400 pl-4 hidden md:block">
+                    Candidate: <span class="font-semibold">Nursing Student</span><br>
+                    Exam: <span class="font-semibold">Comprehensive Assessment</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="text-center">
+                    <div class="text-xs text-blue-200 uppercase tracking-wide">Time Remaining</div>
+                    <div id="timer" class="font-mono text-xl font-bold">90:00</div>
+                </div>
+                <button onclick="finishExamEarly()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-semibold transition">
+                    Submit Exam
+                </button>
+            </div>
+        </header>
+
+        <!-- Body -->
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Left Sidebar (Question List) -->
+            <aside class="w-16 md:w-48 bg-white border-r border-gray-200 overflow-y-auto flex flex-col shadow-inner">
+                <div class="p-3 bg-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wide border-b text-center md:text-left">
+                    <span class="hidden md:inline">Questions</span>
+                    <span class="md:hidden">Q's</span>
+                </div>
+                <div id="question-list" class="flex flex-col">
+                    <!-- Populated by JS -->
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-100 relative">
+                <div class="max-w-4xl mx-auto">
+                    
+                    <!-- Question Header -->
+                    <div class="flex justify-between items-end mb-6 border-b pb-2">
+                        <h2 class="text-2xl font-bold text-gray-800">Question <span id="current-q-num">1</span></h2>
+                        <span id="question-type-badge" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded uppercase tracking-wide">Single Choice</span>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="bg-white p-6 rounded-lg shadow-sm mb-6 border border-gray-200">
+                        <p id="question-text" class="text-lg text-gray-800 leading-relaxed font-medium mb-2"></p>
+                        <p id="sata-instruction" class="text-sm font-bold text-red-600 hidden italic mb-4">Select all that apply.</p>
+                    </div>
+
+                    <!-- Options -->
+                    <div id="options-container" class="space-y-3 mb-8">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="flex justify-end pt-4 border-t border-gray-300 mt-8">
+                        <!-- Forward ONLY: No Previous Button -->
+                        <button id="btn-next" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-10 rounded shadow flex items-center transition">
+                            <span>Next Question</span>
+                            <i class="fas fa-chevron-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN (Hidden initially) -->
+    <div id="results-screen" class="hidden absolute inset-0 bg-gray-50 z-50 overflow-y-auto pb-12">
+        <header class="exam-header text-white px-6 py-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
+            <h1 class="text-2xl font-bold"><i class="fas fa-clipboard-check mr-2"></i>Exam Review & Rationales</h1>
+            <button onclick="window.print()" class="bg-white text-blue-900 px-4 py-2 rounded text-sm font-bold shadow hover:bg-gray-100">
+                <i class="fas fa-print mr-2"></i>Print Results
+            </button>
+        </header>
+
+        <div class="max-w-5xl mx-auto mt-8 px-4">
+            <!-- Score Summary -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 mb-8 text-center">
+                <h2 class="text-gray-500 uppercase tracking-widest font-bold text-sm mb-2">Final Score</h2>
+                <div class="text-5xl font-black text-gray-800 mb-2">
+                    <span id="score-correct">0</span> / <span id="score-total">54</span>
+                </div>
+                <div id="score-percentage" class="text-2xl font-bold text-blue-600">0%</div>
+                <p class="text-gray-600 mt-4 text-sm">Note: Partial credit is not awarded for Select All That Apply (SATA) questions.</p>
+            </div>
+
+            <!-- Detailed Rationales -->
+            <div id="rationales-container" class="space-y-8">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal (Only for blank answers) -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" id="modal-title">No Answer Selected</h3>
+            <p class="text-gray-600 mb-6" id="modal-desc">You have not selected an answer. <strong>You cannot return to this question later.</strong> Are you sure you want to leave it blank?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="modal-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded font-medium hover:bg-gray-300">Cancel</button>
+                <button id="modal-confirm" class="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700">Leave Blank</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Disable right click to mimic secure browser
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Full Quiz Bank
+        const quizData = [
+            // QUIZ 1
+            {
+                id: 1,
+                text: "A nurse is working to build a professional brand while transitioning into a new specialty. Which strategies are effective for managing a professional digital footprint? (Select all that apply.)",
+                type: "sata",
+                options: [
+                    { key: "a", text: "Posting photos of patients if identifiers are blurred or hidden" },
+                    { key: "b", text: "Using professional forums to vent about workplace grievances" },
+                    { key: "c", text: "Sharing evidence-based resources on professional networking sites" },
+                    { key: "d", text: "Providing specific clinical advice to followers in the comments" },
+                    { key: "e", text: "Ensuring social media profiles reflect professional comportment" },
+                    { key: "f", text: "Monitoring online presence for traceable unprofessional content" }
+                ],
+                correct: ["c", "e", "f"],
+                rationales: {
+                    "a": "This violates HIPAA and patient confidentiality, regardless of identifiers.",
+                    "b": "Public venting is unprofessional and can damage one's reputation and employability.",
+                    "c": "Sharing evidence-based content establishes clinical credibility and expertise.",
+                    "d": "Providing specific advice without assessment creates liability and scope-of-practice issues.",
+                    "e": "Professional profiles maintain appropriate boundaries between personal and work life.",
+                    "f": "Regular monitoring prevents damaging content from affecting professional reputation."
+                }
+            },
+            {
+                id: 2,
+                text: "A charge nurse is managing a busy shift and must prioritize care for four clients. Which client should the nurse see first to demonstrate the 'Timely' attribute of health care quality?",
+                type: "single",
+                options: [
+                    { key: "a", text: "A client requesting a repeat dose of an as-needed laxative." },
+                    { key: "b", text: "A client with stable vital signs due for a morning walk." },
+                    { key: "c", text: "A client scheduled for routine dressing change in 1 hour." },
+                    { key: "d", text: "A client reporting new-onset chest pain and diaphoresis." }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "This is a routine comfort need that does not indicate an urgent physiological threat.",
+                    "b": "This is a scheduled activity for stable recovery, not an emergent situation.",
+                    "c": "This scheduled task can be safely delayed without immediate risk to the client.",
+                    "d": "This client has acute symptoms of a potential myocardial infarction requiring immediate assessment and intervention."
+                }
+            },
+            {
+                id: 3,
+                text: "A nurse is caring for a group of patients and must delegate the collection of vital signs to an assistive personnel. Which action by the nurse ensures 'Safe' care under the quality framework?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Evaluating the accuracy of the data collected by the personnel." },
+                    { key: "b", text: "Allowing the personnel to choose which client to assess first." },
+                    { key: "c", text: "Scheduling the vitals for the assistant to perform at noon." },
+                    { key: "d", text: "Asking the personnel if they feel confident taking the signs." }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "This action maintains the nurse's accountability for assessment data and patient safety.",
+                    "b": "Delegating prioritization decisions compromises client safety and is the nurse's responsibility.",
+                    "c": "Scheduling without considering individual client needs ignores time-sensitive assessments.",
+                    "d": "Confidence alone does not ensure competency or validate skill performance."
+                }
+            },
+            {
+                id: 4,
+                text: "During a behavioral interview, the hiring manager asks the candidate to describe a time they had to manage a clinical conflict. This interviewing technique is primarily designed to assess which professional characteristic?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Past actions as predictors of future performance." },
+                    { key: "b", text: "The specific resolution of the former issue." },
+                    { key: "c", text: "Standard oral communication and debate skills." },
+                    { key: "d", text: "Ability to memorize hospital policy manuals." }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Behavioral interview questions evaluate demonstrated competencies through specific past experiences.",
+                    "b": "The question's focus is on behavioral patterns, not the specific outcome of one past event.",
+                    "c": "While communication is involved, the technique specifically evaluates behavioral competencies.",
+                    "d": "This technique assesses applied experience, not rote memorization of procedural documents."
+                }
+            },
+            {
+                id: 5,
+                text: "During a root cause analysis of a sentinel event, the nurse manager emphasizes that the focus is on systemic failures rather than individual blame. This approach is a hallmark of which organizational culture framework?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Just Culture" },
+                    { key: "b", text: "Laissez-faire Management" },
+                    { key: "c", text: "Total Quality Management" },
+                    { key: "d", text: "Punitive Culture" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Just Culture specifically balances accountability with analyzing system-level causes of errors.",
+                    "b": "Laissez-faire management describes a passive, hands-off leadership style, not a safety culture framework.",
+                    "c": "Total Quality Management focuses on continuous process improvement, not specifically on balancing safety and accountability.",
+                    "d": "A punitive culture focuses on blaming individuals, which is the opposite of the described systemic approach."
+                }
+            },
+            {
+                id: 6,
+                text: "A nurse identifies that a high-alert medication was administered to the wrong client due to similar packaging. In a Just Culture, what is the most appropriate organizational response toward the nurse who made the error?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Requiring a public apology to the client and their family." },
+                    { key: "b", text: "Terminating the nurse for a violation of the safe rights." },
+                    { key: "c", text: "Filing a formal reprimand in the nurse's permanent record." },
+                    { key: "d", text: "Evaluating the system factors that contributed to the error." }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "A public apology is a punitive action that conflicts with Just Culture's focus on system improvement.",
+                    "b": "Termination is reserved for reckless behavior, not for unintentional errors in a Just Culture.",
+                    "c": "A formal reprimand is punitive and does not address the systemic causes of the error.",
+                    "d": "A Just Culture focuses on systemic flaws rather than individual blame to improve safety."
+                }
+            },
+            {
+                id: 7,
+                text: "A nurse is caring for a client with a history of heart failure who is reporting sudden shortness of breath. After the nurse elevates the head of the bed, which action best demonstrates the 'Effective' attribute of health care quality?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Administering prescribed oxygen based on evidence-based protocols." },
+                    { key: "b", text: "Placing a fan in the room to increase air circulation for comfort." },
+                    { key: "c", text: "Requesting a consult with the chaplain per the client's preference." },
+                    { key: "d", text: "Scheduling a bedside chest x-ray for the next available time slot." }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "This action directly implements an established clinical guideline to address acute hypoxemia efficiently.",
+                    "b": "This addresses comfort but does not treat the underlying acute respiratory distress.",
+                    "c": "While important for holistic care, this does not address the immediate physiological crisis.",
+                    "d": "This delays critical intervention for a client with acute symptoms of heart failure exacerbation."
+                }
+            },
+            {
+                id: 8,
+                text: "The nurse is delegating tasks to an Assistive Personnel (AP) for a group of stable clients. Which factor must the nurse remain most mindful of to ensure safe and quality care? (Select all that apply.)",
+                type: "sata",
+                options: [
+                    { key: "a", text: "The specific needs of the individual clients" },
+                    { key: "b", text: "The staff's individual seniority status" },
+                    { key: "c", text: "Ease of task for the nurse to complete" },
+                    { key: "d", text: "The abilities and competencies of the worker" },
+                    { key: "e", text: "The AP's personal career preferences" },
+                    { key: "f", text: "The acuity level of the clients" }
+                ],
+                correct: ["a", "d", "f"],
+                rationales: {
+                    "a": "Client-specific needs dictate appropriate task delegation for safety.",
+                    "b": "Seniority does not guarantee competency for a specific delegated task.",
+                    "c": "Delegation decisions must be client-centered, not based on nurse convenience.",
+                    "d": "Worker competency determines ability to perform assigned tasks correctly.",
+                    "e": "Assignment should be based on client needs and staff competency, not staff preference.",
+                    "f": "Client acuity influences complexity of care and required skill level."
+                }
+            },
+            {
+                id: 9,
+                text: "A nurse is evaluating a client's response to a new antihypertensive medication. After 30 minutes, the client’s blood pressure remains unchanged, but the client reports a headache. Which action should the nurse take next?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Administer an additional dose of the medication." },
+                    { key: "b", text: "Reassess the client's vital signs and clinical status." },
+                    { key: "c", text: "Notify the provider to request a different drug." },
+                    { key: "d", text: "Document that the medication was ineffective now." }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Administering an additional dose risks hypotension and exceeds the prescribed parameters.",
+                    "b": "Reassessment is essential to evaluate medication effectiveness and new symptoms.",
+                    "c": "Notifying the provider is premature without further assessment of the client's overall status.",
+                    "d": "Documenting it as ineffective is inaccurate as the full therapeutic effect takes time."
+                }
+            },
+            {
+                id: 10,
+                text: "An RN is applying for a specialized position in a Pediatric Intensive Care Unit. Which document should the nurse submit to provide a concise, customized highlight of their specific 'fit' for this specialized role?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Curriculum Vitae" },
+                    { key: "b", text: "Portfolio" },
+                    { key: "c", text: "Transcript" },
+                    { key: "d", text: "Résumé" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "A curriculum vitae is overly detailed for a targeted job application.",
+                    "b": "A portfolio is comprehensive but not the most concise summary for initial review.",
+                    "c": "A transcript provides academic records but not customized professional highlights.",
+                    "d": "A résumé is a customized document highlighting specific skills and experience relevant to the targeted position."
+                }
+            },
+            {
+                id: 11,
+                text: "A nurse is participating in a peer-review committee to evaluate the clinical comportment of a colleague. Which observation should the nurse identify as a primary indicator of professional comportment according to ANA Provision 4?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Completing all assigned patient assessments before the shift ends." },
+                    { key: "b", text: "Attending mandatory inservice training sessions on new equipment." },
+                    { key: "c", text: "Adhering strictly to the institutional protocols for documentation." },
+                    { key: "d", text: "Engaging in respectful and collaborative communication with the team." }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "This describes task completion, not the accountability and authority central to Provision 4.",
+                    "b": "This reflects mandatory compliance, not the nurse's independent professional responsibility.",
+                    "c": "This focuses on institutional rules, not the nurse's own ethical and professional judgment.",
+                    "d": "ANA Provision 4 emphasizes the nurse's authority and responsibility for professional practice, which inherently requires respectful collaboration to maintain accountability."
+                }
+            },
+            {
+                id: 12,
+                text: "A newly licensed nurse feels overwhelmed by the clinical environment and expresses doubt about their ability to perform like the experienced staff. According to Marcia’s Identity Status Theory, the nurse is likely experiencing which status?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Identity Moratorium" },
+                    { key: "b", text: "Identity Achievement" },
+                    { key: "c", text: "Identity Diffusion" },
+                    { key: "d", text: "Identity Foreclosure" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Moratorium describes actively exploring roles without commitment, matching the nurse's uncertainty about professional identity.",
+                    "b": "Identity Achievement requires commitment after exploring alternatives.",
+                    "c": "Identity Diffusion involves apathy without exploration or commitment.",
+                    "d": "Identity Foreclosure involves commitment without personal exploration."
+                }
+            },
+            {
+                id: 13,
+                text: "While orienting a new hire, a preceptor explains that 'Foreclosure' in professional identity is when a nurse is more focused on changing others than themselves. This concept is derived from which theorist?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Erikson" },
+                    { key: "b", text: "Bandura" },
+                    { key: "c", text: "Marcia" },
+                    { key: "d", text: "Piaget" }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Erikson's theory describes identity crisis but not the specific foreclosure status.",
+                    "b": "Bandura's social learning theory focuses on observational learning, not identity formation stages.",
+                    "c": "Marcia's identity status theory defines foreclosure as adopting beliefs without exploration.",
+                    "d": "Piaget's cognitive development theory addresses schemas, not professional identity statuses."
+                }
+            },
+            {
+                id: 14,
+                text: "A nurse is evaluating several graduate programs to pursue a career in nursing research. Which degree should the nurse prioritize to focus on the generation of new knowledge through original scientific discovery?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Post-Doctoral Certificate" },
+                    { key: "b", text: "Doctor of Philosophy (PhD)" },
+                    { key: "c", text: "Doctor of Nursing Practice" },
+                    { key: "d", text: "Master of Science in Nursing" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "A post-doctoral certificate builds upon existing research training, not entry-level research preparation.",
+                    "b": "A PhD is the terminal research degree designed specifically for generating new knowledge through original scientific inquiry.",
+                    "c": "The DNP focuses on translating evidence into practice, not original scientific discovery.",
+                    "d": "The MSN prepares for advanced clinical practice or initial research roles, not primary knowledge generation."
+                }
+            },
+            {
+                id: 15,
+                text: "A nurse is developing a 'Whole-Life' career framework to ensure long-term career sustainability. Which initial action should the nurse take to satisfy the 'Goal Clarification' component of Hirschi’s framework?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Evaluating current job satisfaction through a formal survey." },
+                    { key: "b", text: "Defining work and non-work goals against personal values." },
+                    { key: "c", text: "Drafting a list of measurable annual clinical achievements." },
+                    { key: "d", text: "Networking with peers who hold advanced leadership roles." }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "This action assesses present status rather than clarifying future-oriented personal goals.",
+                    "b": "This directly aligns with Hirschi's framework by establishing purpose-driven career anchors.",
+                    "c": "This focuses on specific professional outcomes, not broader life and value alignment.",
+                    "d": "This is a strategy for opportunity exploration, not for initial goal definition."
+                }
+            },
+            {
+                id: 16,
+                text: "A nurse is looking for evidence-based research to improve the efficiency of the discharge process on a busy medical-surgical unit. This effort primarily addresses which attribute of health care quality?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Efficient" },
+                    { key: "b", text: "Effective" },
+                    { key: "c", text: "Timely" },
+                    { key: "d", text: "Equitable" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "This directly addresses the timely and resource-conscious delivery of care.",
+                    "b": "Effectiveness focuses on achieving desired outcomes, not process efficiency.",
+                    "c": "Timeliness addresses reducing wait times, not optimizing workflow efficiency.",
+                    "d": "Equitability ensures fair care access regardless of personal characteristics."
+                }
+            },
+            {
+                id: 17,
+                text: "The unit manager is implementing a new barcode medication administration system to reduce errors. According to the Quality and Safety Education for Nurses (QSEN) framework, this initiative primarily addresses which required nursing competency for safety?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Experience" },
+                    { key: "b", text: "Skills" },
+                    { key: "c", text: "Attitudes" },
+                    { key: "d", text: "Knowledge" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Experience refers to clinical practice gained over time, not a defined competency.",
+                    "b": "Implementing a barcode system directly builds technical proficiency to prevent errors.",
+                    "c": "Attitudes involve values and beliefs about safety, not the technical skill being implemented.",
+                    "d": "Knowledge refers to understanding safety principles, not the application of a specific system."
+                }
+            },
+            {
+                id: 18,
+                text: "A staff nurse is considering joining a professional association such as the American Nurses Association (ANA). What is the primary benefit of this involvement regarding the nurse's professional identity as a leader?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Gaining opportunities to influence health policy and standards." },
+                    { key: "b", text: "Receiving discounts on health insurance and liability coverage." },
+                    { key: "c", text: "Obtaining free access to standardized hospital policy manuals." },
+                    { key: "d", text: "Securing guaranteed salary increases with clinical advancement." }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Professional associations provide direct access to policy-making bodies that shape nursing practice standards.",
+                    "b": "Financial benefits are secondary to the primary purpose of professional leadership development.",
+                    "c": "Policy manuals are institution-specific and not a core function of professional associations.",
+                    "d": "Salary structures are determined by employers, not professional membership organizations."
+                }
+            },
+            {
+                id: 19,
+                text: "The nurse is providing care to a client who identifies as non-binary. To demonstrate the AACN Essentials competency of Integrating Diversity, Equity, and Inclusion (DEI), which action should the nurse prioritize during the initial assessment?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Assigning a same-sex nurse" },
+                    { key: "b", text: "Providing a private room" },
+                    { key: "c", text: "Asking preferred pronouns" },
+                    { key: "d", text: "Reviewing previous records" }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Assigning based on gender identity alone violates autonomy and is not client-centered.",
+                    "b": "A private room is not required unless clinically indicated for safety or privacy.",
+                    "c": "This action directly respects gender identity and establishes therapeutic rapport.",
+                    "d": "Previous records may contain outdated or incorrect gender identifiers."
+                }
+            },
+            {
+                id: 20,
+                text: "A nurse is using the 'Stairstep Model' by Crigger and Godfrey to reflect on their professional development. The nurse realizes that a recent clinical error represented a 'slip'. What is the goal of this model?",
+                type: "single",
+                options: [
+                    { key: "a", text: "To show professional transformation as a dynamic, non-linear process." },
+                    { key: "b", text: "To create a rigid hierarchy of skills required for expert nursing roles." },
+                    { key: "c", text: "To establish a fixed timeline for attaining advanced clinical competence." },
+                    { key: "d", text: "To standardize the disciplinary actions for nursing documentation errors." }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "The model's goal is illustrating professional growth as an iterative, non-linear journey.",
+                    "b": "The model describes development as non-linear, not a rigid hierarchy.",
+                    "c": "It focuses on dynamic transformation, not fixed timelines for competence.",
+                    "d": "It is a framework for reflection, not for standardizing disciplinary actions."
+                }
+            },
+            {
+                id: 21,
+                text: "A hospital committee is reviewing the 'Equitable' attribute of health care quality. Which policy should the committee implement to ensure this quality attribute is met for a diverse patient population?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Standardizing care protocols regardless of patient personal characteristics." },
+                    { key: "b", text: "Adjusting health goals to reflect a patient's socioeconomic conditions." },
+                    { key: "c", text: "Prioritizing resource allocation for patients with private insurance." },
+                    { key: "d", text: "Implementing specialized care plans based on specific patient ethnicity." }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Equitable care requires consistent, evidence-based treatment for all patients to eliminate disparities.",
+                    "b": "Adjusting goals based on socioeconomic status creates unequal standards of care.",
+                    "c": "Prioritizing by insurance type violates ethical principles of justice and fairness.",
+                    "d": "Specializing care by ethnicity risks stereotyping rather than providing individualized care."
+                }
+            },
+            {
+                id: 22,
+                text: "A nurse is preparing to flush a peripherally inserted central catheter. To demonstrate the 'Knowledge' domain of professional identity, the nurse must integrate physiological understanding of the vascular system with which other specific competency?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Communication skills to explain the procedure to client." },
+                    { key: "b", text: "Information literacy to document the flush in the EHR." },
+                    { key: "c", text: "Clinical judgment to assess the site for complications." },
+                    { key: "d", text: "Technical skill to perform the sterile dressing change." }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Communication skills are important but represent a separate competency domain, not the specific integration of physiology with clinical judgment.",
+                    "b": "Information literacy is a foundational skill but does not directly integrate physiological knowledge with procedural action.",
+                    "c": "Clinical judgment is required to integrate physiological knowledge with practical assessment for safe catheter care.",
+                    "d": "Technical skill for dressing changes is a procedural task, not the cognitive integration of vascular physiology with assessment judgment."
+                }
+            },
+            {
+                id: 23,
+                text: "The nurse is reviewing a patient's electronic health record and notices a 'Safety' concern: the patient was prescribed a potassium-sparing diuretic despite having a serum potassium level of 5.8 mEq/L. What is the nurse’s priority action as the last line of defense?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Auscultate the heart" },
+                    { key: "b", text: "Chart the potassium" },
+                    { key: "c", text: "Notify the physician" },
+                    { key: "d", text: "Withhold the medication" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Auscultation assesses for hyperkalemia effects but does not address the immediate medication safety risk.",
+                    "b": "Documenting the lab value is necessary but does not constitute an immediate safety intervention.",
+                    "c": "Notifying the physician is appropriate but the nurse must first act to prevent patient harm.",
+                    "d": "Hyperkalemia is a life-threatening contraindication for potassium-sparing diuretics."
+                }
+            },
+            {
+                id: 24,
+                text: "A nurse is managing the care of a client with complex discharge needs. The nurse coordinates with a social worker and a physical therapist to ensure a seamless transition. Which interrelated concept of quality is best exemplified?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Clinical Judgment" },
+                    { key: "b", text: "Health Policy" },
+                    { key: "c", text: "Care Coordination" },
+                    { key: "d", text: "Patient Advocacy" }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Clinical judgment focuses on individual nurse decision-making, not interdisciplinary team management.",
+                    "b": "Health policy involves broader systemic regulations, not direct care coordination activities.",
+                    "c": "Care coordination is the deliberate organization of patient care activities between multiple participants to facilitate appropriate healthcare delivery.",
+                    "d": "Patient advocacy emphasizes protecting client rights rather than organizing multidisciplinary services."
+                }
+            },
+            {
+                id: 25,
+                text: "An experienced nurse is pursuing a specialty certification in oncology nursing. What does obtaining this certification primarily communicate to the public and the profession about the nurse’s identity?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Guaranteed immunity from liability during oncological care." },
+                    { key: "b", text: "Attainment of legal authority to practice in specific settings." },
+                    { key: "c", text: "Verification of specialized expertise beyond basic licensure." },
+                    { key: "d", text: "Satisfaction of the biennial requirement for professional units." }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Certification does not provide legal immunity from malpractice or negligence claims.",
+                    "b": "Legal authority to practice is granted by state licensure, not specialty certification.",
+                    "c": "Certification validates specialized knowledge and competency in a specific practice area.",
+                    "d": "Certification is a voluntary credential distinct from mandatory continuing education requirements."
+                }
+            },
+            {
+                id: 26,
+                text: "A nurse is preparing for a performance appraisal and is reflecting on 'Human Flourishing' within their unit. Which action by the nurse demonstrates an effort to foster outcomes that lead to well-being?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Completing all assigned bedside tasks before the shift ends." },
+                    { key: "b", text: "Focusing solely on minimizing the patient's physical pain." },
+                    { key: "c", text: "Updating the unit protocols to meet accreditation standards." },
+                    { key: "d", text: "Creating a positive environment for colleagues and patients." }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "This action prioritizes task completion over holistic well-being and professional growth.",
+                    "b": "This option is too narrow, as human flourishing extends beyond just physical pain management.",
+                    "c": "This focuses on administrative compliance rather than directly fostering personal or team well-being.",
+                    "d": "Human flourishing focuses on creating environments that promote holistic well-being for all individuals."
+                }
+            },
+            {
+                id: 27,
+                text: "While completing a medication reconciliation, a nurse identifies a potential drug-drug interaction that was overlooked by the provider and pharmacist. By intervening before the medication is administered, which specific nursing attribute of health care quality is being demonstrated?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Timely" },
+                    { key: "b", text: "Patient-centered" },
+                    { key: "c", text: "Equitable" },
+                    { key: "d", text: "Safe" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Timely care refers to reducing wait times, not preventing medication errors.",
+                    "b": "Patient-centered care focuses on individual preferences, not system safety checks.",
+                    "c": "Equitable care ensures fairness across populations, not individual clinical interventions.",
+                    "d": "The nurse's proactive intervention directly prevents patient harm, fulfilling the safety domain of healthcare quality."
+                }
+            },
+            {
+                id: 28,
+                text: "During a multidisciplinary rounds, a nurse notices that a client’s preferences regarding end-of-life care are being ignored by the surgical team. The nurse’s intervention to redirect the conversation to the client's wishes exemplifies which exemplar?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Advocacy" },
+                    { key: "b", text: "Autonomy" },
+                    { key: "c", text: "Justice" },
+                    { key: "d", text: "Fidelity" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Advocacy requires protecting and supporting a client's autonomous healthcare decisions.",
+                    "b": "Autonomy refers to respecting the client's right to make decisions, not actively intervening on their behalf.",
+                    "c": "Justice involves fair resource distribution, not specifically protecting individual care preferences.",
+                    "d": "Fidelity means keeping promises, not intervening when others disregard client wishes."
+                }
+            },
+            
+            // QUIZ 2
+            {
+                id: 29,
+                text: "While scanning a medication, the barcode reader fails to recognize the drug. The nurse resists the urge to manually bypass the system and instead obtains a properly labeled replacement. Which safety KSA 'Attitude' is demonstrated?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Respecting the limitations of nursing informatics." },
+                    { key: "b", text: "Valuing the nurse's role in preventing system errors." },
+                    { key: "c", text: "Focusing on personal clinical proficiency and skill." },
+                    { key: "d", text: "Prioritizing the efficiency of the facility workflow." }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "This attitude undervalues the nurse's active role in error prevention.",
+                    "b": "This action demonstrates the safety attitude of actively engaging with and upholding system safeguards rather than circumventing them.",
+                    "c": "This focuses on individual skill rather than system-wide safety protocols.",
+                    "d": "This prioritizes speed over established safety verification processes."
+                }
+            },
+            {
+                id: 30,
+                text: "The nurse provides a medication one hour later than scheduled because the automated dispensing cabinet was being restocked. When looking to improve the 'Timely' attribute of health care quality, which system-level change should the nurse propose to the department head?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Scanning patient identification" },
+                    { key: "b", text: "Purchasing smart infusion pumps" },
+                    { key: "c", text: "Staggering medication delivery times" },
+                    { key: "d", text: "Reviewing drug labels carefully" }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Scanning patient identification primarily addresses patient safety, not medication administration timeliness.",
+                    "b": "Smart infusion pumps enhance safety for IV medications but do not solve systemic delays in medication availability.",
+                    "c": "Staggering delivery times prevents system-wide delays when automated cabinets are unavailable.",
+                    "d": "Reviewing drug labels is an individual safety practice, not a system-level solution for delayed access."
+                }
+            },
+            {
+                id: 31,
+                text: "A nurse is interviewing for a leadership role and is asked, 'Describe a time you had to intervene when a colleague bypassed a safety protocol.' Which type of interviewing technique is the employer using to assess professionalism?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Situational interview" },
+                    { key: "b", text: "Competency assessment" },
+                    { key: "c", text: "Unstructured format" },
+                    { key: "d", text: "Behavioral interviewing" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Situational interviews present hypothetical scenarios rather than asking for past experiences.",
+                    "b": "Competency assessment is a broader evaluation framework, not a specific interviewing technique.",
+                    "c": "Unstructured format lacks predetermined questions, unlike this targeted behavioral question.",
+                    "d": "Behavioral interviewing assesses past performance to predict future professional conduct."
+                }
+            },
+            {
+                id: 32,
+                text: "A nurse is concerned about their 'digital footprint' and its impact on their professional brand. Which action should the nurse take first to proactively manage this aspect of their professional identity?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Register for a continuing education course on digital ethics." },
+                    { key: "b", text: "Apply restrictive privacy settings to all personal profiles." },
+                    { key: "c", text: "Audit personal social media accounts for professional alignment." },
+                    { key: "d", text: "Update the skills and experience sections on a resume." }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "This is an educational step, not the immediate first action for assessment.",
+                    "b": "Privacy settings limit visibility but don't address existing content assessment.",
+                    "c": "Auditing existing content is the foundational assessment step for managing an online professional identity.",
+                    "d": "This action updates a professional document, not the digital footprint itself."
+                }
+            },
+            {
+                id: 33,
+                text: "After an older adult client falls, the nurse identifies that the patient's bed was left in the highest position with the wheels unlocked. According to the Quality and Safety Education for Nurses (QSEN) framework, which competency requires the nurse to investigate these human factors and system failures?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Patient-Centered Care" },
+                    { key: "b", text: "Quality Improvement" },
+                    { key: "c", text: "Informatics" },
+                    { key: "d", text: "Safety" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Patient-centered care focuses on respecting patient values and preferences, not system analysis.",
+                    "b": "Quality improvement uses data to monitor outcomes, not immediate investigation of specific incidents.",
+                    "c": "Informatics manages information technology for communication, not direct analysis of equipment factors.",
+                    "d": "The QSEN Safety competency mandates analyzing system factors contributing to preventable adverse events."
+                }
+            },
+            {
+                id: 34,
+                text: "A nurse is assisting a client who wants to quit smoking but is unsure of where to start. Which statement should the nurse make to demonstrate compassion and respect for the client's autonomy?",
+                type: "single",
+                options: [
+                    { key: "a", text: "You must follow this specific plan to ensure your success." },
+                    { key: "b", text: "What are the most important factors in your life right now?" },
+                    { key: "c", text: "Smoking is very harmful and you should stop immediately." },
+                    { key: "d", text: "I will make an appointment for you to see a specialist today." }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "This directive approach removes client autonomy by imposing a rigid plan.",
+                    "b": "This open-ended question assesses readiness and respects client's personal values and decision-making autonomy.",
+                    "c": "While true, this statement is judgmental and lacks compassionate support.",
+                    "d": "Making decisions for the client undermines their right to self-determination."
+                }
+            },
+            {
+                id: 35,
+                text: "A nurse is practicing with 'Professional Comportment' while caring for a combative client in the emergency department. Which behavior by the nurse best illustrates this specific attribute of professional identity?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Following hospital policy for utilizing soft wrist and ankle restraints." },
+                    { key: "b", text: "Documenting carefully the aggressive actions and behaviors of the client." },
+                    { key: "c", text: "Maintaining a calm, respectful, and engaged presence despite the stress." },
+                    { key: "d", text: "Assessing the client for metabolic or physiological causes of agitation." }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "This action is a specific safety protocol, not the core attribute of professional demeanor.",
+                    "b": "While necessary for legal documentation, this does not demonstrate the nurse's personal comportment.",
+                    "c": "Professional comportment requires maintaining emotional regulation and therapeutic presence during client crises.",
+                    "d": "This is a clinical assessment skill, separate from the concept of professional presence and behavior."
+                }
+            },
+            {
+                id: 36,
+                text: "A nurse is planning long-term career goals and is currently identifying personal self-esteem issues that may hinder promotion. According to Hirschi’s Whole-Life framework, which step of career counseling is the nurse performing?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Mapping resources and barriers" },
+                    { key: "b", text: "Evaluating potential options" },
+                    { key: "c", text: "Clarifying the purpose" },
+                    { key: "d", text: "Monitoring career progress" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "This step involves identifying internal and external factors affecting career progression.",
+                    "b": "This step occurs after identifying resources and barriers to assess choices.",
+                    "c": "This initial step involves defining career vision before analyzing obstacles.",
+                    "d": "This final step tracks advancement after implementing the career plan."
+                }
+            },
+            {
+                id: 37,
+                text: "A registered nurse is choosing between a Doctor of Nursing Practice (DNP) and a PhD program. The nurse’s goal is to improve clinical outcomes through the application of evidence-based practice in a hospital setting. Which degree should the nurse pursue?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Doctor of Nursing Practice" },
+                    { key: "b", text: "Master of Science Degree" },
+                    { key: "c", text: "Doctor of Philosophy" },
+                    { key: "d", text: "Post-Master Certificate" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "The DNP degree focuses on clinical practice leadership and direct application of research to improve patient outcomes.",
+                    "b": "This degree provides advanced clinical training but not terminal research expertise.",
+                    "c": "This degree focuses on generating new knowledge through research, not direct clinical application.",
+                    "d": "This provides specialized skills but does not confer a terminal practice doctorate degree."
+                }
+            },
+            {
+                id: 38,
+                text: "A nurse manager is evaluating a staff nurse's 'Professional Comportment' following a difficult shift with multiple patient deaths. Which observation by the manager indicates that the staff nurse is demonstrating resilience, a key indicator of this domain?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Declining future critical assignments" },
+                    { key: "b", text: "Suppressing emotional responses" },
+                    { key: "c", text: "Minimizing patient involvement" },
+                    { key: "d", text: "Seeking a debriefing session" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Declining future assignments avoids challenges rather than adapting to them.",
+                    "b": "Suppressing emotions prevents healthy processing and emotional recovery.",
+                    "c": "Minimizing involvement reduces professional engagement and compassionate care.",
+                    "d": "Seeking debriefing demonstrates adaptive coping and professional growth after trauma."
+                }
+            },
+            {
+                id: 39,
+                text: "During a unit meeting, a staff nurse proposes a new protocol to reduce transport delays for critically ill patients to radiology. Which specific attribute of health care quality is this intervention primarily designed to improve?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Equity" },
+                    { key: "b", text: "Efficiency" },
+                    { key: "c", text: "Timeliness" },
+                    { key: "d", text: "Effectiveness" }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Equity focuses on fair treatment regardless of personal characteristics.",
+                    "b": "Efficiency aims to reduce waste of equipment or supplies.",
+                    "c": "Reducing delays directly addresses the speed of receiving necessary care.",
+                    "d": "Effectiveness measures how well care achieves desired health outcomes."
+                }
+            },
+            {
+                id: 40,
+                text: "During a multidisciplinary team meeting, a nurse stands firm against a plan that violates a client’s expressed end-of-life wishes, despite pressure from the surgical lead. Which exemplar of professional identity is the nurse demonstrating?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Clinical competence" },
+                    { key: "b", text: "Moral courage" },
+                    { key: "c", text: "Fidelity" },
+                    { key: "d", text: "Altruism" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Clinical competence refers to technical skill and knowledge, not ethical advocacy.",
+                    "b": "Moral courage involves advocating for ethical principles despite facing opposition or pressure from others.",
+                    "c": "Fidelity means keeping promises, which is not the primary issue here.",
+                    "d": "Altruism involves selfless concern, not specifically defending ethical principles."
+                }
+            },
+            {
+                id: 41,
+                text: "A nurse is evaluating several Doctor of Nursing Practice (DNP) programs. Which factor should the nurse prioritize if their primary goal is to apply advanced clinical knowledge to improve patient outcomes?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Completion of a primary research thesis" },
+                    { key: "b", text: "The faculty research publication count" },
+                    { key: "c", text: "Heavy focus on administration management" },
+                    { key: "d", text: "Role preparation for advanced practice" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "A primary research thesis is more aligned with a PhD's research-focused curriculum.",
+                    "b": "Faculty publication metrics do not directly correlate with clinical skill application.",
+                    "c": "Administration management focuses on leadership rather than direct clinical improvement.",
+                    "d": "The DNP degree's primary purpose is to prepare nurses for advanced clinical practice roles."
+                }
+            },
+            {
+                id: 42,
+                text: "A nurse is participating in a post-conference debriefing after a simulated code blue. The nurse identifies areas for personal improvement in communication. Which process is essential for the formation of professional identity here?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Assessment" },
+                    { key: "b", text: "Repetition" },
+                    { key: "c", text: "Delegation" },
+                    { key: "d", text: "Reflection" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Assessment is a data-gathering phase, not an introspective process for self-improvement.",
+                    "b": "Repetition builds skill proficiency but does not inherently develop professional insight.",
+                    "c": "Delegation involves task assignment, not personal growth through analyzing one's actions.",
+                    "d": "Reflection allows for self-assessment and integration of experiences into professional growth."
+                }
+            },
+            {
+                id: 43,
+                text: "A nurse is reviewing a new clinical pathway for heart failure management that utilizes the latest gold-standard research to dictate nursing interventions. This approach most directly aligns with which attribute of health care quality?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Timely" },
+                    { key: "b", text: "Effective" },
+                    { key: "c", text: "Efficient" },
+                    { key: "d", text: "Equitable" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Timely care focuses on reducing wait times, not using research-based interventions.",
+                    "b": "Effective care is defined as providing services based on scientific evidence to achieve the best outcomes.",
+                    "c": "Efficient care minimizes waste of resources, not implementing evidence-based protocols.",
+                    "d": "Equitable care ensures fairness across populations, not applying current best evidence."
+                }
+            },
+            {
+                id: 44,
+                text: "A nurse is caring for a postoperative client who reports a pain level of 8/10. After the nurse realizes the analgesic was administered incorrectly by the previous shift, which action demonstrates the 'Just Culture' attribute of safety?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Request that the pharmacy auditor review the patient's individual medication drawer." },
+                    { key: "b", text: "Counsel the previous nurse privately regarding the medication administration error." },
+                    { key: "c", text: "Report the error through the facility's confidential occurrence reporting system." },
+                    { key: "d", text: "Document the specific details of the previous nurse's mistake in the progress notes." }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "This action focuses on individual accountability rather than systemic process improvement.",
+                    "b": "Private counseling bypasses the formal reporting system needed for organizational learning.",
+                    "c": "This action prioritizes system improvement over individual blame, which is foundational to a Just Culture approach.",
+                    "d": "Documenting another nurse's error in clinical notes violates confidentiality and creates blame."
+                }
+            },
+            {
+                id: 45,
+                text: "A nurse realizes they forgot to document a PRN pain medication given two hours ago. The nurse immediately enters the late note. This action best demonstrates which exemplar of professional identity?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Advocacy" },
+                    { key: "b", text: "Altruism" },
+                    { key: "c", text: "Autonomy" },
+                    { key: "d", text: "Integrity" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Advocacy involves acting on behalf of a client's needs or rights.",
+                    "b": "Altruism is a selfless concern for the welfare of others.",
+                    "c": "Autonomy refers to the right of self-determination and independence.",
+                    "d": "Integrity requires honest and timely documentation of all care provided."
+                }
+            },
+            {
+                id: 46,
+                text: "A nurse is applying for a leadership position in a different specialty and needs to provide a concise, two-page document that highlights specific achievements relevant to that role. Which document should the nurse prepare?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Curriculum Vitae" },
+                    { key: "b", text: "Functional Résumé" },
+                    { key: "c", text: "Chronological Résumé" },
+                    { key: "d", text: "Biographical Sketch" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "A curriculum vitae is overly detailed and lengthy for this purpose.",
+                    "b": "A functional résumé emphasizes skills and achievements over chronological work history, which is ideal for highlighting transferable competencies when changing specialties.",
+                    "c": "A chronological résumé emphasizes work history over relevant achievements.",
+                    "d": "A biographical sketch is narrative-focused and not achievement-oriented."
+                }
+            },
+            {
+                id: 47,
+                text: "A nurse is considering specialized certification in wound care. What is the most significant clinical benefit of obtaining this certification as it relates to the public and the nursing profession?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Expansion of legal scope of practice for RNs." },
+                    { key: "b", text: "Evidence of specialized expertise beyond basic licensure." },
+                    { key: "c", text: "Elimination of professional liability for mistakes." },
+                    { key: "d", text: "Guaranteed increase in hourly compensation rates." }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Certification demonstrates expertise but does not alter the legal scope defined by state practice acts.",
+                    "b": "Certification validates advanced competency, enhancing public trust in nursing expertise.",
+                    "c": "No credential can eliminate professional liability for errors in nursing practice.",
+                    "d": "While certification may influence pay, it does not guarantee specific compensation increases."
+                }
+            },
+            {
+                id: 48,
+                text: "A client from a marginalized community expresses concern that their pain is not being managed as aggressively as other patients on the unit. Which attribute of health care quality must the nurse prioritize to address this?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Efficient" },
+                    { key: "b", text: "Patient-centered" },
+                    { key: "c", text: "Equitable" },
+                    { key: "d", text: "Timely" }
+                ],
+                correct: ["c"],
+                rationales: {
+                    "a": "Efficiency focuses on resource use, not on addressing potential bias in care delivery.",
+                    "b": "Patient-centered care focuses on individual preferences, not systemic disparities in treatment.",
+                    "c": "Equitable care ensures fair treatment regardless of personal characteristics.",
+                    "d": "Timeliness addresses care delays, not differential treatment based on patient background."
+                }
+            },
+            {
+                id: 49,
+                text: "A nurse is providing care for a client with a localized infection. The nurse explains the rationale for using aseptic technique during the dressing change. This integration of pathophysiology and skill represents which domain of professional identity?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Knowledge" },
+                    { key: "b", text: "Ethics" },
+                    { key: "c", text: "Values" },
+                    { key: "d", text: "Leadership" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Knowledge encompasses understanding pathophysiology and rationale for clinical skills.",
+                    "b": "Ethics pertains to moral principles and right-versus-wrong decisions, not knowledge application.",
+                    "c": "Values involve personal beliefs and priorities, not the integration of pathophysiology with skills.",
+                    "d": "Leadership focuses on guiding others and influencing outcomes, not the cognitive domain of learning."
+                }
+            },
+            {
+                id: 50,
+                text: "A nurse is working on a high-risk obstetric unit where a 'Just Culture' is practiced. After a near-miss medication error occurs, which action by the nurse validates the primary goal of this specific organizational culture framework?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Reporting the error" },
+                    { key: "b", text: "Assigning more tasks" },
+                    { key: "c", text: "Suspending the nurse" },
+                    { key: "d", text: "Hiding the incident" }
+                ],
+                correct: ["a"],
+                rationales: {
+                    "a": "Just Culture prioritizes system safety through transparent reporting of errors.",
+                    "b": "Assigning more tasks increases workload and risk rather than addressing system factors.",
+                    "c": "Suspending the nurse focuses on individual blame instead of analyzing systemic causes.",
+                    "d": "Hiding the incident prevents organizational learning and undermines the culture of safety."
+                }
+            },
+            {
+                id: 51,
+                text: "An experienced nurse is mentoring a newly licensed nurse who is struggling to balance task completion with patient advocacy. According to the Stairstep Model, this process of professional transformation is known as what?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Self-actualizing" },
+                    { key: "b", text: "Resilience" },
+                    { key: "c", text: "Striving" },
+                    { key: "d", text: "Flourishing" }
+                ],
+                correct: ["d"],
+                rationales: {
+                    "a": "Self-actualizing is a concept from Maslow's hierarchy, not the Stairstep Model of professional development.",
+                    "b": "Resilience is a personal trait or outcome, not the defined process of professional transformation in this model.",
+                    "c": "Striving describes an initial effortful stage, not the final integrated state of balancing competing demands.",
+                    "d": "Flourishing represents the final stage where advocacy and professional identity are fully integrated."
+                }
+            },
+            {
+                id: 52,
+                text: "A nurse manager is evaluating a staff nurse's professional identity. The staff nurse consistently follows through on promises made to patients, such as returning to reassess pain. Which exemplar does this behavior represent?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Humility" },
+                    { key: "b", text: "Integrity" },
+                    { key: "c", text: "Compassion" },
+                    { key: "d", text: "Advocacy" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Humility involves acknowledging limitations, not demonstrating reliability.",
+                    "b": "Integrity involves consistently fulfilling commitments and demonstrating reliability in professional practice.",
+                    "c": "Compassion focuses on empathy and alleviating suffering, not promise-keeping.",
+                    "d": "Advocacy involves acting on behalf of patients, not demonstrating personal consistency."
+                }
+            },
+            {
+                id: 53,
+                text: "A charge nurse is managing four patients. Which patient outcome best reflects the 'Effective' attribute of health care quality according to Giddens’ definition of aligning services with current professional knowledge?",
+                type: "single",
+                options: [
+                    { key: "a", text: "Satisfaction scores exceed target" },
+                    { key: "b", text: "Evidence-based protocol adherence" },
+                    { key: "c", text: "Cost-effective supply utilization" },
+                    { key: "d", text: "Reduced wait times for triage" }
+                ],
+                correct: ["b"],
+                rationales: {
+                    "a": "Patient satisfaction is an important outcome but reflects the 'Patient-Centered' attribute, not 'Effective.'",
+                    "b": "This outcome directly measures care alignment with current professional knowledge.",
+                    "c": "Cost efficiency is a key quality measure but aligns with the 'Efficient' attribute of care.",
+                    "d": "Reduced wait times improve access and timeliness, which are separate quality attributes from effectiveness."
+                }
+            },
+            {
+                id: 54,
+                text: "A nurse is reviewing the ANA Code of Ethics to guide their practice. Which of the following actions directly align with the primary commitment of a nurse? (Select all that apply.)",
+                type: "sata",
+                options: [
+                    { key: "a", text: "Advocating for the rights and safety of the client" },
+                    { key: "b", text: "Following all provider prescriptions without question" },
+                    { key: "c", text: "Delegating complex assessments to unlicensed staff" },
+                    { key: "d", text: "Respecting the inherent dignity of every person" },
+                    { key: "e", text: "Practicing with compassion and integrity" },
+                    { key: "f", text: "Prioritizing the goals of the healthcare facility" }
+                ],
+                correct: ["a", "d", "e"],
+                rationales: {
+                    "a": "Advocacy protects client autonomy and well-being as the primary focus.",
+                    "b": "This action violates the nurse's duty to exercise professional judgment.",
+                    "c": "This action compromises client safety and exceeds the delegatee's scope.",
+                    "d": "Respecting dignity is foundational to all ethical nursing relationships.",
+                    "e": "Compassion and integrity are essential to fulfilling the duty to patients.",
+                    "f": "This action conflicts with the nurse's primary commitment to the client."
+                }
+            }
+        ];
+
+        // State Variables
+        let currentQuestionIndex = 0;
+        let userResponses = new Array(quizData.length).fill(null).map(() => []); // Array of arrays for SATA support
+        let timerInterval;
+        let timeLeft = 5400; // 90 minutes in seconds
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const examUI = document.getElementById('exam-ui');
+        const resultsScreen = document.getElementById('results-screen');
+        const btnStart = document.getElementById('btn-start');
+        const btnNext = document.getElementById('btn-next');
+        const questionListEl = document.getElementById('question-list');
+        const qNumEl = document.getElementById('current-q-num');
+        const qTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const qTypeBadge = document.getElementById('question-type-badge');
+        const sataInstruction = document.getElementById('sata-instruction');
+        const timerEl = document.getElementById('timer');
+        
+        // Modal Elements
+        const confirmModal = document.getElementById('confirm-modal');
+        const btnModalCancel = document.getElementById('modal-cancel');
+        const btnModalConfirm = document.getElementById('modal-confirm');
+
+        // Initialization
+        btnStart.addEventListener('click', startExam);
+
+        function startExam() {
+            startScreen.classList.add('hidden');
+            examUI.classList.remove('hidden');
+            buildSidebar();
+            loadQuestion();
+            startTimer();
+            
+            // Enter full screen if supported (mimic secure browser)
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            }
+        }
+
+        function buildSidebar() {
+            questionListEl.innerHTML = '';
+            for (let i = 0; i < quizData.length; i++) {
+                const div = document.createElement('div');
+                div.className = `p-3 border-b text-center md:text-left text-sm sidebar-item ${i === 0 ? 'active' : 'upcoming'}`;
+                div.id = `sidebar-q-${i}`;
+                div.innerHTML = `<span class="hidden md:inline">Question </span>${i + 1}`;
+                questionListEl.appendChild(div);
+            }
+        }
+
+        function updateSidebar() {
+            for (let i = 0; i < quizData.length; i++) {
+                const el = document.getElementById(`sidebar-q-${i}`);
+                if (i < currentQuestionIndex) {
+                    el.className = 'p-3 border-b text-center md:text-left text-sm sidebar-item completed';
+                } else if (i === currentQuestionIndex) {
+                    el.className = 'p-3 border-b text-center md:text-left text-sm sidebar-item active';
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    el.className = 'p-3 border-b text-center md:text-left text-sm sidebar-item upcoming';
+                }
+            }
+        }
+
+        function loadQuestion() {
+            const q = quizData[currentQuestionIndex];
+            qNumEl.textContent = currentQuestionIndex + 1;
+            qTextEl.textContent = q.text;
+            
+            if (q.type === 'sata') {
+                qTypeBadge.textContent = "Select All That Apply";
+                qTypeBadge.className = "bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded uppercase tracking-wide";
+                sataInstruction.classList.remove('hidden');
+            } else {
+                qTypeBadge.textContent = "Single Choice";
+                qTypeBadge.className = "bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded uppercase tracking-wide";
+                sataInstruction.classList.add('hidden');
+            }
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach(opt => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                
+                const input = document.createElement('input');
+                input.type = q.type === 'sata' ? 'checkbox' : 'radio';
+                input.name = 'q_option';
+                input.value = opt.key;
+                input.className = 'option-input';
+                
+                // If previously selected (though forward only prevents this, good for consistency)
+                if (userResponses[currentQuestionIndex].includes(opt.key)) {
+                    input.checked = true;
+                    label.classList.add('selected');
+                }
+
+                input.addEventListener('change', (e) => {
+                    if (q.type === 'single') {
+                        // Clear others
+                        document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+                        if (e.target.checked) label.classList.add('selected');
+                    } else {
+                        // Toggle SATA
+                        if (e.target.checked) label.classList.add('selected');
+                        else label.classList.remove('selected');
+                    }
+                });
+
+                const spanText = document.createElement('span');
+                spanText.className = 'text-gray-700 font-medium leading-relaxed';
+                spanText.textContent = opt.text;
+
+                label.appendChild(input);
+                label.appendChild(spanText);
+                optionsContainer.appendChild(label);
+            });
+
+            // Update Next button text if on last question
+            if (currentQuestionIndex === quizData.length - 1) {
+                btnNext.innerHTML = '<span>Submit Exam</span> <i class="fas fa-check-circle ml-2"></i>';
+                btnNext.classList.replace('bg-blue-700', 'bg-green-600');
+                btnNext.classList.replace('hover:bg-blue-800', 'hover:bg-green-700');
+            }
+        }
+
+        btnNext.addEventListener('click', handleNextClick);
+
+        function handleNextClick() {
+            const inputs = document.querySelectorAll('input[name="q_option"]:checked');
+            const answers = Array.from(inputs).map(inp => inp.value);
+            
+            // Only show a modal if the user didn't pick an answer
+            if (answers.length === 0) {
+                confirmModal.classList.remove('hidden');
+            } else {
+                // Otherwise, save and proceed without a prompt
+                saveAnswerAndProceed();
+            }
+        }
+
+        btnModalCancel.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        btnModalConfirm.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            saveAnswerAndProceed();
+        });
+
+        function saveAnswerAndProceed() {
+            const inputs = document.querySelectorAll('input[name="q_option"]:checked');
+            const answers = Array.from(inputs).map(inp => inp.value);
+            userResponses[currentQuestionIndex] = answers;
+
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                updateSidebar();
+                loadQuestion();
+            } else {
+                finishExam();
+            }
+        }
+        
+        function finishExamEarly() {
+            if(confirm("Are you sure you want to submit your exam early? You will not be able to answer any remaining questions.")){
+                finishExam();
+            }
+        }
+
+        function finishExam() {
+            clearInterval(timerInterval);
+            examUI.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            // Exit fullscreen if possible
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+
+            calculateAndRenderResults();
+        }
+
+        function arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            let sortedA = a.slice().sort();
+            let sortedB = b.slice().sort();
+            for (let i = 0; i < sortedA.length; ++i) {
+                if (sortedA[i] !== sortedB[i]) return false;
+            }
+            return true;
+        }
+
+        function calculateAndRenderResults() {
+            let score = 0;
+            const container = document.getElementById('rationales-container');
+            container.innerHTML = '';
+
+            quizData.forEach((q, index) => {
+                const userAns = userResponses[index];
+                const isCorrect = arraysEqual(userAns, q.correct);
+                if (isCorrect) score++;
+
+                // Build rationales UI
+                const resultCard = document.createElement('div');
+                resultCard.className = `bg-white p-6 rounded-lg shadow-sm border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'} mb-6`;
+                
+                // Question Header
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-start mb-4';
+                header.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800"><span class="text-gray-500 mr-2">Q${index + 1}.</span> ${q.text}</h3>
+                    <span class="px-3 py-1 rounded text-sm font-bold whitespace-nowrap ${isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                        ${isCorrect ? '<i class="fas fa-check mr-1"></i> Correct' : '<i class="fas fa-times mr-1"></i> Incorrect'}
+                    </span>
+                `;
+                resultCard.appendChild(header);
+
+                // Answers Display
+                const ansDisplay = document.createElement('div');
+                ansDisplay.className = 'grid md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded';
+                
+                const formatKeys = (keys) => {
+                    if(!keys || keys.length === 0) return "<em class='text-gray-400'>Blank</em>";
+                    return keys.map(k => k.toUpperCase()).join(', ');
+                };
+
+                ansDisplay.innerHTML = `
+                    <div>
+                        <span class="block text-xs font-bold text-gray-500 uppercase tracking-wide">Your Answer</span>
+                        <span class="text-lg font-semibold ${isCorrect ? 'text-green-700' : 'text-red-700'}">${formatKeys(userAns)}</span>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-bold text-gray-500 uppercase tracking-wide">Correct Answer</span>
+                        <span class="text-lg font-semibold text-green-700">${formatKeys(q.correct)}</span>
+                    </div>
+                `;
+                resultCard.appendChild(ansDisplay);
+
+                // Rationales List
+                const ratHeader = document.createElement('h4');
+                ratHeader.className = 'font-bold text-gray-700 mb-2 uppercase text-sm tracking-wide border-b pb-1';
+                ratHeader.textContent = 'Rationales:';
+                resultCard.appendChild(ratHeader);
+
+                const ratList = document.createElement('ul');
+                ratList.className = 'space-y-3 mt-3';
+                
+                q.options.forEach(opt => {
+                    const li = document.createElement('li');
+                    li.className = 'text-sm flex items-start';
+                    const isCorrectOpt = q.correct.includes(opt.key);
+                    
+                    li.innerHTML = `
+                        <span class="font-bold w-6 flex-shrink-0 ${isCorrectOpt ? 'text-green-600' : 'text-gray-600'}">${opt.key.toUpperCase()}.</span>
+                        <span class="text-gray-700 leading-relaxed"><span class="font-semibold">${opt.text}</span>: ${q.rationales[opt.key]}</span>
+                    `;
+                    ratList.appendChild(li);
+                });
+                
+                resultCard.appendChild(ratList);
+                container.appendChild(resultCard);
+            });
+
+            // Update Score Header
+            document.getElementById('score-correct').textContent = score;
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('score-percentage').textContent = `${percentage}%`;
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time is up! Your exam will now be submitted.");
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft < 300) { // Under 5 minutes
+                timerEl.classList.add('text-red-400');
+            }
+        }
+    </script>
+</body>
+</html>
