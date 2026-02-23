@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Care Policy & Disaster Management</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.3s ease-out forwards',
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6', // Violet focus for Policy/Disaster
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            900: '#4c1d95',
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="font-sans antialiased text-gray-900 bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // --- Mock Authentication Setup ---
+        const mockAuth = {
+            onAuthStateChanged: (callback) => {
+                setTimeout(() => callback({ uid: 'nursing-student-303' }), 100);
+                return () => {}; 
+            },
+            signInAnonymously: () => Promise.resolve({ user: { uid: 'nursing-student-303' } }),
+        };
+
+        // --- Content & Data Structure ---
+        const contentData = {
+            'policy-change': {
+                title: 'Health Policy & Change',
+                color: 'from-violet-500 to-fuchsia-500',
+                description: 'Explore the health policy process, governmental scope, and Lewin’s Change Theory.',
+                steps: [
+                    { id: 'def-policy', title: 'Defining Health Policy', type: 'text', content: `<strong>Health Care Policy:</strong><br>Health policy is goal-directed decision making about health that is the result of an authorized and public decision-making process. It includes actions, nonactions, directions, and guidance related to health decided by governments or other authorized entities.<br><br><strong>Scope and Structure:</strong><br>Major government institutions decide, implement, and regulate policy at the Federal, State, and Local levels:<br>- <strong>Legislature:</strong> Creates laws and determines funding.<br>- <strong>Courts and Judiciary:</strong> Determine rights in health policy disputes (judicial review).<br>- <strong>Executive Branch:</strong> Executes and implements the laws.<br>- <strong>Regulatory Agencies:</strong> Enforce the laws through a rule-making process.` },
+                    { id: 'policy-process', title: 'The Policy Process', type: 'text', content: `The creation of public health policy is a dynamic process subject to public review and input. Goals often change with shifts in political viewpoints, social values, and trends.<br><br><strong>The 5 Stages of the Policy Process:</strong><br><strong>1. Agenda Setting:</strong> Identifying a health problem and bringing it to the attention of policymakers.<br><strong>2. Policy Formulation:</strong> Proposing solutions and drafting potential policies.<br><strong>3. Policy Adoption:</strong> Selecting a specific policy and passing it into law/regulation.<br><strong>4. Policy Implementation:</strong> Putting the policy into action through authorized agencies.<br><strong>5. Policy Evaluation:</strong> Assessing the policy's effectiveness and outcomes, which may lead back to new agenda setting.` },
+                    { id: 'lewin-change', title: 'Change Theory & IOM', type: 'text', content: `Implementing new policies requires effective change management. <strong>Lewin’s Planned Change Theory</strong> involves three stages:<br><br>- <strong>Unfreezing:</strong> Unlearning the behavior that needs change; identifying the problem and creating motivation.<br>- <strong>Experiencing the Change (Moving):</strong> The change is put in place; staff require support, training, and open dialogue.<br>- <strong>Refreezing:</strong> Solidifying the new process so it becomes the new standard.<br><br><strong>The Future of Nursing (IOM, 2010):</strong><br>A monumental assessment that serves as a blueprint for nursing change. Key recommendations included: Removing scope-of-practice barriers, establishing nurse residency programs, reaching 80% BSN-prepared nurses by 2020, and doubling the number of nurses with a doctorate.` },
+                    { id: 'policy-quiz', title: 'Policy & Change Quiz', type: 'quiz',
+                        questions: [
+                            { question: "According to Lewin's Planned Change Theory, which phase involves 'unlearning behavior that needs change' and preparing for the transition?", options: ["Refreezing", "Policy Formulation", "Unfreezing", "Experiencing the change"], correctAnswer: "Unfreezing" },
+                            { question: "Which branch of government is primarily responsible for executing and implementing health policy laws?", options: ["Legislature", "Courts and Judiciary", "Executive Branch", "Regulatory Agencies"], correctAnswer: "Executive Branch" },
+                        ]
+                    }
+                ]
+            },
+            'disaster-stages': {
+                title: 'Disaster Management Stages',
+                color: 'from-blue-500 to-cyan-600',
+                description: 'Understand the continuum of disaster planning and the role of the nurse.',
+                steps: [
+                    { id: 'disaster-intro', title: 'The Disaster Continuum', type: 'text', content: `The American Nurses Association considers disaster management and preparedness to be a core part of a nurse's practice. Disasters can range from natural events (hurricanes, floods) to human-made mass casualty events.<br><br>Effective disaster management is not just about the response; it is a continuous cycle. Understanding this cycle helps organizations allocate resources and minimize the harmful effects of catastrophic events.` },
+                    { id: 'stages-1-3', title: 'Stages: Future, Pre-Disaster, Impact', type: 'text', content: `<strong>1. Disaster in the Future:</strong><br>The time for planning, preparation, and mitigation. This involves risk assessments, developing response protocols, and taking actions to reduce the harmful effects of a potential future disaster.<br><br><strong>2. Pre-Disaster:</strong><br>There is evidence of an impending disaster (e.g., a forecasted hurricane). Actions include issuing warnings, pre-impact mobilization of resources, and initiating evacuation as necessary.<br><br><strong>3. Impact:</strong><br>The disaster has occurred, and the community experiences immediate effects. The primary action here is the <strong>rapid assessment</strong> of damage, injury, and community needs.` },
+                    { id: 'stages-4-5', title: 'Stages: Emergency & Recovery', type: 'text', content: `<strong>4. Emergency:</strong><br>The immediate and long-term need for assistance. Activities include first aid, search and rescue, emergency medical assistance, establishment of transportation/communication, and assessing the community for infectious diseases and mental health impacts. Continued evacuation may occur.<br><br><strong>5. Recovery:</strong><br>The restoration of property and community life. This involves rebuilding, returning to school and work, and continuing life without those lost in the disaster. It ultimately transitions back to preparation for mitigation of future disasters.` },
+                    { id: 'stages-quiz', title: 'Disaster Stages Quiz', type: 'quiz',
+                        questions: [
+                            { question: "During which stage of disaster planning does the community experience the immediate effects and undergo a rapid assessment of damage and injury?", options: ["Pre-Disaster", "Impact", "Emergency", "Recovery"], correctAnswer: "Impact" },
+                            { question: "Which stage focuses on returning the community to normal, rebuilding property, and restoring standard daily life?", options: ["Disaster in the Future", "Pre-Disaster", "Emergency", "Recovery"], correctAnswer: "Recovery" },
+                        ]
+                    }
+                ]
+            },
+            'disaster-triage': {
+                title: 'Mass Casualty Triage',
+                color: 'from-rose-500 to-red-600',
+                description: 'Learn the START Adult Triage algorithm and Color-Coded Priority Tagging.',
+                steps: [
+                    { id: 'triage-colors', title: 'Color-Coded Priority Tagging', type: 'text', content: `During a mass casualty incident, traditional triage (who is the sickest) shifts to doing the greatest good for the greatest number. We use conventional color-coded triage tags:<br><br>🔴 <strong>IMMEDIATE (Red):</strong> Life-threatening injuries with a high probability for survival if treated immediately (within 60 mins). Involves ABC compromises (e.g., shock, compromised airway, chest trauma).<br><br>🟡 <strong>DELAYED (Yellow / Urgent):</strong> Serious and potentially life-threatening injuries, but status is not expected to deteriorate significantly over several hours. Treatment within 30 mins to 2 hours (e.g., open fractures with a pulse).<br><br>🟢 <strong>MINOR (Green / Nonurgent):</strong> Status unlikely to deteriorate over days. These are the "Walking Wounded" (e.g., minor burns, closed fractures).<br><br>⚫ <strong>EXPECTANT (Black):</strong> Victim unlikely to survive given the severity of injuries and level of available care. Extensive injuries with poor prognosis (e.g., pulselessness, apnea, >60% full-thickness burns). Palliative care is provided.` },
+                    { id: 'start-algorithm', title: 'The START Algorithm', type: 'text', content: `<strong>START</strong> (Simple Triage And Rapid Treatment) focuses on <strong>RPM</strong>: Respirations, Perfusion, and Mental Status.<br><br><strong>Step 1: Able to walk?</strong><br>If YES ➔ 🟢 <strong>MINOR (Green)</strong>. If NO ➔ Move to Step 2.<br><br><strong>Step 2: Respirations</strong><br>Not breathing? Position airway. Still apneic? ➔ ⚫ <strong>EXPECTANT (Black)</strong>. Starts breathing? ➔ 🔴 <strong>IMMEDIATE (Red)</strong>.<br>Breathing spontaneously > 30 breaths/min ➔ 🔴 <strong>IMMEDIATE (Red)</strong>. If < 30 ➔ Move to Step 3.<br><br><strong>Step 3: Perfusion</strong><br>Radial pulse absent OR Capillary refill > 2 seconds ➔ 🔴 <strong>IMMEDIATE (Red)</strong>.<br>Radial pulse present OR Capillary refill < 2 seconds ➔ Move to Step 4.<br><br><strong>Step 4: Mental Status</strong><br>Doesn't obey commands ➔ 🔴 <strong>IMMEDIATE (Red)</strong>.<br>Obeys commands ➔ 🟡 <strong>DELAYED (Yellow)</strong>.` },
+                    { id: 'triage-quiz', title: 'START Triage Quiz', type: 'quiz',
+                        questions: [
+                            { question: "You are triaging a victim who is unable to walk. Their respiratory rate is 24, but their capillary refill is 4 seconds. What triage tag should they receive?", options: ["Green (Minor)", "Yellow (Delayed)", "Red (Immediate)", "Black (Expectant)"], correctAnswer: "Red (Immediate)" },
+                            { question: "A victim is not breathing. You position their airway, and they remain apneic without a pulse. What is the appropriate triage category?", options: ["Red (Immediate)", "Yellow (Delayed)", "Green (Minor)", "Black (Expectant)"], correctAnswer: "Black (Expectant)" },
+                        ]
+                    }
+                ]
+            },
+            'policy-case-studies': {
+                title: 'Clinical Application & Cases',
+                color: 'from-amber-500 to-orange-500',
+                description: 'Apply START Triage and Change Theory to clinical scenarios.',
+                steps: [
+                    { id: 'case-1-triage', title: 'Case Study: The Factory Explosion', type: 'case_study', case: {
+                        scenario: `You are the first nurse to arrive at a triage staging area following a large factory explosion. <br><br>You approach a male victim lying on the ground. He is unable to walk and is moaning in pain. You assess his respirations, which are 34 breaths per minute. He has a large laceration on his leg.`,
+                        question: "Using the START Adult Triage algorithm, what is your next immediate action, and what tag does he receive?",
+                        options: [
+                            "Assess his capillary refill; if it is < 2 seconds, tag him Yellow (Delayed).",
+                            "Stop the assessment and immediately tag him Red (Immediate) because his respiratory rate is > 30.",
+                            "Ask him to squeeze your hands to check mental status; if he obeys, tag him Green (Minor).",
+                            "Tag him Black (Expectant) due to the large laceration and inability to walk."
+                        ],
+                        correctAnswer: "Stop the assessment and immediately tag him Red (Immediate) because his respiratory rate is > 30.",
+                        explanation: "In the START algorithm, once a patient meets a 'Red' criterion, you stop the assessment and tag them, then move to the next patient. Because his respirations are greater than 30 breaths per minute, he immediately receives a Red (Immediate) tag. There is no need to assess perfusion or mental status at this moment."
+                    }},
+                    { id: 'case-2-change', title: 'Case Study: Bedside Report Policy', type: 'case_study', case: {
+                        scenario: `Your hospital has just formulated and adopted a new health care policy requiring all nursing shift reports to occur directly at the bedside rather than at the nursing station, aiming to improve patient safety and transparency. <br><br>You are a Nurse Manager. Many of the veteran nurses are resisting the change, citing that it takes too much time and violates privacy. They are holding on to their old habits.`,
+                        question: "Applying Lewin's Planned Change Theory, what phase is this unit currently struggling with, and what is the best strategy?",
+                        options: [
+                            "Refreezing; you should solidify the new process by writing up any nurse who complains.",
+                            "Unfreezing; you need to help them unlearn the old behavior, establish connection, and dialogue about the purpose of the change.",
+                            "Policy Formulation; you should scrap the policy and start over with a different idea.",
+                            "Impact phase; you should declare a unit emergency and bring in external regulators."
+                        ],
+                        correctAnswer: "Unfreezing; you need to help them unlearn the old behavior, establish connection, and dialogue about the purpose of the change.",
+                        explanation: "The staff are struggling with the 'Unfreezing' stage, which involves unlearning old behaviors that need to change. Effective change agents facilitate this by listening, establishing trust, addressing concerns (like privacy), and aligning the staff with the safety purpose behind the new policy."
+                    }}
+                ]
+            }
+        };
+
+        const preAssessmentQuizData = [
+            { moduleId: 'policy-change', question: "What is the very first stage in the Health Policy Process?", options: ["Policy Adoption", "Policy Implementation", "Agenda Setting", "Policy Evaluation"], correctAnswer: "Agenda Setting" },
+            { moduleId: 'policy-change', question: "Under Lewin's Planned Change Theory, which phase involves 'solidifying the new process'?", options: ["Unfreezing", "Moving", "Experiencing", "Refreezing"], correctAnswer: "Refreezing" },
+            { moduleId: 'disaster-stages', question: "Which stage of Disaster Planning involves issuing warnings and pre-impact evacuation?", options: ["Recovery", "Impact", "Pre-Disaster", "Emergency"], correctAnswer: "Pre-Disaster" },
+            { moduleId: 'disaster-triage', question: "According to START Triage, if a victim is unable to walk but is breathing at a rate of 36 breaths per minute, they receive which color tag?", options: ["Green (Minor)", "Yellow (Delayed)", "Red (Immediate)", "Black (Expectant)"], correctAnswer: "Red (Immediate)" },
+            { moduleId: 'disaster-triage', question: "A patient with severe neurological trauma who is apneic even after their airway is repositioned should be tagged as:", options: ["Immediate (Red)", "Minor (Green)", "Delayed (Yellow)", "Expectant (Black)"], correctAnswer: "Expectant (Black)" }
+        ];
+
+        // --- Helper Functions ---
+        const cn = (...classes) => classes.filter(Boolean).join(' ');
+
+        // --- Components ---
+
+        const Quiz = ({ questions, onComplete, isPreAssessment = false }) => {
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [feedback, setFeedback] = useState(null);
+            const [answers, setAnswers] = useState([]);
+
+            const currentQuestion = questions[currentQuestionIndex];
+
+            const handleOptionSelect = (option) => {
+                if (feedback && !isPreAssessment) return;
+                setSelectedOption(option);
+            };
+
+            const handlePreAssessmentNext = () => {
+                if (selectedOption === null) return;
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                const updatedAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                setAnswers(updatedAnswers);
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null);
+                } else {
+                    onComplete(updatedAnswers);
+                }
+            };
+            
+            const handleRegularQuizSubmit = () => {
+                if (selectedOption === null) return;
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                setFeedback(isCorrect ? 'correct' : 'incorrect');
+            };
+
+            const handleRegularQuizNext = () => {
+                const isCorrect = selectedOption.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                const finalAnswers = [...answers, { question: currentQuestion, isCorrect }];
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    setAnswers(finalAnswers);
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedOption(null);
+                    setFeedback(null);
+                } else {
+                    const finalScore = finalAnswers.reduce((acc, ans) => acc + (ans.isCorrect ? 1 : 0), 0);
+                    onComplete({ score: finalScore, total: questions.length });
+                }
+            };
+
+            return (
+                <div className="p-5 md:p-8 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                        <h4 className="font-bold text-lg text-brand-700">Knowledge Check</h4>
+                        <span className="text-sm font-medium text-gray-500">Question {currentQuestionIndex + 1} of {questions.length}</span>
+                    </div>
+                    <p className="font-semibold text-xl text-gray-800 mb-6 leading-snug">{currentQuestion.question}</p>
+                    <div className="space-y-3">
+                        {currentQuestion.options.map((option, index) => {
+                            const isSelected = selectedOption === option;
+                            const isCorrectOption = option.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+                            let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700';
+
+                            if (feedback && !isPreAssessment) {
+                                if (isCorrectOption) {
+                                    optionClass = 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm';
+                                } else if (isSelected && !isCorrectOption) {
+                                    optionClass = 'bg-rose-50 border-rose-500 text-rose-800';
+                                }
+                            } else if (isSelected) {
+                                optionClass = 'bg-brand-50 border-brand-500 text-brand-800 shadow-sm';
+                            }
+
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => handleOptionSelect(option)}
+                                    className={cn('p-4 rounded-xl border-2 cursor-pointer transition-all duration-200', optionClass)}
+                                >
+                                    <div className="flex items-center">
+                                        {feedback && !isPreAssessment && (isCorrectOption || (isSelected && !isCorrectOption)) && (
+                                            isCorrectOption ? 
+                                            <svg className="w-6 h-6 text-emerald-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> : 
+                                            <svg className="w-6 h-6 text-rose-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        )}
+                                        <span className="flex-1 text-base">{option}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-8 flex justify-end">
+                        {isPreAssessment ? (
+                             <button
+                                onClick={handlePreAssessmentNext}
+                                disabled={selectedOption === null}
+                                className="px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                            </button>
+                        ) : (
+                            <>
+                            {!feedback ? (
+                                <button
+                                    onClick={handleRegularQuizSubmit}
+                                    disabled={selectedOption === null}
+                                    className="px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Submit Answer
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleRegularQuizNext}
+                                    className="px-8 py-3 bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:bg-brand-700 transition-colors flex items-center gap-2"
+                                >
+                                    {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                                </button>
+                            )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+        
+        const PreAssessmentQuiz = ({ onComplete, onExit }) => {
+            const [results, setResults] = useState(null);
+
+            const handleQuizComplete = (finalAnswers) => {
+                const moduleResults = {};
+                finalAnswers.forEach(answer => {
+                    const { moduleId } = answer.question;
+                    if (!moduleResults[moduleId]) {
+                        moduleResults[moduleId] = { correct: 0, total: 0 };
+                    }
+                    if (answer.isCorrect) {
+                        moduleResults[moduleId].correct++;
+                    }
+                    moduleResults[moduleId].total++;
+                });
+
+                const completedModules = [];
+                for (const moduleId in moduleResults) {
+                    if (moduleResults[moduleId].correct === moduleResults[moduleId].total) {
+                        completedModules.push(moduleId);
+                    }
+                }
+                setResults({ completedModules, total: finalAnswers.length, correct: finalAnswers.filter(a => a.isCorrect).length });
+                onComplete(completedModules);
+            };
+
+            if (results) {
+                return (
+                    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-40 p-4 animate-fade-in">
+                        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl w-full text-center border border-gray-100">
+                            <div className="w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-10 h-10 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-800 mb-4">Assessment Complete!</h2>
+                            <p className="text-lg text-gray-600 mb-8">
+                                You correctly answered <span className="font-bold text-brand-600">{results.correct}</span> out of {results.total} questions.
+                            </p>
+                            
+                            {results.completedModules.length > 0 ? (
+                                <div className="mb-8">
+                                    <p className="text-emerald-700 font-semibold mb-4 text-left">You've demonstrated mastery in these areas and they have been marked complete:</p>
+                                    <ul className="list-disc list-inside text-left bg-emerald-50 border border-emerald-100 p-5 rounded-xl text-emerald-800">
+                                        {results.completedModules.map(id => <li key={id} className="mb-1">{contentData[id].title}</li>)}
+                                    </ul>
+                                </div>
+                            ) : (
+                                <div className="mb-8 bg-amber-50 border border-amber-100 p-5 rounded-xl">
+                                    <p className="text-amber-800 font-semibold">Great effort! We recommend reviewing all modules to build a strong foundation in Health Policy and Disaster Management.</p>
+                                </div>
+                            )}
+                            <button
+                                onClick={onExit}
+                                className="px-8 py-3 bg-brand-600 text-white font-bold rounded-xl shadow-md hover:bg-brand-700 transition-colors w-full sm:w-auto"
+                            >
+                                Enter Learning Dashboard
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-40 p-4 overflow-y-auto">
+                    <div className="max-w-3xl w-full py-8">
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-gray-800">Diagnostic Assessment</h2>
+                            <p className="text-gray-500 mt-2">Let's see what you already know about Health Policy and Disaster Triage.</p>
+                        </div>
+                        <Quiz questions={preAssessmentQuizData} onComplete={handleQuizComplete} isPreAssessment={true} />
+                    </div>
+                </div>
+            );
+        };
+
+        const Dashboard = ({ onSelectModule, progress, onResetProgress, onStartPreAssessment }) => {
+            let totalCompletedSteps = 0;
+            let totalPossibleSteps = 0;
+
+            Object.entries(contentData).forEach(([moduleId, module]) => {
+                totalPossibleSteps += module.steps.length;
+                const moduleProgress = progress[moduleId] || {};
+                Object.values(moduleProgress).forEach(stepProgress => {
+                    if (stepProgress.completed) totalCompletedSteps++;
+                });
+            });
+
+            const overallPercentage = totalPossibleSteps > 0 ? (totalCompletedSteps / totalPossibleSteps) * 100 : 0;
+
+            return (
+                <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 min-h-screen w-full flex flex-col">
+                    <header className="mb-10 text-center mt-4">
+                        <div className="inline-flex items-center justify-center gap-3 mb-4 bg-white px-6 py-2 rounded-full shadow-sm border border-gray-100">
+                            <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                            <span className="text-sm font-bold tracking-widest text-brand-800 uppercase">NURS Core Module</span>
+                        </div>
+                        <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">Health Care Policy & Disaster Management</h1>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Master the health policy process, lead organizational change, and critically apply mass casualty triage rules.</p>
+                    </header>
+
+                    {overallPercentage === 0 && (
+                        <div className="mb-10 flex justify-center">
+                            <button
+                                onClick={onStartPreAssessment}
+                                className="group relative px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-brand-500 to-fuchsia-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="relative flex items-center gap-3">
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    <span className="text-lg">Take Diagnostic Quiz to Skip Ahead</span>
+                                </div>
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="mb-10 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">Course Progress</h3>
+                                <p className="text-sm text-gray-500">{totalCompletedSteps} of {totalPossibleSteps} activities completed</p>
+                            </div>
+                            {overallPercentage > 0 && (
+                                <button onClick={onResetProgress} className="text-sm text-rose-500 hover:text-rose-700 font-medium transition-colors flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-lg">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                    Reset Progress
+                                </button>
+                            )}
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                            <div
+                                className="bg-gradient-to-r from-brand-500 to-indigo-500 h-full rounded-full transition-all duration-700 ease-out"
+                                style={{ width: `${overallPercentage}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-8">
+                        {Object.entries(contentData).map(([id, module]) => {
+                            const moduleProgress = progress[id] || {};
+                            const completedCount = Object.values(moduleProgress).filter(p => p.completed).length;
+                            const totalSteps = module.steps.length;
+                            const percentage = totalSteps > 0 ? (completedCount / totalSteps) * 100 : 0;
+                            const isCompleted = completedCount === totalSteps;
+
+                            return (
+                                <div
+                                    key={id}
+                                    onClick={() => onSelectModule(id)}
+                                    className={cn(
+                                        "bg-white rounded-3xl border transition-all duration-300 cursor-pointer group flex flex-col overflow-hidden relative",
+                                        isCompleted ? "border-emerald-200 shadow-md hover:shadow-lg" : "border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-brand-300"
+                                    )}
+                                >
+                                    <div className={cn("h-2 w-full bg-gradient-to-r", module.color)}></div>
+                                    <div className="p-6 sm:p-8 flex flex-col h-full relative z-10">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className={cn("p-4 rounded-2xl bg-gradient-to-br text-white shadow-md", module.color)}>
+                                                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    {id === 'policy-change' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />}
+                                                    {id === 'disaster-stages' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />}
+                                                    {id === 'disaster-triage' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />}
+                                                    {id === 'policy-case-studies' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />}
+                                                </svg>
+                                            </div>
+                                            {isCompleted ? (
+                                                <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-sm font-bold">
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                                    Done
+                                                </div>
+                                            ) : (
+                                                <div className="relative w-12 h-12">
+                                                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                        <path className="text-gray-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                                                        <path className="text-brand-500" strokeDasharray={`${percentage}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                                                    </svg>
+                                                    <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">{Math.round(percentage)}%</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-3">{module.title}</h3>
+                                        <p className="text-gray-600 text-sm mb-6 flex-grow leading-relaxed">{module.description}</p>
+                                        
+                                        <div className="mt-auto flex items-center justify-between text-brand-600 font-semibold group-hover:text-brand-800">
+                                            <span>{isCompleted ? 'Review Module' : 'Start Learning'}</span>
+                                            <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                        </div>
+                                    </div>
+                                    {isCompleted && <div className="absolute inset-0 bg-emerald-50 opacity-10 pointer-events-none"></div>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        const CaseStudy = ({ caseData, onComplete }) => {
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+
+            const handleSelect = (option) => {
+                if (selectedAnswer) return;
+                setSelectedAnswer(option);
+                if (option.toLowerCase() === caseData.correctAnswer.toLowerCase()) {
+                    onComplete();
+                }
+            };
+
+            return (
+                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="bg-amber-50 border-b border-amber-100 p-6 md:p-8">
+                        <div className="flex items-center gap-3 mb-4">
+                            <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <h4 className="font-bold text-xl text-amber-900">Clinical Scenario</h4>
+                        </div>
+                        <p className="text-amber-900 leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: caseData.scenario }}></p>
+                    </div>
+                    <div className="p-6 md:p-8">
+                        <p className="font-bold text-xl text-gray-800 mb-6">{caseData.question}</p>
+                        <div className="space-y-3">
+                            {caseData.options.map((option, idx) => {
+                                const isSelected = selectedAnswer === option;
+                                const isCorrect = option.toLowerCase() === caseData.correctAnswer.toLowerCase();
+                                const showFeedback = selectedAnswer !== null;
+
+                                let optionClass = 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700';
+                                if (showFeedback) {
+                                    if (isCorrect) optionClass = 'bg-emerald-50 border-emerald-500 text-emerald-800';
+                                    else if (isSelected && !isCorrect) optionClass = 'bg-rose-50 border-rose-500 text-rose-800';
+                                } else if (isSelected) {
+                                    optionClass = 'bg-brand-50 border-brand-500 text-brand-800';
+                                }
+
+                                return (
+                                    <div
+                                        key={idx}
+                                        onClick={() => handleSelect(option)}
+                                        className={cn('p-4 rounded-xl border-2 cursor-pointer transition-all duration-200', optionClass)}
+                                    >
+                                        <div className="flex items-center">
+                                            {showFeedback && (
+                                                isCorrect ? <svg className="w-6 h-6 text-emerald-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> : 
+                                                (isSelected && <svg className="w-6 h-6 text-rose-500 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>)
+                                            )}
+                                            <span className="flex-1 text-base font-medium">{option}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {selectedAnswer && (
+                            <div className="mt-8 p-6 bg-brand-50 rounded-xl border border-brand-100 animate-fade-in">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <svg className="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <h5 className="font-bold text-brand-900 text-lg">Instructor Rationale</h5>
+                                </div>
+                                <p className="text-base text-brand-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: caseData.explanation }}></p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const StaticContentStep = ({ step, onComplete }) => {
+            useEffect(() => {
+                onComplete();
+            }, []);
+
+            return (
+                <div className="prose prose-lg max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-strong:text-gray-900 prose-li:text-gray-600 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
+                    <div dangerouslySetInnerHTML={{ __html: step.content }} />
+                </div>
+            );
+        };
+
+        const CompletionModal = ({ isOpen, onClose, onNextModule, hasNextModule }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center transform animate-fade-in border border-gray-100">
+                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg className="w-12 h-12 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 className="text-3xl font-bold text-gray-900 mb-4">Module Mastered!</h3>
+                        <p className="text-lg text-gray-600 mb-8">Excellent work. You've successfully completed all activities in this section.</p>
+                        <div className="flex flex-col gap-3">
+                            {hasNextModule ? (
+                                <>
+                                <button
+                                    onClick={onNextModule}
+                                    className="px-6 py-4 bg-brand-600 text-white text-lg font-bold rounded-xl shadow-md hover:bg-brand-700 transition-colors w-full"
+                                >
+                                    Continue to Next Module
+                                </button>
+                                <button
+                                    onClick={onClose}
+                                    className="px-6 py-4 bg-gray-50 text-gray-700 text-lg font-bold rounded-xl hover:bg-gray-100 transition-colors w-full"
+                                >
+                                    Back to Dashboard
+                                </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={onClose}
+                                    className="px-6 py-4 bg-brand-600 text-white text-lg font-bold rounded-xl shadow-md hover:bg-brand-700 transition-colors w-full"
+                                >
+                                    Return to Dashboard
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const LearningModule = ({ module, onBack, progress, onProgressUpdate, onNextModule, hasNextModule }) => {
+            const [activeStep, setActiveStep] = useState(0);
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+            const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
+            const handleStepComplete = useCallback((stepId, data = {}) => {
+                onProgressUpdate(module.id, stepId, { completed: true, ...data });
+            }, [onProgressUpdate, module.id]);
+
+            const moduleProgress = progress[module.id] || {};
+            const allStepsCompletedInModule = module.steps.every(step => moduleProgress[step.id]?.completed);
+
+            const handleNextStep = () => {
+                if (activeStep === module.steps.length - 1 && allStepsCompletedInModule) {
+                    setIsCompletionModalOpen(true);
+                } else if (activeStep < module.steps.length - 1) {
+                    setActiveStep(activeStep + 1);
+                }
+            };
+
+            const handlePrevStep = () => {
+                if (activeStep > 0) setActiveStep(activeStep - 1);
+            };
+
+            const currentStep = module.steps[activeStep];
+
+            const renderStepContent = (step) => {
+                if (!step) return null;
+                const onCompleteForStep = (data) => handleStepComplete(step.id, data);
+                switch (step.type) {
+                    case 'text': return <StaticContentStep key={step.id} step={step} onComplete={onCompleteForStep} />;
+                    case 'case_study': return <CaseStudy key={step.id} caseData={step.case} onComplete={onCompleteForStep} />;
+                    case 'quiz': return <Quiz key={step.id} questions={step.questions} onComplete={onCompleteForStep} />;
+                    default: return <p>Unknown step type.</p>;
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 bg-gray-50 flex flex-col z-20">
+                    <header className="bg-white border-b border-gray-200 px-4 h-16 flex items-center justify-between z-30 flex-shrink-0">
+                        <div className="flex items-center w-1/3">
+                            <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors py-2 px-3 rounded-lg hover:bg-gray-100 -ml-2">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                                <span className="hidden sm:inline font-medium text-sm">Dashboard</span>
+                            </button>
+                        </div>
+                        <div className="flex-1 text-center truncate px-4">
+                            <h2 className="text-lg font-bold text-gray-900 truncate">{module.title}</h2>
+                        </div>
+                        <div className="flex items-center justify-end w-1/3">
+                            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            </button>
+                        </div>
+                    </header>
+
+                    {isSidebarOpen && <div onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 lg:hidden"></div>}
+                    
+                    <div className="flex flex-1 overflow-hidden relative">
+                        {/* Sidebar Navigation */}
+                        <aside className={cn(
+                            "bg-white border-r border-gray-200 w-80 flex-shrink-0 flex flex-col transition-transform duration-300 ease-in-out absolute lg:static h-full z-50 lg:translate-x-0 shadow-2xl lg:shadow-none",
+                            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        )}>
+                            <div className="p-6 border-b border-gray-100">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Learning Path</h3>
+                                <p className="text-gray-900 font-semibold">{module.title}</p>
+                            </div>
+                            <nav className="p-4 space-y-2 overflow-y-auto flex-1">
+                                {module.steps.map((step, index) => {
+                                    const isCompleted = moduleProgress[step.id]?.completed;
+                                    const isActive = activeStep === index;
+                                    
+                                    return (
+                                        <button
+                                            key={step.id}
+                                            onClick={() => { setActiveStep(index); setIsSidebarOpen(false); }}
+                                            className={cn(
+                                                'w-full text-left p-4 rounded-xl flex items-start gap-4 transition-all duration-200',
+                                                isActive ? 'bg-brand-50 border border-brand-200 shadow-sm' : 'hover:bg-gray-50 border border-transparent'
+                                            )}
+                                        >
+                                            <div className="mt-0.5 w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                                                {isCompleted ? (
+                                                    <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                                        <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                    </div>
+                                                ) : (
+                                                    <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold", isActive ? "border-brand-600 text-brand-600" : "border-gray-300 text-gray-400")}>
+                                                        {index + 1}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <span className={cn("block text-sm font-medium", isActive ? "text-brand-900" : "text-gray-700")}>{step.title}</span>
+                                                <span className="text-xs text-gray-400 mt-1 uppercase tracking-wider font-semibold">{step.type.replace('_', ' ')}</span>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </nav>
+                        </aside>
+
+                        {/* Main Content Area */}
+                        <main className="flex-1 overflow-y-auto scroll-smooth">
+                            <div className="max-w-4xl mx-auto p-4 sm:p-8 pb-32">
+                                <div className="mb-8">
+                                    <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wider rounded-full mb-3">
+                                        Step {activeStep + 1} of {module.steps.length}
+                                    </span>
+                                    <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">{currentStep.title}</h3>
+                                </div>
+                                
+                                {renderStepContent(currentStep)}
+
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-12 pt-8 border-t border-gray-200">
+                                    <button
+                                        onClick={handlePrevStep}
+                                        disabled={activeStep === 0}
+                                        className="w-full sm:w-auto px-6 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        Previous Step
+                                    </button>
+
+                                    <button
+                                        onClick={handleNextStep}
+                                        disabled={activeStep === module.steps.length - 1 && !allStepsCompletedInModule}
+                                        className="w-full sm:w-auto px-8 py-3 bg-brand-600 text-white font-bold rounded-xl shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        {activeStep === module.steps.length - 1 ? 'Complete Module' : 'Continue to Next Step'}
+                                        {activeStep !== module.steps.length - 1 && <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                    
+                    <CompletionModal
+                        isOpen={isCompletionModalOpen}
+                        onClose={() => { setIsCompletionModalOpen(false); onBack(); }}
+                        onNextModule={() => { setIsCompletionModalOpen(false); onNextModule(); }}
+                        hasNextModule={hasNextModule}
+                    />
+                </div>
+            );
+        };
+
+        function App() {
+            const [currentModuleId, setCurrentModuleId] = useState(null);
+            const [isPreAssessmentActive, setIsPreAssessmentActive] = useState(false);
+            const [userId, setUserId] = useState(null);
+            const [progress, setProgress] = useState({});
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            useEffect(() => {
+                const unsubscribe = mockAuth.onAuthStateChanged((user) => {
+                    if (user) setUserId(user.uid);
+                    setIsAuthReady(true);
+                });
+                return () => unsubscribe();
+            }, []);
+
+            useEffect(() => {
+                if (!isAuthReady || !userId) return;
+                const storedProgress = localStorage.getItem(`nursing-policy-disaster-${userId}`);
+                if (storedProgress) {
+                    try { setProgress(JSON.parse(storedProgress)); } 
+                    catch (e) { setProgress({}); }
+                }
+            }, [isAuthReady, userId]);
+
+            const handleProgressUpdate = useCallback((moduleId, stepId, data = {}) => {
+                if (!isAuthReady || !userId) return;
+                setProgress(currentProgress => {
+                    const currentStepProgress = currentProgress[moduleId]?.[stepId] || {};
+                    const newStepProgress = { ...currentStepProgress, ...data };
+                    if (JSON.stringify(currentStepProgress) === JSON.stringify(newStepProgress)) return currentProgress;
+                    const newProgress = { ...currentProgress, [moduleId]: { ...(currentProgress[moduleId] || {}), [stepId]: newStepProgress } };
+                    localStorage.setItem(`nursing-policy-disaster-${userId}`, JSON.stringify(newProgress));
+                    return newProgress;
+                });
+            }, [isAuthReady, userId]);
+
+            const handlePreAssessmentComplete = (completedModuleIds) => {
+                const newProgress = { ...progress };
+                completedModuleIds.forEach(moduleId => {
+                    const module = contentData[moduleId];
+                    if (module) {
+                        newProgress[moduleId] = {};
+                        module.steps.forEach(step => { newProgress[moduleId][step.id] = { completed: true }; });
+                    }
+                });
+                setProgress(newProgress);
+                localStorage.setItem(`nursing-policy-disaster-${userId}`, JSON.stringify(newProgress));
+            };
+
+            const handleResetProgress = useCallback(() => {
+                if (!isAuthReady || !userId) return;
+                setProgress({});
+                localStorage.removeItem(`nursing-policy-disaster-${userId}`);
+            }, [isAuthReady, userId]);
+
+            const handleNextModule = useCallback(() => {
+                const moduleIds = Object.keys(contentData);
+                const currentIndex = moduleIds.indexOf(currentModuleId);
+                if (currentIndex !== -1 && currentIndex < moduleIds.length - 1) {
+                    setCurrentModuleId(moduleIds[currentIndex + 1]);
+                } else {
+                    setCurrentModuleId(null);
+                }
+            }, [currentModuleId]);
+
+            const selectedModule = currentModuleId && contentData[currentModuleId] ? { ...contentData[currentModuleId], id: currentModuleId } : null;
+            const moduleIds = Object.keys(contentData);
+            const currentIndex = selectedModule ? moduleIds.indexOf(selectedModule.id) : -1;
+            const hasNextModule = currentIndex !== -1 && currentIndex < moduleIds.length - 1;
+
+            if (!isAuthReady) return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div></div>;
+
+            return (
+                <div className="bg-gray-50 min-h-screen font-sans text-gray-900 selection:bg-brand-200 selection:text-brand-900">
+                    {isPreAssessmentActive ? (
+                        <PreAssessmentQuiz onComplete={handlePreAssessmentComplete} onExit={() => setIsPreAssessmentActive(false)} />
+                    ) : selectedModule ? (
+                        <LearningModule
+                            key={selectedModule.id}
+                            module={selectedModule}
+                            onBack={() => setCurrentModuleId(null)}
+                            progress={progress}
+                            onProgressUpdate={handleProgressUpdate}
+                            onNextModule={handleNextModule}
+                            hasNextModule={hasNextModule}
+                        />
+                    ) : (
+                        <Dashboard 
+                            onSelectModule={setCurrentModuleId} 
+                            progress={progress} 
+                            onResetProgress={handleResetProgress}
+                            onStartPreAssessment={() => setIsPreAssessmentActive(true)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
