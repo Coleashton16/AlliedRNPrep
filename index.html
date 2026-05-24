@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allied RN Prep - Unified Nursing Success Suite (Under Construction)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & DM Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght=0,9..40,100..1000;1,9..40,100..1000&family=Inter:wght=100..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['DM Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        clinicalBlue: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#b9dffe',
+                            300: '#7cc2fd',
+                            400: '#36a0fa',
+                            500: '#0c81eb',
+                            600: '#0062ca',
+                            700: '#014fa3',
+                            800: '#064486',
+                            900: '#0b3a70',
+                            950: '#07254a',
+                        },
+                        tealAccent: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-display {
+            font-family: 'DM Sans', sans-serif;
+        }
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-clinicalBlue-500 selection:text-white">
+
+    <!-- Top System Alert Banner -->
+    <div class="bg-gradient-to-r from-amber-500 via-rose-500 to-clinicalBlue-600 text-white text-center py-2.5 px-4 text-xs font-bold tracking-wide flex items-center justify-center gap-2">
+        <span class="bg-white/20 px-2.5 py-0.5 rounded text-[10px] uppercase animate-pulse">Alert</span>
+        <span>MAJOR CHANGES COMING: We are migrating 4 premium platforms into 1 unified experience. Standby for launch!</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 w-full glass-panel border-b border-slate-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-clinicalBlue-600 to-tealAccent-500 flex items-center justify-center text-white shadow-lg shadow-clinicalBlue-200 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-user-nurse text-xl"></i>
+                </div>
+                <div>
+                    <span class="font-display font-black text-xl tracking-tight text-clinicalBlue-950 block">Allied RN <span class="text-tealAccent-600">Prep</span></span>
+                    <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500 block -mt-1">Next-Gen Education</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#vision" class="text-sm font-semibold text-slate-600 hover:text-clinicalBlue-700 transition-colors">The Integration</a>
+                <a href="#evolution" class="text-sm font-semibold text-slate-600 hover:text-clinicalBlue-700 transition-colors">Core Pillars</a>
+                <a href="#tracker" class="text-sm font-semibold text-slate-600 hover:text-clinicalBlue-700 transition-colors">Sync Telemetry</a>
+                <a href="#quiz" class="text-sm font-semibold text-slate-600 hover:text-clinicalBlue-700 transition-colors">Assessment Challenge</a>
+                <a href="#faq" class="text-sm font-semibold text-slate-600 hover:text-clinicalBlue-700 transition-colors">FAQ</a>
+            </nav>
+
+            <!-- Navigation CTA (Updated to remove email link) -->
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-850 border border-rose-200">
+                    <span class="h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
+                    Major Upgrades Live
+                </span>
+                <a href="#tracker" class="bg-clinicalBlue-700 hover:bg-clinicalBlue-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-md hover:shadow-lg hover:shadow-clinicalBlue-100 transition-all transform hover:-translate-y-0.5">
+                    View Progress
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow">
+        
+        <!-- Hero Section -->
+        <section class="relative pt-12 pb-24 lg:pt-20 lg:pb-32 overflow-hidden">
+            <!-- Background Accent Blobs -->
+            <div class="absolute top-0 right-1/4 w-96 h-96 bg-clinicalBlue-100 rounded-full blur-3xl opacity-60 -z-10"></div>
+            <div class="absolute bottom-10 left-10 w-80 h-80 bg-tealAccent-100 rounded-full blur-3xl opacity-50 -z-10"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                    
+                    <!-- Hero Content (Left) -->
+                    <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-sm font-bold">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600 animate-bounce"></i>
+                            Major Changes Underway
+                        </div>
+                        
+                        <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+                            Four Systems.<br class="hidden sm:inline" />
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-clinicalBlue-700 to-tealAccent-600">One Powerhouse</span> Portal.
+                        </h1>
+                        
+                        <p class="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                            We are actively consolidating our <strong>Tutoring Center</strong>, <strong>Educational Platform</strong>, <strong>Testing Platform</strong>, and <strong>Assignment Platform</strong> into a single, seamless, and deeply interconnected dashboard.
+                        </p>
+
+                        <!-- Live Interactive Countdown Timer (Updated initial text to 5 days) -->
+                        <div class="bg-white p-6 rounded-2xl shadow-xl shadow-slate-100 border border-slate-100 max-w-xl mx-auto lg:mx-0">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 text-center lg:text-left">Estimated Unified Portal Launch:</h3>
+                            <div class="grid grid-cols-4 gap-4 text-center font-mono">
+                                <div class="bg-clinicalBlue-50 p-3 rounded-xl border border-clinicalBlue-100">
+                                    <span id="days" class="font-display font-black text-2xl sm:text-3xl text-clinicalBlue-800">05</span>
+                                    <span class="block text-[10px] font-sans uppercase tracking-wider text-slate-500 font-bold mt-1">Days</span>
+                                </div>
+                                <div class="bg-clinicalBlue-50 p-3 rounded-xl border border-clinicalBlue-100">
+                                    <span id="hours" class="font-display font-black text-2xl sm:text-3xl text-clinicalBlue-800">00</span>
+                                    <span class="block text-[10px] font-sans uppercase tracking-wider text-slate-500 font-bold mt-1">Hours</span>
+                                </div>
+                                <div class="bg-clinicalBlue-50 p-3 rounded-xl border border-clinicalBlue-100">
+                                    <span id="minutes" class="font-display font-black text-2xl sm:text-3xl text-clinicalBlue-800">00</span>
+                                    <span class="block text-[10px] font-sans uppercase tracking-wider text-slate-500 font-bold mt-1">Mins</span>
+                                </div>
+                                <div class="bg-clinicalBlue-50 p-3 rounded-xl border border-clinicalBlue-100">
+                                    <span id="seconds" class="font-display font-black text-2xl sm:text-3xl text-clinicalBlue-800">00</span>
+                                    <span class="block text-[10px] font-sans uppercase tracking-wider text-slate-500 font-bold mt-1">Secs</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Major Changes Announcement Card -->
+                        <div class="max-w-xl mx-auto lg:mx-0">
+                            <div class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-xl relative overflow-hidden">
+                                <div class="absolute -right-12 -bottom-12 w-32 h-32 bg-clinicalBlue-500/10 rounded-full blur-2xl"></div>
+                                <div class="flex items-start gap-4">
+                                    <div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/20">
+                                        <i class="fa-solid fa-gears text-lg"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <h4 class="font-display font-black text-sm text-white uppercase tracking-wider">Major Infrastructure Migration Active</h4>
+                                        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                                            We are executing deep database merges to combine our student centers. High-speed media distribution layers are locked, and final dashboard rendering configurations are being fine-tuned. 
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                                    <span class="text-slate-500">System Sync Telemetry:</span>
+                                    <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
+                                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                        Data Merges Processing
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Telemetry & Mockup Graphic (Right) -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-clinicalBlue-500 to-tealAccent-400 opacity-20 blur-xl"></div>
+                        
+                        <!-- Console Mockup Panel -->
+                        <div class="relative bg-slate-900 rounded-2xl border border-slate-800 text-white shadow-2xl p-6 font-mono text-xs overflow-hidden">
+                            <!-- Window controls -->
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                                    <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                </div>
+                                <span class="text-slate-400 font-display font-medium text-[11px] tracking-wide">allied_rn_integration.sh</span>
+                                <span class="text-tealAccent-400 font-semibold animate-pulse text-[10px]">LIVE SYNC</span>
+                            </div>
+
+                            <!-- Dashboard Telemetry content -->
+                            <div class="space-y-4">
+                                <div>
+                                    <span class="text-tealAccent-400">[CORE STATUS]</span> Synergizing four student hubs:
+                                </div>
+                                
+                                <!-- Core Academy -->
+                                <div class="p-3 bg-slate-800/60 rounded-lg border border-slate-800 space-y-2">
+                                    <div class="flex justify-between items-center text-[11px]">
+                                        <span class="font-semibold text-slate-300">1. RN CoreAcademy™ <span class="text-[9px] text-tealAccent-400 font-normal">Education</span></span>
+                                        <span class="text-emerald-400">Merged 100%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-900 rounded-full h-1.5">
+                                        <div class="bg-gradient-to-r from-tealAccent-500 to-emerald-400 h-1.5 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- BoardShield -->
+                                <div class="p-3 bg-slate-800/60 rounded-lg border border-slate-800 space-y-2">
+                                    <div class="flex justify-between items-center text-[11px]">
+                                        <span class="font-semibold text-slate-300">2. NCLEX BoardShield™ <span class="text-[9px] text-tealAccent-400 font-normal">Testing</span></span>
+                                        <span class="text-emerald-400">Merged 100%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-900 rounded-full h-1.5">
+                                        <div class="bg-gradient-to-r from-tealAccent-500 to-emerald-400 h-1.5 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- MentorHub -->
+                                <div class="p-3 bg-slate-800/60 rounded-lg border border-slate-800 space-y-2">
+                                    <div class="flex justify-between items-center text-[11px]">
+                                        <span class="font-semibold text-slate-300">3. Allied MentorHub™ <span class="text-[9px] text-tealAccent-400 font-normal">Tutoring</span></span>
+                                        <span class="text-emerald-400">Merged 100%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-900 rounded-full h-1.5">
+                                        <div class="bg-gradient-to-r from-tealAccent-500 to-emerald-400 h-1.5 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- PathLabs -->
+                                <div class="p-3 bg-slate-800/60 rounded-lg border border-slate-800 space-y-2">
+                                    <div class="flex justify-between items-center text-[11px]">
+                                        <span class="font-semibold text-slate-300">4. Clinician PathLabs™ <span class="text-[9px] text-amber-400 font-normal">Assignments</span></span>
+                                        <span class="text-amber-400">Optimizing (96%)</span>
+                                    </div>
+                                    <div class="w-full bg-slate-900 rounded-full h-1.5">
+                                        <div class="bg-gradient-to-r from-tealAccent-500 to-amber-400 h-1.5 rounded-full animate-pulse" style="width: 96%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Live Interactive Feature: Clicking compiles modules -->
+                                <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-850 flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">LAST TELEMETRY LOG</span>
+                                        <span id="telemetry-log" class="text-slate-200 text-xs">Allied RN is syncing your combined dashboard...</span>
+                                    </div>
+                                    <button onclick="triggerTelemetryLog()" class="px-2.5 py-1.5 bg-clinicalBlue-600 hover:bg-clinicalBlue-500 active:scale-95 text-white font-semibold rounded text-[10px] flex items-center gap-1 transition-all">
+                                        <i class="fa-solid fa-rotate"></i> Ping Core
+                                    </button>
+                                </div>
+
+                                <div class="text-[10px] text-slate-500 text-center">
+                                    *Combining Tutoring, Lessons, Practice Exams, and Assignments into a unified student database.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- The Vision Section -->
+        <section id="vision" class="py-20 bg-white border-y border-slate-200 scroll-mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="max-w-3xl mx-auto text-center mb-16 space-y-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-clinicalBlue-600 px-3 py-1 bg-clinicalBlue-50 rounded-full">The Synergy Principle</span>
+                    <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-slate-900 tracking-tight">
+                        One Destination. <span class="text-tealAccent-600">Complete Integration.</span>
+                    </h2>
+                    <p class="text-slate-600 text-base leading-relaxed">
+                        Historically, nursing candidates had to jump across multiple applications for tutoring sessions, classroom lectures, mock examinations, and structured study assignments. <strong>We are bringing all four realms under a single unified roof.</strong>
+                    </p>
+                </div>
+
+                <!-- Interactive Comparison Matrix -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- Left Column: Legacy Scattered Way -->
+                    <div class="lg:col-span-5 bg-rose-50/50 rounded-2xl border border-rose-100 p-6 sm:p-8 space-y-6 relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-rose-100 rounded-full blur-2xl opacity-40"></div>
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </span>
+                            <div>
+                                <h4 class="font-display font-bold text-lg text-slate-900">The Scattered Past</h4>
+                                <span class="text-xs text-rose-600 font-semibold uppercase tracking-wider">Four Fragmented Platforms</span>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-4 text-sm text-slate-600">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-xmark text-rose-500 mt-1"></i>
+                                <span>Separate credentials, platforms, and workflows for lectures, tutor scheduling, homework assignments, and exams.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-xmark text-rose-500 mt-1"></i>
+                                <span>No direct performance syncing — tutoring sessions couldn't instantly look up homework results or diagnostic exam errors.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-xmark text-rose-500 mt-1"></i>
+                                <span>Disjointed billing statements, subscription renewals, and administrative confusion.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Middle Column: Interactive Connector Graphic -->
+                    <div class="lg:col-span-2 flex flex-col items-center justify-center py-4 lg:py-0">
+                        <div class="w-12 h-12 rounded-full bg-clinicalBlue-600 text-white flex items-center justify-center font-bold shadow-lg animate-bounce">
+                            <i class="fa-solid fa-angles-right rotate-90 lg:rotate-0"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-clinicalBlue-800 mt-2 uppercase tracking-widest block text-center">Unifying</span>
+                    </div>
+
+                    <!-- Right Column: The New Unified Way -->
+                    <div class="lg:col-span-5 bg-emerald-50/50 rounded-2xl border border-emerald-100 p-6 sm:p-8 space-y-6 relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-100 rounded-full blur-2xl opacity-40"></div>
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </span>
+                            <div>
+                                <h4 class="font-display font-bold text-lg text-slate-900">The Allied RN Combined Suite</h4>
+                                <span class="text-xs text-emerald-600 font-semibold uppercase tracking-wider">One Account, Complete Synergy</span>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-4 text-sm text-slate-600">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Single-Sign-On Master Dashboard:</strong> Jump smoothly between lessons, personalized assignments, practice tests, and coaching calendars.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Cross-Platform Telemetry Sync:</strong> Your adaptive exam results and Case assignments feed directly into your tutor’s diagnostic portal.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Single Flat Pricing:</strong> All 4 learning segments covered in one package rate with zero add-on upsells.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Interactive Integration Highlights Section -->
+        <section id="evolution" class="py-20 bg-slate-50 scroll-mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-tealAccent-600">The Consolidated Pillars</span>
+                    <h2 class="font-display font-black text-3xl sm:text-4xl text-slate-900">Four Elements, One Cohesive Ecosystem</h2>
+                    <p class="text-slate-600 text-sm">Every segment of your nursing prep journey is built to interact with each other in real-time.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Pillar 1: Educational Platform -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md shadow-slate-100 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-clinicalBlue-50 rounded-xl text-clinicalBlue-600 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-graduation-cap text-xl"></i>
+                            </div>
+                            <h4 class="font-display font-bold text-lg text-slate-900 mb-1">RN CoreAcademy™</h4>
+                            <span class="text-[10px] uppercase font-bold text-clinicalBlue-600 tracking-wider block mb-4">Educational Platform</span>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Dive into highly-visual video lectures, concept blueprints, and interactive medical memory grids designed to build clinical judgment.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-full"><i class="fa-solid fa-check"></i> Integration Completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 2: Testing Platform -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md shadow-slate-100 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-tealAccent-50 rounded-xl text-tealAccent-600 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-file-medical text-xl"></i>
+                            </div>
+                            <h4 class="font-display font-bold text-lg text-slate-900 mb-1">NCLEX BoardShield™</h4>
+                            <span class="text-[10px] uppercase font-bold text-tealAccent-600 tracking-wider block mb-4">Testing Platform</span>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Our legendary adaptive examination simulator, hosting over 1,500 board questions, realistic CAT models, and clear analytical reports.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-full"><i class="fa-solid fa-check"></i> Integration Completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 3: Tutoring Center -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md shadow-slate-100 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-amber-50 rounded-xl text-amber-600 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-user-group text-xl"></i>
+                            </div>
+                            <h4 class="font-display font-bold text-lg text-slate-900 mb-1">Allied MentorHub™</h4>
+                            <span class="text-[10px] uppercase font-bold text-amber-700 tracking-wider block mb-4">Tutoring Center</span>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Access private 1-on-1 tutoring schedulers, message active nursing instructors, and access personalized lesson playback archives.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-full"><i class="fa-solid fa-check"></i> Integration Completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 4: Assignment Platform -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md shadow-slate-100 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 bg-purple-50 rounded-xl text-purple-600 flex items-center justify-center mb-6">
+                                <i class="fa-solid fa-list-check text-xl"></i>
+                            </div>
+                            <h4 class="font-display font-bold text-lg text-slate-900 mb-1">Clinician PathLabs™</h4>
+                            <span class="text-[10px] uppercase font-bold text-purple-700 tracking-wider block mb-4">Assignment Platform</span>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Daily interactive homework cards, clinical logic assignments, and dynamic drug-dosage calculations mapped to your syllabus.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wider bg-amber-50 px-2 py-1 rounded-full"><i class="fa-solid fa-rotate animate-spin"></i> Finalizing Sync</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Interactive Development Progress Tracker -->
+        <section id="tracker" class="py-20 bg-clinicalBlue-950 text-white scroll-mt-20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-clinicalBlue-900 to-clinicalBlue-950"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 bg-tealAccent-700/10 rounded-full blur-3xl"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Tracker Content Left -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <span class="text-xs font-bold uppercase tracking-widest text-tealAccent-400">Live Synthesis Telemetry</span>
+                        <h2 class="font-display font-black text-3xl sm:text-4xl">Open Integration Roadmap</h2>
+                        <p class="text-clinicalBlue-200 text-sm leading-relaxed">
+                            Undergoing structural transitions shouldn't leave students guessing. We update our progress status automatically to keep you aligned with every launch checkpoint.
+                        </p>
+                        <div class="bg-clinicalBlue-900/40 border border-clinicalBlue-800 rounded-xl p-4 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-clinicalBlue-700/60 flex items-center justify-center text-emerald-400 font-bold font-mono">
+                                99%
+                            </div>
+                            <div class="text-xs">
+                                <span class="font-bold block text-white">Overall Integration Progress</span>
+                                <span class="text-slate-400">Database migration complete. Running visual responsive alignment.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tracker Board Grid Right -->
+                    <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        
+                        <!-- Track Card 1 -->
+                        <div class="bg-clinicalBlue-900/60 border border-clinicalBlue-800 p-5 rounded-xl space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-white">RN CoreAcademy™ Lectures</span>
+                                <span class="text-emerald-400 font-mono"><i class="fa-solid fa-circle-check"></i> 100% DONE</span>
+                            </div>
+                            <p class="text-[11px] text-clinicalBlue-200 leading-normal">
+                                Re-encoded and transcoded entire video core library onto the unified CDN structures.
+                            </p>
+                        </div>
+
+                        <!-- Track Card 2 -->
+                        <div class="bg-clinicalBlue-900/60 border border-clinicalBlue-800 p-5 rounded-xl space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-white">BoardShield™ CAT Engines</span>
+                                <span class="text-emerald-400 font-mono"><i class="fa-solid fa-circle-check"></i> 100% DONE</span>
+                            </div>
+                            <p class="text-[11px] text-clinicalBlue-200 leading-normal">
+                                Merged over 10,000 legacy diagnostic test profiles and question banks into the database.
+                            </p>
+                        </div>
+
+                        <!-- Track Card 3 -->
+                        <div class="bg-clinicalBlue-900/60 border border-clinicalBlue-800 p-5 rounded-xl space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-white">Clinician PathLabs™ Sync</span>
+                                <span class="text-amber-400 font-mono"><i class="fa-solid fa-spinner animate-spin"></i> 96% ACTIVE</span>
+                            </div>
+                            <p class="text-[11px] text-clinicalBlue-200 leading-normal">
+                                Building homework analytics telemetry directly into the mentor feedback engine.
+                            </p>
+                        </div>
+
+                        <!-- Track Card 4 -->
+                        <div class="bg-clinicalBlue-900/60 border border-clinicalBlue-800 p-5 rounded-xl space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-white">Allied MentorHub™ Schedulers</span>
+                                <span class="text-emerald-400 font-mono"><i class="fa-solid fa-circle-check"></i> 100% DONE</span>
+                            </div>
+                            <p class="text-[11px] text-clinicalBlue-200 leading-normal">
+                                Synced calendars, appointment modules, and live video channels with student coordinator interfaces.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive NCLEX Micro-Quiz Challenge -->
+        <section id="quiz" class="py-20 bg-white scroll-mt-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6">
+                
+                <div class="text-center mb-12 space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-clinicalBlue-600">The NCLEX Prep Challenge</span>
+                    <h2 class="font-display font-black text-3xl text-slate-900">Are you ready for the boards?</h2>
+                    <p class="text-slate-600 text-sm">
+                        While our engineers bring the final tools online, test your diagnostic thinking skills below. The combined portal will make questions like this second nature.
+                    </p>
+                </div>
+
+                <!-- Interactive Quiz Block -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-md">
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-regular fa-circle-question"></i> Micro Challenge Q#1</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-amber-50 text-amber-800 rounded-full border border-amber-200">Medium Difficulty</span>
+                    </div>
+
+                    <!-- Question text -->
+                    <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 mb-6 leading-relaxed">
+                        A nurse is caring for a patient admitted with acute heart failure who is receiving an intravenous infusion of furosemide. Which clinical finding requires immediate intervention by the healthcare professional?
+                    </h3>
+
+                    <!-- Answers options list -->
+                    <div class="space-y-3">
+                        <button onclick="selectQuizAnswer('A', this)" class="quiz-option w-full p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 hover:border-slate-300 transition-all text-left text-sm font-semibold text-slate-700 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-xs flex items-center justify-center flex-shrink-0 font-bold">A</span>
+                            <span>Hourly urine output measurement of 45 mL.</span>
+                        </button>
+
+                        <button onclick="selectQuizAnswer('B', this)" class="quiz-option w-full p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 hover:border-slate-300 transition-all text-left text-sm font-semibold text-slate-700 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-xs flex items-center justify-center flex-shrink-0 font-bold">B</span>
+                            <span>New onset of muscle weakness and irregular cardiac rhythms.</span>
+                        </button>
+
+                        <button onclick="selectQuizAnswer('C', this)" class="quiz-option w-full p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 hover:border-slate-300 transition-all text-left text-sm font-semibold text-slate-700 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-xs flex items-center justify-center flex-shrink-0 font-bold">C</span>
+                            <span>A serum sodium level reading of 136 mEq/L.</span>
+                        </button>
+
+                        <button onclick="selectQuizAnswer('D', this)" class="quiz-option w-full p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 hover:border-slate-300 transition-all text-left text-sm font-semibold text-slate-700 flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-xs flex items-center justify-center flex-shrink-0 font-bold">D</span>
+                            <span>Orthostatic blood pressure drop of 8 mmHg upon rising.</span>
+                        </button>
+                    </div>
+
+                    <!-- Evaluation Banner (Hidden initially) -->
+                    <div id="quiz-response" class="hidden mt-6 p-4 rounded-xl text-xs font-medium border"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Interactive Transition FAQ Section -->
+        <section id="faq" class="py-20 bg-white border-t border-slate-200 scroll-mt-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6">
+                
+                <div class="text-center mb-16 space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-widest text-clinicalBlue-600">Addressing Your Questions</span>
+                    <h2 class="font-display font-black text-3xl text-slate-900">Transition & Consolidation FAQ</h2>
+                    <p class="text-slate-600 text-sm">We are fully dedicated to support transparency during this upgrade window.</p>
+                </div>
+
+                <div class="space-y-4">
+                    
+                    <!-- FAQ 1 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-300 bg-slate-50">
+                        <button onclick="toggleFaq(1)" class="w-full flex items-center justify-between p-5 text-left font-bold text-slate-950 font-display text-sm sm:text-base focus:outline-none">
+                            <span>Why is Allied RN Prep combining its tools?</span>
+                            <span id="faq-icon-1" class="text-clinicalBlue-600 transition-transform duration-300"><i class="fa-solid fa-plus"></i></span>
+                        </button>
+                        <div id="faq-content-1" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                                Previously, nursing candidates had to split their energy across separate applications for tutoring, assignments, tests, and lectures. Combining all four into an interconnected hub lets us offer shared telemetry, a much better user experience, and one unified subscription rate.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-300 bg-slate-50">
+                        <button onclick="toggleFaq(2)" class="w-full flex items-center justify-between p-5 text-left font-bold text-slate-950 font-display text-sm sm:text-base focus:outline-none">
+                            <span>I am an existing user. Will my historical course progress remain safe?</span>
+                            <span id="faq-icon-2" class="text-clinicalBlue-600 transition-transform duration-300"><i class="fa-solid fa-plus"></i></span>
+                        </button>
+                        <div id="faq-content-2" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                                Absolutely. Our system engineers have securely migrated all student history databases. When the combined dashboard launches, your login will carry forward with zero interruption.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-300 bg-slate-50">
+                        <button onclick="toggleFaq(3)" class="w-full flex items-center justify-between p-5 text-left font-bold text-slate-950 font-display text-sm sm:text-base focus:outline-none">
+                            <span>When will the new combined platform go live?</span>
+                            <span id="faq-icon-3" class="text-clinicalBlue-600 transition-transform duration-300"><i class="fa-solid fa-plus"></i></span>
+                        </button>
+                        <div id="faq-content-3" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                                We are running visual alignment and security testing protocols now. The platform is scheduled for release in exactly 5 days. Existing subscribers will receive instructions for portal access directly at login.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden transition-all duration-300 bg-slate-50">
+                        <button onclick="toggleFaq(4)" class="w-full flex items-center justify-between p-5 text-left font-bold text-slate-950 font-display text-sm sm:text-base focus:outline-none">
+                            <span>How will the pricing change? Will it cost more?</span>
+                            <span id="faq-icon-4" class="text-clinicalBlue-600 transition-transform duration-300"><i class="fa-solid fa-plus"></i></span>
+                        </button>
+                        <div id="faq-content-4" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <p class="p-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-200 bg-white">
+                                We are simplifying options! Instead of paying separate fees for private tutoring, lecture portals, practice question databases, and homework checkers, you get total access for one package rate. Active subscribers in transition will receive complete legacy protection.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Dynamic Final Announcement Section (No Email Link) -->
+        <section class="py-16 bg-gradient-to-tr from-clinicalBlue-900 to-clinicalBlue-950 text-white relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+            <div class="relative max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-lg shadow-amber-900/40">
+                    <i class="fa-solid fa-hourglass-half text-2xl animate-spin" style="animation-duration: 4s;"></i>
+                </div>
+                <h2 class="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-tight">The Countdown is On</h2>
+                <p class="text-clinicalBlue-200 text-sm sm:text-base max-w-2xl mx-auto font-medium">
+                    No action is required from existing users. Your historical study profiles, diagnostic metrics, and schedule configurations are fully secured in our upgraded database. Standby for the grand rollout.
+                </p>
+                <div class="pt-4">
+                    <a href="#tracker" class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 px-8 py-4 rounded-xl font-bold transition-all transform hover:-translate-y-0.5 shadow-xl shadow-amber-950/50">
+                        Monitor Integration Telemetry
+                        <i class="fa-solid fa-arrow-down text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Brand Footer -->
+    <footer class="bg-slate-950 text-slate-400 border-t border-slate-900 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-10 mb-12">
+            
+            <!-- Brand Column -->
+            <div class="md:col-span-4 space-y-4">
+                <a href="#" class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-clinicalBlue-600 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-user-nurse"></i>
+                    </div>
+                    <span class="font-display font-black text-lg text-white">Allied RN <span class="text-tealAccent-500">Prep</span></span>
+                </a>
+                <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                    Helping the future generation of nursing professionals pass their exams with confidence. Currently transitioning our separate tools into a unified preparatory ecosystem.
+                </p>
+                <div class="flex items-center gap-4 text-slate-400">
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-x-twitter text-sm"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-linkedin-in text-sm"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-instagram text-sm"></i></a>
+                </div>
+            </div>
+
+            <!-- Platform Columns -->
+            <div class="md:col-span-4 space-y-4">
+                <h5 class="text-white font-bold text-xs uppercase tracking-wider">The Integration Project</h5>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#vision" class="hover:text-white transition-colors">Our Synergy Vision</a></li>
+                    <li><a href="#evolution" class="hover:text-white transition-colors">The Four Core Pillars</a></li>
+                    <li><a href="#tracker" class="hover:text-white transition-colors">Integration Status Tracker</a></li>
+                    <li><a href="#quiz" class="hover:text-white transition-colors">Micro Clinical Challenge</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Support (No emails listed) -->
+            <div class="md:col-span-4 space-y-4">
+                <h5 class="text-white font-bold text-xs uppercase tracking-wider">Student Support Line</h5>
+                <p class="text-xs text-slate-400">
+                    For system login credentials or transitional assistance, our customer support phone networks remain active.
+                </p>
+                <div class="text-xs font-semibold text-white space-y-2">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-phone text-clinicalBlue-400 text-sm"></i>
+                        <span>(800) 555-RN-PREP</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-500 font-normal">
+                        <i class="fa-solid fa-clock text-sm"></i>
+                        <span>Mon-Fri: 9AM - 5PM EST</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-900 pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-4">
+            <span>&copy; 2026 Allied RN Prep. All rights reserved. Registered transition mode.</span>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-white transition-colors">Subscriber Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors">Terms of Services</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Web Interactions Script -->
+    <script>
+        // ----------------- Interactive Countdown Timer (Set to 5 days) -----------------
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 5); 
+
+        function updateCountdown() {
+            const now = new Date();
+            const difference = targetDate - now;
+
+            if (difference <= 0) {
+                document.getElementById('days').innerText = "00";
+                document.getElementById('hours').innerText = "00";
+                document.getElementById('minutes').innerText = "00";
+                document.getElementById('seconds').innerText = "00";
+                return;
+            }
+
+            const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ----------------- Interactive FAQ Accordions -----------------
+        function toggleFaq(id) {
+            const content = document.getElementById(`faq-content-${id}`);
+            const icon = document.getElementById(`faq-icon-${id}`);
+            
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+                icon.innerHTML = '<i class="fa-solid fa-plus"></i>';
+            } else {
+                // Close other faqs first
+                for (let i = 1; i <= 4; i++) {
+                    const otherContent = document.getElementById(`faq-content-${i}`);
+                    const otherIcon = document.getElementById(`faq-icon-${i}`);
+                    if (otherContent) {
+                        otherContent.style.maxHeight = '0px';
+                        otherIcon.style.transform = 'rotate(0deg)';
+                        otherIcon.innerHTML = '<i class="fa-solid fa-plus"></i>';
+                    }
+                }
+                
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(45deg)';
+                icon.innerHTML = '<i class="fa-solid fa-plus"></i>';
+            }
+        }
+
+        // ----------------- Interactive Telemetry Simulator -----------------
+        const telemetryLogs = [
+            "Syncing Allied MentorHub™ session scheduler and tutor database...",
+            "Encrypting previous lesson metrics on RN CoreAcademy™...",
+            "Assembling adaptive randomized questions on NCLEX BoardShield™...",
+            "Formatting interactive nursing cases inside Clinician PathLabs™...",
+            "Aligning diagnostic analytics across tutor boards...",
+            "Establishing lightning-fast media delivery networks..."
+        ];
+
+        function triggerTelemetryLog() {
+            const logElement = document.getElementById('telemetry-log');
+            const randomIndex = Math.floor(Math.random() * telemetryLogs.length);
+            logElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                logElement.innerText = telemetryLogs[randomIndex];
+                logElement.style.opacity = '1';
+            }, 200);
+        }
+
+        // ----------------- Interactive NCLEX Challenge Quiz -----------------
+        function selectQuizAnswer(answer, buttonElement) {
+            // Remove selection styles from all options
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('border-clinicalBlue-500', 'bg-clinicalBlue-50/50', 'ring-2', 'ring-clinicalBlue-200');
+                opt.classList.add('bg-white', 'border-slate-200');
+            });
+
+            // Highlight chosen option
+            buttonElement.classList.remove('bg-white', 'border-slate-200');
+            buttonElement.classList.add('border-clinicalBlue-500', 'bg-clinicalBlue-50/50', 'ring-2', 'ring-clinicalBlue-200');
+
+            // Evaluate answer
+            const responseBanner = document.getElementById('quiz-response');
+            responseBanner.classList.remove('hidden');
+
+            if (answer === 'B') {
+                responseBanner.className = "mt-6 p-5 rounded-xl text-xs font-medium border bg-emerald-50 border-emerald-200 text-emerald-900 space-y-2";
+                responseBanner.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> Correct Assessment!
+                    </div>
+                    <p class="leading-relaxed font-sans">
+                        Furosemide is a potent loop diuretic that causes extensive renal potassium excretion. New onset muscle weakness and irregular cardiac rhythms point directly to acute hypokalemia, a critical cardiotoxic emergency that demands immediate intervention.
+                    </p>
+                `;
+            } else {
+                responseBanner.className = "mt-6 p-5 rounded-xl text-xs font-medium border bg-rose-50 border-rose-200 text-rose-900 space-y-2";
+                responseBanner.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <i class="fa-solid fa-circle-xmark text-rose-600"></i> Incorrect Choice
+                    </div>
+                    <p class="leading-relaxed font-sans">
+                        Although this finding requires observation, it is not the most immediate clinical threat. Severe hypokalemia (indicated by choice B's muscle weakness and cardiac rhythm distress) presents life-threatening ventricular arrhythmia risks. Choose another option to test your skills!
+                    </p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
