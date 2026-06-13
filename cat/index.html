@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full NGN CAT Simulator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <style>
+        /* Custom styles for animations and SVG charts */
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <div id="app" class="min-h-screen flex flex-col"></div>
+
+    <!-- Custom Modal Container (Hidden by default) -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center animate-fade-in">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 border border-slate-200">
+            <h3 id="modal-title" class="text-xl font-bold text-slate-800 mb-2">Confirm Action</h3>
+            <p id="modal-message" class="text-slate-600 mb-6">Are you sure you want to proceed?</p>
+            <div class="flex justify-end gap-3">
+                <button id="modal-cancel" class="px-4 py-2 rounded-lg font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+                <button id="modal-confirm" class="px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- APP STATE ---
+        const AppState = {
+            view: 'dashboard', // 'dashboard', 'exam', 'results'
+            examSession: null,
+            pastExams: [],
+            timerInterval: null,
+            isBankLoaded: false,
+            bankLoadError: null
+        };
+
+        // Configuration: URL to your question bank hosted in the same GitHub container/repo
+        const QUESTION_BANK_URL = './questions.json';
+
+        // --- QUESTION BANK STATE ---
+        let FULL_QUESTION_BANK = [];
+
+        async function loadQuestionBank() {
+            try {
+                // Fetch the external JSON file from the local server/github container
+                const response = await fetch(QUESTION_BANK_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                FULL_QUESTION_BANK = data;
+                AppState.isBankLoaded = true;
+                renderApp();
+            } catch (e) {
+                console.error("Failed to load question bank:", e);
+                AppState.bankLoadError = `Failed to load questions. Ensure '${QUESTION_BANK_URL}' is uploaded to your GitHub repository.`;
+                renderApp();
+            }
+        }
+
+        // --- STREAMING_CHUNK:Defining Algorithm Math... ---
+        const calculateProbability = (ability, difficulty) => {
+          const exponent = ability - difficulty;
+          return Math.exp(exponent) / (1 + Math.exp(exponent));
+        };
+
+        const updateAbility = (currentAbility, difficulty, isCorrect) => {
+          const probCorrect = calculateProbability(currentAbility, difficulty);
+          const stepSize = 0.5; // Learning rate
+          if (isCorrect) {
+            return currentAbility + (stepSize * (1 - probCorrect));
+          } else {
+            return currentAbility - (stepSize * probCorrect);
+          }
+        };
+
+        const selectNextQuestion = (ability, askedIds) => {
+          const available = FULL_QUESTION_BANK.filter(q => !askedIds.includes(q.id));
+          if (available.length === 0) return null;
+
+          let bestQuestion = available[0];
+          let minDifference = Math.abs(available[0].difficulty - ability);
+
+          for (let i = 1; i < available.length; i++) {
+            const diff = Math.abs(available[i].difficulty - ability);
+            if (diff < minDifference) {
+              minDifference = diff;
+              bestQuestion = available[i];
+            }
+          }
+          return bestQuestion;
+        };
+
+        // --- STREAMING_CHUNK:Defining Custom Modal Logic... ---
+        function confirmAction(title, message, onConfirm) {
+            const modal = document.getElementById('modal-backdrop');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            
+            const cancelBtn = document.getElementById('modal-cancel');
+            const confirmBtn = document.getElementById('modal-confirm');
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                cancelBtn.removeEventListener('click', closeAndCancel);
+                confirmBtn.removeEventListener('click', closeAndConfirm);
+            };
+
+            const closeAndCancel = () => closeModal();
+            const closeAndConfirm = () => {
+                closeModal();
+                onConfirm();
+            };
+
+            cancelBtn.addEventListener('click', closeAndCancel);
+            confirmBtn.addEventListener('click', closeAndConfirm);
+
+            modal.classList.remove('hidden');
+        }
+
+        // --- STREAMING_CHUNK:Defining Exam State Controllers... ---
+        function startNewExam() {
+            AppState.examSession = {
+                questionsAsked: [],
+                history: [],
+                currentAbility: 0.0,
+                standardError: STARTING_SE,
+                startTime: new Date(),
+                status: 'in-progress',
+                currentQuestion: selectNextQuestion(0.0, []),
+                selectedAnswers: [],
+                timeRemaining: 5 * 60 * 60, // 5 hours
+            };
+            AppState.view = 'exam';
+            renderApp();
+            
+            if (AppState.timerInterval) clearInterval(AppState.timerInterval);
+            AppState.timerInterval = setInterval(timerTick, 1000);
+        }
+
+        function timerTick() {
+            if (AppState.view !== 'exam' || !AppState.examSession || AppState.examSession.status !== 'in-progress') {
+                clearInterval(AppState.timerInterval);
+                return;
+            }
+
+            AppState.examSession.timeRemaining -= 1;
+            
+            if (AppState.examSession.timeRemaining <= 0) {
+                clearInterval(AppState.timerInterval);
+                const isPass = AppState.examSession.currentAbility > 0;
+                finishExam(isPass ? 'pass' : 'fail');
+                return;
+            }
+
+            // Update UI timer without re-rendering everything
+            const timerEl = document.getElementById('exam-timer');
+            if (timerEl) {
+                timerEl.innerText = formatTime(AppState.examSession.timeRemaining);
+            }
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${h > 0 ? h + ':' : ''}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function toggleAnswer(index) {
+            const q = AppState.examSession.currentQuestion;
+            if (q.type === 'mc') {
+                AppState.examSession.selectedAnswers = [index];
+            } else {
+                const current = AppState.examSession.selectedAnswers;
+                if (current.includes(index)) {
+                    AppState.examSession.selectedAnswers = current.filter(i => i !== index);
+                } else {
+                    AppState.examSession.selectedAnswers.push(index);
+                }
+            }
+            renderExamOptions(); // Only re-render options
+        }
+
+        function handleNextQuestion() {
+            const session = AppState.examSession;
+            if (!session.currentQuestion || session.selectedAnswers.length === 0) return;
+
+            const q = session.currentQuestion;
+            const userAnswers = [...session.selectedAnswers].sort();
+            const correctAnswers = [...q.correct].sort();
+            
+            const isCorrect = JSON.stringify(userAnswers) === JSON.stringify(correctAnswers);
+
+            const newAbility = updateAbility(session.currentAbility, q.difficulty, isCorrect);
+            // Slower SE decay for 85-150 question exam
+            const newSE = Math.max(0.15, session.standardError - 0.008); 
+
+            session.history.push({
+                qId: q.id,
+                difficulty: q.difficulty,
+                isCorrect: isCorrect,
+                abilityAfter: newAbility,
+                category: q.category
+            });
+            session.questionsAsked.push(q.id);
+            session.currentAbility = newAbility;
+            session.standardError = newSE;
+
+            // Check stopping rules
+            let examComplete = false;
+            let finalStatus = 'in-progress';
+
+            if (session.questionsAsked.length >= MIN_QUESTIONS) {
+                if (newAbility - newSE > PASS_LOGIT_THRESHOLD) {
+                    examComplete = true;
+                    finalStatus = 'pass';
+                } else if (newAbility + newSE < FAIL_LOGIT_THRESHOLD) {
+                    examComplete = true;
+                    finalStatus = 'fail';
+                }
+            }
+
+            if (session.questionsAsked.length >= MAX_QUESTIONS || session.questionsAsked.length >= FULL_QUESTION_BANK.length) {
+                examComplete = true;
+                finalStatus = newAbility > 0 ? 'pass' : 'fail';
+            }
+
+            if (examComplete) {
+                finishExam(finalStatus);
+            } else {
+                session.currentQuestion = selectNextQuestion(newAbility, session.questionsAsked);
+                session.selectedAnswers = [];
+                renderApp();
+            }
+        }
+
+        function finishExam(status) {
+            AppState.examSession.status = status;
+            AppState.examSession.endTime = new Date();
+            AppState.pastExams.unshift(AppState.examSession); // Add to history
+            AppState.view = 'results';
+            clearInterval(AppState.timerInterval);
+            renderApp();
+        }
+
+        function exitExam() {
+            confirmAction(
+                "End Exam Early?", 
+                "Are you sure you want to exit? Your progress will be lost and this will not count as a completed attempt.",
+                () => {
+                    AppState.view = 'dashboard';
+                    clearInterval(AppState.timerInterval);
+                    AppState.examSession = null;
+                    renderApp();
+                }
+            );
+        }
+
+        function goToDashboard() {
+            AppState.view = 'dashboard';
+            renderApp();
+        }
+
+        // --- STREAMING_CHUNK:Rendering Dashboard View... ---
+        function renderDashboard() {
+            let historyHTML = '';
+            if (AppState.pastExams.length === 0) {
+                historyHTML = `<div class="text-center py-8 text-slate-400 text-sm">No exams completed yet.</div>`;
+            } else {
+                historyHTML = `<div class="space-y-3">` + AppState.pastExams.map((exam, idx) => `
+                    <button onclick="viewPastResult(${idx})" class="w-full text-left bg-slate-50 hover:bg-slate-100 p-3 rounded border border-slate-200 flex justify-between items-center transition-colors">
+                        <div>
+                            <p class="font-medium text-slate-800 flex items-center gap-2">
+                                <i data-feather="${exam.status === 'pass' ? 'check-circle' : 'x-circle'}" class="${exam.status === 'pass' ? 'text-emerald-500' : 'text-rose-500'} w-4 h-4"></i>
+                                ${exam.status.toUpperCase()}
+                            </p>
+                            <p class="text-xs text-slate-500">${exam.questionsAsked.length} Qs • ${exam.endTime.toLocaleDateString()}</p>
+                        </div>
+                        <i data-feather="chevron-right" class="text-slate-400 w-4 h-4"></i>
+                    </button>
+                `).join('') + `</div>`;
+            }
+
+            // Determine button and bank status based on fetch state
+            let startButtonHtml = '';
+            let bankStatusHtml = '';
+
+            if (AppState.bankLoadError) {
+                startButtonHtml = `<button disabled class="bg-rose-400 text-white px-8 py-3 rounded-lg font-medium text-lg cursor-not-allowed shadow-sm">Bank Error</button>`;
+                bankStatusHtml = `<p class="text-rose-600 font-semibold text-sm mt-2">${AppState.bankLoadError}</p>`;
+            } else if (!AppState.isBankLoaded) {
+                startButtonHtml = `<button disabled class="bg-slate-400 text-white px-8 py-3 rounded-lg font-medium text-lg cursor-not-allowed shadow-sm flex items-center justify-center gap-2 mx-auto">
+                    <i data-feather="loader" class="animate-spin w-5 h-5"></i> Loading Bank...
+                </button>`;
+                bankStatusHtml = `<p class="text-xl font-semibold text-slate-800 flex items-center gap-2"><i data-feather="loader" class="animate-spin w-4 h-4"></i> Connecting...</p>`;
+            } else {
+                startButtonHtml = `<button onclick="startNewExam()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium text-lg transition-colors shadow-sm">
+                                Start Adaptive Exam
+                            </button>`;
+                bankStatusHtml = `<p class="text-xl font-semibold text-slate-800">${FULL_QUESTION_BANK.length} Calibrated Items</p>`;
+            }
+
+            return `
+            <div class="max-w-6xl mx-auto p-6 animate-fade-in w-full flex-grow">
+                <header class="flex items-center justify-between border-b pb-6 mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-2">
+                            <i data-feather="activity" class="text-blue-600 w-8 h-8"></i>
+                            Apex CAT Engine
+                        </h1>
+                        <p class="text-slate-500 mt-1">Adaptive NCLEX-RN Simulation Suite (NGN Standard)</p>
+                    </div>
+                </header>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 space-y-6">
+                        <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center">
+                            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                                <i data-feather="play" class="w-8 h-8 fill-current"></i>
+                            </div>
+                            <h2 class="text-2xl font-semibold mb-2">Simulate NCLEX-RN</h2>
+                            <p class="text-slate-600 mb-6 max-w-md">
+                                Experience a true Computer Adaptive Test. The engine continuously calibrates difficulty, requiring 85 to 150 items to determine competency.
+                            </p>
+                            ${startButtonHtml}
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <i data-feather="bar-chart-2" class="w-5 h-5"></i> Algorithm Status
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <p class="text-slate-500">Item Bank Size</p>
+                                    ${bankStatusHtml}
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <p class="text-slate-500">CAT Engine Logic</p>
+                                    <p class="text-xl font-semibold text-slate-800">Rasch/IRT Model Active</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <i data-feather="file-text" class="w-5 h-5"></i> Recent Results
+                            </h3>
+                            ${historyHTML}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function viewPastResult(index) {
+            AppState.examSession = AppState.pastExams[index];
+            AppState.view = 'results';
+            renderApp();
+        }
+
+        // --- STREAMING_CHUNK:Rendering Exam View... ---
+        function getExamLayout() {
+            const session = AppState.examSession;
+            return `
+            <div class="min-h-screen bg-[#f0f4f8] flex flex-col font-sans w-full animate-fade-in">
+                <!-- Pearson Vue-style header -->
+                <header class="bg-[#1e293b] text-white p-4 flex justify-between items-center shadow-md">
+                    <div class="flex gap-6 items-center">
+                        <span class="font-semibold tracking-wide flex items-center gap-2">
+                            <i data-feather="activity" class="w-5 h-5"></i> NCLEX-RN Simulation
+                        </span>
+                        <span class="text-slate-300 text-sm">Question ${session.questionsAsked.length + 1} of Max ${MAX_QUESTIONS}</span>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-2 text-slate-300 font-mono">
+                            <i data-feather="clock" class="w-4 h-4"></i>
+                            <span id="exam-timer">${formatTime(session.timeRemaining)}</span>
+                        </div>
+                        <button onclick="exitExam()" class="text-slate-400 hover:text-white text-sm transition-colors">
+                            End Exam
+                        </button>
+                    </div>
+                </header>
+
+                <main class="flex-grow flex justify-center items-start pt-10 px-4">
+                    <div class="bg-white w-full max-w-4xl rounded shadow-lg overflow-hidden border border-slate-200">
+                        <!-- Question Area -->
+                        <div class="p-8 md:p-12">
+                            <div class="mb-8">
+                                <h2 id="question-text" class="text-xl text-slate-800 leading-relaxed font-medium"></h2>
+                                <p id="sata-indicator" class="text-sm font-semibold text-blue-700 mt-3 bg-blue-50 inline-block px-3 py-1 rounded hidden">
+                                    Select all that apply.
+                                </p>
+                            </div>
+
+                            <!-- Options Container -->
+                            <div id="options-container" class="space-y-3"></div>
+                        </div>
+
+                        <!-- Footer / Controls -->
+                        <div class="bg-slate-100 p-4 border-t border-slate-200 flex justify-end">
+                            <button id="next-btn" onclick="handleNextQuestion()" disabled class="px-8 py-3 rounded font-medium shadow-sm transition-colors flex items-center gap-2 bg-slate-300 text-slate-500 cursor-not-allowed">
+                                Next <i data-feather="chevron-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            `;
+        }
+
+        function renderExamOptions() {
+            const session = AppState.examSession;
+            if (!session || !session.currentQuestion) return;
+
+            const q = session.currentQuestion;
+            const isSATA = q.type === 'sata';
+            const container = document.getElementById('options-container');
+            const qText = document.getElementById('question-text');
+            const sataInd = document.getElementById('sata-indicator');
+            const nextBtn = document.getElementById('next-btn');
+
+            if(!container) return; // Not in exam view
+
+            qText.innerText = q.text;
+            if (isSATA) sataInd.classList.remove('hidden');
+            else sataInd.classList.add('hidden');
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                const isSelected = session.selectedAnswers.includes(idx);
+                const borderClass = isSelected ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50';
+                const boxClass = isSelected ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-400 bg-white';
+                const shapeClass = isSATA ? 'rounded-sm' : 'rounded-full';
+                
+                let iconHTML = '';
+                if (isSelected) {
+                    iconHTML = isSATA ? `<i data-feather="check" class="w-3 h-3"></i>` : `<div class="w-2 h-2 rounded-full bg-white"></div>`;
+                }
+
+                optionsHTML += `
+                    <button onclick="toggleAnswer(${idx})" class="w-full text-left p-4 rounded border transition-all duration-200 flex items-start gap-4 ${borderClass}">
+                        <div class="mt-0.5 w-5 h-5 flex-shrink-0 flex items-center justify-center border ${shapeClass} ${boxClass}">
+                            ${iconHTML}
+                        </div>
+                        <span class="text-slate-700 text-lg">${opt}</span>
+                    </button>
+                `;
+            });
+            container.innerHTML = optionsHTML;
+            feather.replace();
+
+            // Update Next Button
+            const canSubmit = session.selectedAnswers.length > 0;
+            if (canSubmit) {
+                nextBtn.disabled = false;
+                nextBtn.className = "px-8 py-3 rounded font-medium shadow-sm transition-colors flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer";
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.className = "px-8 py-3 rounded font-medium shadow-sm transition-colors flex items-center gap-2 bg-slate-300 text-slate-500 cursor-not-allowed";
+            }
+        }
+
+        // --- STREAMING_CHUNK:Rendering Results View... ---
+        function renderResults() {
+            const session = AppState.examSession;
+            if (!session) return '';
+
+            const isPass = session.status === 'pass';
+            const totalQ = session.questionsAsked.length;
+
+            const categoryStats = {};
+            session.history.forEach(h => {
+                if (!categoryStats[h.category]) {
+                    categoryStats[h.category] = { total: 0, correct: 0 };
+                }
+                categoryStats[h.category].total++;
+                if (h.isCorrect) categoryStats[h.category].correct++;
+            });
+
+            // SVG Path Generation for Progress Chart
+            const maxX = Math.max(MIN_QUESTIONS, totalQ);
+            const points = session.history.map((h, i) => {
+                const y = 3 - Math.max(-3, Math.min(3, h.abilityAfter));
+                return `${i + 1},${y}`;
+            }).join(' ');
+
+            const circles = session.history.map((h, i) => {
+                const y = 3 - Math.max(-3, Math.min(3, h.abilityAfter));
+                const color = h.isCorrect ? '#10b981' : '#f43f5e';
+                return `<circle cx="${i + 1}" cy="${y}" r="0.8" fill="${color}" />`;
+            }).join('');
+
+            const passThresholdY = 3 - PASS_LOGIT_THRESHOLD;
+
+            let domainsHTML = Object.entries(categoryStats).map(([cat, stats]) => {
+                const pct = Math.round((stats.correct / stats.total) * 100);
+                let status = 'Below Passing Standard';
+                let barColor = 'bg-rose-500';
+                if (pct >= 75) { status = 'Above Passing Standard'; barColor = 'bg-emerald-500'; }
+                else if (pct >= 50) { status = 'Near Passing Standard'; barColor = 'bg-amber-500'; }
+
+                return `
+                    <div class="mb-2">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="font-medium text-slate-700">${cat}</span>
+                            <span class="text-xs font-semibold text-slate-500">${status} (${stats.correct}/${stats.total})</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                            <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="max-w-5xl mx-auto p-6 animate-fade-in w-full">
+                <header class="flex justify-between items-center mb-8 border-b pb-4">
+                    <h1 class="text-2xl font-bold text-slate-800">Candidate Performance Report (CPR)</h1>
+                    <button onclick="goToDashboard()" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium px-4 py-2 rounded bg-blue-50">
+                        <i data-feather="home" class="w-4 h-4"></i> Dashboard
+                    </button>
+                </header>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Main Status -->
+                    <div class="md:col-span-1 space-y-6">
+                        <div class="p-8 rounded-xl shadow-sm text-center border-2 ${isPass ? 'border-emerald-500 bg-emerald-50' : 'border-rose-500 bg-rose-50'}">
+                            <div class="flex justify-center mb-4">
+                                <i data-feather="${isPass ? 'check-circle' : 'x-circle'}" class="w-16 h-16 ${isPass ? 'text-emerald-500' : 'text-rose-500'}"></i>
+                            </div>
+                            <h2 class="text-3xl font-bold mb-2 ${isPass ? 'text-emerald-700' : 'text-rose-700'}">
+                                ${isPass ? 'PASS' : 'FAIL'}
+                            </h2>
+                            <p class="text-slate-600 mb-4 text-sm leading-relaxed">The adaptive algorithm has evaluated your competency level with 95% confidence based on NCSBN models.</p>
+                            <div class="inline-block bg-white px-4 py-2 rounded-lg border shadow-sm text-sm font-mono text-slate-700">
+                                Final Logit Score (θ): ${session.currentAbility.toFixed(2)}
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="font-semibold text-slate-800 mb-4 border-b pb-2">Exam Stats</h3>
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex justify-between"><span class="text-slate-500">Total Items Served:</span> <span class="font-medium text-slate-800">${totalQ}</span></li>
+                                <li class="flex justify-between"><span class="text-slate-500">Min Required:</span> <span class="font-medium text-slate-800">${MIN_QUESTIONS}</span></li>
+                                <li class="flex justify-between"><span class="text-slate-500">Max Limit:</span> <span class="font-medium text-slate-800">${MAX_QUESTIONS}</span></li>
+                                <li class="flex justify-between"><span class="text-slate-500">Duration:</span> <span class="font-medium text-slate-800">${formatTime((5 * 60 * 60) - session.timeRemaining)}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Details & Chart -->
+                    <div class="md:col-span-2 space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-lg font-semibold mb-2 text-slate-800">Adaptive Progress Chart</h3>
+                            <p class="text-sm text-slate-500 mb-6">Visualization of estimated ability (θ). Exam terminated upon reaching required confidence interval boundaries.</p>
+                            
+                            <div class="w-full h-64 bg-slate-50 rounded-lg border border-slate-200 relative p-4 overflow-hidden">
+                                <svg width="100%" height="100%" viewBox="0 0 ${maxX + 2} 6" preserveAspectRatio="none" class="overflow-visible">
+                                    <!-- Grid Lines -->
+                                    <line x1="0" y1="1" x2="${maxX + 2}" y2="1" stroke="#e2e8f0" stroke-width="0.05" />
+                                    <line x1="0" y1="3" x2="${maxX + 2}" y2="3" stroke="#94a3b8" stroke-width="0.05" stroke-dasharray="0.1 0.1" /> 
+                                    <line x1="0" y1="5" x2="${maxX + 2}" y2="5" stroke="#e2e8f0" stroke-width="0.05" />
+                                    
+                                    <!-- Pass Threshold Line -->
+                                    <line x1="0" y1="${passThresholdY}" x2="${maxX + 2}" y2="${passThresholdY}" stroke="#10b981" stroke-width="0.08" stroke-dasharray="0.2 0.2" />
+                                    
+                                    <!-- Ability Path -->
+                                    <polyline fill="none" stroke="#2563eb" stroke-width="0.1" points="${points}" />
+                                    ${circles}
+                                </svg>
+                                <!-- Labels -->
+                                <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+                                    <div class="absolute left-2 top-2 text-xs text-emerald-600 font-semibold bg-white/80 px-1 rounded shadow-sm border border-emerald-100">Pass Threshold</div>
+                                    <div class="absolute left-2 top-1/2 -mt-3 text-xs text-slate-400 bg-white/80 px-1 rounded shadow-sm">Logit 0</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 mt-4 text-xs text-slate-500 justify-center">
+                                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-emerald-500"></div> Correct</span>
+                                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-rose-500"></div> Incorrect</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-lg font-semibold mb-4 text-slate-800 border-b pb-2">Domain Breakdown</h3>
+                            <div class="space-y-4">
+                                ${domainsHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        // --- STREAMING_CHUNK:App Initialization & Routing... ---
+        function renderApp() {
+            const appDiv = document.getElementById('app');
+            
+            if (AppState.view === 'dashboard') {
+                appDiv.innerHTML = renderDashboard();
+            } else if (AppState.view === 'exam') {
+                appDiv.innerHTML = getExamLayout();
+                renderExamOptions();
+            } else if (AppState.view === 'results') {
+                appDiv.innerHTML = renderResults();
+            }
+            
+            // Initialize Icons for the newly injected HTML
+            feather.replace();
+        }
+
+        // Start the application
+        window.onload = () => {
+            renderApp();
+            loadQuestionBank();
+        };
+    </script>
+</body>
+</html>
