@@ -1,0 +1,720 @@
+[
+{
+"id": "q01",
+"type": "mc",
+"category": "Management of Care",
+"difficulty": 2.8,
+"text": "The nurse is receiving report on four clients in the emergency department. Which client should the nurse see first?",
+"options": [
+"A 54-year-old with chronic obstructive pulmonary disease (COPD) and an SpO2 of 89% on room air.",
+"A 22-year-old reporting sudden, severe lower abdominal pain and a positive pregnancy test.",
+"A 68-year-old with heart failure who has gained 3 lbs over the last two days.",
+"A 45-year-old with a closed head injury whose Glasgow Coma Scale (GCS) score changed from 15 to 13."
+],
+"correct": [3]
+},
+{
+"id": "q02",
+"type": "sata",
+"category": "Safety and Infection Control",
+"difficulty": -0.5,
+"text": "A nurse is implementing a fall prevention protocol for an older adult client with a history of falls. Which interventions should the nurse include? (Select all that apply)",
+"options": [
+"Provide the client with nonskid footwear.",
+"Keep the bed in the lowest possible position.",
+"Raise all four bed side rails while the client is sleeping.",
+"Ensure the client's call light is within reach.",
+"Maintain a well-lit environment in the client's room.",
+"Administer a mild sedative at bedtime to ensure uninterrupted sleep."
+],
+"correct": [0, 1, 3, 4]
+},
+{
+"id": "q03",
+"type": "mc",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 1.5,
+"text": "A client is receiving a continuous intravenous infusion of heparin for a deep vein thrombosis. The nurse reviews the client's latest laboratory results and notes an activated partial thromboplastin time (aPTT) of 120 seconds. What is the nurse's priority action?",
+"options": [
+"Document the finding as a therapeutic effect of the medication.",
+"Stop the heparin infusion immediately and notify the healthcare provider.",
+"Administer vitamin K as prescribed by the healthcare provider.",
+"Assess the client for signs of deep vein thrombosis resolution."
+],
+"correct": [1]
+},
+{
+"id": "q04",
+"type": "mc",
+"category": "Physiological Adaptation",
+"difficulty": 2.4,
+"text": "The nurse is caring for a client with a T4 spinal cord injury. The client suddenly reports a severe, throbbing headache, and the nurse notes profuse diaphoresis above the level of injury and a blood pressure of 210/110 mmHg. What is the nurse's immediate action?",
+"options": [
+"Administer PRN acetaminophen for the headache.",
+"Place the client in a supine position.",
+"Check the client's indwelling urinary catheter for kinks.",
+"Elevate the head of the bed to 90 degrees."
+],
+"correct": [3]
+},
+{
+"id": "q05",
+"type": "sata",
+"category": "Management of Care",
+"difficulty": 1.8,
+"text": "The registered nurse (RN) is planning care for a group of clients. Which tasks can the RN safely delegate to the unlicensed assistive personnel (UAP)? (Select all that apply)",
+"options": [
+"Obtaining vital signs on a client who is 2 days post-operative and stable.",
+"Feeding a client who is recovering from a recent stroke with dysphagia.",
+"Measuring and recording the oral fluid intake of a client with heart failure.",
+"Assisting a stable client with a walker to ambulate down the hallway.",
+"Providing discharge instructions regarding wound care."
+],
+"correct": [0, 2, 3]
+},
+{
+"id": "q06",
+"type": "mc",
+"category": "Reduction of Risk Potential",
+"difficulty": 0.5,
+"text": "A conscious client with type 1 diabetes mellitus begins to experience tremors, diaphoresis, and confusion. The nurse checks the capillary blood glucose, which is 52 mg/dL. Which action should the nurse take first?",
+"options": [
+"Administer 1 mg of glucagon intramuscularly.",
+"Provide 15 grams of a fast-acting oral carbohydrate.",
+"Administer 50 mL of 50% dextrose intravenously.",
+"Recheck the blood glucose level in 15 minutes."
+],
+"correct": [1]
+},
+{
+"id": "q07",
+"type": "mc",
+"category": "Psychosocial Integrity",
+"difficulty": 0.2,
+"text": "A client diagnosed with schizophrenia tells the nurse, 'The voices are telling me that I am a bad person and I deserve to be punished.' What is the most therapeutic response by the nurse?",
+"options": [
+"You should ignore those voices because they are not real.",
+"Why do you think the voices are saying those things to you?",
+"I know the voices are real to you, but I do not hear anyone speaking.",
+"Let's focus on the television show that is playing right now."
+],
+"correct": [2]
+},
+{
+"id": "q08",
+"type": "sata",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 2.2,
+"text": "The nurse is providing discharge teaching to a client newly prescribed lisinopril. Which adverse effects should the nurse instruct the client to report immediately to the healthcare provider? (Select all that apply)",
+"options": [
+"A persistent, dry cough.",
+"Swelling of the lips, tongue, or face.",
+"Dizziness when changing positions.",
+"A sudden decrease in urine output.",
+"Constipation and dry mouth."
+],
+"correct": [0, 1, 3]
+},
+{
+"id": "q09",
+"type": "mc",
+"category": "Health Promotion and Maintenance",
+"difficulty": -1.2,
+"text": "The nurse is assessing a 6-month-old infant during a well-child visit. Which developmental milestone does the nurse expect to observe?",
+"options": [
+"The infant pulls to a standing position.",
+"The infant uses a pincer grasp to pick up small objects.",
+"The infant rolls from back to abdomen.",
+"The infant speaks two or three clear words."
+],
+"correct": [2]
+},
+{
+"id": "q10",
+"type": "mc",
+"category": "Basic Care and Comfort",
+"difficulty": -0.8,
+"text": "The nurse is planning care to prevent skin breakdown for a client who is completely immobile. Which intervention is the most effective in preventing pressure injuries?",
+"options": [
+"Massaging reddened bony prominences vigorously every shift.",
+"Repositioning the client at least every 2 hours.",
+"Applying baby powder to keep the client's skin dry.",
+"Using a donut-shaped cushion when the client sits in a chair."
+],
+"correct": [1]
+},
+{
+"id": "q11",
+"type": "mc",
+"category": "Management of Care",
+"difficulty": 2.5,
+"text": "Following a mass casualty incident, the triage nurse assesses four victims. Which client should receive the 'Red Tag' (immediate priority)?",
+"options": [
+"A client with a closed fracture of the right arm and moderate pain.",
+"A client with a large scalp laceration who is alert and walking.",
+"A client with tracheal deviation, severe dyspnea, and absent breath sounds on the right.",
+"A client who is unresponsive with an open skull fracture and agonal respirations."
+],
+"correct": [2]
+},
+{
+"id": "q12",
+"type": "sata",
+"category": "Physiological Adaptation",
+"difficulty": 1.4,
+"text": "A client is admitted to the intensive care unit with a diagnosis of Diabetic Ketoacidosis (DKA). Which clinical manifestations should the nurse expect to find during the assessment? (Select all that apply)",
+"options": [
+"Kussmaul respirations",
+"Fruity breath odor",
+"Hypoglycemia",
+"Bradycardia",
+"Polyuria",
+"Profound dehydration"
+],
+"correct": [0, 1, 4, 5]
+},
+{
+"id": "q13",
+"type": "mc",
+"category": "Safety and Infection Control",
+"difficulty": 0.8,
+"text": "A client is diagnosed with Clostridioides difficile (C. diff) infection. Which infection control measure is required?",
+"options": [
+"Placing the client in a negative-pressure airflow room.",
+"Using alcohol-based hand rub after providing client care.",
+"Washing hands with soap and water after removing gloves.",
+"Wearing an N95 respirator mask when entering the client's room."
+],
+"correct": [2]
+},
+{
+"id": "q14",
+"type": "mc",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 1.7,
+"text": "A client is taking phenelzine, a monoamine oxidase inhibitor (MAOI). The nurse knows that dietary teaching has been effective when the client chooses which meal?",
+"options": [
+"Pepperoni pizza with aged parmesan cheese.",
+"Smoked salmon with a side of sauerkraut.",
+"Roast chicken with mashed potatoes and green beans.",
+"A charcuterie board with cured meats and a glass of red wine."
+],
+"correct": [2]
+},
+{
+"id": "q15",
+"type": "sata",
+"category": "Management of Care",
+"difficulty": 2.0,
+"text": "Which tasks fall within the scope of practice for a Licensed Practical Nurse (LPN) and can be delegated by the Registered Nurse (RN)? (Select all that apply)",
+"options": [
+"Administering oral pain medications to a stable client.",
+"Performing the initial admission assessment for a newly admitted client.",
+"Inserting an indwelling urinary catheter.",
+"Developing a nursing care plan.",
+"Performing a sterile dressing change on an uninfected surgical wound."
+],
+"correct": [0, 2, 4]
+},
+{
+"id": "q16",
+"type": "mc",
+"category": "Physiological Adaptation",
+"difficulty": 2.7,
+"text": "A client in the cardiac telemetry unit goes into ventricular fibrillation. The nurse verifies the rhythm and determines the client is pulseless and unresponsive. What is the priority intervention?",
+"options": [
+"Administer 1 mg of epinephrine intravenously.",
+"Immediately defibrillate the client.",
+"Initiate high-quality cardiopulmonary resuscitation (CPR).",
+"Establish a secure, patent airway."
+],
+"correct": [2]
+},
+{
+"id": "q17",
+"type": "mc",
+"category": "Reduction of Risk Potential",
+"difficulty": 1.2,
+"text": "A client has just undergone a bedside thoracentesis. Which assessment finding requires immediate notification of the healthcare provider?",
+"options": [
+"The client reports mild pain at the puncture site.",
+"The client has a respiratory rate of 20 breaths per minute.",
+"The client exhibits asymmetrical chest expansion and diminished breath sounds on the affected side.",
+"The client's oxygen saturation increases from 92% to 96% on room air."
+],
+"correct": [2]
+},
+{
+"id": "q18",
+"type": "sata",
+"category": "Health Promotion and Maintenance",
+"difficulty": 0.5,
+"text": "A nurse is teaching a pregnant client in her third trimester about signs of complications that must be reported to the provider immediately. Which symptoms should the nurse include? (Select all that apply)",
+"options": [
+"Frequent urination",
+"Severe, continuous headache",
+"Vaginal bleeding",
+"Visual disturbances or blurred vision",
+"Mild ankle edema at the end of the day",
+"Sudden, severe abdominal pain"
+],
+"correct": [1, 2, 3, 5]
+},
+{
+"id": "q19",
+"type": "mc",
+"category": "Psychosocial Integrity",
+"difficulty": 1.0,
+"text": "A client with bipolar disorder is experiencing an acute manic episode. The client is pacing the hallways, talking rapidly, and unable to sit down for meals. Which dietary intervention is most appropriate?",
+"options": [
+"Provide three large, structured meals a day in the dining room.",
+"Offer high-calorie, portable finger foods and protein shakes.",
+"Restrict the client's food intake until they can sit still at the table.",
+"Provide a low-carbohydrate, low-protein diet to decrease energy levels."
+],
+"correct": [1]
+},
+{
+"id": "q20",
+"type": "mc",
+"category": "Basic Care and Comfort",
+"difficulty": 0.4,
+"text": "A nurse is preparing to administer an intermittent enteral feeding through a nasogastric (NG) tube. To prevent aspiration, what must the nurse do first?",
+"options": [
+"Flush the tube with 30 mL of sterile water.",
+"Administer the feeding at a rapid rate.",
+"Check the client's gastric residual volume and tube placement.",
+"Position the client flat in bed."
+],
+"correct": [2]
+},
+{
+"id": "q21",
+"type": "mc",
+"category": "Management of Care",
+"difficulty": 2.9,
+"text": "The nurse is caring for four postoperative clients. Which client assessment requires the most immediate intervention by the nurse?",
+"options": [
+"A client who is 12 hours post-op reporting pain as 7 on a 0-10 scale.",
+"A client who is 2 days post-op with a temperature of 100.1°F (37.8°C).",
+"A client who is 4 hours post-op reporting sudden restlessness, with a heart rate of 120 bpm and a dropping blood pressure.",
+"A client who is 24 hours post-op and has not yet had a bowel movement."
+],
+"correct": [2]
+},
+{
+"id": "q22",
+"type": "sata",
+"category": "Safety and Infection Control",
+"difficulty": 1.1,
+"text": "A nurse is initiating seizure precautions for a newly admitted client with a history of epilepsy. Which items must the nurse ensure are placed in the client's room? (Select all that apply)",
+"options": [
+"Padded tongue blade",
+"Functioning suction equipment",
+"Supplemental oxygen setup",
+"Restraint alternatives",
+"Padded side rails"
+],
+"correct": [1, 2, 4]
+},
+{
+"id": "q23",
+"type": "mc",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 0.9,
+"text": "A client is being discharged on warfarin therapy for atrial fibrillation. The nurse instructs the client to maintain a consistent intake of which nutrient to avoid fluctuations in the drug's effectiveness?",
+"options": [
+"Potassium",
+"Calcium",
+"Vitamin K",
+"Iron"
+],
+"correct": [2]
+},
+{
+"id": "q24",
+"type": "mc",
+"category": "Physiological Adaptation",
+"difficulty": 2.3,
+"text": "A client is admitted with increased intracranial pressure (ICP) following a head injury. Which nursing intervention is crucial to prevent further increases in ICP?",
+"options": [
+"Encourage the client to cough forcefully to clear secretions.",
+"Maintain the client's head and neck in a neutral, midline position.",
+"Cluster all nursing care activities together to provide long rest periods.",
+"Keep the head of the bed flat at all times."
+],
+"correct": [1]
+},
+{
+"id": "q25",
+"type": "sata",
+"category": "Reduction of Risk Potential",
+"difficulty": 1.5,
+"text": "A nurse is caring for a client with advanced cirrhosis and massive ascites. Which interventions should the nurse include in the client's plan of care? (Select all that apply)",
+"options": [
+"Implement a strict fluid restriction as prescribed.",
+"Position the client flat to improve breathing.",
+"Measure and record abdominal girth daily.",
+"Provide a high-sodium diet to replace lost electrolytes.",
+"Obtain the client's daily weight using the same scale."
+],
+"correct": [0, 2, 4]
+},
+{
+"id": "q26",
+"type": "mc",
+"category": "Health Promotion and Maintenance",
+"difficulty": -0.5,
+"text": "A nurse is educating a premenopausal woman on breast self-examination (BSE). What is the optimal time of the month for the client to perform a BSE?",
+"options": [
+"On the first day of her menstrual cycle.",
+"5 to 7 days after her period begins.",
+"Any day, as long as it is the same day every month.",
+"14 days before the start of her next menstrual cycle."
+],
+"correct": [1]
+},
+{
+"id": "q27",
+"type": "mc",
+"category": "Psychosocial Integrity",
+"difficulty": -0.2,
+"text": "A client recently diagnosed with terminal cancer is crying and says to the nurse, 'I just don't know how to tell my family.' Which response uses therapeutic communication?",
+"options": [
+"Don't worry, your family will understand and support you.",
+"Why do you think it is so hard to tell them?",
+"It must be very difficult for you right now. Tell me more about what you are feeling.",
+"I think you should wait until you feel a little stronger before telling them."
+],
+"correct": [2]
+},
+{
+"id": "q28",
+"type": "sata",
+"category": "Basic Care and Comfort",
+"difficulty": 0.7,
+"text": "The nurse is providing sleep hygiene education to a client experiencing chronic insomnia. Which instructions should the nurse include? (Select all that apply)",
+"options": [
+"Engage in vigorous cardiovascular exercise just before bedtime to ensure fatigue.",
+"Establish a consistent sleep schedule by going to bed and waking up at the same time.",
+"Avoid consuming caffeinated beverages in the late afternoon and evening.",
+"Use the bed only for sleep and sexual activity.",
+"Take a long nap in the middle of the day to make up for lost sleep at night."
+],
+"correct": [1, 2, 3]
+},
+{
+"id": "q29",
+"type": "mc",
+"category": "Management of Care",
+"difficulty": 2.6,
+"text": "The Post-Anesthesia Care Unit (PACU) nurse is assessing a client for discharge to the medical-surgical unit. Which finding requires the nurse to delay the client's transfer?",
+"options": [
+"The client is easily aroused when their name is called.",
+"The client's surgical dressing has a small amount of serosanguineous drainage.",
+"The client's oxygen saturation drops to 88% on room air when they fall asleep.",
+"The client's core body temperature is 98.2°F (36.8°C)."
+],
+"correct": [2]
+},
+{
+"id": "q30",
+"type": "mc",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 2.4,
+"text": "A client is receiving an intravenous infusion of vancomycin. The nurse notes that the client's face, neck, and upper chest are extremely red, and the client's blood pressure drops to 90/60 mmHg. What is the nurse's first action?",
+"options": [
+"Administer an IV antihistamine immediately.",
+"Slow down or stop the vancomycin infusion.",
+"Notify the rapid response team.",
+"Document the finding as an expected side effect."
+],
+"correct": [1]
+},
+{
+"id": "q31",
+"type": "mc",
+"category": "Physiological Adaptation",
+"difficulty": 1.8,
+"text": "A client with severe end-stage COPD is admitted with an acute exacerbation. The client is receiving oxygen at 2 L/min via nasal cannula. Which physiological concept dictates the nurse's careful monitoring of the client's oxygen saturation?",
+"options": [
+"High levels of oxygen can cause oxygen toxicity and alveolar collapse.",
+"A high blood oxygen level decreases the client's hypoxic drive to breathe.",
+"Increased oxygen reduces pulmonary vascular resistance too rapidly.",
+"COPD clients require hypercapnia to maintain acid-base balance."
+],
+"correct": [1]
+},
+{
+"id": "q32",
+"type": "sata",
+"category": "Safety and Infection Control",
+"difficulty": 1.9,
+"text": "A nurse accidentally sustains a needlestick injury after administering a medication to a client. What are the correct immediate and follow-up actions the nurse must take? (Select all that apply)",
+"options": [
+"Immediately wash the punctured area vigorously with soap and water.",
+"Squeeze the puncture site to induce maximum bleeding.",
+"Report the incident immediately to the charge nurse or supervisor.",
+"Seek medical evaluation to determine the need for post-exposure prophylaxis (PEP).",
+"Request that the source client's blood be tested for bloodborne pathogens."
+],
+"correct": [0, 2, 3, 4]
+},
+{
+"id": "q33",
+"type": "mc",
+"category": "Reduction of Risk Potential",
+"difficulty": 2.0,
+"text": "A client returns to the unit following a cardiac catheterization via the right femoral artery. What is the priority nursing intervention for this client during the immediate post-procedure period?",
+"options": [
+"Ambulate the client in the hallway within 1 hour.",
+"Assess the client's right pedal pulses and puncture site frequently.",
+"Maintain the client in a high Fowler's position.",
+"Administer oral anticoagulants as prescribed."
+],
+"correct": [1]
+},
+{
+"id": "q34",
+"type": "mc",
+"category": "Health Promotion and Maintenance",
+"difficulty": 0.3,
+"text": "The nurse is assessing a healthy newborn 2 hours after birth. Which respiratory assessment finding is considered normal for a neonate?",
+"options": [
+"A respiratory rate of 18 breaths per minute.",
+"Nasal flaring and intercostal retractions.",
+"A respiratory rate of 45 breaths per minute with short periods of apnea (under 15 seconds).",
+"Expiratory grunting heard without a stethoscope."
+],
+"correct": [2]
+},
+{
+"id": "q35",
+"type": "sata",
+"category": "Psychosocial Integrity",
+"difficulty": 1.3,
+"text": "A nurse is conducting a suicide risk assessment on a client with major depressive disorder. Which findings are considered high-risk factors for suicide? (Select all that apply)",
+"options": [
+"A history of previous suicide attempts.",
+"Having a detailed plan and access to a lethal method.",
+"A sudden, unexplained elevation in mood and energy.",
+"Giving away cherished, prized possessions.",
+"Expressing future goals and plans for returning to work."
+],
+"correct": [0, 1, 2, 3]
+},
+{
+"id": "q36",
+"type": "mc",
+"category": "Basic Care and Comfort",
+"difficulty": -1.0,
+"text": "A nurse is teaching a client who had a left-sided stroke with right-sided weakness how to use a cane. The nurse should instruct the client to hold the cane in which hand?",
+"options": [
+"The right hand.",
+"The left hand.",
+"Whichever hand feels most comfortable.",
+"Both hands alternately."
+],
+"correct": [1]
+},
+{
+"id": "q37",
+"type": "mc",
+"category": "Management of Care",
+"difficulty": 1.9,
+"text": "Which assignment is most appropriate for the charge nurse to delegate to an experienced Licensed Practical Nurse (LPN)?",
+"options": [
+"A client newly admitted with acute respiratory distress syndrome.",
+"A client requiring intravenous push pain medications.",
+"A client with chronic heart failure who requires a focused lung and heart assessment.",
+"A client being discharged today who requires extensive diabetic teaching."
+],
+"correct": [2]
+},
+{
+"id": "q38",
+"type": "mc",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 1.6,
+"text": "A client is prescribed levothyroxine for hypothyroidism. Which instruction is vital for the nurse to include in the discharge teaching?",
+"options": [
+"Take the medication with meals to prevent gastrointestinal upset.",
+"Take the medication in the morning on an empty stomach.",
+"Take the medication right before bedtime.",
+"Mix the crushed medication in a glass of milk."
+],
+"correct": [1]
+},
+{
+"id": "q39",
+"type": "sata",
+"category": "Physiological Adaptation",
+"difficulty": 2.8,
+"text": "A client with a high cervical spinal cord injury is developing neurogenic shock. Which distinct clinical manifestations should the nurse expect? (Select all that apply)",
+"options": [
+"Bradycardia",
+"Tachycardia",
+"Hypotension",
+"Warm, dry skin",
+"Cool, clammy skin"
+],
+"correct": [0, 2, 3]
+},
+{
+"id": "q40",
+"type": "mc",
+"category": "Safety and Infection Control",
+"difficulty": -0.3,
+"text": "A small fire breaks out in a trash can in a client's room. According to the RACE protocol, what is the nurse's first action?",
+"options": [
+"Pull the fire alarm.",
+"Rescue the client and move them to a safe area.",
+"Attempt to extinguish the fire with a fire extinguisher.",
+"Close the door to the client's room to contain the fire."
+],
+"correct": [1]
+},
+{
+"id": "q41",
+"type": "mc",
+"category": "Reduction of Risk Potential",
+"difficulty": 1.4,
+"text": "A client with chronic kidney disease (CKD) who is not on dialysis requires dietary modifications. The nurse should instruct the client to limit the intake of which nutrients?",
+"options": [
+"Carbohydrates, fats, and calcium",
+"Protein, potassium, and phosphorus",
+"Sodium, simple sugars, and vitamin D",
+"Iron, folic acid, and vitamin B12"
+],
+"correct": [1]
+},
+{
+"id": "q42",
+"type": "sata",
+"category": "Health Promotion and Maintenance",
+"difficulty": 0.8,
+"text": "A nurse is teaching a community class about normal physiological changes of aging. Which statements by the nurse are accurate? (Select all that apply)",
+"options": [
+"Gastric motility and emptying are delayed, increasing the risk of constipation.",
+"Skin elasticity decreases and subcutaneous fat is lost.",
+"Renal mass declines and glomerular filtration rate (GFR) decreases.",
+"Cognitive decline and severe confusion are expected parts of normal aging.",
+"Bone density decreases, increasing the risk for fractures."
+],
+"correct": [0, 1, 2, 4]
+},
+{
+"id": "q43",
+"type": "mc",
+"category": "Psychosocial Integrity",
+"difficulty": 2.1,
+"text": "A teenage client is admitted to the inpatient psychiatric unit with severe anorexia nervosa and a potassium level of 2.6 mEq/L. What is the nurse's absolute priority?",
+"options": [
+"Initiating one-on-one observation during and immediately after meals.",
+"Establishing a therapeutic alliance and discussing body image issues.",
+"Monitoring cardiac rhythm and initiating intravenous potassium replacement.",
+"Implementing behavior modification therapy for weight gain."
+],
+"correct": [2]
+},
+{
+"id": "q44",
+"type": "mc",
+"category": "Basic Care and Comfort",
+"difficulty": 0.1,
+"text": "The nurse is caring for an older adult client with profound bilateral hearing loss. What is the most effective communication technique for the nurse to use?",
+"options": [
+"Speak in a very loud voice directly into the client's ear.",
+"Face the client directly, ensuring the nurse's face is well-lit, and speak clearly.",
+"Use exaggerated mouth movements and over-articulate words.",
+"Communicate exclusively using written notes to avoid misunderstandings."
+],
+"correct": [1]
+},
+{
+"id": "q45",
+"type": "sata",
+"category": "Management of Care",
+"difficulty": 2.4,
+"text": "A medical-surgical Registered Nurse (RN) is floated to the maternal-newborn unit. Which clients are safe to assign to the float RN? (Select all that apply)",
+"options": [
+"A client with severe preeclampsia receiving a continuous magnesium sulfate infusion.",
+"A client who is 2 days postpartum and stable, requiring discharge teaching on breast care.",
+"A client who is 32 weeks pregnant reporting regular contractions and spotting.",
+"A pregnant client at 28 weeks gestation admitted with acute appendicitis.",
+"A stable client with gestational diabetes requiring routine blood glucose monitoring."
+],
+"correct": [1, 3, 4]
+},
+{
+"id": "q46",
+"type": "mc",
+"category": "Pharmacological and Parenteral Therapies",
+"difficulty": 2.5,
+"text": "A client with bipolar disorder has been taking lithium carbonate for several months. The client presents to the clinic with coarse hand tremors, confusion, and a staggering gait. The nurse suspects lithium toxicity. Which serum lithium level correlates with these severe symptoms?",
+"options": [
+"0.6 mEq/L",
+"1.0 mEq/L",
+"1.2 mEq/L",
+"2.0 mEq/L"
+],
+"correct": [3]
+},
+{
+"id": "q47",
+"type": "mc",
+"category": "Physiological Adaptation",
+"difficulty": 2.2,
+"text": "A client is admitted to the hospital with a diagnosis of acute pancreatitis. Which immediate interventions should the nurse anticipate in the collaborative plan of care?",
+"options": [
+"Providing a high-fat, low-carbohydrate diet.",
+"Maintaining NPO (nothing by mouth) status and administering IV fluids.",
+"Administering oral pancreatic enzymes before every meal.",
+"Positioning the client supine and flat in bed."
+],
+"correct": [1]
+},
+{
+"id": "q48",
+"type": "sata",
+"category": "Reduction of Risk Potential",
+"difficulty": 1.7,
+"text": "A nurse is caring for a client who is recovering from a total hip arthroplasty. Which interventions are appropriate to prevent venous thromboembolism (VTE)? (Select all that apply)",
+"options": [
+"Applying sequential compression devices (SCDs) while the client is in bed.",
+"Administering prescribed prophylactic low-molecular-weight heparin.",
+"Massaging the client's calf muscles vigorously if they report cramping.",
+"Encouraging early ambulation with physical therapy.",
+"Placing pillows firmly under the client's knees to elevate the legs."
+],
+"correct": [0, 1, 3]
+},
+{
+"id": "q49",
+"type": "mc",
+"category": "Safety and Infection Control",
+"difficulty": 1.6,
+"text": "A client in the intensive care unit is intubated and mechanically ventilated. The healthcare provider orders bilateral soft wrist restraints to prevent the client from pulling out the endotracheal tube. What is a critical nursing responsibility regarding restraint use?",
+"options": [
+"Tying the restraint straps securely to the bed rails.",
+"Removing the restraints every 2 hours to assess skin integrity and perform range of motion.",
+"Securing a PRN (as needed) prescription for the restraints to use over the next 48 hours.",
+"Keeping the restraints on constantly until the client is extubated to ensure absolute safety."
+],
+"correct": [1]
+},
+{
+"id": "q50",
+"type": "mc",
+"category": "Management of Care",
+"difficulty": 2.7,
+"text": "A pediatric nurse is assessing a 4-year-old child brought to the emergency department for a broken arm. The nurse observes multiple bruises in various stages of healing on the child's torso and back. The child's parent gives a vague and inconsistent explanation of the injury. What is the nurse's mandatory action?",
+"options": [
+"Confront the parent directly and ask if they are abusing the child.",
+"Document the findings and wait to see if the child sustains future injuries.",
+"Report the suspected child abuse to the appropriate state agency or child protective services immediately.",
+"Discuss the findings with the healthcare provider and let them make the report."
+],
+"correct": [2]
+}
+]
