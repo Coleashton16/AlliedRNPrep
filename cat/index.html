@@ -665,15 +665,23 @@ ${jsonSchema}
                 let jsonString = data.choices[0].message.content.trim();
 
                 const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) throw new Error("AI model failed to return valid JSON.");
+                if (!jsonMatch) throw new Error("AI model failed to return valid JSON string.");
 
-                const generatedQuestion = JSON.parse(jsonMatch[0]);
+                // PATCH: JSON Parsing Fail-Safe
+                let generatedQuestion;
+                try {
+                    generatedQuestion = JSON.parse(jsonMatch[0]);
+                } catch (parseError) {
+                    throw new Error("Malformed JSON from LLM: " + parseError.message);
+                }
 
                 if (selectedFormat.includes('mc') && selectedFormat !== 'matrix_mc') generatedQuestion.type = 'mc';
                 if (selectedFormat.includes('sata')) generatedQuestion.type = 'sata';
 
                 try {
                     const diffLevel = Number(generatedQuestion.difficulty).toFixed(1);
+                    // SECURITY WARNING: Client-side writes to a global collection can be hijacked. 
+                    // Ensure Firestore rules strictly validate this payload or move this to a backend Cloud Function.
                     await setDoc(doc(db, 'questions', diffLevel, 'bank', generatedQuestion.id), generatedQuestion);
                 } catch (uploadError) {
                     console.error("Cloud Harvester upload failed:", uploadError);
@@ -749,9 +757,13 @@ ${jsonSchema}
             await generateNextQuestion(0.0);
         };
 
+        // PATCH: Stopped the Timer Bleed during AI Generation
         window.timerTick = () => {
-            if (window.AppState.view !== 'exam' || !window.AppState.examSession || window.AppState.examSession.status !== 'in-progress') {
-                clearInterval(window.AppState.timerInterval);
+            if (window.AppState.view !== 'exam' || !window.AppState.examSession || window.AppState.examSession.status !== 'in-progress' || window.AppState.isGenerating) {
+                // Only clear interval if we've actually left the exam completely
+                if (!window.AppState.isGenerating && window.AppState.view !== 'exam') {
+                    clearInterval(window.AppState.timerInterval);
+                }
                 return;
             }
             window.AppState.examSession.timeRemaining -= 1;
@@ -803,18 +815,36 @@ ${jsonSchema}
                 } else {
                     session.selectedAnswers.push(index);
                 }
-            } else if (qType === 'drop_down') {
-                const blankIndex = window.AppState.examSession._currentBlank || 0;
-                const current = [...session.selectedAnswers];
-                while (current.length <= blankIndex) current.push(null);
-                current[blankIndex] = index;
-                session.selectedAnswers = current;
             }
+            // drop_down toggle logic removed from here; handled exclusively by handleDropdownChange
+            
             window.renderExamOptions();
         };
 
-        window.setDropdownBlank = (blankIndex) => {
-            window.AppState.examSession._currentBlank = blankIndex;
+        // PATCH: Maintain Drop-Down UI State natively without triggering DOM re-render
+        window.handleDropdownChange = (blankIndex, value) => {
+            const session = window.AppState.examSession;
+            
+            // Ensure array has enough elements
+            while (session.selectedAnswers.length <= blankIndex) session.selectedAnswers.push(null);
+            
+            // Update the state (parse value back to integer, or null if unselected)
+            session.selectedAnswers[blankIndex] = value === "" ? null : parseInt(value);
+            
+            // Re-evaluate Next Button status
+            const numBlanks = session.currentQuestion.dropdown_options.length;
+            const canSubmit = session.selectedAnswers.length >= numBlanks && 
+                              session.selectedAnswers.slice(0, numBlanks).every(s => s !== null && s !== undefined && !isNaN(s));
+            
+            const nextBtn = document.getElementById('next-btn');
+            if (!nextBtn) return;
+            if (canSubmit) {
+                nextBtn.disabled = false;
+                nextBtn.className = "nclex-btn-blue px-12 py-3 font-bold text-base cursor-pointer transition-colors";
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.className = "nclex-btn-disabled px-12 py-3 font-bold text-base cursor-not-allowed transition-colors";
+            }
         };
 
         window.moveDragItem = (fromIndex, direction) => {
@@ -861,7 +891,7 @@ ${jsonSchema}
                     return;
                 }
             } else if (q.type === 'matrix_mc') {
-                if (session.selectedAnswers.length === 0) return;
+                // PATCH: Removed empty array return to allow "None are relevant" submission
                 canSubmit = true;
                 let points = 0;
                 const total = q.matrix_data.parameters.length;
@@ -875,7 +905,8 @@ ${jsonSchema}
             } else if (q.type === 'drop_down') {
                 const numBlanks = q.dropdown_options.length;
                 if (session.selectedAnswers.length < numBlanks) return;
-                if (session.selectedAnswers.some(s => s === null || s === undefined)) return;
+                // PATCH: Prevent NaN submission exploit
+                if (session.selectedAnswers.some(s => s === null || s === undefined || isNaN(s))) return;
                 canSubmit = true;
                 let points = 0;
                 for (let i = 0; i < numBlanks; i++) {
@@ -1152,7 +1183,6 @@ ${jsonSchema}
 
             return `
             <div class="h-screen flex flex-col w-full animate-fade-in">
-                <!-- Sticky Header -->
                 <header class="nclex-header px-6 py-3 flex justify-between items-center flex-shrink-0">
                     <div class="flex items-center gap-4">
                         <span class="text-sm font-bold text-white/80 uppercase tracking-widest">NCLEX Examination</span>
@@ -1168,7 +1198,6 @@ ${jsonSchema}
                     </div>
                 </header>
 
-                <!-- Item Counter Bar -->
                 <div class="bg-[#e8e8e8] px-6 py-2 flex justify-between items-center border-b border-gray-400 flex-shrink-0">
                     <div class="flex items-center gap-4">
                         <span class="text-black font-bold text-sm">Item ${session.questionsAsked.length + 1}</span>
@@ -1177,12 +1206,10 @@ ${jsonSchema}
                     <span class="text-gray-500 text-xs">${session.questionsAsked.length} of ${MAX_QUESTIONS} answered</span>
                 </div>
 
-                <!-- Main Content Area (scrollable, full width) -->
                 <main class="flex-grow overflow-y-auto bg-[#f3f4f6]">
                     ${mainContent}
                 </main>
 
-                <!-- Sticky Footer with Next Button -->
                 <footer class="bg-white border-t-2 border-gray-300 px-6 py-4 flex justify-end flex-shrink-0">
                     <button id="next-btn" onclick="handleNextQuestion()" disabled class="nclex-btn-disabled px-12 py-3 font-bold text-base transition-colors">
                         Next →
@@ -1294,7 +1321,9 @@ ${jsonSchema}
                     </label>`;
                 });
                 optionsHTML += `</div>`;
-                canSubmit = session.selectedAnswers.length > 0;
+                
+                // PATCH: Matrix MC inherently allows submission even if nothing is selected (i.e. "None are relevant")
+                canSubmit = true; 
 
             } else if (q.type === 'drop_down') {
                 const numBlanks = q.dropdown_options.length;
@@ -1305,7 +1334,7 @@ ${jsonSchema}
                     optionsHTML += `
                     <div class="flex items-center gap-4">
                         <span class="text-base font-bold text-gray-700 w-24 flex-shrink-0">Blank ${i + 1}:</span>
-                        <select onchange="setDropdownBlank(${i}); toggleAnswer(parseInt(this.value));" class="flex-1 nclex-input-box px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#1A365D]">
+                        <select onchange="handleDropdownChange(${i}, this.value)" class="flex-1 nclex-input-box px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#1A365D]">
                             <option value="">-- Select an option --</option>
                             ${q.dropdown_options[i].map((opt, optIdx) => `
                                 <option value="${optIdx}" ${currentVal === optIdx ? 'selected' : ''}>${opt}</option>
@@ -1314,7 +1343,7 @@ ${jsonSchema}
                     </div>`;
                 }
                 optionsHTML += `</div>`;
-                canSubmit = session.selectedAnswers.length >= numBlanks && session.selectedAnswers.slice(0, numBlanks).every(s => s !== null && s !== undefined);
+                canSubmit = session.selectedAnswers.length >= numBlanks && session.selectedAnswers.slice(0, numBlanks).every(s => s !== null && s !== undefined && !isNaN(s));
 
             } else if (q.type === 'drag_drop') {
                 optionsHTML += `<p class="font-bold text-black mb-6 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-4 py-3 rounded-r">Prioritize the nursing actions. Use the arrows to reorder (top = highest priority).</p>`;
