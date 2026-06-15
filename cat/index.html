@@ -79,13 +79,12 @@
         // ─── CONSTANTS ───────────────────────────────────────────────
         const STARTING_SE          = 1.0;
         const MIN_QUESTIONS        = 85;
-        const MAX_QUESTIONS_RN     = 145;  // NGN RN max (was 150)
-        const MAX_QUESTIONS_PN     = 130;  // NGN PN max
-        const MAX_QUESTIONS        = MAX_QUESTIONS_RN; // default to RN
-        const PASSING_STANDARD     = 0.0;  // NCLEX passing logit
+        const MAX_QUESTIONS_RN     = 145;
+        const MAX_QUESTIONS_PN     = 130;
+        const MAX_QUESTIONS        = MAX_QUESTIONS_RN;
+        const PASSING_STANDARD     = 0.0;
         const CATEGORY_PENALTY_WINDOW = 3;
 
-        // 2026 NCSBN Weighted Client Needs Categories
         const CLIENT_NEEDS = [
             { category: "Management of Care",                           weight: 18 },
             { category: "Pharmacological and Parenteral Therapies",     weight: 16 },
@@ -97,7 +96,6 @@
             { category: "Basic Care and Comfort",                       weight:  9 },
         ];
 
-        // NCJMM Clinical Judgment Layers
         const NCJMM_LAYERS = [
             'Recognize Cues',
             'Analyze Cues',
@@ -123,19 +121,16 @@
             categoryHistory: [],
         };
 
-        // ─── ENHANCED BLUEPRINT ENGINE: getNextCategory() ────────────
-        // Proportional allocation: categories furthest below target weight get boosted
+        // ─── BLUEPRINT ENGINE ─────────────────────────────────────────
         function getNextCategory() {
             const asked = window.AppState.examSession
                 ? window.AppState.examSession.history.length
                 : window.AppState.categoryHistory.length;
 
             if (asked < 5) {
-                // Random weighted start for first 5 questions
                 return weightedRandomPick(CLIENT_NEEDS).category;
             }
 
-            // Calculate actual category distribution so far
             const actualCounts = {};
             CLIENT_NEEDS.forEach(cn => actualCounts[cn.category] = 0);
 
@@ -149,7 +144,6 @@
                 });
             }
 
-            // Calculate deficit for each category (how far below target %)
             const deviations = CLIENT_NEEDS.map(cn => {
                 const actualPct = (actualCounts[cn.category] / asked) * 100;
                 const targetPct = cn.weight;
@@ -157,7 +151,6 @@
                 return { category: cn.category, deficit };
             });
 
-            // Use deficit as sampling weight (proportional allocation)
             const totalDeficit = deviations.reduce((s, d) => s + Math.max(0, d.deficit), 0);
             if (totalDeficit < 1) return weightedRandomPick(CLIENT_NEEDS).category;
 
@@ -194,7 +187,6 @@
             return Math.exp(exponent) / (1 + Math.exp(exponent));
         };
 
-        // Newton-Raphson MLE for Rasch ability estimation (replaces simple approximation)
         function estimateAbilityMLE(responses, difficulties) {
             let theta = 0.0;
             for (let iter = 0; iter < 20; iter++) {
@@ -213,15 +205,12 @@
             return Math.max(-4.0, Math.min(4.0, theta));
         }
 
-        // Original simple update (retained for compatibility during transition)
         const updateAbility = (currentAbility, difficulty, scoreDecimal) => {
             const probCorrect = calculateProbability(currentAbility, difficulty);
             const stepSize = 0.5;
             return currentAbility + (stepSize * (scoreDecimal - probCorrect));
         };
 
-        // ─── TEST INFORMATION & STANDARD ERROR ───────────────────────
-        // SE derived from test information function (replaces linear subtraction)
         function calculateSE(theta, administeredDifficulties) {
             let information = 0;
             for (const b of administeredDifficulties) {
@@ -475,7 +464,6 @@
             ];
             const randomSpecialty = specialties[Math.floor(Math.random() * specialties.length)];
 
-            // Expanded format pool including new NGN types
             const formatPool = [
                 "mc_standard","mc_standard","mc_standard","mc_standard","mc_standard","mc_standard",
                 "sata_standard","sata_standard","sata_standard","sata_standard","sata_standard","sata_standard",
@@ -681,11 +669,9 @@ ${jsonSchema}
 
                 const generatedQuestion = JSON.parse(jsonMatch[0]);
 
-                // Normalize type
                 if (selectedFormat.includes('mc') && selectedFormat !== 'matrix_mc') generatedQuestion.type = 'mc';
                 if (selectedFormat.includes('sata')) generatedQuestion.type = 'sata';
 
-                // Cloud Harvester: save to questions/[difficulty]/bank/ in Firestore
                 try {
                     const diffLevel = Number(generatedQuestion.difficulty).toFixed(1);
                     await setDoc(doc(db, 'questions', diffLevel, 'bank', generatedQuestion.id), generatedQuestion);
@@ -702,7 +688,6 @@ ${jsonSchema}
                 } else if (generatedQuestion.type === 'drop_down') {
                     window.AppState.examSession.selectedAnswers = [];
                 } else if (generatedQuestion.type === 'drag_drop') {
-                    // Initialize with current order
                     window.AppState.examSession.selectedAnswers = generatedQuestion.drag_drop_items.map((_, i) => i);
                 } else {
                     window.AppState.examSession.selectedAnswers = [];
@@ -710,6 +695,7 @@ ${jsonSchema}
 
                 window.AppState.isGenerating = false;
                 window.renderApp();
+                window.renderExamOptions();
 
             } catch (error) {
                 console.error("AI Generation Error:", error);
@@ -724,7 +710,7 @@ ${jsonSchema}
             }
         }
 
-        // ─── DYNAMIC BOWTIE SCORING ──────────────────────────────────
+        // ─── SCORING ──────────────────────────────────────────────────
         function scoreBowtieDynamic(bowtieData, selected) {
             let points = 0;
             let total = 0;
@@ -749,7 +735,7 @@ ${jsonSchema}
                 history: [],
                 currentAbility: 0.0,
                 standardError: STARTING_SE,
-                administeredDifficulties: [], // track for test information function
+                administeredDifficulties: [],
                 startTime: new Date(),
                 status: 'in-progress',
                 currentQuestion: null,
@@ -771,7 +757,7 @@ ${jsonSchema}
             window.AppState.examSession.timeRemaining -= 1;
             if (window.AppState.examSession.timeRemaining <= 0) {
                 clearInterval(window.AppState.timerInterval);
-                finishExam(window.AppState.examSession.currentAbility > 0 ? 'pass' : 'fail');
+                finishExam(window.AppState.examSession.currentAbility >= PASSING_STANDARD ? 'pass' : 'fail');
                 return;
             }
             const el = document.getElementById('exam-timer');
@@ -818,10 +804,6 @@ ${jsonSchema}
                     session.selectedAnswers.push(index);
                 }
             } else if (qType === 'drop_down') {
-                // For dropdown, index encodes which blank and which option
-                // We use a different approach: store as array of selected indices per blank
-                // index here is the option index, and we track which blank via a separate mechanism
-                // Simplified: store as array where position = blank index, value = option index
                 const blankIndex = window.AppState.examSession._currentBlank || 0;
                 const current = [...session.selectedAnswers];
                 while (current.length <= blankIndex) current.push(null);
@@ -831,12 +813,10 @@ ${jsonSchema}
             window.renderExamOptions();
         };
 
-        // For dropdown: set which blank is being answered
         window.setDropdownBlank = (blankIndex) => {
             window.AppState.examSession._currentBlank = blankIndex;
         };
 
-        // For drag_drop: move item up/down in priority
         window.moveDragItem = (fromIndex, direction) => {
             const session = window.AppState.examSession;
             const arr = [...session.selectedAnswers];
@@ -862,7 +842,6 @@ ${jsonSchema}
             } else if (q.type === 'sata' || q.type === 'highlight') {
                 if (session.selectedAnswers.length === 0) return;
                 canSubmit = true;
-                // NGN +/- Partial Credit Scoring
                 const totalCorrect = q.correct.length;
                 let hits   = 0;
                 let misses = 0;
@@ -884,7 +863,6 @@ ${jsonSchema}
             } else if (q.type === 'matrix_mc') {
                 if (session.selectedAnswers.length === 0) return;
                 canSubmit = true;
-                // Score: each correct decision (selected = true when correct = true, or not selected when correct = false)
                 let points = 0;
                 const total = q.matrix_data.parameters.length;
                 for (let i = 0; i < total; i++) {
@@ -895,7 +873,6 @@ ${jsonSchema}
                 scoreDecimal = points / total;
 
             } else if (q.type === 'drop_down') {
-                // Check all blanks have a selection
                 const numBlanks = q.dropdown_options.length;
                 if (session.selectedAnswers.length < numBlanks) return;
                 if (session.selectedAnswers.some(s => s === null || s === undefined)) return;
@@ -909,7 +886,6 @@ ${jsonSchema}
             } else if (q.type === 'drag_drop') {
                 if (session.selectedAnswers.length !== q.drag_drop_items.length) return;
                 canSubmit = true;
-                // Score based on how many items are in correct position
                 let points = 0;
                 for (let i = 0; i < session.selectedAnswers.length; i++) {
                     if (session.selectedAnswers[i] === q.correct_order[i]) points++;
@@ -919,10 +895,8 @@ ${jsonSchema}
 
             if (!canSubmit) return;
 
-            // Track difficulty for test information function
             session.administeredDifficulties.push(q.difficulty);
 
-            // Use Newton-Raphson MSE for ability estimation after sufficient data
             let newAbility;
             if (session.history.length >= 10) {
                 const responses = session.history.map(h => h.score);
@@ -931,11 +905,9 @@ ${jsonSchema}
                 difficulties.push(q.difficulty);
                 newAbility = estimateAbilityMLE(responses, difficulties);
             } else {
-                // Use simple update for first 10 questions
                 newAbility = updateAbility(session.currentAbility, q.difficulty, scoreDecimal);
             }
 
-            // Use test information function for SE
             const newSE = calculateSE(newAbility, session.administeredDifficulties);
 
             session.history.push({
@@ -956,7 +928,6 @@ ${jsonSchema}
             let examComplete = false;
             let finalStatus  = 'in-progress';
 
-            // True 95% CI rule: entire confidence interval must lie above/below passing standard
             if (session.questionsAsked.length >= MIN_QUESTIONS) {
                 if (newAbility - 1.96 * newSE > PASSING_STANDARD) {
                     examComplete = true;
@@ -968,7 +939,7 @@ ${jsonSchema}
             }
             if (session.questionsAsked.length >= MAX_QUESTIONS) {
                 examComplete = true;
-                finalStatus  = newAbility > PASSING_STANDARD ? 'pass' : 'fail';
+                finalStatus  = newAbility >= PASSING_STANDARD ? 'pass' : 'fail';
             }
 
             if (examComplete) {
@@ -1155,61 +1126,68 @@ ${jsonSchema}
             </div>`;
         }
 
-        // ─── RENDER: EXAM ─────────────────────────────────────────────
+        // ─── RENDER: EXAM (FULL SCREEN) ───────────────────────────────
         function getExamLayout() {
             const session = window.AppState.examSession;
             let mainContent = '';
 
             if (window.AppState.isGenerating) {
                 mainContent = `
-                <div class="flex flex-col items-center justify-center h-[500px] bg-white">
+                <div class="flex flex-col items-center justify-center flex-grow w-full py-32">
                     <div class="w-10 h-10 border-4 border-[#1A365D] border-t-transparent rounded-full spinner mb-4"></div>
                     <p class="text-black font-bold tracking-wide">Generating next item...</p>
-                                    </div>`;
+                </div>`;
             } else if (session.currentQuestion) {
                 const qTextFormatted = session.currentQuestion.text.replace(/\n/g, '<br>');
                 mainContent = `
-                <div class="p-8 bg-white min-h-[500px]">
-                    <div class="mb-8">
-                        <h2 id="question-text" class="text-base text-black leading-relaxed font-normal">${qTextFormatted}</h2>
+                <div class="w-full flex-grow flex flex-col px-6 md:px-16 lg:px-24 py-10 overflow-y-auto">
+                    <div class="max-w-4xl mx-auto w-full">
+                        <div class="mb-8">
+                            <h2 id="question-text" class="text-lg text-black leading-relaxed font-normal">${qTextFormatted}</h2>
+                        </div>
+                        <div id="options-container"></div>
                     </div>
-                    <div id="options-container" class="ml-2"></div>
                 </div>`;
             }
 
             return `
-            <div class="min-h-screen nclex-bg flex flex-col w-full animate-fade-in">
-                <header class="nclex-header p-1 flex justify-between items-center">
-                    <div class="flex items-center ml-2">
-                        <div class="bg-[#1e3a8a] border border-blue-400 p-1 cursor-default flex flex-col items-center justify-center w-12 h-12 shadow-[inset_1px_1px_0px_0px_#60a5fa,inset_-1px_-1px_0px_0px_#1e3a8a]">
-                            <i data-feather="monitor" class="w-5 h-5 text-white"></i>
-                            <span class="text-[9px] mt-1 text-white font-bold">Calc</span>
-                        </div>
+            <div class="h-screen flex flex-col w-full animate-fade-in">
+                <!-- Sticky Header -->
+                <header class="nclex-header px-6 py-3 flex justify-between items-center flex-shrink-0">
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-bold text-white/80 uppercase tracking-widest">NCLEX Examination</span>
                     </div>
-                    <div class="flex items-center mr-4 flex-col items-end">
-                        <span class="text-[10px] text-white uppercase tracking-widest font-bold">Time Remaining</span>
-                        <span id="exam-timer" class="font-bold text-lg text-white">${formatTime(session.timeRemaining)}</span>
+                    <div class="flex items-center gap-6">
+                        <div class="flex flex-col items-end">
+                            <span class="text-[10px] text-white/70 uppercase tracking-widest font-bold">Time Remaining</span>
+                            <span id="exam-timer" class="font-bold text-xl text-white font-mono">${formatTime(session.timeRemaining)}</span>
+                        </div>
+                        <button onclick="requestExitExam()" class="text-white/80 hover:text-white text-sm font-bold border border-white/30 px-3 py-1 rounded hover:bg-white/10 transition-colors">
+                            End Exam
+                        </button>
                     </div>
                 </header>
 
-                <div class="bg-[#f0f0f0] p-1 px-4 flex justify-between items-center border-b border-gray-400">
+                <!-- Item Counter Bar -->
+                <div class="bg-[#e8e8e8] px-6 py-2 flex justify-between items-center border-b border-gray-400 flex-shrink-0">
                     <div class="flex items-center gap-4">
                         <span class="text-black font-bold text-sm">Item ${session.questionsAsked.length + 1}</span>
                         <span class="text-gray-500 text-xs">(Min: ${MIN_QUESTIONS} · Max: ${MAX_QUESTIONS})</span>
                     </div>
-                    <button onclick="requestExitExam()" class="text-[#1A365D] hover:underline text-sm font-bold">End Exam</button>
+                    <span class="text-gray-500 text-xs">${session.questionsAsked.length} of ${MAX_QUESTIONS} answered</span>
                 </div>
 
-                <main class="flex-grow flex justify-center items-start pt-6 px-4 pb-16">
-                    <div class="w-full max-w-5xl border border-gray-300 bg-white flex flex-col shadow-sm rounded-md overflow-hidden">
-                        ${mainContent}
-                        <div class="nclex-footer p-4 flex justify-end">
-                            <button id="next-btn" onclick="handleNextQuestion()" disabled class="nclex-btn-disabled px-10 py-2 font-bold text-sm transition-colors">
-                                Next
-                            </button>
-                        </div>
-                    </div>
+                <!-- Main Content Area (scrollable, full width) -->
+                <main class="flex-grow overflow-y-auto bg-[#f3f4f6]">
+                    ${mainContent}
                 </main>
+
+                <!-- Sticky Footer with Next Button -->
+                <footer class="bg-white border-t-2 border-gray-300 px-6 py-4 flex justify-end flex-shrink-0">
+                    <button id="next-btn" onclick="handleNextQuestion()" disabled class="nclex-btn-disabled px-12 py-3 font-bold text-base transition-colors">
+                        Next →
+                    </button>
+                </footer>
             </div>`;
         }
 
@@ -1228,35 +1206,36 @@ ${jsonSchema}
                 optionsHTML += `<div class="space-y-3">`;
                 q.options.forEach((opt, idx) => {
                     const isSelected = session.selectedAnswers.includes(idx);
-                    const inputMarker = `<div class="w-5 h-5 border-2 border-black rounded-full flex items-center justify-center bg-white flex-shrink-0 mt-0.5">${isSelected ? '<div class="w-2.5 h-2.5 bg-black rounded-full"></div>' : ''}</div>`;
+                    const inputMarker = `<div class="w-6 h-6 border-2 border-black rounded-full flex items-center justify-center bg-white flex-shrink-0 mt-0.5">${isSelected ? '<div class="w-3 h-3 bg-black rounded-full"></div>' : ''}</div>`;
                     optionsHTML += `
-                    <label onclick="toggleAnswer(${idx})" class="flex items-start gap-3 cursor-pointer p-2 rounded hover:bg-gray-50 ${isSelected ? 'bg-blue-50 border border-blue-200' : 'border border-transparent'}">
+                    <label onclick="toggleAnswer(${idx})" class="flex items-start gap-4 cursor-pointer p-4 rounded-lg hover:bg-white transition-colors ${isSelected ? 'bg-blue-50 border-2 border-blue-400 shadow-sm' : 'border-2 border-transparent hover:border-gray-200'}">
                         ${inputMarker}
-                        <span class="text-black text-base font-normal">${opt}</span>
+                        <span class="text-black text-base font-normal leading-relaxed">${opt}</span>
                     </label>`;
                 });
                 optionsHTML += `</div>`;
                 canSubmit = session.selectedAnswers.length > 0;
 
             } else if (q.type === 'sata') {
-                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-3 py-2">SELECT ALL THAT APPLY — Choose all options that apply.</p><div class="space-y-3">`;
+                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-4 py-3 rounded-r">SELECT ALL THAT APPLY — Choose all options that apply.</p><div class="space-y-3">`;
                 q.options.forEach((opt, idx) => {
                     const isSelected = session.selectedAnswers.includes(idx);
-                    const inputMarker = `<div class="w-5 h-5 border-2 border-black flex items-center justify-center bg-white flex-shrink-0 mt-0.5">${isSelected ? '<div class="w-3 h-3 bg-black"></div>' : ''}</div>`;
+                    const inputMarker = `<div class="w-6 h-6 border-2 border-black flex items-center justify-center bg-white flex-shrink-0 mt-0.5">${isSelected ? '<div class="w-4 h-4 bg-black"></div>' : ''}</div>`;
                     optionsHTML += `
-                    <label onclick="toggleAnswer(${idx})" class="flex items-start gap-3 cursor-pointer p-2 rounded hover:bg-gray-50 ${isSelected ? 'bg-blue-50 border border-blue-200' : 'border border-transparent'}">
+                    <label onclick="toggleAnswer(${idx})" class="flex items-start gap-4 cursor-pointer p-4 rounded-lg hover:bg-white transition-colors ${isSelected ? 'bg-blue-50 border-2 border-blue-400 shadow-sm' : 'border-2 border-transparent hover:border-gray-200'}">
                         ${inputMarker}
-                        <span class="text-black text-base font-normal">${opt}</span>
+                        <span class="text-black text-base font-normal leading-relaxed">${opt}</span>
                     </label>`;
                 });
                 optionsHTML += `</div>`;
                 canSubmit = session.selectedAnswers.length > 0;
 
             } else if (q.type === 'highlight') {
-                optionsHTML += `<div class="bg-[#f9f9f9] border border-gray-300 p-6 text-base leading-loose cursor-pointer select-none rounded">`;
+                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-4 py-3 rounded-r">Click on the sentences that answer the question.</p>`;
+                optionsHTML += `<div class="bg-white border border-gray-300 p-8 text-base leading-loose cursor-pointer select-none rounded-lg shadow-sm">`;
                 q.options.forEach((opt, idx) => {
                     const isSelected    = session.selectedAnswers.includes(idx);
-                    const highlightClass = isSelected ? 'bg-yellow-300 font-bold border-b-2 border-black' : 'hover:bg-gray-200 transition-colors';
+                    const highlightClass = isSelected ? 'bg-yellow-300 font-bold border-b-2 border-black' : 'hover:bg-gray-100 transition-colors';
                     optionsHTML += `<span onclick="toggleAnswer(${idx})" class="p-1 rounded ${highlightClass}">${opt}</span>`;
                 });
                 optionsHTML += `</div>`;
@@ -1265,36 +1244,36 @@ ${jsonSchema}
             } else if (q.type === 'bowtie') {
                 const sel = session.selectedAnswers;
                 optionsHTML += `
-                <div class="bg-[#f9f9f9] p-4 border border-gray-400 rounded">
-                    <p class="font-bold text-black mb-4 text-center text-sm">Complete the clinical diagram: select the CONDITION (1), ACTIONS (2), and PARAMETERS (2).</p>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="bg-white border border-gray-400 p-2 rounded">
-                            <h4 class="font-bold text-center border-b border-gray-400 pb-1 mb-2 text-sm bg-[#e0e0e0] -mx-2 px-2">Actions to Take</h4>
-                            <p class="text-xs text-gray-600 text-center mb-2">${sel.actions.length}/2 selected</p>
-                            <div class="space-y-1">
+                <div class="bg-white p-6 border border-gray-300 rounded-lg shadow-sm">
+                    <p class="font-bold text-black mb-6 text-center text-base">Complete the clinical diagram: select the CONDITION (1), ACTIONS (2), and PARAMETERS (2).</p>
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="bg-[#f8f8f8] border border-gray-300 p-4 rounded-lg">
+                            <h4 class="font-bold text-center border-b border-gray-300 pb-2 mb-3 text-sm bg-[#e0e0e0] -mx-4 px-4 py-1">Actions to Take</h4>
+                            <p class="text-xs text-gray-600 text-center mb-3">${sel.actions.length}/2 selected</p>
+                            <div class="space-y-2">
                                 ${q.bowtie_data.actions.map((opt, idx) => {
                                     const isSel = sel.actions.includes(idx);
-                                    return `<div onclick="toggleAnswer(${idx}, 'actions')" class="cursor-pointer text-sm p-2 border border-black rounded ${isSel ? 'bg-[#1A365D] text-white font-bold' : 'bg-white hover:bg-gray-100'}">${opt}</div>`;
+                                    return `<div onclick="toggleAnswer(${idx}, 'actions')" class="cursor-pointer text-sm p-3 border border-black rounded-lg ${isSel ? 'bg-[#1A365D] text-white font-bold' : 'bg-white hover:bg-gray-50'} transition-colors">${opt}</div>`;
                                 }).join('')}
                             </div>
                         </div>
-                        <div class="bg-white border-2 border-black p-2 shadow-inner rounded">
-                            <h4 class="font-bold text-center border-b border-black pb-1 mb-2 text-sm bg-[#e0e0e0] -mx-2 px-2">Potential Condition</h4>
-                            <p class="text-xs text-gray-600 text-center mb-2">${sel.condition.length}/1 selected</p>
-                            <div class="space-y-1">
+                        <div class="bg-[#f8f8f8] border-2 border-black p-4 rounded-lg shadow-inner">
+                            <h4 class="font-bold text-center border-b border-black pb-2 mb-3 text-sm bg-[#e0e0e0] -mx-4 px-4 py-1">Potential Condition</h4>
+                            <p class="text-xs text-gray-600 text-center mb-3">${sel.condition.length}/1 selected</p>
+                            <div class="space-y-2">
                                 ${q.bowtie_data.condition.map((opt, idx) => {
                                     const isSel = sel.condition.includes(idx);
-                                    return `<div onclick="toggleAnswer(${idx}, 'condition')" class="cursor-pointer text-sm p-2 border border-black rounded ${isSel ? 'bg-[#1A365D] text-white font-bold' : 'bg-white hover:bg-gray-100'}">${opt}</div>`;
+                                    return `<div onclick="toggleAnswer(${idx}, 'condition')" class="cursor-pointer text-sm p-3 border border-black rounded-lg ${isSel ? 'bg-[#1A365D] text-white font-bold' : 'bg-white hover:bg-gray-50'} transition-colors">${opt}</div>`;
                                 }).join('')}
                             </div>
                         </div>
-                        <div class="bg-white border border-gray-400 p-2 rounded">
-                            <h4 class="font-bold text-center border-b border-gray-400 pb-1 mb-2 text-sm bg-[#e0e0e0] -mx-2 px-2">Parameters to Monitor</h4>
-                            <p class="text-xs text-gray-600 text-center mb-2">${sel.parameters.length}/2 selected</p>
-                            <div class="space-y-1">
+                        <div class="bg-[#f8f8f8] border border-gray-300 p-4 rounded-lg">
+                            <h4 class="font-bold text-center border-b border-gray-300 pb-2 mb-3 text-sm bg-[#e0e0e0] -mx-4 px-4 py-1">Parameters to Monitor</h4>
+                            <p class="text-xs text-gray-600 text-center mb-3">${sel.parameters.length}/2 selected</p>
+                            <div class="space-y-2">
                                 ${q.bowtie_data.parameters.map((opt, idx) => {
                                     const isSel = sel.parameters.includes(idx);
-                                    return `<div onclick="toggleAnswer(${idx}, 'parameters')" class="cursor-pointer text-sm p-2 border border-black rounded ${isSel ? 'bg-[#1A365D] text-white font-bold' : 'bg-white hover:bg-gray-100'}">${opt}</div>`;
+                                    return `<div onclick="toggleAnswer(${idx}, 'parameters')" class="cursor-pointer text-sm p-3 border border-black rounded-lg ${isSel ? 'bg-[#1A365D] text-white font-bold' : 'bg-white hover:bg-gray-50'} transition-colors">${opt}</div>`;
                                 }).join('')}
                             </div>
                         </div>
@@ -1303,15 +1282,15 @@ ${jsonSchema}
                 canSubmit = sel.actions.length === 2 && sel.condition.length === 1 && sel.parameters.length === 2;
 
             } else if (q.type === 'matrix_mc') {
-                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-3 py-2">For each parameter below, select whether it is relevant to the clinical scenario.</p>`;
-                optionsHTML += `<div class="space-y-2">`;
+                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-4 py-3 rounded-r">For each parameter below, select whether it is relevant to the clinical scenario.</p>`;
+                optionsHTML += `<div class="space-y-3">`;
                 q.matrix_data.parameters.forEach((param, idx) => {
                     const isSelected = session.selectedAnswers.includes(idx);
                     optionsHTML += `
-                    <label onclick="toggleAnswer(${idx})" class="flex items-center gap-3 cursor-pointer p-3 rounded border ${isSelected ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-300 hover:bg-gray-50'}">
-                        <div class="w-5 h-5 border-2 border-black flex items-center justify-center bg-white flex-shrink-0">${isSelected ? '<div class="w-3 h-3 bg-black"></div>' : ''}</div>
-                        <span class="text-black text-sm font-normal">${param}</span>
-                        <span class="ml-auto text-xs font-bold ${isSelected ? 'text-blue-700' : 'text-gray-400'}">${isSelected ? 'RELEVANT' : 'Click to mark relevant'}</span>
+                    <label onclick="toggleAnswer(${idx})" class="flex items-center gap-4 cursor-pointer p-4 rounded-lg border-2 ${isSelected ? 'bg-blue-50 border-blue-400 shadow-sm' : 'bg-white border-gray-200 hover:bg-gray-50'} transition-colors">
+                        <div class="w-6 h-6 border-2 border-black flex items-center justify-center bg-white flex-shrink-0">${isSelected ? '<div class="w-4 h-4 bg-black"></div>' : ''}</div>
+                        <span class="text-black text-base font-normal flex-1">${param}</span>
+                        <span class="text-sm font-bold ${isSelected ? 'text-blue-700' : 'text-gray-400'}">${isSelected ? '✓ RELEVANT' : 'Click to mark relevant'}</span>
                     </label>`;
                 });
                 optionsHTML += `</div>`;
@@ -1319,15 +1298,15 @@ ${jsonSchema}
 
             } else if (q.type === 'drop_down') {
                 const numBlanks = q.dropdown_options.length;
-                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-3 py-2">Select the correct option for each dropdown.</p>`;
-                optionsHTML += `<div class="space-y-4">`;
+                optionsHTML += `<p class="font-bold text-black mb-6 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-4 py-3 rounded-r">Select the correct option for each dropdown.</p>`;
+                optionsHTML += `<div class="space-y-5 bg-white p-6 rounded-lg border border-gray-300 shadow-sm">`;
                 for (let i = 0; i < numBlanks; i++) {
                     const currentVal = session.selectedAnswers[i];
                     optionsHTML += `
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold text-gray-700 w-20">Blank ${i + 1}:</span>
-                        <select onchange="toggleAnswer(this.value); setDropdownBlank(${i})" class="flex-1 nclex-input-box px-3 py-2 text-sm">
-                            <option value="">-- Select --</option>
+                    <div class="flex items-center gap-4">
+                        <span class="text-base font-bold text-gray-700 w-24 flex-shrink-0">Blank ${i + 1}:</span>
+                        <select onchange="setDropdownBlank(${i}); toggleAnswer(parseInt(this.value));" class="flex-1 nclex-input-box px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#1A365D]">
+                            <option value="">-- Select an option --</option>
                             ${q.dropdown_options[i].map((opt, optIdx) => `
                                 <option value="${optIdx}" ${currentVal === optIdx ? 'selected' : ''}>${opt}</option>
                             `).join('')}
@@ -1338,17 +1317,17 @@ ${jsonSchema}
                 canSubmit = session.selectedAnswers.length >= numBlanks && session.selectedAnswers.slice(0, numBlanks).every(s => s !== null && s !== undefined);
 
             } else if (q.type === 'drag_drop') {
-                optionsHTML += `<p class="font-bold text-black mb-4 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-3 py-2">Prioritize the nursing actions. Use the arrows to reorder (top = highest priority).</p>`;
-                optionsHTML += `<div class="space-y-2">`;
+                optionsHTML += `<p class="font-bold text-black mb-6 text-sm bg-[#fff8dc] border-l-4 border-amber-400 px-4 py-3 rounded-r">Prioritize the nursing actions. Use the arrows to reorder (top = highest priority).</p>`;
+                optionsHTML += `<div class="space-y-3">`;
                 session.selectedAnswers.forEach((itemIdx, rank) => {
                     const item = q.drag_drop_items[itemIdx];
                     optionsHTML += `
-                    <div class="flex items-center gap-3 p-3 bg-white border border-gray-300 rounded">
-                        <span class="w-8 h-8 flex items-center justify-center bg-[#1A365D] text-white font-bold rounded-full text-sm">${rank + 1}</span>
-                        <span class="flex-1 text-sm font-normal text-black">${item}</span>
+                    <div class="flex items-center gap-4 p-4 bg-white border border-gray-300 rounded-lg shadow-sm">
+                        <span class="w-10 h-10 flex items-center justify-center bg-[#1A365D] text-white font-bold rounded-full text-base flex-shrink-0">${rank + 1}</span>
+                        <span class="flex-1 text-base font-normal text-black">${item}</span>
                         <div class="flex flex-col gap-1">
-                            <button onclick="moveDragItem(${rank}, -1)" class="text-xs px-2 py-0.5 bg-gray-200 hover:bg-gray-300 rounded font-bold" ${rank === 0 ? 'disabled' : ''}>▲</button>
-                            <button onclick="moveDragItem(${rank}, 1)" class="text-xs px-2 py-0.5 bg-gray-200 hover:bg-gray-300 rounded font-bold" ${rank === session.selectedAnswers.length - 1 ? 'disabled' : ''}>▼</button>
+                            <button onclick="moveDragItem(${rank}, -1)" class="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded font-bold transition-colors" ${rank === 0 ? 'disabled opacity-30' : ''}>▲</button>
+                            <button onclick="moveDragItem(${rank}, 1)" class="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded font-bold transition-colors" ${rank === session.selectedAnswers.length - 1 ? 'disabled opacity-30' : ''}>▼</button>
                         </div>
                     </div>`;
                 });
@@ -1361,10 +1340,10 @@ ${jsonSchema}
 
             if (canSubmit) {
                 nextBtn.disabled  = false;
-                nextBtn.className = "nclex-btn-blue px-12 py-2 font-bold text-base cursor-pointer";
+                nextBtn.className = "nclex-btn-blue px-12 py-3 font-bold text-base cursor-pointer transition-colors";
             } else {
                 nextBtn.disabled  = true;
-                nextBtn.className = "nclex-btn-disabled px-12 py-2 font-bold text-base cursor-not-allowed";
+                nextBtn.className = "nclex-btn-disabled px-12 py-3 font-bold text-base cursor-not-allowed transition-colors";
             }
         };
 
@@ -1480,7 +1459,7 @@ ${jsonSchema}
             else if (window.AppState.view === 'auth')  appDiv.innerHTML = renderAuth();
             else if (window.AppState.view === 'pending') appDiv.innerHTML = renderPending();
             else if (window.AppState.view === 'dashboard') appDiv.innerHTML = renderDashboard();
-            else if (window.AppState.view === 'exam')  { appDiv.innerHTML = getExamLayout(); window.renderExamOptions(); }
+            else if (window.AppState.view === 'exam')  appDiv.innerHTML = getExamLayout();
             else if (window.AppState.view === 'results') appDiv.innerHTML = renderResults();
             feather.replace();
         };
