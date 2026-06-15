@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatClex Engine</title>
+    <title>CatClex Engine — 2026 Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
@@ -616,7 +616,7 @@
             const finalPrompt = `
 You are an expert NCSBN 2026 Next Generation NCLEX (NGN) Item Writer.
 
-Target IRT Difficulty: ${targetDifficulty.toFixed(2)} (scale: -3.0 = very easy, 0.0 = passing threshold, +3.0 = very hard)
+Target IRT Difficulty: ${targetDifficulty.toFixed(2)} (scale: -3.0 = very easy, 0.0 = passing threshold, +3.0 = very hard, with 0.5 intervals between each number)
 NCLEX 2026 Client Needs Category: ${targetCategory}
 NCJMM Clinical Judgment Layer: ${ncjmmLayer}
 Clinical Specialty Context: ${randomSpecialty}
@@ -627,9 +627,9 @@ ${promptInstructions}
 Ensure the patient demographic and clinical scenario heavily reflect the assigned Clinical Specialty Context (${randomSpecialty}).
 
 HEALTH EQUITY MANDATE (2026 NCSBN Requirement):
-- Integrate modernized, unbiased, and equitable language throughout. Use "substance misuse" not "substance abuse". Use gender-affirming language where appropriate (e.g., "client who is transgender", "person who menstruates"). 
-- Where clinically relevant, weave in health equity considerations such as social determinants of health, implicit bias, cultural humility, or disparities in care access.
-- Represent diverse patient demographics (age, race, gender identity, socioeconomic status) naturally in scenarios without stereotyping.
+- Integrate modernized, unbiased, and equitable language throughout. Use "substance misuse" not "substance abuse". 
+- Where ONLY clinically relevant, weave in health equity considerations such as social determinants of health, implicit bias, cultural humility, or disparities in care access.
+- Represent diverse patient demographics (age, race, gender identity, socioeconomic status) naturally in scenarios IF INDICATED.
 
 CLINICAL QUALITY STANDARDS:
 - Test clinical judgment and safe decision-making using the NCJMM (Next-Generation Clinical Judgment Measurement Model), specifically targeting the "${ncjmmLayer}" layer.
