@@ -3,54 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Allied</title>
-    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <title>AlliedRNPrep - Nursing Exam Preparation</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WQKB2E7CLH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WQKB2E7CLH');
+    </script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Configure Tailwind to use the Inter font family */
         :root {
             font-family: 'Inter', sans-serif;
         }
 
-        /* --- Sophisticated Gradient & Mask Reveal Animation (5.5s) --- */
-        
-        /* Base background for the animation overlay */
+        /* --- LOADING SCREEN ANIMATION (FASTER) --- */
         #animation-overlay {
-            background-color: #1a202c; /* Darker than gray-900, almost black */
-            overflow: hidden; 
+            background-color: #0f172a;
+            overflow: hidden;
         }
 
-        /* Subtle ambient glow/grid effect */
         .ambient-effect {
             position: absolute;
-            inset: 0; 
-            background: 
-                radial-gradient(circle at center, rgba(30, 41, 59, 0.4) 0%, transparent 70%), 
-                repeating-linear-gradient(0deg, #2d3748 0, #2d3748 1px, transparent 1px, transparent 100%), 
-                repeating-linear-gradient(90deg, #2d3748 0, #2d3748 1px, transparent 1px, transparent 100%); 
-            background-size: 100% 100%, 10px 10px, 10px 10px; 
+            inset: 0;
+            background:
+                radial-gradient(circle at center, rgba(30, 41, 59, 0.4) 0%, transparent 70%),
+                repeating-linear-gradient(0deg, #1e293b 0, #1e293b 1px, transparent 1px, transparent 100%),
+                repeating-linear-gradient(90deg, #1e293b 0, #1e293b 1px, transparent 1px, transparent 100%);
+            background-size: 100% 100%, 10px 10px, 10px 10px;
             opacity: 0;
-            animation: ambientFadeIn 1s ease-out forwards; 
+            animation: ambientFadeIn 0.5s ease-out forwards;
         }
 
         @keyframes ambientFadeIn {
-            to { opacity: 0.1; } 
+            to { opacity: 0.15; }
         }
 
-        /* The 'Allied' text container */
         .allied-text-container {
-            position: relative; 
-            display: inline-block; 
-            font-size: 6rem; 
-            font-weight: 800; 
-            letter-spacing: 0.1em; 
-            color: transparent; 
-            background-clip: text; 
-            -webkit-background-clip: text; 
-            line-height: 1; 
+            position: relative;
+            display: inline-block;
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            line-height: 1;
             z-index: 10;
             opacity: 0;
             transform: scale(0.95);
-            animation: textEntrance 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards; 
+            animation: textEntrance 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
         }
 
         @keyframes textEntrance {
@@ -59,31 +69,30 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* The actual gradient that will move over the text */
         .allied-text-container::before {
-            content: attr(data-text); 
+            content: attr(data-text);
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, #00C6FF, #0072FF, #00C6FF); /* Vibrant blue gradient */
-            background-size: 200% auto; 
+            background: linear-gradient(90deg, #00C6FF, #0072FF, #00C6FF);
+            background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             z-index: 5;
-            animation: gradientShift 4s linear infinite, maskReveal 2s ease-out 1s forwards;
-            -webkit-mask-image: linear-gradient(90deg, transparent, white, transparent); 
+            animation: gradientShift 3s linear infinite, maskReveal 1.2s ease-out 0.3s forwards;
+            -webkit-mask-image: linear-gradient(90deg, transparent, white, transparent);
             mask-image: linear-gradient(90deg, transparent, white, transparent);
-            -webkit-mask-size: 0% 100%; 
+            -webkit-mask-size: 0% 100%;
             mask-size: 0% 100%;
-            -webkit-mask-position: -50% 0; 
+            -webkit-mask-position: -50% 0;
             mask-position: -50% 0;
-            font-size: inherit; 
+            font-size: inherit;
             font-weight: inherit;
             letter-spacing: inherit;
         }
 
         @keyframes gradientShift {
-            to { background-position: 200% center; } 
+            to { background-position: 200% center; }
         }
 
         @keyframes maskReveal {
@@ -92,198 +101,549 @@
             100% { -webkit-mask-size: 200% 100%; mask-size: 200% 100%; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
         }
 
-
-        /* The 'RN | EMS' tagline */
         .tagline-reveal {
             opacity: 0;
             transform: translateY(10px);
-            animation: fadeInSlide 0.5s ease-out 3.5s forwards; 
-            color: #94a3b8; /* Tailwind slate-400 */
+            animation: fadeInSlide 0.4s ease-out 1.8s forwards;
+            color: #94a3b8;
         }
 
         @keyframes fadeInSlide {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Utility classes for link styling */
-        .nav-link {
-            @apply text-slate-300 hover:text-sky-400 transition duration-200;
+        /* --- MAIN APP ANIMATIONS --- */
+        @keyframes fadeInFromBottom {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .prep-link {
-            @apply block p-6 rounded-xl shadow-lg transform hover:-translate-y-1 transition duration-300 ease-in-out border-b-4 text-center;
+        .animate-fade-in-up {
+            animation: fadeInFromBottom 0.8s ease-out forwards;
+            opacity: 0;
         }
-        .prep-link-rn {
-            @apply bg-blue-700 border-blue-900 hover:bg-blue-600 hover:border-blue-700 text-blue-100;
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-700 { animation-delay: 0.7s; }
+        .animation-delay-1000 { animation-delay: 1s; }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.15); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-        .prep-link-ems {
-            @apply bg-teal-600 border-teal-800 hover:bg-teal-500 hover:border-teal-600 text-teal-100;
+        .animate-blob {
+            animation: blob 12s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
         }
 
+        .password-input-container { position: relative; }
+        .password-toggle-icon {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        .password-toggle-icon:hover { color: #3b82f6; }
+
+        /* Professional card hover effect */
+        .module-card {
+            transition: all 0.3s ease;
+        }
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
+<body class="min-h-screen bg-slate-50 font-sans antialiased text-slate-800">
 
-    <!-- 
-        1. ANIMATION OVERLAY (Visible for 5.5 seconds) 
-    --><div id="animation-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center">
-        
-        <!-- Ambient digital grid effect --><div class="ambient-effect"></div>
-
-        <!-- The main 'Allied' text with gradient and mask reveal --><div class="allied-text-container" data-text="Allied">
+    <!-- 1. ANIMATION OVERLAY -->
+    <div id="animation-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center">
+        <div class="ambient-effect"></div>
+        <div class="allied-text-container" data-text="Allied">
             Allied
         </div>
-        
-        <!-- The 'RN | EMS' tagline --><div class="mt-6 text-2xl md:text-3xl font-light tagline-reveal tracking-wider">
-            RN | EMS
+        <div class="mt-6 text-xl md:text-2xl font-light tagline-reveal tracking-widest uppercase">
+            RN Prep
         </div>
     </div>
 
-    <!-- 
-        2. MAIN CONTENT (Hidden initially, revealed after 5.5 seconds) 
-    --><div id="main-content" class="opacity-0 transition-opacity duration-1000">
+    <!-- 2. AUTHENTICATION SECTION -->
+    <div id="auth-container" class="hidden flex-col items-center justify-center min-h-screen p-4 relative z-20 bg-gradient-to-br from-slate-100 to-blue-50">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg">
+                    <i class="fas fa-user-nurse text-2xl text-white"></i>
+                </div>
+                <h1 class="text-4xl font-extrabold text-slate-800">AlliedRNPrep</h1>
+                <p class="text-slate-500 mt-2 text-lg">Your secure nursing student portal.</p>
+            </div>
 
-        <!-- Header and Navigation -->
-        <header class="sticky top-0 z-40 bg-gray-800/90 backdrop-blur-sm shadow-xl border-b border-gray-700">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                <!-- Logo/Brand Name -->
-                <a href="#home" class="text-3xl font-bold tracking-wider text-sky-400">Allied</a>
-                
-                <!-- Navigation Links (Hidden on small screens for simplicity) -->
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#home" class="nav-link font-semibold">Home</a>
-                    <a href="#about" class="nav-link">About Us</a>
-                    <a href="#services" class="nav-link">Resources</a>
-                    <!-- External Links for Prep Portals -->
-                    <a href="/AlliedRNPrep/index.html" class="nav-link text-blue-400 hover:text-blue-300 font-bold">RN Prep</a>
-                    <a href="/AlliedEMSPrep/index.html" class="nav-link text-teal-400 hover:text-teal-300 font-bold">EMS Prep</a>
-                    <!-- Removed: Contact Link -->
+            <div class="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-slate-200 animate-fade-in-up">
+
+                <!-- Login/Signup Toggle -->
+                <div class="flex bg-slate-100 rounded-xl p-1 mb-8">
+                    <button id="show-login" class="w-1/2 py-3 px-4 rounded-lg text-center font-semibold transition-all duration-300 text-sm md:text-base">Login</button>
+                    <button id="show-signup" class="w-1/2 py-3 px-4 rounded-lg text-center font-semibold transition-all duration-300 text-sm md:text-base">Sign Up</button>
+                </div>
+
+                <!-- Auth Form -->
+                <form id="auth-form" class="space-y-5">
+                    <div>
+                        <label for="auth-email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                        <input type="email" id="auth-email" required class="block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-slate-400" placeholder="your.email@example.com">
+                    </div>
+
+                    <div class="password-input-container">
+                        <label for="auth-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" id="auth-password" required class="block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-slate-400" placeholder="••••••••">
+                        <i class="fas fa-eye password-toggle-icon" data-target="auth-password"></i>
+                    </div>
+
+                    <div id="confirm-password-group" class="hidden password-input-container">
+                        <label for="auth-confirm-password" class="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+                        <input type="password" id="auth-confirm-password" class="block w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 placeholder-slate-400" placeholder="••••••••">
+                        <i class="fas fa-eye password-toggle-icon" data-target="auth-confirm-password"></i>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center">
+                            <input id="remember-me-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                            <label for="remember-me-checkbox" class="ml-2 block text-slate-600 select-none">Remember me</label>
+                        </div>
+                        <a href="#" id="forgot-password-link" class="font-medium text-blue-600 hover:text-blue-700 transition">Forgot password?</a>
+                    </div>
+
+                    <div>
+                        <button type="submit" id="main-auth-button" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+                            Login
+                        </button>
+                    </div>
+                </form>
+
+                <p id="auth-message" class="mt-6 text-center text-sm font-medium min-h-[20px]"></p>
+            </div>
+
+            <p class="text-center text-slate-400 text-xs mt-6">&copy; <span id="auth-year"></span> AlliedRNPrep. All rights reserved.</p>
+        </div>
+    </div>
+
+    <!-- 3. MAIN APPLICATION CONTENT -->
+    <div id="app-content" class="hidden min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-white shadow-sm py-4 sticky top-0 z-40 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user-nurse text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-slate-800">AlliedRNPrep</span>
+                </div>
+                <nav class="hidden md:block">
+                    <ul class="flex items-center space-x-6">
+                        <li><a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition duration-200">Home</a></li>
+                        <li><a href="About.html" class="text-slate-600 hover:text-blue-600 font-medium transition duration-200">About</a></li>
+                        <li id="logout-button-container" class="hidden flex items-center space-x-4">
+                            <span id="welcome-user-name" class="text-slate-600 font-medium text-sm"></span>
+                            <button id="logout-button" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition duration-200 font-medium text-sm border border-slate-300">
+                                <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                            </button>
+                        </li>
+                    </ul>
                 </nav>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hero Section -->
+        <section class="relative bg-gradient-to-br from-slate-800 to-slate-900 text-white py-20 md:py-28 overflow-hidden">
+            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob"></div>
+            <div class="absolute bottom-[-10%] right-[5%] w-80 h-80 bg-cyan-400 rounded-full mix-blend-overlay filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
 
-            <!-- 1. Closure Alert Banner (NEW) -->
-            <section id="closure-alert" class="mt-8 mb-12 p-6 bg-amber-900/50 border-l-4 border-amber-400 rounded-xl shadow-2xl">
-                <div class="flex items-start space-x-4">
-                    <!-- Icon: Inline SVG Alert Icon -->
-                    <svg class="w-8 h-8 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.332 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-
-                    <div>
-                        <h2 class="text-2xl font-bold text-amber-200 mb-2">Important Announcement: Allied Prep Closure</h2>
-                        <p class="text-lg text-amber-100">
-                            We are writing to inform you that Allied Prep will be permanently closing its services and shutting down this website on <strong class="text-white">Wednesday, December 17, 2025</strong>.
-                        </p>
-                        <p class="text-md text-amber-100 mt-3">
-                            This was a difficult decision driven by affordability constraints. We are incredibly grateful for your support.
-                            Please ensure you <strong class="text-white underline">download any materials</strong> you wish to keep before this final closure date.
-                            Thank you for being part of the Allied Prep journey.
-                        </p>
-                    </div>
-                </div>
-            </section>
-            <!-- END Closure Alert Banner -->
-
-
-            <!-- 3. HOME / HERO Section -->
-            <section id="home" class="py-20 md:py-32 text-center min-h-[70vh]">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-white">
-                    Master Your <span class="text-sky-400">Healthcare Future</span>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <span class="inline-block py-2 px-4 rounded-full bg-blue-600/30 border border-blue-400/30 text-blue-200 text-sm font-medium mb-6 animate-fade-in-up">
+                    <i class="fas fa-graduation-cap mr-2"></i> Comprehensive Nursing Education
+                </span>
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6 animate-fade-in-up animation-delay-300">
+                    Master Your Nursing Career
                 </h1>
-                <p class="text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto">
-                    We provide the most rigorous, focused, and up-to-date prep materials to ensure success in both Nursing (RN) and Emergency Medical Services (EMS) certification exams. <strong>And the best part? It's all free.</strong>
+                <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-slate-300 font-light animate-fade-in-up animation-delay-500">
+                    Access structured study modules, practice exams, and comprehensive resources designed to help you succeed in your nursing education and certification exams.
                 </p>
 
-                <!-- Calls to Action -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    
-                    <a href="/AlliedRNPrep/index.html" class="prep-link prep-link-rn">
-                        <span class="text-3xl font-extrabold block mb-2 text-blue-100">RN Prep Portal</span>
-                        <span class="text-sm font-medium text-blue-200">
-                            Nursing Exams & Licensing Curriculum
-                        </span>
-                    </a>
+                <a href="#semesters-content" class="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg hover:bg-blue-700 transform hover:scale-105 transition duration-300 animate-fade-in-up animation-delay-700">
+                    Explore Modules <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </section>
 
-                    <a href="/AlliedEMSPrep/index.html" class="prep-link prep-link-ems">
-                        <span class="text-3xl font-extrabold block mb-2 text-teal-100">EMS Prep Portal</span>
-                        <span class="text-sm font-medium text-teal-200">
-                            Paramedic & EMT Certifications Roadmap
-                        </span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- 4. ABOUT Section (Updated for Founder's Mission) -->
-            <section id="about" class="py-16 border-t border-gray-700">
-                <h2 class="text-4xl font-bold mb-8 text-sky-400">About Allied</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-slate-300">
+        <!-- Stats Section -->
+        <section class="py-12 bg-white border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                     <div>
-                        <h3 class="text-2xl font-semibold mb-3">Our Mission: Free Education</h3>
-                        <p>Allied was created and is currently operated by a <strong>current nursing student</strong> who understands the financial burden of pursuing a career in healthcare. Our mission is built on the frustration of constantly paying for study guides and prep courses.</p>
-                        <p class="mt-4">We are committed to eliminating these financial barriers, providing <strong>100% free</strong>, high-quality study resources for both Nursing and EMS students, fostering a community of peer support and accessible education.</p>
+                        <div class="text-3xl font-bold text-blue-600">5</div>
+                        <div class="text-slate-500 text-sm mt-1">Study Modules</div>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-semibold mb-3">Why Choose Allied?</h3>
-                        <ul class="space-y-3 list-disc list-inside">
-                            <li><strong>Completely Free:</strong> All resources are provided at absolutely no cost, ensuring equity in education.</li>
-                            <li><strong>Peer-Created Content:</strong> Materials developed and personally curated by a student, for students, ensuring content is highly relevant to current academic needs.</li>
-                            <li><strong>No Expert Talk:</strong> The content is driven by focused, real-world study experience, not external claims of expertise.</li>
-                        </ul>
-                        <p class="text-sm mt-4 text-slate-500 italic">Disclaimer: Allied Prep resources are not affiliated with or endorsed by any certifying body or licensing board. Resources are provided for free as supplemental study tools only.</p>
+                        <div class="text-3xl font-bold text-blue-600">100%</div>
+                        <div class="text-slate-500 text-sm mt-1">Free Access</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-blue-600">24/7</div>
+                        <div class="text-slate-500 text-sm mt-1">Available</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-blue-600">NCLEX</div>
+                        <div class="text-slate-500 text-sm mt-1">Prep Included</div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- 5. SERVICES Overview (Updated to reflect "peer-created" resources and remove video) -->
-            <section id="services" class="py-16 border-t border-gray-700">
-                <h2 class="text-4xl font-bold mb-8 text-sky-400">Our Integrated Resources</h2>
-                <p class="text-xl text-slate-400 mb-6">We offer comprehensive study guides, simulated practice exams, and interactive tools, all personally curated and created to reflect the most current, high-stakes testing environments.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border-t-4 border-blue-500">
-                        <h3 class="text-xl font-bold mb-2">Simulated Exams</h3>
-                        <p class="text-slate-400">Experience practice test conditions with adaptive question banks and detailed performance feedback.</p>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border-t-4 border-teal-500">
-                        <h3 class="text-xl font-bold mb-2">Focused Study Modules</h3>
-                        <p class="text-slate-400">Target specific weaknesses with content modules created for both nursing and paramedic/EMT domains.</p>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border-t-4 border-sky-500">
-                        <h3 class="text-xl font-bold mb-2">Study Guides & Interactive Tools</h3>
-                        <p class="text-slate-400">Access comprehensive study guides and interactive tools created by the founder, covering key concepts.</p>
-                    </div>
+        <!-- Semesters Content Section -->
+        <section id="semesters-content" class="py-16 md:py-24 bg-slate-50 flex-grow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+                        Study Modules
+                    </h2>
+                    <p class="text-slate-500 max-w-2xl mx-auto">
+                        Comprehensive curriculum covering all aspects of nursing education, from fundamentals to advanced practice and certification preparation.
+                    </p>
                 </div>
-            </section>
 
-            <!-- Removed: CONTACT Section -->
-        </main>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Semester One -->
+                    <div class="module-card bg-white rounded-xl shadow-md border border-slate-200 p-6 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3">
+                                <i class="fas fa-graduation-cap text-xl"></i>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Semester One</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">Fundamental nursing concepts, health assessment techniques, and core pharmacology foundations.</p>
+                        <a href="SemesterOne.html" class="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                            Access Module
+                        </a>
+                    </div>
+
+                    <!-- Semester Two -->
+                    <div class="module-card bg-white rounded-xl shadow-md border border-slate-200 p-6 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3">
+                                <i class="fas fa-stethoscope text-xl"></i>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Semester Two</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">Medical-surgical nursing, pathophysiology, and patient-centered care approaches.</p>
+                        <a href="SemesterTwo.html" class="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                            Access Module
+                        </a>
+                    </div>
+
+                    <!-- Semester Three -->
+                    <div class="module-card bg-white rounded-xl shadow-md border border-slate-200 p-6 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3">
+                                <i class="fas fa-heartbeat text-xl"></i>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Semester Three</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">Advanced medical-surgical nursing, critical care concepts, and specialized populations.</p>
+                        <a href="SemesterThree.html" class="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                            Access Module
+                        </a>
+                    </div>
+
+                    <!-- Semester Four -->
+                    <div class="module-card bg-white rounded-xl shadow-md border border-slate-200 p-6 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-blue-100 text-blue-600 rounded-lg p-3">
+                                <i class="fas fa-user-tie text-xl"></i>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Semester Four</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">Leadership, management principles, and transition to professional nursing practice.</p>
+                        <a href="/practicum/" class="block w-full bg-blue-600 text-white text-center py-2.5 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                            Access Module
+                        </a>
+                    </div>
+
+                    <!-- NCLEX & HESI Prep -->
+                    <div class="module-card bg-white rounded-xl shadow-md border border-slate-200 p-6 flex flex-col md:col-span-2 lg:col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-amber-100 text-amber-600 rounded-lg p-3">
+                                <i class="fas fa-certificate text-xl"></i>
+                            </div>
+                            <span class="bg-amber-100 text-amber-700 text-xs font-medium px-2 py-1 rounded-full">Certification</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">NCLEX & HESI Prep</h3>
+                        <p class="text-slate-500 text-sm mb-6 flex-grow">Comprehensive review materials, practice questions, and exam strategies for NCLEX-RN and HESI certification exams.</p>
+                        <a href="https://www.google.com" target="_blank" class="block w-full bg-amber-500 text-white text-center py-2.5 rounded-lg font-medium hover:bg-amber-600 transition duration-200">
+                            Access Module <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
 
         <!-- Footer -->
-        <footer class="mt-16 bg-gray-800 py-8 text-center border-t border-gray-700">
-            <p class="text-slate-500 text-sm">&copy; 2025 Allied Prep. All rights reserved. | <a href="#home" class="hover:text-sky-400">Privacy Policy</a></p>
+        <footer class="bg-slate-800 text-slate-400 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-nurse text-white text-sm"></i>
+                        </div>
+                        <span class="text-white font-semibold">AlliedRNPrep</span>
+                    </div>
+                    <div class="flex items-center space-x-6 text-sm">
+                        <a href="/AlliedRNPrep/TOS.html" class="hover:text-white transition duration-200">Privacy Policy</a>
+                        <a href="/AlliedRNPrep/TOS.html" class="hover:text-white transition duration-200">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="border-t border-slate-700 mt-6 pt-6 text-center text-sm">
+                    <p>&copy; <span id="current-year"></span> AlliedRNPrep. All rights reserved.</p>
+                </div>
+            </div>
         </footer>
-
     </div>
 
-    <script>
-        // Duration remains 5.5 seconds (5500 ms)
-        const ANIMATION_DURATION_MS = 5500; 
+    <!-- Firebase SDK and Authentication Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged,
+            sendPasswordResetEmail,
+            setPersistence,
+            browserLocalPersistence,
+            browserSessionPersistence
+        } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const overlay = document.getElementById('animation-overlay');
-            const content = document.getElementById('main-content');
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj6SkqR0iNxNTRMA3x7qske9cmZ6pwpV8",
+            authDomain: "vsrep-92201.firebaseapp.com",
+            projectId: "vsrep-92201",
+            storageBucket: "vsrep-92201.appspot.com",
+            messagingSenderId: "833328760520",
+            appId: "1:833328760520:web:c25191e71a3ae31a55c7fd",
+            measurementId: "G-WQKB2E7CLH"
+        };
 
-            // Timer to trigger the website reveal
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // DOM Elements
+        const animationOverlay = document.getElementById('animation-overlay');
+        const authContainer = document.getElementById('auth-container');
+        const appContent = document.getElementById('app-content');
+        const authEmailInput = document.getElementById('auth-email');
+        const authPasswordInput = document.getElementById('auth-password');
+        const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
+        const mainAuthButton = document.getElementById('main-auth-button');
+        const logoutButton = document.getElementById('logout-button');
+        const logoutButtonContainer = document.getElementById('logout-button-container');
+        const authMessage = document.getElementById('auth-message');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const rememberMeCheckbox = document.getElementById('remember-me-checkbox');
+        const showLoginButton = document.getElementById('show-login');
+        const showSignupButton = document.getElementById('show-signup');
+        const confirmPasswordGroup = document.getElementById('confirm-password-group');
+        const welcomeUserName = document.getElementById('welcome-user-name');
+
+        const ANIMATION_DURATION_MS = 2500; // Reduced from 5500 to 2500
+        let isLoginMode = true;
+        let currentUser = null;
+
+        // --- Animation & Reveal Logic ---
+        function finishAnimation() {
+            animationOverlay.style.transition = 'opacity 0.5s ease-out';
+            animationOverlay.style.opacity = '0';
             setTimeout(() => {
-                overlay.style.opacity = '0'; // Start fading out the animation overlay
-                content.style.opacity = '1'; // Start fading in the main website content
-                
-                // Remove the overlay from the DOM after it has faded out completely
-                setTimeout(() => {
-                    overlay.remove();
-                }, 1000); 
-            }, ANIMATION_DURATION_MS);
+                animationOverlay.remove();
+                if (currentUser) {
+                    showApp(currentUser);
+                } else {
+                    showAuth();
+                }
+            }, 500);
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(finishAnimation, ANIMATION_DURATION_MS);
+        });
+
+        // --- UI Functions ---
+
+        function showAuth() {
+            authContainer.classList.remove('hidden');
+            authContainer.classList.add('flex');
+            appContent.classList.add('hidden');
+        }
+
+        function showApp(user) {
+            authContainer.classList.add('hidden');
+            authContainer.classList.remove('flex');
+            appContent.classList.remove('hidden');
+            logoutButtonContainer.classList.remove('hidden');
+
+            if (user && user.email) {
+                const username = user.email.split('@')[0];
+                welcomeUserName.textContent = `Welcome, ${username}`;
+            } else {
+                welcomeUserName.textContent = `Welcome`;
+            }
+        }
+
+        function setAuthMode(mode) {
+            isLoginMode = (mode === 'login');
+            if (isLoginMode) {
+                showLoginButton.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+                showLoginButton.classList.remove('bg-transparent', 'text-slate-600');
+                showSignupButton.classList.add('bg-transparent', 'text-slate-600');
+                showSignupButton.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+
+                mainAuthButton.textContent = 'Login';
+                confirmPasswordGroup.classList.add('hidden');
+                forgotPasswordLink.classList.remove('hidden');
+            } else {
+                showSignupButton.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+                showSignupButton.classList.remove('bg-transparent', 'text-slate-600');
+                showLoginButton.classList.add('bg-transparent', 'text-slate-600');
+                showLoginButton.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+
+                mainAuthButton.textContent = 'Create Account';
+                confirmPasswordGroup.classList.remove('hidden');
+                forgotPasswordLink.classList.add('hidden');
+            }
+            displayAuthMessage('');
+        }
+
+        function displayAuthMessage(message, isSuccess = false) {
+            authMessage.textContent = message;
+            authMessage.className = `mt-6 text-center text-sm font-medium min-h-[20px] ${isSuccess ? 'text-green-600' : 'text-red-600'}`;
+        }
+
+        // --- Firebase Auth State Listener ---
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (!document.getElementById('animation-overlay')) {
+                if (user) {
+                    showApp(user);
+                } else {
+                    showAuth();
+                }
+            }
+        });
+
+        // --- Auth Form Submit ---
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            const rememberMe = rememberMeCheckbox.checked;
+
+            try {
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                if (isLoginMode) {
+                    displayAuthMessage('Logging in...', true);
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const confirmPassword = authConfirmPasswordInput.value;
+                    if (password !== confirmPassword) {
+                        displayAuthMessage('Passwords do not match.', false);
+                        return;
+                    }
+                    if (password.length < 6) {
+                        displayAuthMessage('Password must be at least 6 characters.', false);
+                        return;
+                    }
+                    displayAuthMessage('Creating account...', true);
+                    await createUserWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                console.error("Authentication Error:", error);
+                let errorMessage = "An authentication error occurred.";
+                if (error.code === 'auth/wrong-password') {
+                    errorMessage = "Invalid password. Please try again.";
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = "No user found with that email.";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "This email is already registered.";
+                } else {
+                    errorMessage = error.message.replace('Firebase: ', '');
+                }
+                displayAuthMessage("Error: " + errorMessage, false);
+            }
+        });
+
+        // --- Logout ---
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        // --- Forgot Password ---
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = authEmailInput.value;
+            if (!email) {
+                displayAuthMessage('Enter email to reset password.', false);
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                displayAuthMessage(`Password reset link sent to ${email}`, true);
+            } catch (error) {
+                let errorMessage = error.message.replace('Firebase: ', '');
+                displayAuthMessage("Error: " + errorMessage, false);
+            }
+        });
+
+        // --- Toggle Login/Signup ---
+        showLoginButton.addEventListener('click', () => setAuthMode('login'));
+        showSignupButton.addEventListener('click', () => setAuthMode('signup'));
+
+        // --- Password Visibility Toggle ---
+        document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                const targetId = e.target.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    e.target.classList.remove('fa-eye');
+                    e.target.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    e.target.classList.remove('fa-eye-slash');
+                    e.target.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // --- Initialize ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setAuthMode('login');
+            const year = new Date().getFullYear();
+            document.getElementById('current-year').textContent = year;
+            document.getElementById('auth-year').textContent = year;
         });
     </script>
 </body>
