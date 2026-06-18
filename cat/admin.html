@@ -48,13 +48,11 @@
         .spinner { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
 
-        /* Toast Animation */
         .toast-enter { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .toast-exit { animation: slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -65,7 +63,6 @@
 
     <div id="app" class="flex-grow flex flex-col relative z-10"></div>
     
-    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
     <script type="module">
@@ -73,7 +70,6 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Same Firebase Config as main app
         const firebaseConfig = {
             apiKey: "AIzaSyA_kK3OVsj9AkIS3cDzEMeRXDvXlcRG9L8",
             authDomain: "catclex.firebaseapp.com",
@@ -87,12 +83,21 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // ============================================
+        // CONFIGURATION - Toggle features here
+        // ============================================
+        const CONFIG = {
+            ENABLE_ACCOUNT_VERIFICATION: false,  // Set to true to re-enable account verification
+            ENABLE_CREDIT_REQUESTS: true         // Credit request system
+        };
+
         window.AdminState = {
             view: 'loading',
             user: null,
             usersList: [],
+            creditRequests: [],
             engineConfig: { apikey: '', slugs: '' },
-            stats: { total: 0, pending: 0 }
+            stats: { total: 0, pending: 0, pendingCredits: 0 }
         };
 
         // --- TOAST NOTIFICATIONS ---
@@ -121,7 +126,6 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    // Secretly pull the allowed admin email from the server (or fallback to the hardcoded one)
                     const adminConfigSnap = await getDoc(doc(db, 'engine', 'adminConfig'));
                     let allowedEmail = 'cashton858@gmail.com'; 
                     
@@ -129,7 +133,6 @@
                         allowedEmail = adminConfigSnap.data().adminEmail;
                     }
 
-                    // Strict Gateway: If a normal student tries to access the admin portal, instantly boot them.
                     if (user.email !== allowedEmail) {
                         await signOut(auth);
                         window.AdminState.user = null;
@@ -165,13 +168,8 @@
             btn.disabled = true;
 
             try {
-                // Rely on Firebase to securely verify the password stored on the server
                 await signInWithEmailAndPassword(auth, email, pass);
-                
-                // Note: We don't show the success toast here yet, because the onAuthStateChanged 
-                // observer will catch the login and do the secret email check first.
             } catch (err) {
-                // Generic error so malicious users don't know if the email exists or not
                 window.showToast("Invalid credentials or unauthorized access.", "error");
                 btn.innerHTML = 'Access Portal';
                 btn.disabled = false;
@@ -189,10 +187,21 @@
                 const usersSnap = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
                 const users = [];
                 let pendingCount = 0;
+                let pendingCreditRequests = 0;
 
                 usersSnap.forEach(doc => {
                     const data = doc.data();
                     if(data.createdAt && data.createdAt.toDate) data.createdAt = data.createdAt.toDate();
+                    
+                    // Count pending credit requests
+                    if (data.requests && Array.isArray(data.requests)) {
+                        data.requests.forEach(req => {
+                            if (req.status === 'pending') {
+                                pendingCreditRequests++;
+                            }
+                        });
+                    }
+                    
                     users.push({ uid: doc.id, ...data });
                     if(data.verified === false) pendingCount++;
                 });
@@ -200,6 +209,7 @@
                 window.AdminState.usersList = users;
                 window.AdminState.stats.total = users.length;
                 window.AdminState.stats.pending = pendingCount;
+                window.AdminState.stats.pendingCredits = pendingCreditRequests;
 
                 // Fetch Engine Config
                 const apikeySnap = await getDoc(doc(db, 'engine', 'apikey'));
@@ -216,12 +226,18 @@
         }
 
         // --- ADMIN ACTIONS ---
+
+        // Account Verification (Disabled but can be re-enabled)
         window.toggleVerification = async (uid, currentStatus) => {
+            if (!CONFIG.ENABLE_ACCOUNT_VERIFICATION) {
+                window.showToast("Account verification is currently disabled.", "error");
+                return;
+            }
+            
             try {
                 const newStatus = !currentStatus;
                 await updateDoc(doc(db, 'users', uid), { verified: newStatus });
                 
-                // Update local state to immediately reflect changes without a full reload
                 const userIndex = window.AdminState.usersList.findIndex(u => u.uid === uid);
                 if(userIndex > -1) {
                     window.AdminState.usersList[userIndex].verified = newStatus;
@@ -235,6 +251,128 @@
             }
         };
 
+        // Credit Request Actions
+        window.approveCreditRequest = async (userId, requestId, amount) => {
+            try {
+                const userRef = doc(db, 'users', userId);
+                const userDoc = await getDoc(userRef);
+                
+                if (!userDoc.exists()) {
+                    window.showToast("User not found.", "error");
+                    return;
+                }
+
+                const userData = userDoc.data();
+                const requests = userData.requests || [];
+                
+                // Update the request status
+                const updatedRequests = requests.map(req => {
+                    if (req.id === requestId) {
+                        return { ...req, status: 'approved', updatedAt: new Date().toISOString() };
+                    }
+                    return req;
+                });
+
+                // Add credits to user's balance
+                const currentCredits = userData.credits || 0;
+                const newCredits = currentCredits + parseInt(amount);
+
+                // Update user document
+                await updateDoc(userRef, {
+                    credits: newCredits,
+                    requests: updatedRequests
+                });
+
+                // Update local state
+                const userIndex = window.AdminState.usersList.findIndex(u => u.uid === userId);
+                if (userIndex > -1) {
+                    window.AdminState.usersList[userIndex].credits = newCredits;
+                    window.AdminState.usersList[userIndex].requests = updatedRequests;
+                    window.AdminState.stats.pendingCredits--;
+                }
+
+                window.showToast(`Approved ${amount} credits for user!`);
+                window.renderApp();
+            } catch (err) {
+                console.error("Error approving credit request:", err);
+                window.showToast("Failed to approve credit request.", "error");
+            }
+        };
+
+        window.denyCreditRequest = async (userId, requestId) => {
+            try {
+                const userRef = doc(db, 'users', userId);
+                const userDoc = await getDoc(userRef);
+                
+                if (!userDoc.exists()) {
+                    window.showToast("User not found.", "error");
+                    return;
+                }
+
+                const userData = userDoc.data();
+                const requests = userData.requests || [];
+                
+                // Update the request status
+                const updatedRequests = requests.map(req => {
+                    if (req.id === requestId) {
+                        return { ...req, status: 'denied', updatedAt: new Date().toISOString() };
+                    }
+                    return req;
+                });
+
+                // Update user document
+                await updateDoc(userRef, {
+                    requests: updatedRequests
+                });
+
+                // Update local state
+                const userIndex = window.AdminState.usersList.findIndex(u => u.uid === userId);
+                if (userIndex > -1) {
+                    window.AdminState.usersList[userIndex].requests = updatedRequests;
+                    window.AdminState.stats.pendingCredits--;
+                }
+
+                window.showToast("Credit request denied.");
+                window.renderApp();
+            } catch (err) {
+                console.error("Error denying credit request:", err);
+                window.showToast("Failed to deny credit request.", "error");
+            }
+        };
+
+        // Manual Credit Adjustment
+        window.adjustCredits = async (userId, amount) => {
+            try {
+                const userRef = doc(db, 'users', userId);
+                const userDoc = await getDoc(userRef);
+                
+                if (!userDoc.exists()) {
+                    window.showToast("User not found.", "error");
+                    return;
+                }
+
+                const userData = userDoc.data();
+                const currentCredits = userData.credits || 0;
+                const newCredits = currentCredits + parseInt(amount);
+
+                await updateDoc(userRef, {
+                    credits: newCredits
+                });
+
+                // Update local state
+                const userIndex = window.AdminState.usersList.findIndex(u => u.uid === userId);
+                if (userIndex > -1) {
+                    window.AdminState.usersList[userIndex].credits = newCredits;
+                }
+
+                window.showToast(`Adjusted credits by ${amount > 0 ? '+' : ''}${amount} for user!`);
+                window.renderApp();
+            } catch (err) {
+                console.error("Error adjusting credits:", err);
+                window.showToast("Failed to adjust credits.", "error");
+            }
+        };
+
         window.saveEngineConfig = async () => {
             const btn = document.getElementById('save-config-btn');
             btn.innerHTML = '<i data-feather="loader" class="w-4 h-4 spinner"></i> Saving...';
@@ -243,7 +381,6 @@
             const newSlugs = document.getElementById('config-slugs').value;
 
             try {
-                // Save to Firestore using the exact paths your app expects
                 await setDoc(doc(db, 'engine', 'apikey'), { apikey: newKey, string: newKey });
                 await setDoc(doc(db, 'engine', 'slugs'), { slugs: newSlugs, string: newSlugs });
                 
@@ -275,7 +412,6 @@
             return `
             <div class="flex-grow flex items-center justify-center p-4 animate-fade-in">
                 <div class="glass-panel p-8 rounded-2xl w-full max-w-md relative overflow-hidden">
-                    <!-- Decorative glow -->
                     <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500 rounded-full mix-blend-screen filter blur-[60px] opacity-20"></div>
                     <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-[60px] opacity-20"></div>
                     
@@ -312,14 +448,29 @@
 
             // Generate User Table Rows
             const userRows = s.usersList.map(u => {
-                const isVerified = u.verified;
-                const statusBadge = isVerified 
-                    ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-feather="check-circle" class="w-3 h-3"></i> Approved</span>`
-                    : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-feather="clock" class="w-3 h-3"></i> Pending</span>`;
+                const credits = u.credits || 0;
+                const requests = u.requests || [];
+                const pendingRequests = requests.filter(r => r.status === 'pending').length;
                 
-                const actionBtn = isVerified
-                    ? `<button onclick="toggleVerification('${u.uid}', true)" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30 rounded-md text-xs font-medium transition-colors">Revoke Access</button>`
-                    : `<button onclick="toggleVerification('${u.uid}', false)" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_10px_rgba(99,102,241,0.3)] rounded-md text-xs font-medium transition-all">Approve User</button>`;
+                // Verification status (disabled but shown for reference)
+                const isVerified = u.verified;
+                let statusBadge;
+                if (CONFIG.ENABLE_ACCOUNT_VERIFICATION) {
+                    statusBadge = isVerified 
+                        ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i data-feather="check-circle" class="w-3 h-3"></i> Approved</span>`
+                        : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><i data-feather="clock" class="w-3 h-3"></i> Pending</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-500/10 text-slate-400 border border-slate-500/20"><i data-feather="minus-circle" class="w-3 h-3"></i> N/A</span>`;
+                }
+
+                // Action buttons
+                let actionButtons = '';
+                if (CONFIG.ENABLE_ACCOUNT_VERIFICATION) {
+                    const verifyBtn = isVerified
+                        ? `<button onclick="toggleVerification('${u.uid}', true)" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30 rounded-md text-xs font-medium transition-colors">Revoke</button>`
+                        : `<button onclick="toggleVerification('${u.uid}', false)" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_10px_rgba(99,102,241,0.3)] rounded-md text-xs font-medium transition-all">Approve</button>`;
+                    actionButtons += verifyBtn;
+                }
 
                 const dateStr = u.createdAt ? u.createdAt.toLocaleDateString() : 'Unknown';
 
@@ -330,121 +481,285 @@
                             <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center text-xs font-bold text-white shadow-inner">
                                 ${u.email.charAt(0).toUpperCase()}
                             </div>
-                            <span class="text-sm font-medium text-slate-200">${u.email}</span>
+                            <div>
+                                <span class="text-sm font-medium text-slate-200">${u.email}</span>
+                                ${pendingRequests > 0 ? `<span class="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-[10px] font-bold text-white">${pendingRequests}</span>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-1.5">
+                            <i data-feather="coins" class="w-4 h-4 text-amber-400"></i>
+                            <span class="text-sm font-medium text-amber-400">${credits}</span>
                         </div>
                     </td>
                     <td class="py-4 px-4 text-sm text-slate-400">${dateStr}</td>
                     <td class="py-4 px-4">${statusBadge}</td>
-                    <td class="py-4 px-4 text-right">${actionBtn}</td>
+                    <td class="py-4 px-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            ${actionButtons}
+                            <button onclick="openCreditModal('${u.uid}', '${u.email}', ${credits})" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 rounded-md text-xs font-medium transition-colors">
+                                <i data-feather="plus-circle" class="w-3 h-3 inline mr-1"></i>Credits
+                            </button>
+                        </div>
+                    </td>
                 </tr>`;
             }).join('');
+
+            // Generate Credit Requests Section
+            let creditRequestsHtml = '';
+            if (CONFIG.ENABLE_CREDIT_REQUESTS) {
+                const allPendingRequests = [];
+                s.usersList.forEach(user => {
+                    const requests = user.requests || [];
+                    requests.forEach(req => {
+                        if (req.status === 'pending') {
+                            allPendingRequests.push({
+                                ...req,
+                                userId: user.uid,
+                                userEmail: user.email
+                            });
+                        }
+                    });
+                });
+
+                if (allPendingRequests.length > 0) {
+                    const requestRows = allPendingRequests.map(req => {
+                        const dateStr = req.createdAt ? new Date(req.createdAt).toLocaleDateString() : 'Unknown';
+                        return `
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center text-[10px] font-bold text-white">
+                                        ${req.userEmail.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span class="text-sm text-slate-300">${req.userEmail}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-sm font-medium text-amber-400">+${req.amount} credits</span>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-slate-400 max-w-xs truncate" title="${req.reason}">${req.reason}</td>
+                            <td class="py-3 px-4 text-sm text-slate-500">${dateStr}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button onclick="approveCreditRequest('${req.userId}', '${req.id}', ${req.amount})" class="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 rounded-md text-xs font-medium transition-colors">
+                                        <i data-feather="check" class="w-3 h-3 inline mr-1"></i>Approve
+                                    </button>
+                                    <button onclick="denyCreditRequest('${req.userId}', '${req.id}')" class="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-md text-xs font-medium transition-colors">
+                                        <i data-feather="x" class="w-3 h-3 inline mr-1"></i>Deny
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('');
+
+                    creditRequestsHtml = `
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-amber-500/10">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-feather="bell" class="w-5 h-5 text-amber-400"></i>
+                                Pending Credit Requests
+                                <span class="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-amber-500 text-xs font-bold text-white">${allPendingRequests.length}</span>
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-900/50">
+                                    <tr>
+                                        <th class="py-2 px-4 text-xs font-semibold text-slate-400 uppercase">User</th>
+                                        <th class="py-2 px-4 text-xs font-semibold text-slate-400 uppercase">Amount</th>
+                                        <th class="py-2 px-4 text-xs font-semibold text-slate-400 uppercase">Reason</th>
+                                        <th class="py-2 px-4 text-xs font-semibold text-slate-400 uppercase">Date</th>
+                                        <th class="py-2 px-4 text-xs font-semibold text-slate-400 uppercase text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${requestRows}</tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                } else {
+                    creditRequestsHtml = `
+                    <div class="glass-panel rounded-2xl p-8 text-center">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i data-feather="check-circle" class="w-6 h-6 text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-white mb-1">All Caught Up!</h3>
+                        <p class="text-sm text-slate-400">No pending credit requests at this time.</p>
+                    </div>`;
+                }
+            }
 
             return `
             <!-- Top Navigation -->
             <nav class="glass-panel border-b-0 border-x-0 sticky top-0 z-40">
-                <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-500/20 p-2 rounded-lg border border-indigo-500/30">
-                            <i data-feather="activity" class="w-5 h-5 text-indigo-400"></i>
+                <div class="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <div class="bg-indigo-500/20 p-1.5 md:p-2 rounded-lg border border-indigo-500/30">
+                            <i data-feather="activity" class="w-4 h-4 md:w-5 md:h-5 text-indigo-400"></i>
                         </div>
-                        <span class="text-lg font-bold text-white tracking-wide">CatClex <span class="font-light text-slate-400">Nexus</span></span>
+                        <span class="text-base md:text-lg font-bold text-white tracking-wide">CatClex <span class="font-light text-slate-400">Nexus</span></span>
                     </div>
-                    <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors">
-                        <i data-feather="log-out" class="w-4 h-4"></i> Disconnect
+                    <button onclick="logout()" class="flex items-center gap-2 text-xs md:text-sm font-medium text-slate-400 hover:text-white transition-colors">
+                        <i data-feather="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Disconnect</span>
                     </button>
                 </div>
             </nav>
 
-            <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-8 animate-fade-in grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <main class="flex-grow max-w-7xl mx-auto w-full px-4 md:px-6 py-6 md:py-8 animate-fade-in space-y-6 md:space-y-8">
                 
-                <!-- Left Column: Stats & Users -->
-                <div class="lg:col-span-2 space-y-6">
-                    
-                    <!-- Stats Overview -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-feather="users" class="w-16 h-16"></i></div>
-                            <h3 class="text-sm font-medium text-slate-400 uppercase tracking-wider mb-2">Total Students</h3>
-                            <div class="text-4xl font-bold text-white">${s.stats.total}</div>
-                        </div>
-                        <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-feather="alert-circle" class="text-amber-500 w-16 h-16"></i></div>
-                            <h3 class="text-sm font-medium text-slate-400 uppercase tracking-wider mb-2">Pending Approvals</h3>
-                            <div class="text-4xl font-bold ${s.stats.pending > 0 ? 'text-amber-400' : 'text-emerald-400'}">${s.stats.pending}</div>
-                        </div>
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                    <div class="glass-panel p-4 md:p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-feather="users" class="w-12 h-12 md:w-16 md:h-16"></i></div>
+                        <h3 class="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wider mb-1 md:mb-2">Total Users</h3>
+                        <div class="text-2xl md:text-4xl font-bold text-white">${s.stats.total}</div>
                     </div>
-
-                    <!-- User Management Table -->
-                    <div class="glass-panel rounded-2xl overflow-hidden flex flex-col h-[500px]">
-                        <div class="px-6 py-5 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
-                            <h2 class="text-lg font-bold text-white flex items-center gap-2"><i data-feather="shield" class="w-5 h-5 text-indigo-400"></i> Access Management</h2>
-                        </div>
-                        <div class="flex-grow overflow-auto custom-scrollbar">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-slate-900/50 sticky top-0 z-10 backdrop-blur-md">
-                                    <tr>
-                                        <th class="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Candidate Email</th>
-                                        <th class="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Date Joined</th>
-                                        <th class="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                                        <th class="py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${userRows.length > 0 ? userRows : `<tr><td colspan="4" class="py-8 text-center text-slate-500 italic">No users found in database.</td></tr>`}
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="glass-panel p-4 md:p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-feather="coins" class="w-12 h-12 md:w-16 md:h-16 text-amber-500"></i></div>
+                        <h3 class="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wider mb-1 md:mb-2">Pending Credits</h3>
+                        <div class="text-2xl md:text-4xl font-bold ${s.stats.pendingCredits > 0 ? 'text-amber-400' : 'text-emerald-400'}">${s.stats.pendingCredits}</div>
                     </div>
-
+                    <div class="glass-panel p-4 md:p-6 rounded-2xl relative overflow-hidden group col-span-2 md:col-span-1">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-feather="settings" class="w-12 h-12 md:w-16 md:h-16 text-fuchsia-500"></i></div>
+                        <h3 class="text-xs md:text-sm font-medium text-slate-400 uppercase tracking-wider mb-1 md:mb-2">Engine Status</h3>
+                        <div class="text-2xl md:text-4xl font-bold text-emerald-400">Online</div>
+                    </div>
                 </div>
 
-                <!-- Right Column: System Config -->
-                <div class="space-y-6">
-                    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
-                        <div class="absolute -top-20 -right-20 w-40 h-40 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10"></div>
-                        
-                        <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2 border-b border-white/10 pb-4">
-                            <i data-feather="cpu" class="w-5 h-5 text-fuchsia-400"></i> Engine Architecture
-                        </h2>
-                        
-                        <div class="space-y-5">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">OpenRouter API Key</label>
-                                <div class="relative">
-                                    <i data-feather="key" class="absolute left-3 top-3 w-4 h-4 text-slate-500"></i>
-                                    <input type="password" id="config-apikey" value="${s.engineConfig.apikey}" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-mono">
-                                </div>
-                                <p class="text-[10px] text-slate-500 mt-1.5">Securely updates the global database configuration.</p>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">AI Model Fallback Chain</label>
-                                <div class="relative">
-                                    <i data-feather="server" class="absolute left-3 top-3 w-4 h-4 text-slate-500"></i>
-                                    <textarea id="config-slugs" rows="4" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-mono leading-relaxed resize-none">${s.engineConfig.slugs}</textarea>
-                                </div>
-                                <p class="text-[10px] text-slate-500 mt-1.5">Separate slugs with commas to dictate OpenRouter's auto-fallback priority.</p>
-                            </div>
+                ${creditRequestsHtml}
 
-                            <button id="save-config-btn" onclick="saveEngineConfig()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm mt-2">
-                                <i data-feather="save" class="w-4 h-4"></i> Save Configuration
-                            </button>
-                        </div>
+                <!-- User Management Table -->
+                <div class="glass-panel rounded-2xl overflow-hidden flex flex-col">
+                    <div class="px-4 md:px-6 py-4 md:py-5 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+                        <h2 class="text-base md:text-lg font-bold text-white flex items-center gap-2"><i data-feather="users" class="w-4 h-4 md:w-5 md:h-5 text-indigo-400"></i> User Management</h2>
                     </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-900/50 sticky top-0 z-10 backdrop-blur-md">
+                                <tr>
+                                    <th class="py-2 md:py-3 px-3 md:px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">User</th>
+                                    <th class="py-2 md:py-3 px-3 md:px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Credits</th>
+                                    <th class="py-2 md:py-3 px-3 md:px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Joined</th>
+                                    <th class="py-2 md:py-3 px-3 md:px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                                    <th class="py-2 md:py-3 px-3 md:px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${userRows.length > 0 ? userRows : `<tr><td colspan="5" class="py-8 text-center text-slate-500 italic">No users found in database.</td></tr>`}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Engine Config -->
+                <div class="glass-panel rounded-2xl p-4 md:p-6 relative overflow-hidden">
+                    <div class="absolute -top-20 -right-20 w-40 h-40 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10"></div>
                     
-                    <!-- Environment Info -->
-                    <div class="glass-panel rounded-xl p-4 flex items-start gap-3 border-l-4 border-l-indigo-500">
-                        <i data-feather="info" class="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5"></i>
+                    <h2 class="text-base md:text-lg font-bold text-white mb-4 md:mb-6 flex items-center gap-2 border-b border-white/10 pb-4">
+                        <i data-feather="cpu" class="w-4 h-4 md:w-5 md:h-5 text-fuchsia-400"></i> Engine Architecture
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div>
-                            <h4 class="text-sm font-semibold text-white">Live Production Data</h4>
-                            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Changes made here instantly affect the live CatClex student engine connected to the <span class="font-mono text-indigo-300">catclex</span> Firebase instance.</p>
+                            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">OpenRouter API Key</label>
+                            <div class="relative">
+                                <i data-feather="key" class="absolute left-3 top-3 w-4 h-4 text-slate-500"></i>
+                                <input type="password" id="config-apikey" value="${s.engineConfig.apikey}" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-mono">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">AI Model Fallback Chain</label>
+                            <div class="relative">
+                                <i data-feather="server" class="absolute left-3 top-3 w-4 h-4 text-slate-500"></i>
+                                <textarea id="config-slugs" rows="3" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-mono leading-relaxed resize-none">${s.engineConfig.slugs}</textarea>
+                            </div>
                         </div>
                     </div>
+
+                    <button id="save-config-btn" onclick="saveEngineConfig()" class="mt-4 md:mt-6 w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
+                        <i data-feather="save" class="w-4 h-4"></i> Save Configuration
+                    </button>
                 </div>
 
             </main>
             `;
         }
+
+        // --- CREDIT MODAL ---
+        window.openCreditModal = (userId, userEmail, currentCredits) => {
+            const modal = document.createElement('div');
+            modal.id = 'credit-modal';
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4';
+            modal.innerHTML = `
+                <div class="glass-panel rounded-2xl p-6 w-full max-w-md animate-fade-in">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-white">Adjust Credits</h3>
+                        <button onclick="closeCreditModal()" class="text-slate-400 hover:text-white transition">
+                            <i data-feather="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-slate-800/50 rounded-lg p-4 mb-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
+                                ${userEmail.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-white">${userEmail}</p>
+                                <p class="text-xs text-slate-400">Current: <span class="text-amber-400 font-medium">${currentCredits} credits</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Adjustment Amount</label>
+                            <input type="number" id="credit-adjustment" placeholder="e.g. 100 or -50" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all">
+                            <p class="text-xs text-slate-500 mt-1">Use positive numbers to add credits, negative to remove.</p>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="closeCreditModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition">
+                                Cancel
+                            </button>
+                            <button onclick="submitCreditAdjustment('${userId}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-medium py-2.5 rounded-lg transition">
+                                Apply Adjustment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            feather.replace();
+        };
+
+        window.closeCreditModal = () => {
+            const modal = document.getElementById('credit-modal');
+            if (modal) modal.remove();
+        };
+
+        window.submitCreditAdjustment = async (userId) => {
+            const input = document.getElementById('credit-adjustment');
+            const amount = parseInt(input.value);
+            
+            if (isNaN(amount) || amount === 0) {
+                window.showToast("Please enter a valid amount.", "error");
+                return;
+            }
+
+            await window.adjustCredits(userId, amount);
+            closeCreditModal();
+        };
+
+        // Close modal on outside click
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('credit-modal');
+            if (modal && e.target === modal) {
+                closeCreditModal();
+            }
+        });
 
         window.renderApp = () => {
             const appDiv = document.getElementById('app');
